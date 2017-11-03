@@ -18,10 +18,9 @@ services:
       WERKZEUG_DEBUG_PIN: 'off'
     volumes:
       - ./config/:/app/config/
-      - ./pip_cache/:/app/pip_cache/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
-      - ./dropins/:/app/dropins
+      - ./sf_dump/:/app/sf_dump/
     ports:
       - "8007:8007"
     depends_on:
