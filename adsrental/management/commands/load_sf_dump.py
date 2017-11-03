@@ -4,7 +4,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from adsrental.models import Lead, RaspberryPi, EC2Instance
+from adsrental.models import RaspberryPi, EC2Instance
 
 
 class Command(BaseCommand):
