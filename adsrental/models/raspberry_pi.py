@@ -16,7 +16,7 @@ class RaspberryPi(models.Model):
     date_shipped = models.DateField(db_column='Date_Shipped__c', null=True, blank=True)
     delivered_internal = models.BooleanField(db_column='Delivered__c', default=False)
     delivered_status = models.TextField(db_column='Delivery_Status__c', null=True, blank=True)
-    ec2_instance = models.ForeignKey('EC2Instance', null=True, blank=True)
+    ec2_instance = models.ForeignKey('adsrental.EC2Instance', null=True, blank=True)
 
     def __str__(self):
         return self.name
