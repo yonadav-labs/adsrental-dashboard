@@ -20,4 +20,5 @@ services:
       - ./v1/:/app/v1/
       - ./scripts/:/app/scripts/
     ports:
+      - "80:8007"
       - "8007:8007"
