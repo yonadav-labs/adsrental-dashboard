@@ -1,4 +1,4 @@
-# Trusted Access
+# Adsrental Dashboard
 
 ## Docker Setup
 
@@ -16,11 +16,6 @@ sudo usermod -aG docker $(whoami)
 logout # this is needed to be able to use docker as current user
 sudo curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 sudo chmod a+x /usr/local/bin/docker-compose
-
-pip install -U awscli --user
-export PATH=$PATH:~/.local/bin/
-echo "export PATH=$PATH:~/.local/bin/" >> ~/.bashrc
-aws --version
 ```
 
 ### Local development mode
@@ -39,14 +34,4 @@ docker-compose run web /app/scripts/image_push.sh
 
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
-```
-
-### Helpful scripts
-
-```bash
-# Update dev lambda
-docker-compose run web /app/scripts/update_dev.sh
-
-# Update production lambda
-docker-compose run web /app/scripts/update_prod.sh
 ```

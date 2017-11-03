@@ -3,15 +3,15 @@
     "model": "sites.site",
     "pk": 1,
     "fields": {
-      "name": "Trusted Access (Dev)",
-      "domain": "j1alm9mp2l.execute-api.us-west-2.amazonaws.com"
+      "name": "Adsrental Dashboard",
+      "domain": "165.227.74.143"
     }
   },
   {
     "model": "sites.site",
     "pk": 2,
     "fields": {
-      "name": "Trusted Access (Local)",
+      "name": "Adsrental Dashboard (Local)",
       "domain": "localhost:8007"
     }
   },
@@ -25,8 +25,8 @@
       "date_joined": "2017-05-23T14:31:19.347Z",
       "email": "admin@email.com",
       "username": "admin@email.com",
-      "first_name": "",
-      "last_name": "",
+      "first_name": "Vlad",
+      "last_name": "Emelianov",
       "is_active": true,
       "is_staff": true,
       "groups": [],
