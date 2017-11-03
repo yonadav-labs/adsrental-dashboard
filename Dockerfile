@@ -24,6 +24,7 @@ ADD ./cert /app/cert/
 ADD ./config/ /app/config/
 ADD ./scripts/ /app/scripts/
 ADD ./adsrental/ /app/adsrental/
+ADD ./sf_dump/ /app/sf_dump/
 
 EXPOSE 8007
 CMD ["/app/scripts/server.sh"]
