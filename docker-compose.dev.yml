@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: adsrental
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./dbdata1:/var/lib/mysql
+    ports:
+      - "13306:3306"
   web:
     build: .
     command: /app/scripts/server.sh
@@ -11,4 +20,4 @@ services:
       - ./v1/:/app/v1/
       - ./scripts/:/app/scripts/
     ports:
-      - "8006:8006"
+      - "8007:8007"
