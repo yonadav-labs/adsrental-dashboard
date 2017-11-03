@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: /app/scripts/server.sh
+    environment:
+      ENV: dev
+    volumes:
+      - ./config/:/app/config/
+      - ./v1/:/app/v1/
+      - ./scripts/:/app/scripts/
+    ports:
+      - "8006:8006"

@@ -1,0 +1,10 @@
+django==1.11.4
+django-cors-headers==2.1.0
+django-storages==1.6.3
+django-smtp-ssl==1.0
+flake8==3.4.1
+gunicorn==19.7.1
+MySQL-Python==1.2.5
+werkzeug==0.12.2
+boto==2.48.0
+whitenoise==4.0b4

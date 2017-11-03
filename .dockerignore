@@ -1,0 +1,7 @@
+dbdata1/
+.idea/
+.vscode/
+.git/
+venv
+**/*.pyc
+__pycache__

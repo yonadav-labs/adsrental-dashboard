@@ -1,0 +1,19 @@
+# Base
+*.sqlite3
+.DS_Store
+.idea
+__pycache__
+node_modules
+.vscode
+venv
+/static
+dbdata1
+/pip_cache/http
+/pip_cache/wheels
+
+**/*.pyc
+
+# Migrations
+# **/migrations/*
+# !**/migrations/__init__.py
+dropins

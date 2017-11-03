@@ -1,0 +1,38 @@
+[
+  {
+    "model": "sites.site",
+    "pk": 1,
+    "fields": {
+      "name": "Trusted Access (Dev)",
+      "domain": "j1alm9mp2l.execute-api.us-west-2.amazonaws.com"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 2,
+    "fields": {
+      "name": "Trusted Access (Local)",
+      "domain": "localhost:8007"
+    }
+  },
+  {
+    "model": "adsrental.user",
+    "pk": "044f6628-9beb-49eb-b902-19b6e44702cb",
+    "fields": {
+      "password": "pbkdf2_sha256$36000$V1vIx86gEk1s$GnTUmuWTdxG/xZre62EDgCiRhUN+kawzjjXqmSIv27Q=",
+      "last_login": "2017-05-23T14:31:38.340Z",
+      "is_superuser": true,
+      "date_joined": "2017-05-23T14:31:19.347Z",
+      "email": "admin@email.com",
+      "username": "admin@email.com",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_staff": true,
+      "groups": [],
+      "user_permissions": [],
+      "created": "2017-07-18T03:27:38.177694Z",
+      "updated": "2017-07-18T03:27:38.177694Z"
+    }
+  }
+]

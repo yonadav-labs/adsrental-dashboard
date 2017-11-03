@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: adsrental
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./dbdata1:/var/lib/mysql
+    # ports:
+    #   - "13306:3306"
+  web:
+    build: .
+    command: /app/scripts/runserver.sh
+    environment:
+      ENV: local
+      WERKZEUG_DEBUG_PIN: 'off'
+    volumes:
+      - ./config/:/app/config/
+      - ./pip_cache/:/app/pip_cache/
+      - ./adsrental/:/app/adsrental/
+      - ./scripts/:/app/scripts/
+      - ./dropins/:/app/dropins
+    ports:
+      - "8007:8007"
+    depends_on:
+      - db
+    links:
+      - db:db
