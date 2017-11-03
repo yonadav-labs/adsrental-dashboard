@@ -19,6 +19,6 @@ python manage.py loaddata adsrental/fixtures/fixtures.json
 echo Starting Gunicorn.
 exec gunicorn config.wsgi:application \
     --bind 0.0.0.0:8007 \
-    --workers 3
+    --workers 2
    --timeout 300
 
