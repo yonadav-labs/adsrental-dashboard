@@ -4,7 +4,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from adsrental.models import Lead, RaspberryPi
+from adsrental.models import Lead, RaspberryPi, EC2Instance
 
 
 class Command(BaseCommand):
@@ -12,6 +12,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('dir')
+        parser.add_argument('load', nargs='+', choices=['ec2', 'extension', 'lead', 'rpi'], default=[])
 
     def handle(self, *args, **options):
         dump_dir = os.path.join(settings.BASE_DIR, 'sf_dump', options['dir'])
@@ -19,31 +20,33 @@ class Command(BaseCommand):
         if not os.path.exists(dump_dir):
             raise CommandError('Dump does not exist')
 
-        print 'Reading lead.csv'
-        with open(os.path.join(dump_dir, 'lead.csv'), 'rb') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                print row
-                break
+        if 'ec2' in options['load']:
+            print 'Reading ec2.csv'
+            with open(os.path.join(dump_dir, 'ec2.csv'), 'rb') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    print 'Importing EC2Instance {}'.format(row['NAME'])
+                    EC2Instance.upsert_from_sf(row)
 
-        print 'Reading ec2.csv'
-        with open(os.path.join(dump_dir, 'ec2.csv'), 'rb') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                print row
-                break
+        if 'rpi' in options['load']:
+            print 'Reading rpi.csv'
+            with open(os.path.join(dump_dir, 'rpi.csv'), 'rb') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    print 'Importing RaspberryPI {}'.format(row['NAME'])
+                    RaspberryPi.upsert_from_sf(row)
 
-        print 'Reading extension.csv'
-        with open(os.path.join(dump_dir, 'extension.csv'), 'rb') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                print row
-                break
+        if 'lead' in options['load']:
+            print 'Reading lead.csv'
+            with open(os.path.join(dump_dir, 'lead.csv'), 'rb') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    print row
+                    break
 
-        print 'Reading rpi.csv'
-        with open(os.path.join(dump_dir, 'rpi.csv'), 'rb') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                print row
-                break
-
+        # print 'Reading extension.csv'
+        # with open(os.path.join(dump_dir, 'extension.csv'), 'rb') as csvfile:
+        #     reader = csv.DictReader(csvfile)
+        #     for row in reader:
+        #         print row
+        #         break

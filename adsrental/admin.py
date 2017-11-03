@@ -24,13 +24,13 @@ class LeadAdmin(admin.ModelAdmin):
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('name', 'ec2_instance', )
+    list_display = ('name', 'ec2_instance', 'version', 'is_deleted', )
     search_fields = ['name', 'ec2_instance__hostname', ]
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = EC2Instance
-    list_display = ('name', 'hostname', )
+    list_display = ('name', 'hostname', 'is_deleted', )
     search_fields = ['name', 'hostname', ]
 
 
