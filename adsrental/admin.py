@@ -21,8 +21,11 @@ class LeadAdmin(admin.ModelAdmin):
     list_select_related = (
         'raspberry_pi',
     )
-    list_display = ('name', 'account_name', 'email', 'phone', 'address', 'raspberry_pi', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', )
+    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'raspberry_pi', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', )
     search_fields = ['name', 'email', ]
+
+    def full_address(self, obj):
+        return '{}, {}, {}, {}, {}'.format(obj.street, obj.city, obj.state, obj.postal_code, obj.country)
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
