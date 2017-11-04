@@ -18,8 +18,11 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('name', 'title', )
-    search_fields = ['name', 'title', ]
+    list_select_related = (
+        'raspberry_pi',
+    )
+    list_display = ('name', 'account_name', 'email', 'phone', 'address', 'raspberry_pi', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', )
+    search_fields = ['name', 'email', ]
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
