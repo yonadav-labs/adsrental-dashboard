@@ -36,8 +36,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = EC2Instance
-    list_display = ('name', 'hostname', 'is_deleted', )
-    search_fields = ['name', 'hostname', ]
+    list_display = ('name', 'hostname', 'instance_id', 'is_deleted', )
+    search_fields = ['name', 'hostname', 'instance_id', ]
 
 
 class BrowserExtensionAdmin(admin.ModelAdmin):

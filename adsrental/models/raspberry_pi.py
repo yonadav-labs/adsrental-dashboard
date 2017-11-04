@@ -42,7 +42,7 @@ class RaspberryPi(models.Model):
                 date_shipped=data['DATE_SHIPPED__C'] or None,
                 delivered_internal=data['DELIVERED_INTERNAL__C'] == 'true',
                 delivery_status=data['DELIVERY_STATUS__C'],
-                ec2_instance=EC2Instance.objects.filter(salesforce_id=data['EC2_INSTANCE_ID__C']).first(),
+                ec2_instance=EC2Instance.objects.filter(name=data['NAME']).first(),
                 is_deleted=data['ISDELETED'] == 'true',
             ),
         )
