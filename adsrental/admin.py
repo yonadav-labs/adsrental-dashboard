@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import User, Lead, RaspberryPi, EC2Instance
+from .models import User, Lead, RaspberryPi, EC2Instance, BrowserExtension
 
 
 class CustomUserAdmin(UserAdmin):
@@ -34,7 +34,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     search_fields = ['name', 'hostname', ]
 
 
+class BrowserExtensionAdmin(admin.ModelAdmin):
+    model = EC2Instance
+    list_display = ('name', 'fb_email', 'version', 'ip_address', 'status', 'created_date', )
+    search_fields = ['name', ]
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
 admin.site.register(EC2Instance, EC2InstanceAdmin)
+admin.site.register(BrowserExtension, BrowserExtensionAdmin)

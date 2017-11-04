@@ -26,7 +26,7 @@ class EC2Instance(models.Model):
                 hostname=data['HOSTNAME__C'],
                 instance_id=data['INSTANCE_ID__C'],
                 owner_id=data['OWNERID'],
-                created_date=data['CREATEDDATE'],
+                created_date=data['CREATEDDATE'] or None,
                 is_deleted=data['ISDELETED'] == 'true',
             ),
         )

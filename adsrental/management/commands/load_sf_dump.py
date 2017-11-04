@@ -4,7 +4,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from adsrental.models import RaspberryPi, EC2Instance
+from adsrental.models import RaspberryPi, EC2Instance, Lead, BrowserExtension
 
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('dir')
-        parser.add_argument('load', nargs='+', choices=['ec2', 'extension', 'lead', 'rpi'], default=[])
+        parser.add_argument('load', nargs='+', choices=['ec2', 'ext', 'lead', 'rpi'], default=[])
 
     def handle(self, *args, **options):
         dump_dir = os.path.join(settings.BASE_DIR, 'sf_dump', options['dir'])
@@ -41,12 +41,13 @@ class Command(BaseCommand):
             with open(os.path.join(dump_dir, 'lead.csv'), 'rb') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    print row
-                    break
+                    print 'Importing Lead {}'.format(row['NAME'])
+                    Lead.upsert_from_sf(row)
 
-        # print 'Reading extension.csv'
-        # with open(os.path.join(dump_dir, 'extension.csv'), 'rb') as csvfile:
-        #     reader = csv.DictReader(csvfile)
-        #     for row in reader:
-        #         print row
-        #         break
+        if 'ext' in options['load']:
+            print 'Reading extension.csv'
+            with open(os.path.join(dump_dir, 'extension.csv'), 'rb') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    print 'Importing BrowserExtension {}'.format(row['NAME'])
+                    BrowserExtension.upsert_from_sf(row)
