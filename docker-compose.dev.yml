@@ -15,10 +15,6 @@ services:
     command: /app/scripts/server.sh
     environment:
       ENV: dev
-    volumes:
-      - ./config/:/app/config/
-      - ./v1/:/app/v1/
-      - ./scripts/:/app/scripts/
     ports:
       - "80:8007"
       - "8007:8007"
