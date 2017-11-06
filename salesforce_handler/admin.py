@@ -1,0 +1,5 @@
+from salesforce.testrunner.example.universal_admin import register_omitted_classes
+
+import salesforce_handler.models
+
+register_omitted_classes(salesforce_handler.models)

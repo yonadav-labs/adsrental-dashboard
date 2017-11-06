@@ -13,6 +13,7 @@ ADD ./manage.py /app/
 ADD ./cert /app/cert/
 ADD ./config/ /app/config/
 ADD ./scripts/ /app/scripts/
+ADD ./salesforce_handler/ /app/salesforce_handler/
 ADD ./adsrental/ /app/adsrental/
 ADD ./sf_dump/ /app/sf_dump/
 
