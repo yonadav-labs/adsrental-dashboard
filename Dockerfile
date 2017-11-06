@@ -17,7 +17,7 @@ RUN bash -c 'source venv/bin/activate && pip install MySQL-Python==1.2.5'
 RUN bash -c 'source venv/bin/activate && pip install werkzeug==0.12.2'
 RUN bash -c 'source venv/bin/activate && pip install boto==2.48.0'
 RUN bash -c 'source venv/bin/activate && pip install whitenoise==4.0b4'
-
+RUN bash -c 'source venv/bin/activate && pip install gevent==1.2.2'
 
 ADD ./manage.py /app/
 ADD ./cert /app/cert/

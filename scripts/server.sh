@@ -18,7 +18,8 @@ python manage.py loaddata adsrental/fixtures/fixtures.json
 # Start Gunicorn processes
 echo Starting Gunicorn.
 exec gunicorn config.wsgi:application \
+    --worker-class gevent \
     --bind 0.0.0.0:8007 \
-    --workers 3
+    --workers 3 \
     --timeout 300
 
