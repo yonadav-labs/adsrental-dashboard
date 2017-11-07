@@ -20,5 +20,4 @@ while true; do
   echo "Re-starting Django runserver"
   python manage.py runserver_plus 0.0.0.0:8007
   sleep 5
-  exit
 done
