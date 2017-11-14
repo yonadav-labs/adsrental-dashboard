@@ -34,7 +34,7 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi.tunnel_online if obj.raspberry_pi else False
 
     def last_seen(self, obj):
-        return obj.raspberry_pi.last_seen if obj.raspberry_pi else False
+        return obj.raspberry_pi.last_seen if obj.raspberry_pi else None
 
     online.boolean = True
     tunnel_online.boolean = True
@@ -42,7 +42,7 @@ class LeadAdmin(admin.ModelAdmin):
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('name', 'version', 'links', 'is_deleted', )
+    list_display = ('name', 'version', 'links', 'is_deleted', 'last_seen', )
     search_fields = ['name', 'ec2_instance__hostname', ]
     # list_filter = ['online', ]
 
