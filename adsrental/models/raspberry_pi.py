@@ -1,101 +1,58 @@
 from django.db import models
 
-from adsrental.models.ec2_instance import EC2Instance
-
 
 class RaspberryPi(models.Model):
-    class Meta:
-        verbose_name = 'Raspberry PI'
-        verbose_name_plural = 'Raspberry PIs'
+    # owner = models.ForeignKey(Group)  # Reference to tables [Group, User]
+    is_deleted = models.BooleanField(verbose_name='Deleted', default=False)
+    name = models.CharField(max_length=80, verbose_name='Raspberry Pi ID')
+    created_date = models.DateTimeField()
+    # created_by = models.ForeignKey('User', related_name='raspberrypi_createdby_set')
+    last_modified_date = models.DateTimeField()
+    # last_modified_by = models.ForeignKey('User', related_name='raspberrypi_lastmodifiedby_set')
+    system_modstamp = models.DateTimeField()
+    last_viewed_date = models.DateTimeField(blank=True, null=True)
+    last_referenced_date = models.DateTimeField(blank=True, null=True)
+    # connection_received = models.ForeignKey(PartnerNetworkConnection, related_name='raspberrypi_connectionreceived_set', blank=True, null=True)
+    # connection_sent = models.ForeignKey(PartnerNetworkConnection, related_name='raspberrypi_connectionsent_set', blank=True, null=True)
+    version = models.CharField(max_length=255, help_text='DO NOT EDIT', blank=True, null=True)
+    tracking_number = models.CharField(db_column='Tracking_Number__c', max_length=255, verbose_name='Tracking Number', blank=True, null=True)
+    date_shipped = models.DateField(db_column='Date_Shipped__c', verbose_name='Date Shipped', blank=True, null=True)
+    delivery_status = models.TextField(db_column='Delivery_Status__c', verbose_name='Delivery Status', blank=True, null=True)
+    last_seen = models.DateTimeField(db_column='Last_Seen__c', verbose_name='Last Seen', blank=True, null=True)
+    linked_lead = models.ForeignKey('adsrental.Lead', db_column='Linked_Lead__c', related_name='raspberrypi_linkedlead_set', blank=True, null=True)
+    status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Address Error', 'Address Error'), ('Provisioned', 'Provisioned'), ('Shipped', 'Shipped'), ('Online', 'Online'), ('Offline', 'Offline'), ('Initializing', 'Initializing'), ('Error', 'Error'), ('Banned', 'Banned'), ('Delivered', 'Delivered'), ('Cancelled', 'Cancelled'), ('Testing', 'Testing')], blank=True, null=True)
+    # ec2_instance_id = models.CharField(db_column='EC2_Instance_ID__c', max_length=255, verbose_name='EC2 Instance ID', help_text='DO NOT EDIT!', blank=True, null=True)
+    farmbot_active = models.BooleanField(db_column='Farmbot_Active__c', verbose_name='Farmbot Active', help_text='DO NOT EDIT!')
+    ignore_city_check = models.BooleanField(db_column='Ignore_City_Check__c', verbose_name='Ignore City Check', help_text='BE CAREFUL USING THIS. REQUIRES REVGO VALIDATION.')
+    current_ip_address = models.CharField(db_column='Current_IP_Address__c', max_length=255, verbose_name='Current IP Address', blank=True, null=True)
+    current_isp = models.CharField(db_column='Current_ISP__c', max_length=255, verbose_name='Current ISP', blank=True, null=True)
+    current_city = models.CharField(db_column='Current_City__c', max_length=255, verbose_name='Current City', blank=True, null=True)
+    current_state_region = models.CharField(db_column='Current_State_Region__c', max_length=255, verbose_name='Current State/Region', blank=True, null=True)
+    current_country = models.CharField(db_column='Current_Country__c', max_length=255, verbose_name='Current Country', blank=True, null=True)
+    status_message = models.TextField(db_column='Status_Message__c', verbose_name='Status Message', blank=True, null=True)
+    rev_go_shipment_id = models.CharField(db_column='RevGo_Shipment_ID__c', max_length=255, verbose_name='RevGo Shipment ID', blank=True, null=True)
+    rev_go_feedback = models.CharField(db_column='RevGo_Feedback__c', max_length=255, verbose_name='RevGo Feedback', blank=True, null=True)
+    first_seen = models.DateTimeField(db_column='First_Seen__c', verbose_name='First Seen', blank=True, null=True)
+    ignore_location_check = models.BooleanField(db_column='Ignore_Location_Check__c', verbose_name='Ignore Location Check', help_text='NEVER USE WITHOUT SUPREME APPROVAL!!!!!!')
+    comment = models.TextField(blank=True, null=True)
+    ec2_instance = models.ForeignKey('adsrental.Ec2Instance', db_column='EC2_Instance__c', blank=True, null=True)
+    online = models.BooleanField()
+    tunnel_last_tested = models.DateTimeField(db_column='Tunnel_Last_Tested__c', verbose_name='Tunnel Last Tested', blank=True, null=True)
+    tunnel_online = models.BooleanField(db_column='Tunnel_Online__c', verbose_name='Tunnel Online')
+    usps_tracking_code = models.CharField(db_column='USPS_Tracking_Code__c', max_length=255, verbose_name='USPS Tracking Code', blank=True, null=True)
+    logfile_url = models.CharField(db_column='Logfile_Url__c', max_length=1300, verbose_name='Logfile Url', blank=True, null=True)
+    rdp = models.CharField(db_column='RDP__c', max_length=1300, verbose_name='RDP', blank=True, null=True)
+    location_match = models.BooleanField(db_column='Location_Match__c', verbose_name='Location Match')
+    tested_internal = models.BooleanField(db_column='Tested_Internal__c', verbose_name='Tested Internal')
+    usps_feedback = models.TextField(db_column='USPS_Feedback__c', verbose_name='USPS Feedback', blank=True, null=True)
+    tested = models.BooleanField()
+    config_file_download = models.CharField(db_column='Config_File_Download__c', max_length=1300, verbose_name='Config File Download', blank=True, null=True)
+    rp_status = models.CharField(db_column='RP_Status__c', max_length=255, verbose_name='RP Status', choices=[('Offline', 'Offline'), ('Online', 'Online')], blank=True, null=True)
+    delivered_internal = models.BooleanField(db_column='Delivered_Internal__c', verbose_name='Delivered Internal')
+    delivered = models.BooleanField()
 
-    salesforce_id = models.CharField(max_length=255, db_index=True, null=True)
-    name = models.CharField(max_length=255, db_column='Name', db_index=True)
-    comment = models.TextField(db_column='Comment__c', null=True, blank=True)
-    version = models.TextField(null=True, blank=True)
-    config_file_download = models.TextField(db_column='Config_File_Download__c', null=True, blank=True)
-    current_city = models.CharField(max_length=255, db_column='Current_City__c', null=True, blank=True)
-    current_ip_address = models.CharField(max_length=255, db_column='Current_IP_Address__c', null=True, blank=True)
-    current_isp = models.CharField(max_length=255, db_column='Current_ISP__c', null=True, blank=True)
-    current_state_region = models.CharField(max_length=255, db_column='Current_State_Region__c', null=True, blank=True)
-    date_shipped = models.DateField(db_column='Date_Shipped__c', null=True, blank=True)
-    delivered_internal = models.BooleanField(db_column='Delivered__c', default=False)
-    delivery_status = models.TextField(db_column='Delivery_Status__c', null=True, blank=True)
-    ec2_instance = models.ForeignKey(EC2Instance, null=True, blank=True)
-    is_deleted = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-    @classmethod
-    def upsert_from_sf(cls, data):
-        item, created = cls.objects.update_or_create(
-            salesforce_id=data['ID'],
-            defaults=dict(
-                name=data['NAME'],
-                comment=data['COMMENT__C'],
-                version=data['VERSION__C'],
-                config_file_download=data['CONFIG_FILE_DOWNLOAD__C'],
-                current_city=data['CURRENT_CITY__C'],
-                current_ip_address=data['CURRENT_IP_ADDRESS__C'],
-                current_isp=data['CURRENT_ISP__C'],
-                current_state_region=data['CURRENT_STATE_REGION__C'],
-                date_shipped=data['DATE_SHIPPED__C'] or None,
-                delivered_internal=data['DELIVERED_INTERNAL__C'] == 'true',
-                delivery_status=data['DELIVERY_STATUS__C'],
-                ec2_instance=EC2Instance.objects.filter(name=data['NAME']).first(),
-                is_deleted=data['ISDELETED'] == 'true',
-            ),
-        )
-        item.save()
-
-# {
-#     'REVGO_FEEDBACK__C': '',
-#     'LASTMODIFIEDDATE': '2017-09-06T02:52:00.000Z',
-#     'CURRENT_STATE_REGION__C': 'Texas (TX)',
-#     'LASTMODIFIEDBYID': '00546000000rlLVAAY',
-#     'CURRENT_IP_ADDRESS__C': '73.166.155.174',
-#     'USPS_FEEDBACK__C': '',
-#     'IGNORE_CITY_CHECK__C': 'false',
-#     'TUNNEL_LAST_TESTED__C': '',
-#     'FIRST_SEEN__C': '2017-06-21T14:00:19.000Z',
-#     'CONNECTIONSENTID': '',
-#     'CURRENT_CITY__C': 'Houston',
-#     'ISDELETED': 'false',
-#     'CONFIG_FILE_DOWNLOAD__C': '<a href="https://adsrental.com/SF/download_config_file.php?rpid=RP-00000001" target="_blank">RP-00000001</a>',
-#     'USPS_TRACKING_CODE__C': '',
-#     'COMMENT__C': '',
-#     'VERSION__C': '1.2.11',
-#     'DELIVERY_STATUS__C': '',
-#     'LAST_SEEN__C': '2017-07-25T22:04:00.000Z',
-#     'CURRENT_ISP__C': 'Comcast Cable',
-#     'LINKED_LEAD__C': '00Q46000003r2pAEAQ',
-#     'SYSTEMMODSTAMP': '2017-09-21T07:34:31.000Z',
-#     'LASTREFERENCEDDATE': '',
-#     'OWNERID': '00546000000rlLVAAY',
-#     'CONNECTIONRECEIVEDID': '',
-#     'RP_STATUS__C': '',
-#     'CURRENT_COUNTRY__C': 'United States (US)',
-#     'EC2_INSTANCE_ID__C': 'i-01cacd76b8e526ae9',
-#     'TUNNEL_ONLINE__C': 'false',
-#     'DATE_SHIPPED__C': '',
-#     'REVGO_SHIPMENT_ID__C': '',
-#     'CREATEDDATE': '2017-05-18T19:07:40.000Z',
-#     'LASTVIEWEDDATE': '',
-#     'ID': 'a0246000001uLhzAAE',
-#     'LOGFILE_URL__C': '<a href="https://adsrental.com/log/RP-00000001" target="_blank">https://adsrental.com/log/RP-00000001</a>',
-#     'TESTED_INTERNAL__C': 'false',
-#     'DELIVERED_INTERNAL__C': 'false',
-#     'STATUS__C': 'Offline',
-#     'TRACKING_NUMBER__C': '',
-#     'NAME': 'RP-00000001',
-#     'IGNORE_LOCATION_CHECK__C': 'false',
-#     'DELIVERED__C': 'false',
-#     'FARMBOT_ACTIVE__C': 'false',
-#     'RDP__C': '<a href="https://adsrental.com/rdp.php?i=RP-00000001&amp;h=" target="_blank"> </a>',
-#     'CREATEDBYID': '00546000000rlLVAAY',
-#     'LOCATION_MATCH__C': 'true',
-#     'EC2_INSTANCE__C': '',
-#     'TESTED__C': 'false',
-#     'ONLINE__C': 'false',
-#     'STATUS_MESSAGE__C': ''
-# }
+    class Meta():
+        db_table = 'Raspberry_Pi__c'
+        verbose_name = 'Raspberry Pi'
+        verbose_name_plural = 'Raspberry Pis'
+        # keyPrefix = 'a02'

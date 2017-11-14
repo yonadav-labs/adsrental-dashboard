@@ -2,334 +2,114 @@ import string
 
 from django.db import models
 
-from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.browser_extension import BrowserExtension
 
 
 class Lead(models.Model):
-    salesforce_id = models.CharField(max_length=255, db_index=True, null=True)
-    name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
-    jigsaw_contact_id = models.CharField(max_length=255, null=True, blank=True)
-    middlename = models.CharField(max_length=255, null=True, blank=True)
-    geocode_accuracy = models.CharField(max_length=255, null=True, blank=True)
-    postal_code = models.CharField(max_length=255, null=True, blank=True)
-    street = models.CharField(max_length=255, null=True, blank=True)
-    activation_ip_address = models.CharField(max_length=255, null=True, blank=True)
-    email = models.CharField(max_length=255, db_index=True, null=True, blank=True)
-    activation_isp = models.CharField(max_length=255, null=True, blank=True)
-    winprox_download_url = models.CharField(max_length=255, null=True, blank=True)
-    account_name = models.CharField(max_length=255, null=True, blank=True)
-    ad_account_status_last_checked = models.DateField(null=True, blank=True)
-    rating = models.CharField(max_length=255, null=True, blank=True)
-    credentials_acquired = models.BooleanField(default=True)
-    registered_isp = models.CharField(max_length=255, null=True, blank=True)
-    not_banned_status = models.CharField(max_length=255, null=True, blank=True)
-    longitude = models.CharField(max_length=255, null=True, blank=True)
-    banned_reason = models.CharField(max_length=255, null=True, blank=True)
-    old_pi_status = models.CharField(max_length=255, null=True, blank=True)
-    country = models.CharField(max_length=255, null=True, blank=True)
-    industry = models.CharField(max_length=255, null=True, blank=True)
-    jigsaw = models.CharField(max_length=255, null=True, blank=True)
-    billed = models.BooleanField(default=True)
-    lead_source = models.CharField(max_length=255, null=True, blank=True)
-    address = models.CharField(max_length=255, null=True, blank=True)
-    winprox_online = models.BooleanField(default=True)
-    lastname = models.CharField(max_length=255, null=True, blank=True)
-    facebook_account = models.BooleanField(default=False)
-    is_converted = models.BooleanField(default=False)
-    winprox_tunnel_last_started = models.DateTimeField(null=True, blank=True)
-    website = models.CharField(max_length=255, null=True, blank=True)
-    remarks = models.CharField(max_length=255, null=True, blank=True)
-    email_bounced_date = models.DateTimeField(null=True, blank=True)
-    company = models.CharField(max_length=255, null=True, blank=True)
-    converted_account_id = models.CharField(max_length=255, null=True, blank=True)
-    payment_first_name = models.CharField(max_length=255, null=True, blank=True)
-    phone = models.CharField(max_length=255, null=True, blank=True)
-    last_referenced_date = models.DateTimeField(null=True, blank=True)
-    secret_changed = models.CharField(max_length=255, null=True, blank=True)
-    last_touch_date = models.DateTimeField(null=True, blank=True)
-    converted_date = models.DateTimeField(null=True, blank=True)
-    winprox_ec2_instance = models.CharField(max_length=255, null=True, blank=True)
-    created_date = models.DateTimeField(null=True, blank=True)
-    salutation = models.CharField(max_length=255, null=True, blank=True)
-    ad_account_status = models.CharField(max_length=255, null=True, blank=True)
-    master_record_id = models.CharField(max_length=255, null=True, blank=True)
-    firstname = models.CharField(max_length=255, null=True, blank=True)
-    photo_url = models.CharField(max_length=255, null=True, blank=True)
-    bundler_paid = models.BooleanField(default=False)
-    created_by = models.CharField(max_length=255, null=True, blank=True)
-    is_unread_by_owner = models.BooleanField(default=False)
-    useragent = models.CharField(max_length=255, null=True, blank=True)
-    payment_last_name = models.CharField(max_length=255, null=True, blank=True)
-    winprox_status = models.CharField(max_length=255, null=True, blank=True)
-    suffix = models.CharField(max_length=255, null=True, blank=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    last_modified_date = models.DateTimeField(null=True, blank=True)
-    payment_zipcode = models.CharField(max_length=255, null=True, blank=True)
-    last_modified_by_id = models.CharField(max_length=255, null=True, blank=True)
-    touch_count = models.IntegerField(null=True, blank=True)
-    facebook_profile_url = models.CharField(max_length=255, null=True, blank=True)
-    is_deleted = models.BooleanField(default=False)
-    paspberry_pi_ec2_instance_hostname = models.CharField(max_length=255, null=True, blank=True)
-    converted_opportunity_id = models.CharField(max_length=255, null=True, blank=True)
-    wrong_password = models.BooleanField(default=False)
-    system_mod_stamp = models.DateTimeField(null=True, blank=True)
-    winprox_last_seen = models.DateTimeField(null=True, blank=True)
-    payment_street = models.CharField(max_length=255, null=True, blank=True)
-    payment_state = models.CharField(max_length=255, null=True, blank=True)
-    state = models.CharField(max_length=255, null=True, blank=True)
-    registered_ip_address = models.CharField(max_length=255, null=True, blank=True)
-    owner_id = models.CharField(max_length=255, null=True, blank=True)
-    fb_secret = models.CharField(max_length=255, null=True, blank=True)
-    google_account = models.BooleanField(default=False)
-    number_of_employees = models.CharField(max_length=255, null=True, blank=True)
-    fb_friends = models.CharField(max_length=255, null=True, blank=True)
-    winprox_log_url = models.CharField(max_length=255, null=True, blank=True)
-    qualified_lead = models.BooleanField(default=False)
-    connection_sent_id = models.CharField(max_length=255, null=True, blank=True)
-    payment_city = models.CharField(max_length=255, null=True, blank=True)
-    activation_seed = models.CharField(max_length=255, null=True, blank=True)
-    facebook_account_status = models.CharField(max_length=255, null=True, blank=True)
-    email_bounced_reason = models.CharField(max_length=255, null=True, blank=True)
-    google_account_status = models.CharField(max_length=255, null=True, blank=True)
-    connection_received_id = models.CharField(max_length=255, null=True, blank=True)
-    status = models.CharField(max_length=255, null=True, blank=True)
-    mobile_phone = models.CharField(max_length=255, null=True, blank=True)
-    last_activity_date = models.DateField(null=True, blank=True)
-    latitude = models.CharField(max_length=255, null=True, blank=True)
-    dns_anonymization_updated = models.BooleanField(default=False)
-    activation_key = models.CharField(max_length=255, null=True, blank=True)
-    last_viewed_date = models.DateTimeField(null=True, blank=True)
-    utm_source = models.CharField(max_length=255, null=True, blank=True)
-    winprox_uid = models.CharField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=255, null=True, blank=True)
-    login_notifications_disabled = models.BooleanField(default=False)
-    raspberry_pi = models.ForeignKey(RaspberryPi, null=True, blank=True)
-    fb_email = models.CharField(max_length=255, null=True, blank=True)
-    browser_extension = models.ForeignKey(BrowserExtension, null=True, blank=True)
-    browser_extension_installed = models.BooleanField(default=False)
-    activation_url = models.CharField(max_length=255, null=True, blank=True)
+    is_deleted = models.BooleanField(verbose_name='Deleted', default=False)
+    master_record = models.ForeignKey('self', blank=True, null=True)
+    last_name = models.CharField(max_length=80)
+    first_name = models.CharField(max_length=40, blank=True, null=True)
+    salutation = models.CharField(max_length=40, choices=[('Mr.', 'Mr.'), ('Ms.', 'Ms.'), ('Mrs.', 'Mrs.'), ('Dr.', 'Dr.'), ('Prof.', 'Prof.')], blank=True, null=True)
+    middle_name = models.CharField(max_length=40, blank=True, null=True)
+    suffix = models.CharField(max_length=40, blank=True, null=True)
+    name = models.CharField(max_length=121, verbose_name='Full Name')
+    title = models.CharField(max_length=128, blank=True, null=True)
+    company = models.CharField(max_length=255)
+    street = models.TextField(blank=True, null=True)
+    city = models.CharField(max_length=40, blank=True, null=True)
+    state = models.CharField(max_length=80, verbose_name='State/Province', blank=True, null=True)
+    postal_code = models.CharField(max_length=20, verbose_name='Zip/Postal Code', blank=True, null=True)
+    country = models.CharField(max_length=80, blank=True, null=True)
+    latitude = models.DecimalField(max_digits=18, decimal_places=15, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=18, decimal_places=15, blank=True, null=True)
+    geocode_accuracy = models.CharField(max_length=40, choices=[('Address', 'Address'), ('NearAddress', 'NearAddress'), ('Block', 'Block'), ('Street', 'Street'), ('ExtendedZip', 'ExtendedZip'), ('Zip', 'Zip'), ('Neighborhood', 'Neighborhood'), ('City', 'City'), ('County', 'County'), ('State', 'State'), ('Unknown', 'Unknown')], blank=True, null=True)
+    address = models.TextField(blank=True, null=True)  # This field type is a guess.
+    phone = models.CharField(max_length=40, blank=True, null=True)
+    mobile_phone = models.CharField(max_length=40, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    photo_url = models.URLField(verbose_name='Photo URL', blank=True, null=True)
+    lead_source = models.CharField(max_length=40, choices=[('Advertisement', 'Advertisement'), ('Customer Event', 'Customer Event'), ('Employee Referral', 'Employee Referral'), ('Google AdWords', 'Google AdWords'), ('Other', 'Other'), ('Partner', 'Partner'), ('Purchased List', 'Purchased List'), ('Trade Show', 'Trade Show'), ('Webinar', 'Webinar'), ('Website', 'Website')], blank=True, null=True)
+    status = models.CharField(max_length=40, choices=[('Available', 'Available'), ('Banned', 'Banned'), ('Qualified', 'Qualified'), ('In-Progress', 'In-Progress')])
+    industry = models.CharField(max_length=40, choices=[('Agriculture', 'Agriculture'), ('Apparel', 'Apparel'), ('Banking', 'Banking'), ('Biotechnology', 'Biotechnology'), ('Chemicals', 'Chemicals'), ('Communications', 'Communications'), ('Construction', 'Construction'), ('Consulting', 'Consulting'), ('Education', 'Education'), ('Electronics', 'Electronics'), ('Energy', 'Energy'), ('Engineering', 'Engineering'), ('Entertainment', 'Entertainment'), ('Environmental', 'Environmental'), ('Finance', 'Finance'), ('Food & Beverage', 'Food & Beverage'), ('Government', 'Government'), ('Healthcare', 'Healthcare'), ('Hospitality', 'Hospitality'), ('Insurance', 'Insurance'), ('Machinery', 'Machinery'), ('Manufacturing', 'Manufacturing'), ('Media', 'Media'), ('Not For Profit', 'Not For Profit'), ('Other', 'Other'), ('Recreation', 'Recreation'), ('Retail', 'Retail'), ('Shipping', 'Shipping'), ('Technology', 'Technology'), ('Telecommunications', 'Telecommunications'), ('Transportation', 'Transportation'), ('Utilities', 'Utilities')], blank=True, null=True)
+    rating = models.CharField(max_length=40, choices=[('Hot', 'Hot'), ('Warm', 'Warm'), ('Cold', 'Cold')], blank=True, null=True)
+    number_of_employees = models.IntegerField(verbose_name='Employees', blank=True, null=True)
+    # owner = models.ForeignKey(Group)  # Reference to tables [Group, User]
+    is_converted = models.BooleanField(verbose_name='Converted')
+    converted_date = models.DateField(blank=True, null=True)
+    # converted_account = models.ForeignKey(Account, blank=True, null=True)
+    # converted_contact = models.ForeignKey(Contact, blank=True, null=True)
+    # converted_opportunity = models.ForeignKey('Opportunity', blank=True, null=True)
+    is_unread_by_owner = models.BooleanField(verbose_name='Unread By Owner')
+    created_date = models.DateTimeField()
+    # created_by = models.ForeignKey('User', related_name='lead_createdby_set')
+    last_modified_date = models.DateTimeField()
+    last_modified_by = models.ForeignKey('User', related_name='lead_lastmodifiedby_set')
+    system_modstamp = models.DateTimeField()
+    last_activity_date = models.DateField(verbose_name='Last Activity', blank=True, null=True)
+    last_viewed_date = models.DateTimeField(blank=True, null=True)
+    last_referenced_date = models.DateTimeField(blank=True, null=True)
+    jigsaw = models.CharField(max_length=20, verbose_name='Data.com Key', blank=True, null=True)
+    jigsaw_contact_id = models.CharField(max_length=20, verbose_name='Jigsaw Contact ID', blank=True, null=True)
+    # connection_received = models.ForeignKey('PartnerNetworkConnection', related_name='lead_connectionreceived_set', blank=True, null=True)
+    # connection_sent = models.ForeignKey('PartnerNetworkConnection', related_name='lead_connectionsent_set', blank=True, null=True)
+    email_bounced_reason = models.CharField(max_length=255, blank=True, null=True)
+    email_bounced_date = models.DateTimeField(blank=True, null=True)
+    raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', db_column='Raspberry_Pi__c', blank=True, null=True)
+    billed = models.BooleanField()
+    registered_ip_address = models.CharField(db_column='Registered_IP_Address__c', max_length=255, verbose_name='Registered IP Address', blank=True, null=True)
+    registered_isp = models.CharField(db_column='Registered_ISP__c', max_length=255, verbose_name='Registered ISP', blank=True, null=True)
+    login_notifications_disabled = models.BooleanField(db_column='Login_Notifications_Disabled__c', verbose_name='Login Notifications Disabled')
+    winprox_uid = models.CharField(db_column='Winprox_UID__c', max_length=255, verbose_name='Winprox UID', blank=True, null=True)
+    winprox_ec2_instance = models.ForeignKey('adsrental.Ec2Instance', db_column='Winprox_EC2_Instance__c', blank=True, null=True)
+    facebook_profile_url = models.CharField(db_column='Facebook_Profile_Url__c', max_length=255, verbose_name='Facebook Profile Url', blank=True, null=True)
+    utm_source = models.CharField(db_column='utm_source__c', max_length=255, verbose_name='utm_source', blank=True, null=True)
+    user_agent = models.CharField(max_length=255, verbose_name='UserAgent', blank=True, null=True)
+    winprox_download_url = models.CharField(db_column='Winprox_Download_Url__c', max_length=1300, verbose_name='Winprox Download Url', blank=True, null=True)
+    activation_ip_address = models.CharField(db_column='Activation_IP_Address__c', max_length=255, verbose_name='Activation IP Address', blank=True, null=True)
+    activation_isp = models.CharField(db_column='Activation_ISP__c', max_length=255, verbose_name='Activation ISP', blank=True, null=True)
+    activation_seed_1 = models.CharField(db_column='Activation_Seed_1__c', max_length=30, verbose_name='Activation Seed 1')
+    activation_key = models.CharField(db_column='Activation_Key__c', max_length=1300, verbose_name='Activation Key', blank=True, null=True)
+    browser_extension = models.ForeignKey('adsrental.BrowserExtension', db_column='Browser_Extension__c', blank=True, null=True)
+    qualified_lead = models.BooleanField(db_column='Qualified_Lead__c', verbose_name='Qualified Lead')
+    browser_extension_installed = models.BooleanField(db_column='Browser_Extension_Installed__c', verbose_name='Browser Extension Installed')
+    ad_account_status_last_checked = models.DateField(db_column='Ad_Account_Status_Last_Checked__c', verbose_name='Ad Account Status Last Checked', blank=True, null=True)
+    fb_friends = models.DecimalField(db_column='FB_friends__c', max_digits=18, decimal_places=0, verbose_name='FB friends', blank=True, null=True)
+    account_name = models.CharField(db_column='Account_Name__c', max_length=30, verbose_name='Account Name')
+    activation_url = models.CharField(db_column='Activation_Url__c', max_length=1300, verbose_name='Activation Url', blank=True, null=True)
+    banned_reason = models.CharField(db_column='Banned_Reason__c', max_length=255, verbose_name='Banned Reason', choices=[('FAKE', 'FAKE'), ('BAD AD ACCOUNT', 'BAD AD ACCOUNT'), ('SAME COMPUTER', 'SAME COMPUTER'), ('OTHER', 'OTHER'), ('DUPLICATE', 'DUPLICATE')], blank=True, null=True)
+    payment_first_name = models.CharField(db_column='Payment_First_Name__c', max_length=255, verbose_name='Payment First Name', blank=True, null=True)
+    payment_last_name = models.CharField(db_column='Payment_Last_Name__c', max_length=255, verbose_name='Payment Last Name', blank=True, null=True)
+    payment_zipcode = models.CharField(db_column='Payment_Zipcode__c', max_length=40, verbose_name='Payment Zipcode', blank=True, null=True)
+    payment_state = models.CharField(db_column='Payment_State__c', max_length=255, verbose_name='Payment State', blank=True, null=True)
+    payment_street = models.CharField(db_column='Payment_Street__c', max_length=255, verbose_name='Payment Street', blank=True, null=True)
+    payment_city = models.CharField(db_column='Payment_City__c', max_length=255, verbose_name='Payment City', blank=True, null=True)
+    winprox_status = models.CharField(db_column='Winprox_Status__c', max_length=255, verbose_name='Winprox Status', blank=True, null=True)
+    ad_account_status = models.CharField(db_column='Ad_Account_Status__c', max_length=1300, verbose_name='Ad Account Status', blank=True, null=True)
+    credentials_acquired = models.BooleanField(db_column='Credentials_Acquired__c', verbose_name='Credentials Acquired')
+    remarks = models.TextField(blank=True, null=True)
+    winprox_log_url = models.CharField(db_column='Winprox_Log_Url__c', max_length=1300, verbose_name='Winprox Log Url', blank=True, null=True)
+    winprox_last_seen = models.DateTimeField(db_column='Winprox_Last_Seen__c', verbose_name='Winprox Last Seen', blank=True, null=True)
+    winprox_tunnel_last_started = models.DateTimeField(db_column='Winprox_Tunnel_Last_Started__c', verbose_name='Winprox Tunnel Last Started', blank=True, null=True)
+    raspberry_pi_ec2_instance_hostname = models.CharField(db_column='Raspberry_Pi_EC2_Instance_Hostname__c', max_length=1300, verbose_name='Raspberry Pi EC2 Instance Hostname', blank=True, null=True)
+    winprox_online = models.BooleanField(db_column='Winprox_Online__c', verbose_name='Winprox Online')
+    touch_count = models.DecimalField(db_column='Touch_Count__c', max_digits=18, decimal_places=0, verbose_name='Touch Count', blank=True, null=True)
+    last_touch_date = models.DateTimeField(db_column='Last_Touch_Date__c', verbose_name='Last Touch Date', blank=True, null=True)
+    fb_email = models.CharField(db_column='FB_email__c', max_length=1300, verbose_name='FB email', blank=True, null=True)
+    fb_secret = models.CharField(db_column='FB_secret__c', max_length=1300, verbose_name='FB secret', blank=True, null=True)
+    old_pi_status = models.CharField(db_column='Old_Pi_Status__c', max_length=1300, verbose_name='Old Pi Status', blank=True, null=True)
+    google_account = models.BooleanField(db_column='Google_Account__c', verbose_name='Google Account')
+    facebook_account = models.BooleanField(db_column='Facebook_Account__c', verbose_name='Facebook Account')
+    secret_changed = models.BooleanField(db_column='Secret_Changed__c', verbose_name='Secret Changed')
+    facebook_account_status = models.CharField(db_column='Facebook_Account_Status__c', max_length=255, verbose_name='Facebook Account Status', choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
+    google_account_status = models.CharField(db_column='Google_Account_Status__c', max_length=255, verbose_name='Google Account Status', choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
+    dns_anonymization_updated = models.BooleanField(db_column='DNS_Anonymization_Updated__c', verbose_name='DNS Anonymization Updated')
+    wrong_password = models.BooleanField(db_column='Wrong_Password__c', verbose_name='Wrong Password')
+    bundler_paid = models.BooleanField(db_column='Bundler_Paid__c', verbose_name='Bundler Paid')
+    not_banned_status = models.CharField(max_length=20, verbose_name='NotBannedStatus', help_text='When Lead becomes Banned, previous Status is saved here to be restored later once Lead is unbanned.', blank=True, null=True)
 
-    def __str__(self):
-        return self.name
-
-    @staticmethod
-    def str_printable(s):
-        printable = set(string.printable)
-        return filter(lambda x: x in printable, s)
-
-    @classmethod
-    def upsert_from_sf(cls, data):
-        item, created = cls.objects.update_or_create(
-            salesforce_id=data['ID'],
-            defaults=dict(
-                jigsaw_contact_id=data['JIGSAWCONTACTID'],
-                middlename=data['MIDDLENAME'],
-                geocode_accuracy=data['GEOCODEACCURACY'],
-                postal_code=data['POSTALCODE'],
-                street=data['STREET'],
-                activation_ip_address=data['ACTIVATION_IP_ADDRESS__C'],
-                email=data['EMAIL'],
-                activation_isp=data['ACTIVATION_ISP__C'],
-                winprox_download_url=data['WINPROX_DOWNLOAD_URL__C'],
-                account_name=data['ACCOUNT_NAME__C'],
-                ad_account_status_last_checked=data['AD_ACCOUNT_STATUS_LAST_CHECKED__C'] if data['AD_ACCOUNT_STATUS_LAST_CHECKED__C'] else None,
-                rating=data['RATING'],
-                credentials_acquired=data['CREDENTIALS_ACQUIRED__C'] == 'true',
-                registered_isp=data['REGISTERED_ISP__C'],
-                not_banned_status=data['NOTBANNEDSTATUS__C'],
-                longitude=data['LONGITUDE'],
-                banned_reason=data['BANNED_REASON__C'],
-                old_pi_status=data['OLD_PI_STATUS__C'],
-                country=data['COUNTRY'],
-                industry=data['INDUSTRY'],
-                jigsaw=data['JIGSAW'],
-                billed=data['BILLED__C'] == 'true',
-                lead_source=data['LEADSOURCE'],
-                address=data['ADDRESS'],
-                winprox_online=data['WINPROX_ONLINE__C'] == 'true',
-                lastname=data['LASTNAME'],
-                facebook_account=data['FACEBOOK_ACCOUNT__C'] == 'true',
-                is_converted=data['ISCONVERTED'] == 'true',
-                winprox_tunnel_last_started=data['WINPROX_TUNNEL_LAST_STARTED__C'] or None,
-                website=data['WEBSITE'],
-                remarks=data['REMARKS__C'],
-                email_bounced_date=data['EMAILBOUNCEDDATE'] or None,
-                company=data['COMPANY'],
-                converted_account_id=data['CONVERTEDACCOUNTID'],
-                payment_first_name=data['PAYMENT_FIRST_NAME__C'],
-                phone=data['PHONE'],
-                last_referenced_date=data['LASTREFERENCEDDATE'] or None,
-                secret_changed=data['SECRET_CHANGED__C'] == 'true',
-                last_touch_date=data['LAST_TOUCH_DATE__C'] or None,
-                converted_date=data['CONVERTEDDATE'] or None,
-                winprox_ec2_instance=data['WINPROX_EC2_INSTANCE__C'],
-                created_date=data['CREATEDDATE'] if data['CREATEDDATE'] else None,
-                salutation=data['SALUTATION'],
-                ad_account_status=cls.str_printable(data['AD_ACCOUNT_STATUS__C']),
-                master_record_id=data['MASTERRECORDID'],
-                firstname=cls.str_printable(data['FIRSTNAME']),
-                photo_url=data['PHOTOURL'],
-                bundler_paid=data['BUNDLER_PAID__C'] == 'true',
-                created_by=data['CREATEDBYID'],
-                is_unread_by_owner=data['ISUNREADBYOWNER'] == 'true',
-                useragent=data['USERAGENT__C'],
-                payment_last_name=data['PAYMENT_LAST_NAME__C'],
-                winprox_status=data['WINPROX_STATUS__C'],
-                suffix=data['SUFFIX'],
-                title=data['TITLE'],
-                last_modified_date=data['LASTMODIFIEDDATE'] or None,
-                payment_zipcode=data['PAYMENT_ZIPCODE__C'],
-                last_modified_by_id=data['LASTMODIFIEDBYID'],
-                touch_count=data['TOUCH_COUNT__C'].split('.')[0] if data['TOUCH_COUNT__C'] else None,
-                facebook_profile_url=data['FACEBOOK_PROFILE_URL__C'],
-                is_deleted=data['ISDELETED'] == 'true',
-                paspberry_pi_ec2_instance_hostname=data['RASPBERRY_PI_EC2_INSTANCE_HOSTNAME__C'],
-                converted_opportunity_id=data['CONVERTEDOPPORTUNITYID'],
-                wrong_password=data['WRONG_PASSWORD__C'] == 'true',
-                system_mod_stamp=data['SYSTEMMODSTAMP'] or None,
-                winprox_last_seen=data['WINPROX_LAST_SEEN__C'] or None,
-                payment_street=data['PAYMENT_STREET__C'],
-                payment_state=data['PAYMENT_STATE__C'],
-                state=data['STATE'],
-                registered_ip_address=data['REGISTERED_IP_ADDRESS__C'],
-                owner_id=data['OWNERID'],
-                fb_secret=data['FB_SECRET__C'],
-                google_account=data['GOOGLE_ACCOUNT__C'] == 'true',
-                name=cls.str_printable(data['NAME']),
-                number_of_employees=data['NUMBEROFEMPLOYEES'],
-                fb_friends=data['FB_FRIENDS__C'],
-                winprox_log_url=data['WINPROX_LOG_URL__C'],
-                qualified_lead=data['QUALIFIED_LEAD__C'] == 'true',
-                connection_sent_id=data['CONNECTIONSENTID'],
-                payment_city=data['PAYMENT_CITY__C'],
-                activation_seed=data['ACTIVATION_SEED_1__C'],
-                facebook_account_status=data['FACEBOOK_ACCOUNT_STATUS__C'],
-                email_bounced_reason=data['EMAILBOUNCEDREASON'],
-                google_account_status=data['GOOGLE_ACCOUNT_STATUS__C'],
-                connection_received_id=data['CONNECTIONRECEIVEDID'],
-                status=data['STATUS'],
-                mobile_phone=data['MOBILEPHONE'],
-                last_activity_date=data['LASTACTIVITYDATE'] or None,
-                latitude=data['LATITUDE'],
-                dns_anonymization_updated=data['DNS_ANONYMIZATION_UPDATED__C'] == 'true',
-                activation_key=data['ACTIVATION_KEY__C'],
-                last_viewed_date=data['LASTVIEWEDDATE'] or None,
-                utm_source=data['UTM_SOURCE__C'],
-                winprox_uid=data['WINPROX_UID__C'],
-                city=cls.str_printable(data['CITY']),
-                login_notifications_disabled=data['LOGIN_NOTIFICATIONS_DISABLED__C'] == 'true',
-                raspberry_pi=RaspberryPi.objects.filter(salesforce_id=data['RASPBERRY_PI__C']).first(),
-                fb_email=data['FB_EMAIL__C'],
-                browser_extension=BrowserExtension.objects.filter(salesforce_id=data['BROWSER_EXTENSION__C']).first(),
-                browser_extension_installed=data['BROWSER_EXTENSION_INSTALLED__C'] == 'true',
-                activation_url=data['ACTIVATION_URL__C'],
-            ),
-        )
-        item.save()
-
-# {
-#     'JIGSAWCONTACTID': '',
-#     'MIDDLENAME': '',
-#     'GEOCODEACCURACY': '',
-#     'POSTALCODE': '77055',
-#     'STREET': '456 Main St',
-#     'ACTIVATION_IP_ADDRESS__C': '73.166.155.174',
-#     'EMAIL': '',
-#     'ACTIVATION_ISP__C': '',
-#     'WINPROX_DOWNLOAD_URL__C': '<a href="https://adsrental.com/download.php?uid=3f5aa3f960c6d292a1d959d26c1175b2" target="_blank">https://adsrental.com/download.php?uid=3f5aa3f960c6d292a1d959d26c1175b2</a>',
-#     'ACCOUNT_NAME__C': '',
-#     'AD_ACCOUNT_STATUS_LAST_CHECKED__C': '',
-#     'RATING': '',
-#     'CREDENTIALS_ACQUIRED__C': 'false',
-#     'REGISTERED_ISP__C': 'Comcast Cable',
-#     'NOTBANNEDSTATUS__C': '',
-#     'LONGITUDE': '',
-#     'BANNED_REASON__C': '',
-#     'OLD_PI_STATUS__C': 'Offline',
-#     'COUNTRY': 'United States (US)',
-#     'INDUSTRY': '',
-#     'JIGSAW': '',
-#     'BILLED__C': 'false',
-#     'LEADSOURCE': 'Website',
-#     'ADDRESS': '',
-#     'WINPROX_ONLINE__C': 'false',
-#     'LASTNAME': 'McGee',
-#     'FACEBOOK_ACCOUNT__C': 'true',
-#     'ISCONVERTED': 'false',
-#     'WINPROX_TUNNEL_LAST_STARTED__C': '',
-#     'WEBSITE': '',
-#     'REMARKS__C': '',
-#     'EMAILBOUNCEDDATE': '',
-#     'COMPANY': '[Empty]',
-#     'CONVERTEDACCOUNTID': '',
-#     'PAYMENT_FIRST_NAME__C': '',
-#     'PHONE': '',
-#     'CONVERTEDCONTACTID': '',
-#     'LASTREFERENCEDDATE': '',
-#     'SECRET_CHANGED__C': 'false',
-#     'LAST_TOUCH_DATE__C': '',
-#     'CONVERTEDDATE': '',
-#     'WINPROX_EC2_INSTANCE__C': '',
-#     'CREATEDDATE': '2017-05-17T17:40:35.000Z',
-#     'SALUTATION': 'Mr.',
-#     'AD_ACCOUNT_STATUS__C': '',
-#     'MASTERRECORDID': '',
-#     'FIRSTNAME': 'Test',
-#     'PHOTOURL': '/services/images/photo/00Q46000003r2pAEAQ',
-#     'BUNDLER_PAID__C': 'false',
-#     'CREATEDBYID': '00546000000rlLVAAY',
-#     'ISUNREADBYOWNER': 'false',
-#     'USERAGENT__C': '',
-#     'PAYMENT_LAST_NAME__C': '',
-#     'WINPROX_STATUS__C': '',
-#     'SUFFIX': '',
-#     'TITLE': '',
-#     'LASTMODIFIEDDATE': '2017-09-07T23:03:40.000Z',
-#     'PAYMENT_ZIPCODE__C': '',
-#     'LASTMODIFIEDBYID': '00546000000rlLVAAY',
-#     'TOUCH_COUNT__C': '0.0',
-#     'FACEBOOK_PROFILE_URL__C': '',
-#     'ISDELETED': 'false',
-#     'RASPBERRY_PI_EC2_INSTANCE_HOSTNAME__C': '',
-#     'CONVERTEDOPPORTUNITYID': '',
-#     'ID': '00Q46000003r2pAEAQ',
-#     'WRONG_PASSWORD__C': 'false',
-#     'SYSTEMMODSTAMP': '2017-10-13T10:38:03.000Z',
-#     'WINPROX_LAST_SEEN__C': '',
-#     'PAYMENT_STREET__C': '',
-#     'PAYMENT_STATE__C': '',
-#     'STATE': 'Texas (TX)',
-#     'REGISTERED_IP_ADDRESS__C': '73.166.155.174',
-#     'OWNERID': '00546000000rlLVAAY',
-#     'FB_SECRET__C': '',
-#     'GOOGLE_ACCOUNT__C': 'false',
-#     'NAME': 'Test McGee',
-#     'NUMBEROFEMPLOYEES': '',
-#     'FB_FRIENDS__C': '0.0',
-#     'WINPROX_LOG_URL__C': '<a href="https://adsrental.com/log/3f5aa3f960c6d292a1d959d26c1175b2" target="_blank">https://adsrental.com/log/3f5aa3f960c6d292a1d959d26c1175b2</a>',
-#     'QUALIFIED_LEAD__C': 'false',
-#     'CONNECTIONSENTID': '',
-#     'PAYMENT_CITY__C': '',
-#     'ACTIVATION_SEED_1__C': '',
-#     'FACEBOOK_ACCOUNT_STATUS__C': '',
-#     'EMAILBOUNCEDREASON': '',
-#     'GOOGLE_ACCOUNT_STATUS__C': '',
-#     'CONNECTIONRECEIVEDID': '',
-#     'STATUS': 'In-Progress',
-#     'MOBILEPHONE': '',
-#     'LASTACTIVITYDATE': '',
-#     'LATITUDE': '',
-#     'DNS_ANONYMIZATION_UPDATED__C': 'false',
-#     'ACTIVATION_KEY__C': '',
-#     'LASTVIEWEDDATE': '',
-#     'UTM_SOURCE__C': '',
-#     'WINPROX_UID__C': '3f5aa3f960c6d292a1d959d26c1175b2',
-#     'CITY': 'Houston',
-#     'LOGIN_NOTIFICATIONS_DISABLED__C': 'false',
-#     'RASPBERRY_PI__C': 'a0246000001uLhzAAE',
-#     'FB_EMAIL__C': '',
-#     'BROWSER_EXTENSION__C': '',
-#     'BROWSER_EXTENSION_INSTALLED__C': 'false',
-#     'ACTIVATION_URL__C': '<a href="https://adsrental.com/check.html?" target="_blank">https://adsrental.com/check.html?</a>'
-# }
+    class Meta():
+        db_table = 'Lead'
+        verbose_name = 'Lead'
+        verbose_name_plural = 'Leads'
+        # keyPrefix = '00Q'

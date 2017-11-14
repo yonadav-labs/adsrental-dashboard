@@ -8,5 +8,6 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-pip install -U pip
+rm /usr/local/bin/python
+ln -s /app/venv/bin/python /usr/local/bin/python
 pip install -r requirements/base.txt

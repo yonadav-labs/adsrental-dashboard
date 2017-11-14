@@ -8,7 +8,7 @@ class LeadAdmin(admin.ModelAdmin):
     # list_select_related = (
     #     'raspberry_pi',
     # )
-    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', )
+    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', 'last_seen', )
     search_fields = ['name', 'email', ]
 
     def full_address(self, obj):
@@ -23,6 +23,9 @@ class LeadAdmin(admin.ModelAdmin):
     def tunnel_online(self, obj):
         return obj.raspberry_pi.tunnel_online if obj.raspberry_pi else False
 
+    def last_seen(self, obj):
+        return obj.raspberry_pi.last_seen if obj.raspberry_pi else False
+
     online.boolean = True
     tunnel_online.boolean = True
 
@@ -31,6 +34,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
     list_display = ('name', 'version', 'online', 'tunnel_online', 'links', 'is_deleted', )
     search_fields = ['name', ]
+    list_filter = ['online', ]
 
     def links(self, obj):
         return ' '.join([
