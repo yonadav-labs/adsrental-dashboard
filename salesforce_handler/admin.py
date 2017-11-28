@@ -8,8 +8,15 @@ class LeadAdmin(admin.ModelAdmin):
     # list_select_related = (
     #     'raspberry_pi',
     # )
-    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'bundler_paid', 'wrong_password', 'last_seen', )
+    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'utm_source', 'bundler_paid', 'wrong_password', 'last_seen', )
     search_fields = ['name', 'email', ]
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(LeadAdmin, self).get_search_results(request, queryset, search_term)
+
+        if request.user.utm_source:
+            queryset |= self.model.objects.filter(utm_source=request.user.utm_source)
+        return queryset, use_distinct
 
     def full_address(self, obj):
         return '{}, {}, {}, {}, {}'.format(obj.street, obj.city, obj.state, obj.postal_code, obj.country)
