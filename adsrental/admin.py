@@ -10,7 +10,9 @@ class CustomUserAdmin(UserAdmin):
         (
             None,
             {
-                'fields': [],
+                'fields': [
+                    'utm_source',
+                ],
             },
         ),
     )

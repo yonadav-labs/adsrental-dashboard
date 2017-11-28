@@ -28,6 +28,7 @@
       "first_name": "Vlad",
       "last_name": "Emelianov",
       "is_active": true,
+      "utm_source": "",
       "is_staff": true,
       "groups": [],
       "user_permissions": [],
