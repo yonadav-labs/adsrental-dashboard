@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block title %}Adsrental | Dashboard{% endblock %}
+
+{% block content %}
+    <table class="table table-striped">
+        <tr>
+            <th>#</th>
+            <th>Account</th>
+            <th>Lead</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Raspberry Pi</th>
+            <th>Google</th>
+            <th>Facebook</th>
+            <th>Online</th>
+            <th>First Seen</th>
+            <th>Last Seen</th>
+            <th>Tunnel Last Tested</th>
+            <th>Bundler Paid</th>
+            <th>Wrong Password</th>
+            <th>Pi delivered</th>
+        </tr>
+        {% for entry in entries %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ entry.account_name }}</td>
+                <td>{{entry.first_name}} {{entry.last_name}}</td>
+                <td>{{entry.phone}}</td>
+                <td>
+                    {{ entry.address }}
+                    {% if entry.usps_tracking_code %}
+                        <br />    
+                        USPS: {{entry.usps_tracking_code}}
+                    {% endif %}
+                </td>
+                <td>{{ entry.raspberry_pi.name }}</td>
+                <td>{% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
+                <td>{% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
+                <td>
+                    {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
+                    <br />
+                    {% if entry.raspberry_pi.tunnel_online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Tunnel Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Tunnel Offline{% endif %}
+                    <br />
+                    <a href=\"http://{{entry.ec2_hostname}}:13608/start-tunnel\">Restart tunnel</a>
+                </td>
+                <td>{{entry.raspberry_pi.first_seen}}</td>
+                <td>{{entry.raspberry_pi.last_seen}}</td>
+                <td>
+                    {{entry.raspberry_pi.tunnel_last_tested}}
+                </td>
+                <td>
+                    {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
+                </td>
+                <td>
+                    {% if entry.wrong_password %}<span class="glyphicon glyphicon-ok" style="color: red;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>{% endif %}   
+                </td>
+                <td>
+                    {% if entry.pi_delivered %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}           
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

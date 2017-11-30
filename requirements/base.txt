@@ -11,3 +11,4 @@ boto==2.48.0
 whitenoise==4.0b4
 gevent==1.2.2
 django-salesforce==0.7.2
+django-bootstrap-form
