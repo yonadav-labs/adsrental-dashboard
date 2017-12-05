@@ -1,2 +1,2 @@
-php/log/*
-php/apache_logs/*
+log/*
+apache_logs/*
