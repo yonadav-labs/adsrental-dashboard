@@ -13,7 +13,7 @@ class Lead(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True)
     account_name = models.CharField(max_length=255)
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True)
-    utm_source = models.CharField(max_length=80, blank=True, null=True)
+    utm_source = models.CharField(max_length=80, blank=True, null=True, db_index=True)
     google_account = models.BooleanField(default=False)
     facebook_account = models.BooleanField(default=False)
     raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', null=True, blank=True)
