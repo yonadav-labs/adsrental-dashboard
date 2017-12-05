@@ -16,6 +16,9 @@ class Lead(models.Model):
     google_account = models.IntegerField()
     facebook_account = models.IntegerField()
     raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', null=True, blank=True)
+    wrong_password = models.BooleanField(default=False)
+    bundler_paid = models.BooleanField(default=False)
+    pi_delivered = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'lead'
