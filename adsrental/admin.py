@@ -5,6 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
+from django.core.urlresolvers import reverse
 
 from adsrental.models.user import User
 from adsrental.models.legacy import Lead, RaspberryPi
@@ -95,7 +96,7 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid', 'name', 'email', 'phone', 'google_account', 'facebook_account', 'raspberry_pi', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid')
+    list_display = ('leadid', 'name', 'email', 'phone', 'google_account', 'facebook_account', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid')
     list_filter = (OnlineListFilter, TunnelOnlineListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'first_name', 'last_name', 'raspberry_pi__rpid', )
@@ -127,14 +128,56 @@ class LeadAdmin(admin.ModelAdmin):
 
         return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
 
+    def raspberry_pi_link(self, obj):
+        return '<a target="_blank" href="{}?q={}">{}</a>'.format(
+            reverse('admin:adsrental_raspberrypi_changelist'),
+            obj.raspberry_pi,
+            obj.raspberry_pi,
+        )
+
     online.boolean = True
     tunnel_online.boolean = True
+    raspberry_pi_link.short_description = 'Raspberry PI'
+    raspberry_pi_link.allow_tags = True
+    first_seen.empty_value_display = 'Never'
+    last_seen.empty_value_display = 'Never'
+    tunnel_last_tested.empty_value_display = 'Never'
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', )
+    list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', 'ec2_hostname', )
+
+    def online(self, obj):
+        return obj.online()
+
+    def tunnel_online(self, obj):
+        return obj.tunnel_online()
+
+    def first_seen(self, obj):
+        if obj.first_seen is None:
+            return None
+
+        return naturaltime(obj.first_seen + datetime.timedelta(hours=7))
+
+    def last_seen(self, obj):
+        if obj.last_seen is None:
+            return None
+
+        return naturaltime(obj.last_seen + datetime.timedelta(hours=7))
+
+    def tunnel_last_tested(self, obj):
+        if obj.tunnel_last_tested is None:
+            return None
+
+        return naturaltime(obj.tunnel_last_tested + datetime.timedelta(hours=7))
+
+    online.boolean = True
+    tunnel_online.boolean = True
+    first_seen.empty_value_display = 'Never'
+    last_seen.empty_value_display = 'Never'
+    tunnel_last_tested.empty_value_display = 'Never'
 
 
 admin.site.register(User, CustomUserAdmin)
