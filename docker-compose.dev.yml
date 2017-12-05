@@ -15,10 +15,10 @@ services:
     volumes:
       - ./php/cert/:/var/www/html/cert/
       - ./php/app/:/var/www/html/app/
-      - ./php/log/:/var/www/html/log/
+      - /var/www/html/log/:/var/www/html/log/
     ports:
-      - "8008:80"
-      - "8443:443"
+      - "80:80"
+      - "443:443"
     depends_on:
       - db
       - web
