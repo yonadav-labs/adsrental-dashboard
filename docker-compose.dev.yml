@@ -22,7 +22,6 @@ services:
       - "443:443"
     depends_on:
       - db
-      - web
     links:
       - db:db
       - web:web
