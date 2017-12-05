@@ -11,9 +11,9 @@ source venv/bin/activate
 python -c 'import MySQLdb; MySQLdb.connect(user="root", host="db").cursor().execute("create database if not exists adsrental CHARACTER SET utf8;")'
 
 #install DB and fixtures
-python manage.py migrate adsrental
-python manage.py migrate
-python manage.py loaddata adsrental/fixtures/fixtures.json
+# python manage.py migrate adsrental
+# python manage.py migrate
+# python manage.py loaddata adsrental/fixtures/fixtures.json
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
