@@ -95,8 +95,8 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid', 'name', 'email', 'phone', 'google_account', 'facebook_account', 'raspberry_pi', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password')
-    list_filter = (OnlineListFilter, TunnelOnlineListFilter, WrongPasswordListFilter, 'utm_source', )
+    list_display = ('leadid', 'name', 'email', 'phone', 'google_account', 'facebook_account', 'raspberry_pi', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid')
+    list_filter = (OnlineListFilter, TunnelOnlineListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'first_name', 'last_name', 'raspberry_pi__rpid', )
 
