@@ -117,13 +117,13 @@ class LeadAdmin(admin.ModelAdmin):
 
     def last_seen(self, obj):
         if obj.raspberry_pi.last_seen is None:
-            return None 
+            return None
 
         return naturaltime(obj.raspberry_pi.last_seen + datetime.timedelta(hours=7))
 
     def tunnel_last_tested(self, obj):
         if obj.raspberry_pi.tunnel_last_tested is None:
-            return None 
+            return None
 
         return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
 
