@@ -129,10 +129,11 @@ class LeadAdmin(admin.ModelAdmin):
         return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
 
     def raspberry_pi_link(self, obj):
-        return '<a target="_blank" href="{}?q={}">{}</a>'.format(
-            reverse('admin:adsrental_raspberrypi_changelist'),
-            obj.raspberry_pi,
-            obj.raspberry_pi,
+        if obj.raspberry_pi is None:
+            return None
+        return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="/rdp.php?i={rpid}&h={rpid}">RDP</a>)'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            rpid=obj.raspberry_pi,
         )
 
     online.boolean = True
