@@ -110,12 +110,21 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi.tunnel_online()
 
     def first_seen(self, obj):
+        if obj.raspberry_pi.first_seen is None:
+            return None
+
         return naturaltime(obj.raspberry_pi.first_seen + datetime.timedelta(hours=7))
 
     def last_seen(self, obj):
+        if obj.raspberry_pi.last_seen is None:
+            return None 
+
         return naturaltime(obj.raspberry_pi.last_seen + datetime.timedelta(hours=7))
 
     def tunnel_last_tested(self, obj):
+        if obj.raspberry_pi.tunnel_last_tested is None:
+            return None 
+
         return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
 
     online.boolean = True

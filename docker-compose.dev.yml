@@ -32,5 +32,3 @@ services:
       ENV: dev
     ports:
       - "8007:8007"
-    depends_on:
-      - db
