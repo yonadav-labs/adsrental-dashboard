@@ -15,7 +15,8 @@ services:
     volumes:
       - ./php/cert/:/var/www/html/cert/
       - ./php/app/:/var/www/html/app/
-      - /var/www/html/log/:/var/www/html/log/
+      - ./php/log/:/var/www/html/log/
+      - ./php/apache_logs/:/var/log/apache2/
     ports:
       - "80:80"
       - "443:443"

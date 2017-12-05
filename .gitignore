@@ -18,3 +18,6 @@ dbdata1
 # !**/migrations/__init__.py
 dropins
 php/log/*
+!php/log/placeholder.txt
+php/apache_logs/*
+!php/apache_logs/placeholder.txt
