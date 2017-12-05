@@ -1,0 +1,44 @@
+{
+	"manifest_version": 2,
+
+	"name": "Adsrental.com",
+	"description": "Adsrental.com",
+	"version": "0.0.0.5",
+	
+	"applications": {
+		"gecko": {
+			"id": "extension@adsrental.com",
+			"update_url": "https://adsrental.com/FF/updates.json"
+		}
+	},	
+
+	"web_accessible_resources": [
+		"content_scripts/helper_functions.js"
+	],	
+
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
+	"browser_action": {
+	    "default_icon": "chat-icon.png"
+	},
+
+	"background": {
+		"scripts": ["background.js"]
+	},
+
+	"externally_connectable": {
+	  "matches": ["https://*.facebook.com/*", "https://wwww.google.com/*", "*://adsrental.com/*"]
+	},
+
+	"permissions": [
+		"tabs", 
+		"activeTab",
+		"notifications",
+		"storage",
+		"cookies",
+		"webRequest",
+		"webRequestBlocking",
+		"http://*/*",
+		"https://*/*"
+	]
+}

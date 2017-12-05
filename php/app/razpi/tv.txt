@@ -1,0 +1,5 @@
+Laptop Sawyer
+windows 10
+924 795 421
+
+pw = 123456

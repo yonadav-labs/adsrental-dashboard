@@ -1,0 +1,1 @@
+@reboot /home/pi/new-pi/start.sh >> /home/pi/cron-launch.log

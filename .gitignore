@@ -17,3 +17,4 @@ dbdata1
 # **/migrations/*
 # !**/migrations/__init__.py
 dropins
+php/log/*

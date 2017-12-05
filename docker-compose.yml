@@ -8,8 +8,23 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
       - ./dbdata1:/var/lib/mysql
-    # ports:
-    #   - "13306:3306"
+    ports:
+      - "23306:3306"
+  php:
+    build: php
+    volumes:
+      - ./php/cert/:/var/www/html/cert/
+      - ./php/app/:/var/www/html/app/
+      - ./php/log/:/var/www/html/log/
+    ports:
+      - "8080:80"
+      - "7443:443"
+    depends_on:
+      - db
+      - web
+    links:
+      - db:db
+      - web:web
   web:
     build: .
     command: /app/scripts/runserver.sh
