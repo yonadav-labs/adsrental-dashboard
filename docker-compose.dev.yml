@@ -17,12 +17,14 @@ services:
       - ./php/app/:/var/www/html/app/
       - ./php/log/:/var/www/html/log/
     ports:
-      - "80:80"
-      - "443:443"
+      - "8008:80"
+      - "8443:443"
     depends_on:
       - db
+      - web
     links:
       - db:db
+      - web:web
   web:
     build: .
     command: /app/scripts/server.sh
