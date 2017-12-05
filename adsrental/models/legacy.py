@@ -41,13 +41,13 @@ class RaspberryPi(models.Model):
         if self.last_seen is None:
             return False
 
-        return (timezone.now() - self.last_seen).total_seconds() < 7 * 60 * 60
+        return (timezone.now() - self.last_seen).total_seconds() < 14 * 60 * 60
 
     def tunnel_online(self):
         if self.tunnel_last_tested is None:
             return False
 
-        return (timezone.now() - self.tunnel_last_tested).total_seconds() < 7 * 60 * 60
+        return (timezone.now() - self.tunnel_last_tested).total_seconds() < 14 * 60 * 60
 
     def __str__(self):
         return self.rpid

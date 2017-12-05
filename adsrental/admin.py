@@ -24,13 +24,13 @@ class OnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=7))
+            return queryset.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=14))
         if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=7))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14))
         if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=7 + 2 * 24))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=7 + 5 * 24))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
 class TunnelOnlineListFilter(SimpleListFilter):
@@ -47,13 +47,13 @@ class TunnelOnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=7))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14))
         if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=7))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14))
         if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=7 + 2 * 24))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=7 + 5 * 24))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
 class WrongPasswordListFilter(SimpleListFilter):
@@ -74,9 +74,9 @@ class WrongPasswordListFilter(SimpleListFilter):
         if self.value() == 'yes':
             return queryset.filter(wrong_password=True)
         if self.value() == 'yes_2days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=7 + 2 * 24))
+            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
         if self.value() == 'yes_5days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=7 + 5 * 24))
+            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
 class CustomUserAdmin(UserAdmin):
@@ -110,10 +110,10 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi.tunnel_online()
 
     def first_seen(self, obj):
-        return naturaltime(obj.raspberry_pi.first_seen)
+        return naturaltime(obj.raspberry_pi.first_seen + datetime.timedelta(hours=7))
 
     def last_seen(self, obj):
-        return naturaltime(obj.raspberry_pi.last_seen)
+        return naturaltime(obj.raspberry_pi.last_seen + datetime.timedelta(hours=7))
 
     online.boolean = True
     tunnel_online.boolean = True
