@@ -17,6 +17,7 @@ services:
       - ./php/app/:/var/www/html/app/
       - ./php/log/:/var/www/html/log/
       - ./php/apache_logs/:/var/log/apache2/
+      - ./php/uploads/:/var/www/html/uploads/
     ports:
       - "80:80"
       - "443:443"

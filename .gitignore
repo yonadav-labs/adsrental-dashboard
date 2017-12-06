@@ -21,3 +21,5 @@ php/log/*
 !php/log/placeholder.txt
 php/apache_logs/*
 !php/apache_logs/placeholder.txt
+php/uploads/photo_ids/*
+!php/uploads/photo_ids/placeholder.txt
