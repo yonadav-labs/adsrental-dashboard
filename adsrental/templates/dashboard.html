@@ -1,66 +1,102 @@
 {% extends 'base.html' %}
 
 {% load bootstrap %}
+{% load humanize %}
 
 {% block title %}Adsrental | Dashboard{% endblock %}
 
 {% block content %}
+<div class="container">
+
+    <form role="form" action="" method="POST" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="control-label col-sm-2 col-lg-2">UTM Source</label>
+            <div class=" col-sm-10 col-lg-10 ">
+                <input class="form-control" type="text" value="{{ utm_source|default:"Not set" }}" readonly>
+            </div>
+        </div>
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+    </form>
+</div>
+
     <table class="table table-striped">
-        <tr>
-            <th>#</th>
-            <th>Account</th>
-            <th>Lead</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Raspberry Pi</th>
-            <th>Google</th>
-            <th>Facebook</th>
-            <th>Online</th>
-            <th>First Seen</th>
-            <th>Last Seen</th>
-            <th>Tunnel Last Tested</th>
-            <th>Bundler Paid</th>
-            <th>Wrong Password</th>
-            <th>Pi delivered</th>
-        </tr>
-        {% for entry in entries %}
+        <thead>
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ entry.account_name }}</td>
-                <td>{{entry.first_name}} {{entry.last_name}}</td>
-                <td>{{entry.phone}}</td>
-                <td>
-                    {{ entry.address }}
-                    {% if entry.usps_tracking_code %}
-                        <br />    
-                        USPS: {{entry.usps_tracking_code}}
-                    {% endif %}
-                </td>
-                <td>{{ entry.raspberry_pi.name }}</td>
-                <td>{% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
-                <td>{% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
-                <td>
-                    {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
-                    <br />
-                    {% if entry.raspberry_pi.tunnel_online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Tunnel Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Tunnel Offline{% endif %}
-                    <br />
-                    <a href=\"http://{{entry.ec2_hostname}}:13608/start-tunnel\">Restart tunnel</a>
-                </td>
-                <td>{{entry.raspberry_pi.first_seen}}</td>
-                <td>{{entry.raspberry_pi.last_seen}}</td>
-                <td>
-                    {{entry.raspberry_pi.tunnel_last_tested}}
-                </td>
-                <td>
-                    {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
-                </td>
-                <td>
-                    {% if entry.wrong_password %}<span class="glyphicon glyphicon-ok" style="color: red;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>{% endif %}   
-                </td>
-                <td>
-                    {% if entry.pi_delivered %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}           
-                </td>
+                <th>#</th>
+                <th>Account</th>
+                <th>Lead</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Raspberry Pi</th>
+                <th>Google</th>
+                <th>Facebook</th>
+                <th>Online</th>
+                <th>First Seen</th>
+                <th>Last Seen</th>
+                <th>Tunnel Last Tested</th>
+                <th>Bundler Paid</th>
+                <th>Wrong Password</th>
+                <th>Pi delivered</th>
             </tr>
+        </thead>
+        {% for entry in entries %}
+            <tbody>
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ entry.account_name }}</td>
+                    <td>{{entry.first_name}} {{entry.last_name}}</td>
+                    <td>{{entry.phone}}</td>
+                    <td>
+                        {{ entry.address }}
+                        {% if entry.usps_tracking_code %}
+                            <br />    
+                            USPS: {{entry.usps_tracking_code}}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ entry.raspberry_pi.rpid }}
+                        (
+                            <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
+                            <a href="/rdp.php?i={{ entry.raspberry_pi.rpid }}&amp;h={{ entry.raspberry_pi.rpid }}">RDP</a>
+                        )
+                    </td>
+                    <td>{% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
+                    <td>{% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
+                    <td>
+                        {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
+                        <br />
+                        {% if entry.raspberry_pi.tunnel_online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Tunnel Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Tunnel Offline{% endif %}
+                        <br />
+                        <a href=\"http://{{entry.ec2_hostname}}:13608/start-tunnel\">Restart tunnel</a>
+                    </td>
+                    <td>{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
+                    <td>{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
+                    <td>
+                        {{entry.raspberry_pi.get_tunnel_last_tested|naturaltime|default:"Never"}}
+                    </td>
+                    <td>
+                        {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
+                    </td>
+                    <td>
+                        {% if entry.wrong_password %}<span class="glyphicon glyphicon-ok" style="color: red;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>{% endif %}   
+                    </td>
+                    <td>
+                        {% if entry.pi_delivered %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}           
+                    </td>
+                </tr>
+            </tbody>
+        {% empty %}
+            <tfoot>
+                <tr>
+                    <th colspan="100">No entries found</th>
+                </tr>
+            </tfoot>
         {% endfor %}
     </table>
 {% endblock %}
