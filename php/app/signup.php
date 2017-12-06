@@ -28,7 +28,7 @@
 
 
 		$ext = pathinfo($_FILES['photo_id']['name'], PATHINFO_EXTENSION);
-		$filepath = sprintf('../uploads/photo_ids/%s.%s',
+		$filepath = sprintf('/var/www/html/uploads/photo_ids/%s.%s',
 			sha1_file($_FILES['photo_id']['tmp_name']),
 			$ext
 		);
