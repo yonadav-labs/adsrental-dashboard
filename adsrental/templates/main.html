@@ -11,7 +11,14 @@
                 <p>
                     Your UTM Source is {{user.utm_source}}. If you want to see your leads, just click on the button below.
                 </p>
-                <p><a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a></p>
+                <p>
+                  <a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a>
+                </p>
+                {% if user.is_superuser %}
+                  <p>
+                    <a class="btn btn-default btn-lg" href="{% url "admin:index" %}" role="button">Admin UI »</a>
+                  </p>
+                {% endif %}
               </div>
             </div>
         
