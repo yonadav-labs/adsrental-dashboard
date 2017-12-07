@@ -12,6 +12,7 @@ class Lead(models.Model):
     leadid = models.CharField(primary_key=True, max_length=255)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=40, choices=[('Available', 'Available'), ('Banned', 'Banned'), ('Qualified', 'Qualified'), ('In-Progress', 'In-Progress')], default='Available')
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
@@ -59,6 +60,7 @@ class Lead(models.Model):
             sf_lead.country or '',
         ])
         lead.account_name = sf_lead.account_name
+        lead.status = sf_lead.status
         lead.usps_tracking_code = sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None
         lead.utm_source = sf_lead.utm_source
         lead.google_account = sf_lead.google_account

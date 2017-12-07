@@ -31,6 +31,7 @@
                 <th>#</th>
                 <th>Account</th>
                 <th>Lead</th>
+                <th>Status</th>
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Raspberry Pi</th>
@@ -51,6 +52,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ entry.account_name }}</td>
                     <td>{{entry.first_name}} {{entry.last_name}}</td>
+                    <td>{{ entry.status }}</td>
                     <td>{{entry.phone}}</td>
                     <td>
                         {{ entry.address }}
@@ -66,8 +68,14 @@
                             <a href="/rdp.php?i={{ entry.raspberry_pi.rpid }}&amp;h={{ entry.raspberry_pi.rpid }}">RDP</a>
                         )
                     </td>
-                    <td>{% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
-                    <td>{% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}</td>
+                    <td>
+                        {% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}
+                        {{ entry.google_account_status }}
+                    </td>
+                    <td>
+                        {% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}
+                        {{ entry.google_account_status }}
+                    </td>
                     <td>
                         {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
                         <br />
