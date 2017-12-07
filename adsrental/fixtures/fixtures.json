@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "name": "Adsrental Dashboard",
-      "domain": "165.227.74.143"
+      "domain": "adsrental.com"
     }
   },
   {
@@ -12,7 +12,7 @@
     "pk": 2,
     "fields": {
       "name": "Adsrental Dashboard (Local)",
-      "domain": "localhost:8007"
+      "domain": "localhost:7443"
     }
   },
   {
