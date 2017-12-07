@@ -126,9 +126,12 @@ class RaspberryPi(models.Model):
         raspberry_pi.leadid = lead_id
         raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
         # raspberry_pi.ec2_hostname = sf_raspberry_pi.ec2
-        raspberry_pi.first_seen = sf_raspberry_pi.first_seen
-        raspberry_pi.last_seen = sf_raspberry_pi.last_seen
-        raspberry_pi.tunnel_last_tested = sf_raspberry_pi.tunnel_last_tested
+        if raspberry_pi.first_seen is None or sf_raspberry_pi.first_seen > raspberry_pi.first_seen:
+            raspberry_pi.first_seen = sf_raspberry_pi.first_seen
+        if raspberry_pi.last_seen is None or sf_raspberry_pi.last_seen > raspberry_pi.last_seen:
+            raspberry_pi.last_seen = sf_raspberry_pi.last_seen
+        if raspberry_pi.tunnel_last_tested is None or sf_raspberry_pi.tunnel_last_tested > raspberry_pi.tunnel_last_tested:
+            raspberry_pi.tunnel_last_tested = sf_raspberry_pi.tunnel_last_tested
         raspberry_pi.save()
         return raspberry_pi
 

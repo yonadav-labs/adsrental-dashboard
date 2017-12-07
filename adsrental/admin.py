@@ -133,13 +133,13 @@ class LeadAdmin(admin.ModelAdmin):
     def facebook_account_column(self, obj):
         return '{} {}'.format(
             '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
-            obj.facebook_account_status or 'Not set',
+            obj.facebook_account_status,
         )
 
     def google_account_column(self, obj):
         return '{} {}'.format(
             '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
-            obj.google_account_status or 'Not set',
+            obj.google_account_status,
         )
 
     def raspberry_pi_link(self, obj):
@@ -160,16 +160,23 @@ class LeadAdmin(admin.ModelAdmin):
             Lead.upsert_from_sf(sf_lead)
 
     online.boolean = True
+    online.admin_order_field = 'raspberry_pi__first_seen'
     tunnel_online.boolean = True
+    tunnel_online.admin_order_field = 'raspberry_pi__tunnel_last_tested'
     raspberry_pi_link.short_description = 'Raspberry PI'
     raspberry_pi_link.allow_tags = True
     first_seen.empty_value_display = 'Never'
+    first_seen.admin_order_field = 'raspberry_pi__first_seen'
     last_seen.empty_value_display = 'Never'
+    last_seen.admin_order_field = 'raspberry_pi__last_seen'
     tunnel_last_tested.empty_value_display = 'Never'
+    tunnel_last_tested.admin_order_field = 'raspberry_pi__tunnel_last_tested'
     facebook_account_column.short_description = 'Facebook Account'
     facebook_account_column.allow_tags = True
+    google_account_column.admin_order_field = 'facebook_account'
     google_account_column.short_description = 'Google Account'
     google_account_column.allow_tags = True
+    google_account_column.admin_order_field = 'google_account'
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
