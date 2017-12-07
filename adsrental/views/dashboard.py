@@ -65,6 +65,10 @@ class DashboardView(View):
                 if value == 'yes_5days':
                     entries = entries.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
+            if form.cleaned_data['lead_status']:
+                value = form.cleaned_data['lead_status']
+                entries = entries.filter(status=value)
+
             return render(request, 'dashboard.html', dict(
                 utm_source=request.user.utm_source,
                 entries=entries,

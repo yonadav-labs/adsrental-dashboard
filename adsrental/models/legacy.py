@@ -9,10 +9,17 @@ from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class Lead(models.Model):
+    STATUS_CHOICES = [
+        ('Available', 'Available'),
+        ('Banned', 'Banned'),
+        ('Qualified', 'Qualified'),
+        ('In-Progress', 'In-Progress'),
+    ]
+
     leadid = models.CharField(primary_key=True, max_length=255)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(max_length=40, choices=[('Available', 'Available'), ('Banned', 'Banned'), ('Qualified', 'Qualified'), ('In-Progress', 'In-Progress')], default='Available')
+    status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)

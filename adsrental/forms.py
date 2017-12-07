@@ -23,6 +23,14 @@ class DashboardForm(forms.Form):
         ('yes_2days', 'Yes for 2 days'),
         ('yes_5days', 'Yes for 5 days'),
     )
-    ec2_state = forms.ChoiceField(label='EC2 state', choices=EC2_STATE_CHOICES, required=False)
-    tunnel_state = forms.ChoiceField(label='Tunnel state', choices=TUNNEL_STATE_CHOICES, required=False)
+    LEAD_STATUS_CHOICES = (
+        ('', 'All'),
+        ('Available', 'Available'),
+        ('Banned', 'Banned'),
+        ('Qualified', 'Qualified'),
+        ('In-Progress', 'In-Progress'),
+    )
+    lead_status = forms.ChoiceField(label='Lead Status', choices=LEAD_STATUS_CHOICES, required=False)
+    ec2_state = forms.ChoiceField(label='EC2 State', choices=EC2_STATE_CHOICES, required=False)
+    tunnel_state = forms.ChoiceField(label='Tunnel State', choices=TUNNEL_STATE_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
