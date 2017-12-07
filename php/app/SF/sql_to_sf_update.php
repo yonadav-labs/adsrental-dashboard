@@ -21,7 +21,12 @@
 		$lastSeen = new DateTime($row["last_seen"], new DateTimeZone("America/Los_Angeles"));
 		$tunnelLastTested = new DateTime($row["tunnel_last_tested"], new DateTimeZone("America/Los_Angeles"));
 		
-		createOrUpdateSFObject("Raspberry_Pi__c", "Name", $row["rpid"], array("First_Seen__c" => $firstSeen->format("c"), "Last_Seen__c" => $lastSeen->format("c"), "Tunnel_Last_Tested__c" => $tunnelLastTested->format("c"), "Current_IP_Address__c" => $row["ipaddress"]));
+		createOrUpdateSFObject("Raspberry_Pi__c", "Name", $row["rpid"], array(
+			"First_Seen__c" => $firstSeen->format("c"),
+			"Last_Seen__c" => $lastSeen->format("c"),
+			"Tunnel_Last_Tested__c" => $tunnelLastTested->format("c"),
+			"Current_IP_Address__c" => $row["ipaddress"]
+		));
 	}
 	
 ?>

@@ -4,6 +4,8 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
+from salesforce_handler.models import Lead as SFLead
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class Lead(models.Model):
@@ -70,6 +72,10 @@ class Lead(models.Model):
         lead.save()
         return lead
 
+    @staticmethod
+    def upsert_to_sf(leads):
+        pass
+
 
 class RaspberryPi(models.Model):
     rpid = models.CharField(primary_key=True, max_length=255)
@@ -79,6 +85,8 @@ class RaspberryPi(models.Model):
     first_seen = models.DateTimeField(blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def online(self):
         if self.last_seen is None:
@@ -134,6 +142,22 @@ class RaspberryPi(models.Model):
             raspberry_pi.tunnel_last_tested = sf_raspberry_pi.tunnel_last_tested
         raspberry_pi.save()
         return raspberry_pi
+
+    @staticmethod
+    def upsert_to_sf(raspberry_pis):
+        names = []
+        names_map = {}
+        for r in raspberry_pis:
+            names.append(r.rpid)
+            names_map[r.rpid] = r
+
+        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=names)
+        for sf_raspberry_pi in sf_raspberry_pis:
+            sf_raspberry_pi.first_seen = names_map[sf_raspberry_pi.name].first_seen
+            sf_raspberry_pi.last_seen = names_map[sf_raspberry_pi.name].last_seen
+            sf_raspberry_pi.tunnel_last_tested = names_map[sf_raspberry_pi.name].tunnel_last_tested
+            sf_raspberry_pi.current_ip_address = names_map[sf_raspberry_pi.name].ipaddress
+            sf_raspberry_pi.save()
 
     class Meta:
         db_table = 'raspberry_pi'
