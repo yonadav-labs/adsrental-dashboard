@@ -4,7 +4,7 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
-from salesforce_handler.models import Lead as SFLead
+# from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
