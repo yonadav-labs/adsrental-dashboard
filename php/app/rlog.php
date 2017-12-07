@@ -67,6 +67,7 @@
 		if (mysqlUpsertRaspberryPi($_GET["rpid"]) == null)
 		{
 			$leads = getSFQueryResult("SELECT Id, FirstName, LastName, Email, Phone, Street, City, State, PostalCode, Country, Account_Name__c, Raspberry_Pi__r.Name, Raspberry_Pi__r.USPS_Tracking_Code__c, utm_source__c, Google_Account__c, Facebook_Account__c, Wrong_Password__c, Bundler_Paid__c, Raspberry_Pi__r.Delivered__c FROM Lead WHERE Raspberry_Pi__r.Name = '$_GET[rpid]'")["records"];
+
 			if (!$leads){
 				echo "No leads found for $_GET[rpid]";
 				exit;
@@ -153,7 +154,9 @@
 						Google_Account__c,
 						Facebook_Account__c,
 						Wrong_Password__c,
-						Bundler_Paid__c
+						Bundler_Paid__c,
+						Facebook_Account_Status__c,
+						Google_Account_Status__c
 					FROM Lead WHERE Raspberry_Pi__r.Name = '$_GET[rpid]'
 EOD
 				)["records"][0];

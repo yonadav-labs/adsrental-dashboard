@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 
 from adsrental.models.user import User
 from adsrental.models.legacy import Lead, RaspberryPi
+from salesforce_handler.models import Lead as SFLead
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -96,37 +97,50 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid', 'name', 'email', 'phone', 'google_account', 'facebook_account', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid')
+    list_display = ('leadid', 'name', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid')
     list_filter = (OnlineListFilter, TunnelOnlineListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
+    actions = ('update_from_salesforce', )
 
     def name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
 
     def online(self, obj):
-        return obj.raspberry_pi.online()
+        return obj.raspberry_pi.online() if obj.raspberry_pi else False
 
     def tunnel_online(self, obj):
-        return obj.raspberry_pi.tunnel_online()
+        return obj.raspberry_pi.tunnel_online() if obj.raspberry_pi else False
 
     def first_seen(self, obj):
-        if obj.raspberry_pi.first_seen is None:
+        if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
             return None
 
         return naturaltime(obj.raspberry_pi.first_seen + datetime.timedelta(hours=7))
 
     def last_seen(self, obj):
-        if obj.raspberry_pi.last_seen is None:
+        if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
             return None
 
         return naturaltime(obj.raspberry_pi.last_seen + datetime.timedelta(hours=7))
 
     def tunnel_last_tested(self, obj):
-        if obj.raspberry_pi.tunnel_last_tested is None:
+        if obj.raspberry_pi is None or obj.raspberry_pi.tunnel_last_tested is None:
             return None
 
         return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
+
+    def facebook_account_column(self, obj):
+        return '{} {}'.format(
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
+            obj.facebook_account_status or 'Not set',
+        )
+
+    def google_account_column(self, obj):
+        return '{} {}'.format(
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
+            obj.google_account_status or 'Not set',
+        )
 
     def raspberry_pi_link(self, obj):
         if obj.raspberry_pi is None:
@@ -136,6 +150,15 @@ class LeadAdmin(admin.ModelAdmin):
             rpid=obj.raspberry_pi,
         )
 
+    def update_from_salesforce(self, request, queryset):
+        sf_lead_ids = []
+        for lead in queryset:
+            sf_lead_ids.append(lead.leadid)
+
+        sf_leads = SFLead.objects.filter(id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+        for sf_lead in sf_leads:
+            Lead.upsert_from_sf(sf_lead)
+
     online.boolean = True
     tunnel_online.boolean = True
     raspberry_pi_link.short_description = 'Raspberry PI'
@@ -143,6 +166,10 @@ class LeadAdmin(admin.ModelAdmin):
     first_seen.empty_value_display = 'Never'
     last_seen.empty_value_display = 'Never'
     tunnel_last_tested.empty_value_display = 'Never'
+    facebook_account_column.short_description = 'Facebook Account'
+    facebook_account_column.allow_tags = True
+    google_account_column.short_description = 'Google Account'
+    google_account_column.allow_tags = True
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):

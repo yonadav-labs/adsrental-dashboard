@@ -8,20 +8,24 @@ from django.db import models
 
 class Lead(models.Model):
     leadid = models.CharField(primary_key=True, max_length=255)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
-    account_name = models.CharField(max_length=255)
+    account_name = models.CharField(max_length=255, blank=True, null=True)
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True)
-    utm_source = models.CharField(max_length=80, blank=True, null=True, db_index=True)
+    utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     google_account = models.BooleanField(default=False)
     facebook_account = models.BooleanField(default=False)
     raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', null=True, blank=True)
     wrong_password = models.BooleanField(default=False)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)
+    facebook_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
+    google_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.leadid
@@ -29,14 +33,51 @@ class Lead(models.Model):
     class Meta:
         db_table = 'lead'
 
+    @staticmethod
+    def upsert_from_sf(sf_lead):
+        raspberry_pi = None
+        if sf_lead.raspberry_pi:
+            raspberry_pi = RaspberryPi.upsert_from_sf(sf_lead.id, sf_lead.raspberry_pi)
+
+        lead = Lead.objects.filter(leadid=sf_lead.id).first()
+        if lead is None:
+            lead = Lead(
+                leadid=sf_lead.id,
+            )
+
+        lead.first_name = sf_lead.first_name
+        lead.last_name = sf_lead.last_name
+        lead.email = sf_lead.email
+        lead.phone = sf_lead.phone
+        lead.address = ', '.join([
+            sf_lead.street or '',
+            sf_lead.city or '',
+            sf_lead.state or '',
+            sf_lead.postal_code or '',
+            sf_lead.country or '',
+        ])
+        lead.account_name = sf_lead.account_name
+        lead.usps_tracking_code = sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None
+        lead.utm_source = sf_lead.utm_source
+        lead.google_account = sf_lead.google_account
+        lead.facebook_account = sf_lead.facebook_account
+        lead.raspberry_pi = raspberry_pi
+        lead.wrong_password = sf_lead.wrong_password
+        lead.bundler_paid = sf_lead.bundler_paid
+        lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
+        lead.facebook_account_status = sf_lead.facebook_account_status
+        lead.google_account_status = sf_lead.google_account_status
+        lead.save()
+        return lead
+
 
 class RaspberryPi(models.Model):
     rpid = models.CharField(primary_key=True, max_length=255)
     leadid = models.CharField(max_length=255, blank=True, null=True)
-    ipaddress = models.CharField(max_length=255)
+    ipaddress = models.CharField(max_length=255, blank=True, null=True)
     ec2_hostname = models.CharField(max_length=255, blank=True, null=True)
-    first_seen = models.DateTimeField()
-    last_seen = models.DateTimeField()
+    first_seen = models.DateTimeField(blank=True, null=True)
+    last_seen = models.DateTimeField(blank=True, null=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
 
     def online(self):
@@ -71,6 +112,25 @@ class RaspberryPi(models.Model):
 
     def __str__(self):
         return self.rpid
+
+    @staticmethod
+    def upsert_from_sf(lead_id, sf_raspberry_pi):
+        raspberry_pi = RaspberryPi.objects.filter(rpid=sf_raspberry_pi.name).first()
+        if raspberry_pi is None:
+            raspberry_pi = RaspberryPi(
+                rpid=sf_raspberry_pi.name,
+                leadid=lead_id,
+                ipaddress=sf_raspberry_pi.current_ip_address,
+            )
+
+        raspberry_pi.leadid = lead_id
+        raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
+        # raspberry_pi.ec2_hostname = sf_raspberry_pi.ec2
+        raspberry_pi.first_seen = sf_raspberry_pi.first_seen
+        raspberry_pi.last_seen = sf_raspberry_pi.last_seen
+        raspberry_pi.tunnel_last_tested = sf_raspberry_pi.tunnel_last_tested
+        raspberry_pi.save()
+        return raspberry_pi
 
     class Meta:
         db_table = 'raspberry_pi'
