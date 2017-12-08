@@ -185,7 +185,7 @@ class LeadAdmin(admin.ModelAdmin):
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
     list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
-    search_fields = ('leadid', 'rpid', 'ec2_hostname', )
+    search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
     actions = ('update_from_salesforce', 'update_salesforce')
 
     def online(self, obj):
