@@ -35,6 +35,29 @@ class OnlineListFilter(SimpleListFilter):
             return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
+class RaspberryPiOnlineListFilter(SimpleListFilter):
+    title = 'EC2 online state'
+    parameter_name = 'online'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('online', 'Online only'),
+            ('offline', 'Offline only'),
+            ('offline_2days', 'Offline for last 2 days'),
+            ('offline_5days', 'Offline for last 5 days'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'online':
+            return queryset.filter(last_seen__gt=timezone.now() - datetime.timedelta(hours=14))
+        if self.value() == 'offline':
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14))
+        if self.value() == 'offline_2days':
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+        if self.value() == 'offline_5days':
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+
+
 class TunnelOnlineListFilter(SimpleListFilter):
     title = 'Tunnel online state'
     parameter_name = 'tunnel_online'
@@ -56,6 +79,29 @@ class TunnelOnlineListFilter(SimpleListFilter):
             return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
         if self.value() == 'offline_5days':
             return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+
+
+class RaspberryPiTunnelOnlineListFilter(SimpleListFilter):
+    title = 'Tunnel online state'
+    parameter_name = 'tunnel_online'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('online', 'Online only'),
+            ('offline', 'Offline only'),
+            ('offline_2days', 'Offline for last 2 days'),
+            ('offline_5days', 'Offline for last 5 days'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'online':
+            return queryset.filter(tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14))
+        if self.value() == 'offline':
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14))
+        if self.value() == 'offline_2days':
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+        if self.value() == 'offline_5days':
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
 class WrongPasswordListFilter(SimpleListFilter):
@@ -186,6 +232,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
     list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
+    list_filter = (RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, )
     actions = ('update_from_salesforce', 'update_salesforce')
 
     def online(self, obj):
