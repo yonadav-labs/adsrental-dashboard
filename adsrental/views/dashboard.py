@@ -1,13 +1,23 @@
 import datetime
 
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 
 from adsrental.models.legacy import Lead
 from adsrental.forms import DashboardForm
+
+
+class CheckSentView(View):
+    @method_decorator(login_required)
+    def post(self, request):
+        lead_id = request.POST.get('leadid')
+        lead = Lead.objects.get(leadid=lead_id)
+        lead.pi_sent = timezone.now()
+        lead.save()
+        return redirect('dashboard')
 
 
 class DashboardView(View):

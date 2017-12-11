@@ -36,12 +36,22 @@ class Lead(models.Model):
     google_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    pi_sent = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.leadid
 
     class Meta:
         db_table = 'lead'
+
+    def get_pi_sent_this_month(self):
+        if not self.pi_sent:
+            return False
+        now = timezone.now()
+        if now.year == self.pi_sent.year and now.month == self.pi_sent.month:
+            return True
+
+        return False
 
     @staticmethod
     def upsert_from_sf(sf_lead):
