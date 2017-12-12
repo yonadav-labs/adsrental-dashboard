@@ -1,2 +1,3 @@
 from user import User  # noqa: F401
-from legacy import Lead, RaspberryPi  # noqa: F401
+from lead import Lead  # noqa: F401
+from raspberry_pi import RaspberryPi  # noqa: F401

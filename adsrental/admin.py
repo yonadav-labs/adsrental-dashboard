@@ -7,8 +7,7 @@ from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 
-from adsrental.models.user import User
-from adsrental.models.legacy import Lead, RaspberryPi
+from adsrental.models import User, Lead, RaspberryPi
 from salesforce_handler.models import Lead as SFLead
 
 

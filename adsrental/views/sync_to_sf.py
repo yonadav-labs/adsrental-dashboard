@@ -4,7 +4,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.utils import timezone
 
-from adsrental.models.legacy import Lead, RaspberryPi
+from adsrental.models import Lead, RaspberryPi
 
 
 class SyncToSFView(View):

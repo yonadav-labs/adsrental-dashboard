@@ -1,7 +1,7 @@
 from django.views import View
 from django.http import JsonResponse
 
-from adsrental.models.legacy import Lead
+from adsrental.models import Lead
 from salesforce_handler.models import Lead as SFLead
 
 
