@@ -33,7 +33,7 @@ class DashboardView(View):
 
         return render(request, 'dashboard.html', dict(
             utm_source=request.user.utm_source,
-            entries=entries.order_by('-raspberry_pi__last_seen')[:100],
+            entries=entries.order_by('-raspberry_pi__last_seen'),
             form=DashboardForm(),
         ))
 
@@ -81,6 +81,6 @@ class DashboardView(View):
 
             return render(request, 'dashboard.html', dict(
                 utm_source=request.user.utm_source,
-                entries=entries.order_by('-raspberry_pi__last_seen')[:100],
+                entries=entries.order_by('-raspberry_pi__last_seen'),
                 form=form,
             ))
