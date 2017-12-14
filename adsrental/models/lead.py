@@ -28,7 +28,7 @@ class Lead(models.Model):
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     google_account = models.BooleanField(default=False)
     facebook_account = models.BooleanField(default=False)
-    raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', null=True, blank=True)
+    raspberry_pi = models.ForeignKey('adsrental.RaspberryPi', null=True, blank=True, default=None)
     wrong_password = models.BooleanField(default=False)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)
