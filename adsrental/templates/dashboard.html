@@ -2,14 +2,14 @@
 
 {% load bootstrap %}
 {% load humanize %}
+{% load helpers %}
 
 {% block title %}Adsrental | Dashboard{% endblock %}
 
 {% block content %}
 <div class="container">
 
-    <form role="form" action="" method="POST" class="form-horizontal">
-        {% csrf_token %}
+    <form role="form" action="" method="GET" class="form-horizontal">
         <div class="form-group">
             <label class="control-label col-sm-2 col-lg-2">UTM Source</label>
             <div class=" col-sm-10 col-lg-10 ">
@@ -25,22 +25,22 @@
     </form>
 </div>
 
-    <table class="table table-striped">
+    <table id="results" class="table table-striped">
         <thead>
             <tr>
                 <th>#</th>
-                <th>Account</th>
-                <th>Lead</th>
-                <th>Status</th>
-                <th>Phone</th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'account_name' %}">Account</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
                 <th>Address</th>
-                <th>Raspberry Pi</th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'raspberry_pi__rpid' %}">Raspberry Pi</a></th>
                 <th>Google</th>
                 <th>Facebook</th>
                 <th>Online</th>
-                <th>First Seen</th>
-                <th>Last Seen</th>
-                <th>Tunnel Last Tested</th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__first_seen' %}">First Seen</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__last_seen' %}">Last Seen</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__tunnel_last_tested' %}">Tunnel Last Tested</a></th>
                 <th>Bundler Paid</th>
                 <th>Wrong Password</th>
                 <th>Pi delivered</th>
@@ -120,4 +120,25 @@
             </tfoot>
         {% endfor %}
     </table>
+    {% if entries.has_other_pages %}
+      <ul class="pagination">
+        {% if entries.has_previous %}
+          <li><a href="{% relative_url request.GET.urlencode 'page' entries.previous_page_number %}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in entries.paginator.page_range %}
+          {% if entries.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="{% relative_url request.GET.urlencode 'page' i %}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if entries.has_next %}
+          <li><a href="{% relative_url request.GET.urlencode 'page' entries.next_page_number %}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
 {% endblock %}

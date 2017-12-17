@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from adsrental.models import Lead
 from adsrental.forms import DashboardForm
@@ -22,6 +23,8 @@ class CheckSentView(View):
 
 
 class DashboardView(View):
+    items_per_page = 100
+
     def get_entries(self, user):
         if not user.utm_source:
             return Lead.objects.all().select_related('raspberry_pi')
@@ -30,17 +33,7 @@ class DashboardView(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        entries = self.get_entries(request.user)
-
-        return render(request, 'dashboard.html', dict(
-            utm_source=request.user.utm_source,
-            entries=entries.order_by('-raspberry_pi__last_seen'),
-            form=DashboardForm(),
-        ))
-
-    @method_decorator(login_required)
-    def post(self, request):
-        form = DashboardForm(request.POST)
+        form = DashboardForm(request.GET)
         if form.is_valid():
             entries = self.get_entries(request.user)
             if form.cleaned_data['ec2_state']:
@@ -103,8 +96,20 @@ class DashboardView(View):
                     Q(email__icontains=value)
                 )
 
+            order = request.GET.get('order', '-raspberry_pi__last_seen')
+            entries = entries.order_by(order)
+
+            page = request.GET.get('page', 1)
+            paginator = Paginator(entries, self.items_per_page)
+            try:
+                entries = paginator.page(page)
+            except PageNotAnInteger:
+                entries = paginator.page(1)
+            except EmptyPage:
+                entries = paginator.page(paginator.num_pages)
+
             return render(request, 'dashboard.html', dict(
                 utm_source=request.user.utm_source,
-                entries=entries.order_by('-raspberry_pi__last_seen'),
+                entries=entries,
                 form=form,
             ))
