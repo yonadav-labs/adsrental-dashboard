@@ -46,35 +46,35 @@ class DashboardView(View):
             if form.cleaned_data['ec2_state']:
                 value = form.cleaned_data['ec2_state']
                 if value == 'online':
-                    entries = entries.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=14))
+                    entries = entries.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=14), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline':
-                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14))
+                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline_2days':
-                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline_5days':
-                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+                    entries = entries.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24), pi_delivered=True).exclude(status='Banned')
 
             if form.cleaned_data['tunnel_state']:
                 value = form.cleaned_data['tunnel_state']
                 if value == 'online':
-                    entries = entries.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14))
+                    entries = entries.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline':
-                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14))
+                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline_2days':
-                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24), pi_delivered=True).exclude(status='Banned')
                 if value == 'offline_5days':
-                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+                    entries = entries.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24), pi_delivered=True).exclude(status='Banned')
 
             if form.cleaned_data['wrong_password']:
                 value = form.cleaned_data['wrong_password']
                 if value == 'no':
-                    entries = entries.filter(wrong_password=False)
+                    entries = entries.filter(wrong_password=False, pi_delivered=True).exclude(status='Banned')
                 if value == 'yes':
-                    entries = entries.filter(wrong_password=True)
+                    entries = entries.filter(wrong_password=True, pi_delivered=True)
                 if value == 'yes_2days':
-                    entries = entries.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+                    entries = entries.filter(wrong_password=True, pi_delivered=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24)).exclude(status='Banned')
                 if value == 'yes_5days':
-                    entries = entries.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+                    entries = entries.filter(wrong_password=True, pi_delivered=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24)).exclude(status='Banned')
 
             if form.cleaned_data['lead_status']:
                 value = form.cleaned_data['lead_status']
