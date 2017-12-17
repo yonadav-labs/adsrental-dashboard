@@ -70,7 +70,7 @@ class DashboardView(View):
                 if value == 'no':
                     entries = entries.filter(wrong_password=False, pi_delivered=True).exclude(status='Banned')
                 if value == 'yes':
-                    entries = entries.filter(wrong_password=True, pi_delivered=True)
+                    entries = entries.filter(wrong_password=True, pi_delivered=True).exclude(status='Banned')
                 if value == 'yes_2days':
                     entries = entries.filter(wrong_password=True, pi_delivered=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24)).exclude(status='Banned')
                 if value == 'yes_5days':
