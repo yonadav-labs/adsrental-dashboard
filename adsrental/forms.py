@@ -30,7 +30,20 @@ class DashboardForm(forms.Form):
         ('Qualified', 'Qualified'),
         ('In-Progress', 'In-Progress'),
     )
+    BANNED_CHOICES = (
+        ('', 'All'),
+        ('true', 'Banned', ),
+        ('false', 'Not banned', ),
+    )
+    PI_DELIVERED_CHOICES = (
+        ('', 'All'),
+        ('true', 'Yes', ),
+        ('false', 'No', ),
+    )
+    search = forms.CharField(label='Search', required=False)
     lead_status = forms.ChoiceField(label='Lead Status', choices=LEAD_STATUS_CHOICES, required=False)
     ec2_state = forms.ChoiceField(label='EC2 State', choices=EC2_STATE_CHOICES, required=False)
     tunnel_state = forms.ChoiceField(label='Tunnel State', choices=TUNNEL_STATE_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
+    banned = forms.ChoiceField(label='Banned', choices=BANNED_CHOICES, required=False)
+    pi_delivered = forms.ChoiceField(label='Delivered', choices=PI_DELIVERED_CHOICES, required=False)
