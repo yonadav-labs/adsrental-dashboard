@@ -32,6 +32,7 @@ class Lead(models.Model):
     wrong_password = models.BooleanField(default=False)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)
+    tested = models.BooleanField(default=False)
     facebook_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -88,6 +89,7 @@ class Lead(models.Model):
         lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
+        lead.tested = sf_lead.tested
         lead.save()
         return lead
 
