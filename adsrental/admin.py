@@ -80,6 +80,23 @@ class TunnelOnlineListFilter(SimpleListFilter):
             return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
 
 
+class AccountTypeListFilter(SimpleListFilter):
+    title = 'Account type'
+    parameter_name = 'account_type'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('facebook', 'Facebook'),
+            ('google', 'Google'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'facebook':
+            return queryset.filter(facebook_account=True)
+        if self.value() == 'google':
+            return queryset.filter(google_account=True)
+
+
 class RaspberryPiTunnelOnlineListFilter(SimpleListFilter):
     title = 'Tunnel online state'
     parameter_name = 'tunnel_online'
@@ -143,7 +160,7 @@ class CustomUserAdmin(UserAdmin):
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
     list_display = ('leadid', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
-    list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
+    list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
     actions = ('update_from_salesforce', 'update_salesforce')

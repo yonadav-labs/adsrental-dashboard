@@ -96,6 +96,13 @@ class DashboardView(View):
                     Q(email__icontains=value)
                 )
 
+            if form.cleaned_data['account_type']:
+                value = form.cleaned_data['account_type']
+                if value == 'facebook':
+                    entries = entries.filter(facebook_account=True)
+                if value == 'google':
+                    entries = entries.filter(google_account=True)
+
             order = request.GET.get('order', '-raspberry_pi__last_seen')
             entries = entries.order_by(order)
 
