@@ -89,7 +89,7 @@ class Lead(models.Model):
         lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
-        lead.tested = sf_lead.raspberry_pi.tested if sf_lead.tested else False
+        lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
         lead.save()
         return lead
 
