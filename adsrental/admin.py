@@ -197,12 +197,14 @@ class LeadAdmin(admin.ModelAdmin):
 
     def update_from_salesforce(self, request, queryset):
         sf_lead_ids = []
+        leads_map = {}
         for lead in queryset:
+            leads_map[lead.leadid] = lead
             sf_lead_ids.append(lead.leadid)
 
         sf_leads = SFLead.objects.filter(id__in=sf_lead_ids).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
-            Lead.upsert_from_sf(sf_lead)
+            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
 
     def update_salesforce(self, request, queryset):
         Lead.upsert_to_sf(queryset)
@@ -260,12 +262,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def update_from_salesforce(self, request, queryset):
         sf_raspberry_pi_names = []
+        raspberry_pis_map = {}
         for raspberry_pi in queryset:
+            raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
             sf_raspberry_pi_names.append(raspberry_pi.rpid)
 
         sf_raspberry_pis = SFLead.objects.filter(name__in=sf_raspberry_pi_names)
         for sf_raspberry_pi in sf_raspberry_pis:
-            RaspberryPi.upsert_from_sf(sf_raspberry_pi)
+            RaspberryPi.upsert_from_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
 
     def update_salesforce(self, request, queryset):
         RaspberryPi.upsert_to_sf(queryset)
