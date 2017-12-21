@@ -53,14 +53,25 @@ class RaspberryPi(models.Model):
         return self.rpid
 
     @staticmethod
-    def upsert_from_sf(lead_id, sf_raspberry_pi):
-        raspberry_pi = RaspberryPi.objects.filter(rpid=sf_raspberry_pi.name).first()
+    def upsert_from_sf(lead_id, sf_raspberry_pi, raspberry_pi):
         if raspberry_pi is None:
             raspberry_pi = RaspberryPi(
                 rpid=sf_raspberry_pi.name,
                 leadid=lead_id,
                 ipaddress=sf_raspberry_pi.current_ip_address,
             )
+
+        for new_field, old_field in (
+            (lead_id, raspberry_pi.leadid, ),
+            (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
+            (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
+            (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),
+            (sf_raspberry_pi.tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
+        ):
+            if new_field != old_field:
+                break
+        else:
+            return raspberry_pi
 
         raspberry_pi.leadid = lead_id
         raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
