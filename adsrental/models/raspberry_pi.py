@@ -60,6 +60,7 @@ class RaspberryPi(models.Model):
                 leadid=lead_id,
                 ipaddress=sf_raspberry_pi.current_ip_address,
             )
+            raspberry_pi.save()
 
         for new_field, old_field in (
             (lead_id, raspberry_pi.leadid, ),

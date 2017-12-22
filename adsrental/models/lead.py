@@ -58,7 +58,14 @@ class Lead(models.Model):
     def upsert_from_sf(sf_lead, lead):
         raspberry_pi = None
         if sf_lead.raspberry_pi:
-            raspberry_pi = RaspberryPi.upsert_from_sf(sf_lead.id, sf_lead.raspberry_pi, lead.raspberry_pi if lead else None)
+            old_raspberry_pi = lead.raspberry_pi if lead else None
+            if sf_lead.raspberry_pi and not old_raspberry_pi:
+                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
+
+            if sf_lead.raspberry_pi and old_raspberry_pi and sf_lead.raspberry_pi.name != old_raspberry_pi.rpid:
+                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
+
+            raspberry_pi = RaspberryPi.upsert_from_sf(sf_lead.id, sf_lead.raspberry_pi, old_raspberry_pi)
 
         if lead is None:
             lead = Lead(
