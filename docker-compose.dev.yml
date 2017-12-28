@@ -15,7 +15,7 @@ services:
     volumes:
       - ./php/cert/:/var/www/html/cert/
       - ./php/app/:/var/www/html/app/
-      - ./php/log/:/var/www/html/log/
+      - /mnt/volume-nyc3-01/log/:/var/www/html/log/
       - ./php/apache_logs/:/var/log/apache2/
       - ./php/uploads/:/var/www/html/uploads/
     ports:
