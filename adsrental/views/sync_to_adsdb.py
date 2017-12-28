@@ -1,7 +1,6 @@
 from django.views import View
 from django.http import JsonResponse
 import requests
-import json
 
 from adsrental.models import Lead
 
