@@ -35,4 +35,3 @@ for i in aws_json['Reservations']:
             # print value
             print 'aws ec2 terminate-instances --instance-ids', j['InstanceId']
         # print j['Tags']
-

@@ -1,5 +1,6 @@
 from django.views import View
 from django.http import JsonResponse
+from django.utils import dateformat
 import requests
 
 from adsrental.models import Lead
@@ -7,7 +8,7 @@ from adsrental.models import Lead
 
 class SyncToAdsdbView(View):
     def get(self, request):
-        leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, is_sync_adsdb=False, fb_email__isnull=False).select_related('raspberry_pi')
+        leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, is_sync_adsdb=True, fb_email__isnull=False).select_related('raspberry_pi')
         saved_emails = []
         responses = []
         for lead in leads[:10]:
@@ -17,11 +18,12 @@ class SyncToAdsdbView(View):
                 email=lead.email,
                 fb_username=lead.fb_email,
                 fb_password=lead.fb_secret,
-                last_seen=lead.raspberry_pi.last_seen.isoformat() if lead.raspberry_pi and lead.raspberry_pi.last_seen else None,
+                last_seen=dateformat.format(lead.raspberry_pi.last_seen, 'j E Y H:i') if lead.raspberry_pi and lead.raspberry_pi.last_seen else None,
                 phone=lead.phone,
                 ec2_hostname=lead.raspberry_pi.ec2_hostname if lead.raspberry_pi else None,
                 utm_source_id=20,
             )
+            # import json
             # raise ValueError(json.dumps(data))
             response = requests.post(
                 'https://www.adsdb.io/api/v1/accounts/create-s',
