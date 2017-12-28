@@ -9,10 +9,11 @@ from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class Lead(models.Model):
+    STATUS_QUALIFIED = 'Qualified'
     STATUS_CHOICES = [
         ('Available', 'Available'),
         ('Banned', 'Banned'),
-        ('Qualified', 'Qualified'),
+        (STATUS_QUALIFIED, 'Qualified'),
         ('In-Progress', 'In-Progress'),
     ]
 
@@ -35,6 +36,9 @@ class Lead(models.Model):
     tested = models.BooleanField(default=False)
     facebook_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[('Available', 'Available'), ('Banned', 'Banned')], blank=True, null=True)
+    fb_email = models.CharField(max_length=255, blank=True, null=True)
+    fb_secret = models.CharField(max_length=255, blank=True, null=True)
+    is_sync_adsdb = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     pi_sent = models.DateTimeField(null=True, blank=True)
@@ -98,6 +102,8 @@ class Lead(models.Model):
             (sf_lead.facebook_account_status, lead.facebook_account_status, ),
             (sf_lead.google_account_status, lead.google_account_status, ),
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
+            (sf_lead.fb_email, lead.fb_email, ),
+            (sf_lead.fb_secret, lead.fb_secret, ),
         ):
             if new_field != old_field:
                 break
@@ -122,6 +128,8 @@ class Lead(models.Model):
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
         lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
+        lead.fb_email = sf_lead.fb_email
+        lead.fb_secret = sf_lead.fb_secret
         lead.save()
         return lead
 
