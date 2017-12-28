@@ -44,5 +44,5 @@ class SyncToAdsdbView(View):
         return JsonResponse({
             'result': True,
             'saved_emails': saved_emails,
-            # 'responses': responses,
+            'responses': responses,
         })
