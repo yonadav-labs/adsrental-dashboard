@@ -8,7 +8,7 @@ from adsrental.models import Lead
 
 class SyncToAdsdbView(View):
     def get(self, request):
-        leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, is_sync_adsdb=True, fb_email__isnull=False).select_related('raspberry_pi')
+        leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, is_sync_adsdb=False, fb_email__isnull=False).select_related('raspberry_pi')
         saved_emails = []
         responses = []
         for lead in leads[:10]:
