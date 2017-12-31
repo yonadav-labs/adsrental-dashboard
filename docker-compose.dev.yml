@@ -31,5 +31,9 @@ services:
     command: /app/scripts/server.sh
     environment:
       ENV: dev
+    depends_on:
+      - db
+    links:
+      - db:db
     ports:
       - "8007:8007"
