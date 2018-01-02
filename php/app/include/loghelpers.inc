@@ -31,9 +31,13 @@
 	{
 		$filename = "/var/www/html/log/GENERAL.log";
 
-		$f = fopen($filename, "a");
-		fwrite($f, $uid . ": " . getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $message . "\n");
-		fclose($f);
+		try {
+			$f = fopen($filename, "a");
+			fwrite($f, $uid . ": " . getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $message . "\n");
+			fclose($f);
+		} catch ( Exception $e ) {
+			// send error message if you can
+		} 
 	}
 
 	function logEntry($uid, $message)
@@ -42,18 +46,26 @@
 
 		$filename = getLogPath($uid) . getNow("Ymd") . ".log";
 
-		$f = fopen($filename, "a");
-		fwrite($f, getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $message . "\n");
-		fclose($f);
+		try {
+			$f = fopen($filename, "a");
+			fwrite($f, getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $message . "\n");
+			fclose($f);
+		} catch ( Exception $e ) {
+			// send error message if you can
+		} 
 	}
 
 	function logError($uid, $message)
 	{
 		$filename = "/var/www/html/log/ERRORS.log";
 
-		$f = fopen($filename, "a");
-		fwrite($f, getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $uid . ": " . $message . "\n");
-		fclose($f);		
+		try {
+			$f = fopen($filename, "a");
+			fwrite($f, getNow("Y-m-d H:i:s") . ": " . $_SERVER["REMOTE_ADDR"] . ": " . $uid . ": " . $message . "\n");
+			fclose($f);
+		} catch ( Exception $e ) {
+			// send error message if you can
+		} 
 	}
 
 	function saveFile($uid, $url, $script, $file)
