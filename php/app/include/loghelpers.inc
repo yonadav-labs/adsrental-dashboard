@@ -30,6 +30,7 @@
 	function logGeneral($uid, $message)
 	{
 		$filename = "/var/www/html/log/GENERAL.log";
+		return;
 
 		try {
 			$f = fopen($filename, "a");
