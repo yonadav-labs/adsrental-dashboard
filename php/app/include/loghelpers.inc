@@ -42,7 +42,7 @@
 
 	function logEntry($uid, $message)
 	{
-		logGeneral($uid, $message);
+		// logGeneral($uid, $message);
 
 		$filename = getLogPath($uid) . getNow("Ymd") . ".log";
 
