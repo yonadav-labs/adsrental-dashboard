@@ -14,9 +14,9 @@ class SyncFromSFView(View):
         last_touch_date_min = timezone.now() - datetime.timedelta(minutes=minutes_ago)
         sf_leads = SFLead.objects.filter(last_touch_date__gt=last_touch_date_min).simple_select_related('raspberry_pi')
         sf_leads_ids = [i.id for i in sf_leads]
+
         if request.GET.get('all'):
             leads = Lead.objects.all().select_related('raspberry_pi')
-            
         else:
             leads = Lead.objects.filter(leadid__in=sf_leads_ids).select_related('raspberry_pi')
 
