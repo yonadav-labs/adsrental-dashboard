@@ -10,14 +10,17 @@ from salesforce_handler.models import Lead as SFLead
 
 class SyncFromSFView(View):
     def get(self, request):
-        minutes_ago = int(request.GET.get('minutes')) if request.GET.get('minutes') else 15
-        last_touch_date_min = timezone.now() - datetime.timedelta(minutes=minutes_ago)
-        sf_leads = SFLead.objects.filter(last_touch_date__gt=last_touch_date_min).simple_select_related('raspberry_pi')
-        sf_leads_ids = [i.id for i in sf_leads]
-
+        leads = []
+        sf_leads = []
+        sf_leads_ids = []
         if request.GET.get('all'):
+            sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
             leads = Lead.objects.all().select_related('raspberry_pi')
         else:
+            minutes_ago = int(request.GET.get('minutes')) if request.GET.get('minutes') else 15
+            last_touch_date_min = timezone.now() - datetime.timedelta(minutes=minutes_ago)
+            sf_leads = SFLead.objects.filter(last_touch_date__gt=last_touch_date_min).simple_select_related('raspberry_pi')
+            sf_leads_ids = [i.id for i in sf_leads]
             leads = Lead.objects.filter(leadid__in=sf_leads_ids).select_related('raspberry_pi')
 
         leads_map = {}
