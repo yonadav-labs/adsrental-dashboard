@@ -4,7 +4,7 @@
 
 	require_once("include/config.php");
 	require_once("include/salesforce.inc");
-	require_once("include/loghelpers.inc");
+	require_once("include/loghelper.inc");
 	require_once("include/jsonhelpers.inc");
 
 	require_once("include/AWSSDK/aws-autoloader.php");

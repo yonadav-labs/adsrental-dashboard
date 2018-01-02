@@ -3,7 +3,7 @@
 
 	require_once("include/config.php");
 	require_once("include/salesforce.inc");
-	require_once("include/loghelpers.inc");
+	require_once("include/loghelper.inc");
 
 	header("Expires: Mon, 01 Jan 1985 05:00:00 GMT");
 	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");

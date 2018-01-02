@@ -7,7 +7,7 @@
 		exit;
 	}
 
-	require_once(__DIR__ . "/include/loghelpers.inc");
+	require_once(__DIR__ . "/include/loghelper.inc");
 	require_once(__DIR__ . "/include/jsonhelpers.inc");
 	require_once(__DIR__ . "/include/iphelpers.inc");
 
