@@ -9,6 +9,15 @@
 		exit;
 	}
 
+	function generateRandomString($length = 10) {
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, $charactersLength - 1)];
+		}
+		return $randomString;
+	}
 
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$url = 'https://www.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
@@ -26,10 +35,9 @@
 		$data['debug'] = '1';
 		$data['debugEmail'] = 'volshebnyi@gmail.com';
 
-
 		$ext = pathinfo($_FILES['photo_id']['name'], PATHINFO_EXTENSION);
 		$filepath = sprintf('/var/www/html/uploads/photo_ids/%s.%s',
-			sha1_file($_FILES['photo_id']['tmp_name']),
+			sha1_file($_FILES['photo_id']['tmp_name']) || generateRandomString(),
 			$ext
 		);
 		$data['Photo_Id_Url__c'] = sprintf('https://adsrental.com/%s', $filepath);
