@@ -19,7 +19,7 @@
 	function createEC2Instance($ec2Client, $name, $uid)
 	{
 		$result = $ec2Client->runInstances(array(
-		    "ImageId"        	=> "ami-2d7a6a54",
+		    "ImageId"        	=> "ami-8d8f55f5",
 		    "MinCount"       	=> 1,
 		    "MaxCount"       	=> 1,
 		    "InstanceType"   	=> "t2.micro",
