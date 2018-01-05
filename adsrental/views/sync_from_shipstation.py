@@ -12,15 +12,15 @@ class SyncFromShipStationView(View):
     def get(self, request):
         leads = []
         order_numbers = []
+        days_ago = int(request.GET.get('days_ago', '1'))
         if request.GET.get('all'):
             leads = Lead.objects.filter(pi_delivered=False, status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS])
             for lead in leads:
                 lead.update_from_shipstation()
         else:
             request_params = {}
-            if request.GET.get('days_ago'):
-                date_start = timezone.now() - datetime.timedelta(days=int(request.GET.get('days_ago')))
-                request_params['shipDateStart'] = date_start.strftime('%Y-%m-%d')
+            date_start = timezone.now() - datetime.timedelta(days=days_ago)
+            request_params['shipDateStart'] = date_start.strftime('%Y-%m-%d')
 
             response = requests.get(
                 'https://ssapi.shipstation.com/shipments',
@@ -38,4 +38,5 @@ class SyncFromShipStationView(View):
         return JsonResponse({
             'result': True,
             'order_numbers': order_numbers,
+            'days_ago': days_ago,
         })

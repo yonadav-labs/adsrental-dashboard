@@ -11,7 +11,7 @@ from salesforce_handler.models import Lead as SFLead
 class SyncToSFView(View):
     def get(self, request):
         seconds_ago = int(request.GET.get('seconds_ago', '300'))
-        leads = Lead.objects.filter(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago))[:1]
+        leads = Lead.objects.filter(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago))
         sf_leadids = []
         leads_map = {}
         for lead in leads:
