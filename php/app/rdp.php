@@ -18,11 +18,20 @@
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
 
-	echo "auto connect:i:1\n";
-	echo "full address:s:" . $result["Reservations"][0]["Instances"][0]["PublicDnsName"] . ":23255\n";
-	echo "username:s:Administrator\n";
-	echo "password:s:Dk.YDq8pXQS-R5ZAn84Lgma9rFvGlfvL\n";
+	// echo $result;
+	foreach ($result["Reservations"] as $key => $reservation)
+	{
+		$instance = $reservation["Instances"][0];
+		if ($instance["State"]["Name"] != "running"){
+			continue;
+		}
+		echo "auto connect:i:1\n";
+		echo "full address:s:" . $instance["PublicDnsName"] . ":23255\n";
+		echo "username:s:Administrator\n";
+		echo "password:s:Dk.YDq8pXQS-R5ZAn84Lgma9rFvGlfvL\n";
+	
+		exit;
+	}
 
-    exit;
 
 ?>

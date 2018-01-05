@@ -91,20 +91,24 @@ class RaspberryPi(models.Model):
         return raspberry_pi
 
     @staticmethod
-    def upsert_to_sf(raspberry_pis):
-        names = []
-        names_map = {}
-        for r in raspberry_pis:
-            names.append(r.rpid)
-            names_map[r.rpid] = r
+    def upsert_to_sf(lead_id, sf_raspberry_pi, raspberry_pi):
+        for new_field, old_field in (
+            (lead_id, raspberry_pi.leadid, ),
+            (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
+            (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
+            (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),
+            (sf_raspberry_pi.tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
+        ):
+            if new_field != old_field:
+                break
+        else:
+            return raspberry_pi
 
-        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=names)
-        for sf_raspberry_pi in sf_raspberry_pis:
-            sf_raspberry_pi.first_seen = names_map[sf_raspberry_pi.name].first_seen
-            sf_raspberry_pi.last_seen = names_map[sf_raspberry_pi.name].last_seen
-            sf_raspberry_pi.tunnel_last_tested = names_map[sf_raspberry_pi.name].tunnel_last_tested
-            sf_raspberry_pi.current_ip_address = names_map[sf_raspberry_pi.name].ipaddress
-            sf_raspberry_pi.save()
+        sf_raspberry_pi.first_seen = raspberry_pi.first_seen
+        sf_raspberry_pi.last_seen = raspberry_pi.last_seen
+        sf_raspberry_pi.tunnel_last_tested = raspberry_pi.tunnel_last_tested
+        sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
+        sf_raspberry_pi.save()
 
     def get_lead(self):
         Lead = apps.get_app_config('adsrental').get_model('Lead')
