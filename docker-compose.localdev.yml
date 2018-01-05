@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: adsrental
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./dbdata1:/var/lib/mysql
+    ports:
+      - "23306:3306"
+  php:
+    build: php
+    volumes:
+      - ./php/cert/:/var/www/html/cert/
+      - ./php/app/:/var/www/html/app/
+      - ./php/log/:/var/www/html/log/
+      - ./php/uploads/:/var/www/html/uploads/
+      - ./php/apache_logs/:/var/log/apache2/
+    ports:
+      - "7443:443"
+    depends_on:
+      - db
+      - web
+    links:
+      - db:db
+      - web:web
+  web:
+    build: .
+    command: /app/scripts/server.sh
+    environment:
+      ENV: dev
+      WERKZEUG_DEBUG_PIN: 'off'
+    volumes:
+      - ./config/:/app/config/
+      - ./salesforce_handler/:/app/salesforce_handler/
+      - ./adsrental/:/app/adsrental/
+      - ./scripts/:/app/scripts/
+      - ./sf_dump/:/app/sf_dump/
+    depends_on:
+      - db
+    links:
+      - db:db

@@ -10,6 +10,8 @@ source venv/bin/activate
 #create database if it is not there yet
 python -c 'import MySQLdb; MySQLdb.connect(user="root", host="db").cursor().execute("create database if not exists adsrental CHARACTER SET utf8;")'
 
+python manage.py collectstatic --noinput
+
 #install DB and fixtures
 # python manage.py migrate adsrental
 # python manage.py migrate
