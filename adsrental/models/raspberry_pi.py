@@ -6,8 +6,6 @@ from django.utils import timezone
 from django.db import models
 from django.apps import apps
 
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
-
 
 class RaspberryPi(models.Model):
     rpid = models.CharField(primary_key=True, max_length=255)
