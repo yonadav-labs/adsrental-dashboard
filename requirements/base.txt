@@ -7,7 +7,7 @@ flake8==3.4.1
 gunicorn==19.7.1
 MySQL-Python==1.2.5
 werkzeug==0.12.2
-boto==2.48.0
+boto3==1.5.8
 whitenoise==4.0b4
 gevent==1.2.2
 django-salesforce==0.7.2
