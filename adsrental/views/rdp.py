@@ -1,9 +1,9 @@
 from django.views import View
-from django.http import FileResponse, Http404
+from django.http import FileResponse, HttpResponse
 from django.conf import settings
 import boto3
 
-from adsrental.models.lead import Lead
+from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class RDPDownloadView(View):
@@ -17,9 +17,9 @@ class RDPDownloadView(View):
         return None
 
     def get(self, request, rpid):
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
-        if not lead:
-            raise Http404()
+        raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+        if not raspberry_pi:
+            return HttpResponse('RaspberryPi {} does not exist'.format(rpid))
 
         boto_client = boto3.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -31,7 +31,7 @@ class RDPDownloadView(View):
                 {
                     'Name': 'tag:Name',
                     # 'Values': ['WP00000015'],
-                    'Values': [lead.raspberry_pi.rpid],
+                    'Values': [raspberry_pi.rpid],
                 },
             ],
             # MaxResults=10,
@@ -40,14 +40,14 @@ class RDPDownloadView(View):
         instance = self.get_instance(response)
 
         if not instance:
-            raise Http404()
+            return HttpResponse('EC2 {} is not running'.format(rpid))
 
         public_dns_name = instance.get('PublicDnsName')
         ip_address = instance.get('PublicIpAddress')
 
-        lead.raspberry_pi.ec2_hostname = public_dns_name
-        lead.raspberry_pi.current_ip_address = ip_address
-        lead.raspberry_pi.save()
+        raspberry_pi.ec2_hostname = public_dns_name
+        raspberry_pi.current_ip_address = ip_address
+        raspberry_pi.save()
 
         # raise ValueError(public_dns_name, ip_address)
 
