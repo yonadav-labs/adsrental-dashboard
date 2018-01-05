@@ -12,11 +12,13 @@ from adsrental.models.raspberry_pi import RaspberryPi
 class Lead(models.Model):
     STATUS_QUALIFIED = 'Qualified'
     STATUS_AVAILABLE = 'Available'
+    STATUS_IN_PROGRESS = 'In-Progress'
+    STATUS_BANNED = 'Banned'
     STATUS_CHOICES = [
         (STATUS_AVAILABLE, 'Available'),
-        ('Banned', 'Banned'),
+        (STATUS_BANNED, 'Banned'),
         (STATUS_QUALIFIED, 'Qualified'),
-        ('In-Progress', 'In-Progress'),
+        (STATUS_IN_PROGRESS, 'In-Progress'),
     ]
 
     leadid = models.CharField(primary_key=True, max_length=255)
@@ -94,13 +96,13 @@ class Lead(models.Model):
             (address, lead.address, ),
             (sf_lead.account_name, lead.account_name, ),
             (sf_lead.status, lead.status, ),
-            (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
+            # (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
+            # (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
             (sf_lead.utm_source, lead.utm_source, ),
             (sf_lead.google_account, lead.google_account, ),
             (raspberry_pi.pk if raspberry_pi else None, lead.raspberry_pi.pk if lead.raspberry_pi else None, ),
             (sf_lead.wrong_password, lead.wrong_password, ),
             (sf_lead.bundler_paid, lead.bundler_paid, ),
-            (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
             (sf_lead.facebook_account_status, lead.facebook_account_status, ),
             (sf_lead.google_account_status, lead.google_account_status, ),
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
@@ -119,14 +121,14 @@ class Lead(models.Model):
         lead.address = address
         lead.account_name = sf_lead.account_name
         lead.status = sf_lead.status
-        lead.usps_tracking_code = sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None
+        # lead.usps_tracking_code = sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None
+        # lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
         lead.utm_source = sf_lead.utm_source
         lead.google_account = sf_lead.google_account
         lead.facebook_account = sf_lead.facebook_account
         lead.raspberry_pi = raspberry_pi
         lead.wrong_password = sf_lead.wrong_password
         lead.bundler_paid = sf_lead.bundler_paid
-        lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
         lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
@@ -157,9 +159,10 @@ class Lead(models.Model):
                 params={'shipDateStart': '2017-12-30'},
                 # params={'orderNumber': self.account_name},
                 auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
-            ).json()
-        if data.get('shipments') and data.get('shipments')[0].get('trackingNumber'):
-            self.usps_tracking_code = data.get('shipments')[0].get('trackingNumber')
+            ).json().get('shipments')
+            data = data[0] if data else {}
+        if data.get('trackingNumber'):
+            self.usps_tracking_code = data.get('trackingNumber')
             self.pi_delivered = True
         else:
             self.usps_tracking_code = None

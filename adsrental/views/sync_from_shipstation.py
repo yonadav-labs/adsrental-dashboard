@@ -13,7 +13,7 @@ class SyncFromShipStationView(View):
         leads = []
         order_numbers = []
         if request.GET.get('all'):
-            leads = Lead.objects.filter(pi_delivered=False, status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE])
+            leads = Lead.objects.filter(pi_delivered=False, status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS])
             for lead in leads:
                 lead.update_from_shipstation()
         else:
