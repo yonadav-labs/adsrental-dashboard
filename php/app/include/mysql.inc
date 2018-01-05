@@ -72,7 +72,8 @@
 				facebook_account,
 				wrong_password,
 				bundler_paid,
-				pi_delivered
+				pi_delivered,
+				raspberry_pi_id
 			)
 			VALUES (
 				'$lead[Id]',
@@ -88,7 +89,8 @@
 				'$facebookAccount',
 				'$wrongPassword',
 				'$bundlerPaid',
-				'$piDelivered'
+				'$piDelivered',
+				NULL
 			)
 			ON DUPLICATE KEY UPDATE
 				`wrong_password` = '$wrongPassword',

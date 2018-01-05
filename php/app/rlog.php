@@ -128,7 +128,8 @@
 		else if (array_key_exists("p", $_GET))
 		{
 			logEntry($_GET["rpid"], "PING");
-			$updateFromSF = (date("i", time()) % 30 == 0) || isset($_GET['update']);
+			// $updateFromSF = (date("i", time()) % 30 == 0) || isset($_GET['update']);
+			$updateFromSF = false;
 			echo nowSFFormat();
 			if ($_SERVER["REMOTE_ADDR"] == "24.234.215.233") {
 				createOrUpdateSFObject("Raspberry_Pi__c", "Name", $_GET["rpid"], array("Tested_Internal__c" => true));
