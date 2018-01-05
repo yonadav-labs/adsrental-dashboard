@@ -66,7 +66,7 @@
                         {{ entry.raspberry_pi.rpid }}
                         (
                             <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
-                            <a href="/rdp.php?i={{ entry.raspberry_pi.rpid }}&amp;h={{ entry.raspberry_pi.rpid }}">RDP</a>
+                            <a href="{% url 'rdp' rpid=entry.raspberry_pi.rpid %}">RDP</a>
                         )
                     </td>
                     <td>

@@ -48,7 +48,7 @@
 			$output[] = "<td>";
 			$output[] = "    $row[rpid] ($row[ipaddress])";
 			$output[] = "    <br /><a href='https://adsrental.com/log/$row[rpid]' target='_blank'>Logs</a>";
-			$output[] = "    <a href='https://adsrental.com/rdp.php?i=$row[rpid]&h=$row[rpid]' target='_blank'>RDP</a>";
+			$output[] = "    <a href='https://adsrental.com/app/rdp/$row[rpid]/' target='_blank'>RDP</a>";
 			$output[] = "</td>";
 			$output[] = "<td>" . ($row["google_account"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";
 			$output[] = "<td>" . ($row["facebook_account"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";
