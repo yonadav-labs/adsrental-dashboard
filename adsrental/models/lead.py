@@ -161,11 +161,7 @@ class Lead(models.Model):
                 auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
             ).json().get('shipments')
             data = data[0] if data else {}
-        if data.get('trackingNumber'):
+        if data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
             self.pi_delivered = True
-        else:
-            self.usps_tracking_code = None
-            self.pi_delivered = False
-
-        self.save()
+            self.save()
