@@ -4,6 +4,7 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
+from django.apps import apps
 
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
@@ -104,6 +105,10 @@ class RaspberryPi(models.Model):
             sf_raspberry_pi.tunnel_last_tested = names_map[sf_raspberry_pi.name].tunnel_last_tested
             sf_raspberry_pi.current_ip_address = names_map[sf_raspberry_pi.name].ipaddress
             sf_raspberry_pi.save()
+
+    def get_lead(self):
+        Lead = apps.get_app_config('adsrental').get_model('Lead')
+        return Lead.objects.filter(leadid=self.leadid).first()
 
     class Meta:
         db_table = 'raspberry_pi'

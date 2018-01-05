@@ -159,11 +159,11 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
+    list_display = ('leadid',  'account_name', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
-    actions = ('update_from_salesforce', 'update_salesforce')
+    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation')
 
     def name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
@@ -224,7 +224,19 @@ class LeadAdmin(admin.ModelAdmin):
             Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
 
     def update_salesforce(self, request, queryset):
-        Lead.upsert_to_sf(queryset)
+        sf_lead_ids = []
+        leads_map = {}
+        for lead in queryset:
+            leads_map[lead.leadid] = lead
+            sf_lead_ids.append(lead.leadid)
+
+        sf_leads = SFLead.objects.filter(id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+        for sf_lead in sf_leads:
+            Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
+
+    def update_from_shipstation(self, request, queryset):
+        for lead in queryset:
+            lead.update_from_shipstation()
 
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
@@ -251,7 +263,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
     list_filter = (RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, )
-    actions = ('update_from_salesforce', 'update_salesforce')
+    actions = ('update_from_salesforce', )
 
     def online(self, obj):
         return obj.online()
@@ -287,9 +299,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         sf_raspberry_pis = SFLead.objects.filter(name__in=sf_raspberry_pi_names)
         for sf_raspberry_pi in sf_raspberry_pis:
             RaspberryPi.upsert_from_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
-
-    def update_salesforce(self, request, queryset):
-        RaspberryPi.upsert_to_sf(queryset)
 
     online.boolean = True
     tunnel_online.boolean = True

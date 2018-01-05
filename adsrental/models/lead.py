@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import requests
 from django.utils import timezone
 from django.db import models
 
@@ -10,8 +11,9 @@ from adsrental.models.raspberry_pi import RaspberryPi
 
 class Lead(models.Model):
     STATUS_QUALIFIED = 'Qualified'
+    STATUS_AVAILABLE = 'Available'
     STATUS_CHOICES = [
-        ('Available', 'Available'),
+        (STATUS_AVAILABLE, 'Available'),
         ('Banned', 'Banned'),
         (STATUS_QUALIFIED, 'Qualified'),
         ('In-Progress', 'In-Progress'),
@@ -134,5 +136,33 @@ class Lead(models.Model):
         return lead
 
     @staticmethod
-    def upsert_to_sf(leads):
-        pass
+    def upsert_to_sf(sf_lead, lead):
+        for new_field, old_field in (
+            (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
+            (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
+        ):
+            if new_field != old_field:
+                break
+        else:
+            return lead
+
+        sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
+        sf_lead.raspberry_pi.delivered = lead.pi_delivered
+        sf_lead.raspberry_pi.save()
+
+    def update_from_shipstation(self, data=None):
+        if data is None:
+            data = requests.get(
+                'https://ssapi.shipstation.com/shipments',
+                params={'shipDateStart': '2017-12-30'},
+                # params={'orderNumber': self.account_name},
+                auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
+            ).json()
+        if data.get('shipments') and data.get('shipments')[0].get('trackingNumber'):
+            self.usps_tracking_code = data.get('shipments')[0].get('trackingNumber')
+            self.pi_delivered = True
+        else:
+            self.usps_tracking_code = None
+            self.pi_delivered = False
+
+        self.save()
