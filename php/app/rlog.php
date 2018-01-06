@@ -22,7 +22,7 @@
 
 	function nowSFFormat()
 	{
-		return date("Y-m-d") . "T" . date("H:i:s.000O");
+		return gmdate("Y-m-d") . "T" . gmdate("H:i:s.000O");
 	}
 
 	$SFData = json_decode(file_get_contents("SF.json"), true);
