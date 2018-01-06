@@ -27,7 +27,7 @@ class SyncFromShipStationView(View):
                 params=request_params,
                 auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
             ).json()
-            raise ValueError(response)
+            # raise ValueError(response)
 
             for row in response['shipments']:
                 order_number = row['orderNumber']
