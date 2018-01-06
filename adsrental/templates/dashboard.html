@@ -63,12 +63,14 @@
                         {% endif %}
                     </td>
                     <td>
-                        {{ entry.raspberry_pi.rpid }}
                         {% if entry.raspberry_pi.rpid %}
-                        (
-                            <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
-                            <a href="{% url 'rdp' rpid=entry.raspberry_pi.rpid %}">RDP</a>
-                        )
+                            {{ entry.raspberry_pi.rpid }}
+                            (
+                                <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
+                                <a href="{% url 'rdp' rpid=entry.raspberry_pi.rpid %}">RDP</a>
+                            )
+                        {% else %}
+                            n/a
                         {% endif %}
                     </td>
                     <td>
