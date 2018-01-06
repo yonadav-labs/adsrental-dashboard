@@ -16,7 +16,7 @@ class FulltextSearchMixin(object):
             ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
         '''
 
-        return [normspace('', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+        return [normspace('', (t[0] or t[1]).strip().lower()) for t in findterms(query_string)]
 
     @classmethod
     def get_fulltext_filter(cls, query_string, search_fields):
@@ -27,10 +27,13 @@ class FulltextSearchMixin(object):
 
         query = None  # Query to search for every search term
         terms = cls.normalize_query(query_string)
+        # raise ValueError(terms)
         for term in terms:
             or_query = None  # Query to search for a given term in each field
             for field_name in search_fields:
-                q = Q(**{"%s__icontains" % field_name: term})
+                q = Q(**{
+                    "{}__icontains".format(field_name): term
+                })
                 if or_query is None:
                     or_query = q
                 else:
