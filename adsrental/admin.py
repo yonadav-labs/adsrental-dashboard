@@ -183,6 +183,7 @@ class LeadAdmin(admin.ModelAdmin):
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
     actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation', 'update_pi_delivered')
+    readonly_fields = ('created', 'updated', )
 
     def name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
@@ -288,6 +289,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
     list_filter = (RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, )
     actions = ('update_from_salesforce', )
+    readonly_fields = ('created', 'updated', )
 
     def online(self, obj):
         return obj.online()
@@ -304,6 +306,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def last_seen(self, obj):
         if obj.last_seen is None:
             return None
+
+        return obj.last_seen + ' ' + timezone.now()
 
         return naturaltime(obj.raspberry_pi.get_last_seen())
 
