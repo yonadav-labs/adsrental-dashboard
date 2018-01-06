@@ -14,7 +14,7 @@ You can find all instructions [here](https://docs.docker.com/docker-for-mac/inst
 curl -fsSL get.docker.com -o- | bash
 sudo usermod -aG docker $(whoami)
 logout # this is needed to be able to use docker as current user
-sudo curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo curl -L --fail https://github.com/docker/compose/releases/download/1.18.0/run.sh -o /usr/local/bin/docker-compose
 sudo chmod a+x /usr/local/bin/docker-compose
 ```
 
