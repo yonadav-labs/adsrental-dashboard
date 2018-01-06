@@ -100,9 +100,15 @@ class RaspberryPi(models.Model):
         else:
             return raspberry_pi
 
-        sf_raspberry_pi.first_seen = raspberry_pi.first_seen
-        sf_raspberry_pi.last_seen = raspberry_pi.last_seen
-        sf_raspberry_pi.tunnel_last_tested = raspberry_pi.tunnel_last_tested
+        if raspberry_pi.first_seen is not None:
+            if sf_raspberry_pi.first_seen is None or raspberry_pi.first_seen > sf_raspberry_pi.first_seen:
+                sf_raspberry_pi.first_seen = raspberry_pi.first_seen
+        if raspberry_pi.last_seen is not None:
+            if sf_raspberry_pi.last_seen is None or raspberry_pi.last_seen > sf_raspberry_pi.last_seen:
+                sf_raspberry_pi.last_seen = raspberry_pi.last_seen
+        if raspberry_pi.tunnel_last_tested is not None:
+            if sf_raspberry_pi.tunnel_last_tested is None or raspberry_pi.tunnel_last_tested > sf_raspberry_pi.tunnel_last_tested:
+                sf_raspberry_pi.tunnel_last_tested = raspberry_pi.tunnel_last_tested
         sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
         sf_raspberry_pi.save()
 
