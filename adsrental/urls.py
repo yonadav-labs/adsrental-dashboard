@@ -6,6 +6,7 @@ from adsrental.views.sync_from_sf import SyncFromSFView
 from adsrental.views.sync_to_sf import SyncToSFView
 from adsrental.views.sync_to_adsdb import SyncToAdsdbView
 from adsrental.views.sync_from_shipstation import SyncFromShipStationView
+from adsrental.views.sync_delivered import SyncDeliveredView
 from adsrental.views.dashboard import DashboardView, CheckSentView
 from adsrental.views.rdp import RDPDownloadView
 import django.contrib.auth.views as auth_views
@@ -15,6 +16,7 @@ urlpatterns = [
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
     url(r'^sync/from_sf/$', SyncFromSFView.as_view(), name='sync_from_sf'),
     url(r'^sync/from_shipstation/$', SyncFromShipStationView.as_view(), name='sync_from_shipstation'),
+    url(r'^sync/delivered/$', SyncDeliveredView.as_view(), name='sync_delivered'),
     url(r'^sync/to_sf/$', SyncToSFView.as_view(), name='sync_to_sf'),
     url(r'^sync/to_adsdb/$', SyncToAdsdbView.as_view(), name='sync_to_adsdb'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
