@@ -64,10 +64,12 @@
                     </td>
                     <td>
                         {{ entry.raspberry_pi.rpid }}
+                        {% if entry.raspberry_pi.rpid %}
                         (
                             <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
                             <a href="{% url 'rdp' rpid=entry.raspberry_pi.rpid %}">RDP</a>
                         )
+                        {% endif %}
                     </td>
                     <td>
                         {% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}
