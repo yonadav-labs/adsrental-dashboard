@@ -6,11 +6,10 @@ from django.utils import timezone
 from django.db import models
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.mixins import FulltextSearchMixin
 
-# from salesforce_handler.models import Lead as SFLead
 
-
-class Lead(models.Model):
+class Lead(models.Model, FulltextSearchMixin):
     STATUS_QUALIFIED = 'Qualified'
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
