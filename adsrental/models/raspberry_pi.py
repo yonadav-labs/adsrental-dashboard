@@ -50,17 +50,17 @@ class RaspberryPi(models.Model):
         return self.rpid
 
     @staticmethod
-    def upsert_from_sf(lead_id, sf_raspberry_pi, raspberry_pi):
+    def upsert_from_sf(sf_raspberry_pi, raspberry_pi):
         if raspberry_pi is None:
             raspberry_pi = RaspberryPi(
                 rpid=sf_raspberry_pi.name,
-                leadid=lead_id,
+                leadid=sf_raspberry_pi.linked_lead_id,
                 ipaddress=sf_raspberry_pi.current_ip_address,
             )
             raspberry_pi.save()
 
         for new_field, old_field in (
-            (lead_id, raspberry_pi.leadid, ),
+            (sf_raspberry_pi.linked_lead_id, raspberry_pi.leadid, ),
             (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
             (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
             (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),
@@ -71,7 +71,7 @@ class RaspberryPi(models.Model):
         else:
             return raspberry_pi
 
-        raspberry_pi.leadid = lead_id
+        raspberry_pi.leadid = sf_raspberry_pi.linked_lead_id
         raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
         # raspberry_pi.ec2_hostname = sf_raspberry_pi.ec2
         if sf_raspberry_pi.first_seen is not None:
@@ -87,9 +87,9 @@ class RaspberryPi(models.Model):
         return raspberry_pi
 
     @staticmethod
-    def upsert_to_sf(lead_id, sf_raspberry_pi, raspberry_pi):
+    def upsert_to_sf(sf_raspberry_pi, raspberry_pi):
         for new_field, old_field in (
-            (lead_id, raspberry_pi.leadid, ),
+            (sf_raspberry_pi.linked_lead_id, raspberry_pi.leadid, ),
             (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
             (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
             (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),

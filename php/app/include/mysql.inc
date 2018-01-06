@@ -1,6 +1,6 @@
 <?php
 
-	$sqlNowUtcToPst = "DATE_SUB(NOW(), INTERVAL 7 HOUR)";
+	$sqlNowUtcToPst = "NOW()";
 	function mysqlConnect()
 	{
 		return new mysqli("db", "root", "", "adsrental");

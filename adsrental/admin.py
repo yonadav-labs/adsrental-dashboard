@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 
 from adsrental.models import User, Lead, RaspberryPi
 from salesforce_handler.models import Lead as SFLead
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -288,7 +289,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
     list_filter = (RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, )
-    actions = ('update_from_salesforce', )
+    actions = ('update_from_salesforce', 'update_to_salesforce', )
     readonly_fields = ('created', 'updated', )
 
     def online(self, obj):
@@ -324,9 +325,22 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
             sf_raspberry_pi_names.append(raspberry_pi.rpid)
 
-        sf_raspberry_pis = SFLead.objects.filter(name__in=sf_raspberry_pi_names)
+        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=sf_raspberry_pi_names)
+
         for sf_raspberry_pi in sf_raspberry_pis:
             RaspberryPi.upsert_from_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
+
+    def update_to_salesforce(self, request, queryset):
+        sf_raspberry_pi_names = []
+        raspberry_pis_map = {}
+        for raspberry_pi in queryset:
+            raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
+            sf_raspberry_pi_names.append(raspberry_pi.rpid)
+
+        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=sf_raspberry_pi_names)
+
+        for sf_raspberry_pi in sf_raspberry_pis:
+            RaspberryPi.upsert_to_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
 
     online.boolean = True
     tunnel_online.boolean = True
