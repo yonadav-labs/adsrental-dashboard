@@ -159,7 +159,26 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid', 'usps_tracking_code', 'account_name', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
+    list_display = (
+        'leadid',
+        # 'usps_tracking_code',
+        'account_name',
+        'name', 'status',
+        'email',
+        'phone',
+        'google_account_column',
+        'facebook_account_column',
+        'raspberry_pi_link',
+        'first_seen',
+        'last_seen',
+        'tunnel_last_tested',
+        'online',
+        'tunnel_online',
+        'wrong_password',
+        'pi_delivered',
+        'bundler_paid',
+        'tested',
+    )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
