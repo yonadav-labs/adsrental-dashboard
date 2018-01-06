@@ -22,31 +22,31 @@ class RaspberryPi(models.Model):
         if self.last_seen is None:
             return False
 
-        return (timezone.now() - self.get_last_seen()).total_seconds() < 7 * 60 * 60
+        return (timezone.now() - self.get_last_seen()).total_seconds() < 1 * 60 * 60
 
     def tunnel_online(self):
         if self.tunnel_last_tested is None:
             return False
 
-        return (timezone.now() - self.get_tunnel_last_tested()).total_seconds() < 7 * 60 * 60
+        return (timezone.now() - self.get_tunnel_last_tested()).total_seconds() < 1 * 60 * 60
 
     def get_first_seen(self):
         if self.first_seen is None:
             return None
 
-        return self.first_seen + datetime.timedelta(hours=7)
+        return self.first_seen
 
     def get_last_seen(self):
         if self.last_seen is None:
             return None
 
-        return self.last_seen + datetime.timedelta(hours=7)
+        return self.last_seen
 
     def get_tunnel_last_tested(self):
         if self.tunnel_last_tested is None:
             return None
 
-        return self.tunnel_last_tested + datetime.timedelta(hours=7)
+        return self.tunnel_last_tested
 
     def __str__(self):
         return self.rpid

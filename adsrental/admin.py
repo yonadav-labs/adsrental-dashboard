@@ -197,19 +197,19 @@ class LeadAdmin(admin.ModelAdmin):
         if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.first_seen + datetime.timedelta(hours=7))
+        return naturaltime(obj.raspberry_pi.get_first_seen())
 
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.last_seen + datetime.timedelta(hours=7))
+        return naturaltime(obj.raspberry_pi.get_last_seen())
 
     def tunnel_last_tested(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.tunnel_last_tested is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.tunnel_last_tested + datetime.timedelta(hours=7))
+        return naturaltime(obj.raspberry_pi.get_tunnel_last_tested())
 
     def facebook_account_column(self, obj):
         return '{} {}'.format(
@@ -299,19 +299,19 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         if obj.first_seen is None:
             return None
 
-        return naturaltime(obj.first_seen + datetime.timedelta(hours=7))
+        return naturaltime(obj.raspberry_pi.get_first_seen())
 
     def last_seen(self, obj):
         if obj.last_seen is None:
             return None
 
-        return naturaltime(obj.last_seen + datetime.timedelta(hours=7))
+        return naturaltime(obj.raspberry_pi.get_last_seen())
 
     def tunnel_last_tested(self, obj):
         if obj.tunnel_last_tested is None:
             return None
 
-        return naturaltime(obj.tunnel_last_tested + datetime.timedelta(hours=7))
+        return naturaltime(obj.get_tunnel_last_tested())
 
     def update_from_salesforce(self, request, queryset):
         sf_raspberry_pi_names = []
