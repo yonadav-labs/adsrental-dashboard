@@ -140,6 +140,16 @@ class Lead(models.Model):
 
     @staticmethod
     def upsert_to_sf(sf_lead, lead):
+        if sf_lead.raspberry_pi:
+            old_raspberry_pi = lead.raspberry_pi if lead else None
+            if sf_lead.raspberry_pi and not old_raspberry_pi:
+                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
+
+            if sf_lead.raspberry_pi and old_raspberry_pi and sf_lead.raspberry_pi.name != old_raspberry_pi.rpid:
+                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
+
+            RaspberryPi.upsert_to_sf(sf_lead.id, sf_lead.raspberry_pi, old_raspberry_pi)
+
         for new_field, old_field in (
             (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
             (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
