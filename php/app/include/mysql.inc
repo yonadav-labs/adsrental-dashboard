@@ -19,15 +19,16 @@
 		}
 
 		$tunnelLastTested = "NULL";
+		$now = gmdate("Y-m-d");
 
 		if ($updateTunnelLastTested)
 		{
-			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, tunnel_last_tested) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, $sqlNowUtcToPst) " .
+			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, tunnel_last_tested, `created`, `updated`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now') " .
 				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst, tunnel_last_tested = $sqlNowUtcToPst";
 		}
 		else
 		{
-			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst) " .
+			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, `created`, `updated`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now') " .
 				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst";
 		}
 
@@ -56,6 +57,7 @@
 		$wrongPassword = empty($lead['Wrong_Password__c']) ? "0" : $lead['Wrong_Password__c'];
 		$bundlerPaid = empty($lead['Bundler_Paid__c']) ? "0" : $lead['Bundler_Paid__c'];
 		$piDelivered = empty($lead["Raspberry_Pi__r"]["Delivered__c"]) ? "0" : $lead["Raspberry_Pi__r"]["Delivered__c"];
+		$now = gmdate("Y-m-d");
 
 		$sql = <<<EOD
 			INSERT INTO lead (
@@ -73,7 +75,9 @@
 				wrong_password,
 				bundler_paid,
 				pi_delivered,
-				raspberry_pi_id
+				raspberry_pi_id,
+				`created`,
+				`updated`
 			)
 			VALUES (
 				'$lead[Id]',
@@ -90,7 +94,9 @@
 				'$wrongPassword',
 				'$bundlerPaid',
 				'$piDelivered',
-				NULL
+				NULL,
+				'$now',
+				'$now'
 			)
 			ON DUPLICATE KEY UPDATE
 				`wrong_password` = '$wrongPassword',
