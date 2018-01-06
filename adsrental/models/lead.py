@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import requests
+from xml.etree import ElementTree
 from django.utils import timezone
 from django.db import models
 
@@ -163,5 +164,27 @@ class Lead(models.Model):
             data = data[0] if data else {}
         if data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
-            self.pi_delivered = True
+            # self.pi_delivered = True
+            self.save()
+
+    def update_pi_delivered(self):
+        if not self.usps_tracking_code:
+            return
+
+        xml = '<TrackRequest USERID="039ADCRU4974"><TrackID ID="{}"></TrackID></TrackRequest>'.format(self.usps_tracking_code)
+        url = 'https://secure.shippingapis.com/ShippingAPI.dll'
+        response = requests.get(url, params={
+            'API': 'TrackV2',
+            'xml': xml,
+        })
+
+        tree = ElementTree.fromstring(response.text)
+        pi_delivered = False
+        try:
+            pi_delivered = 'delivered' in tree.find('TrackInfo').getchildren()[0].text
+        except:
+            pass
+
+        if self.pi_delivered != pi_delivered:
+            self.pi_delivered = pi_delivered
             self.save()

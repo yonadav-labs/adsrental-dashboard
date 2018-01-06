@@ -159,11 +159,11 @@ class CustomUserAdmin(UserAdmin):
 
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
-    list_display = ('leadid',  'account_name', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
+    list_display = ('leadid', 'usps_tracking_code', 'account_name', 'name', 'status', 'email', 'phone', 'google_account_column', 'facebook_account_column', 'raspberry_pi_link', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', 'wrong_password', 'pi_delivered', 'bundler_paid', 'tested', )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
-    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation')
+    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation', 'update_pi_delivered')
 
     def name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
@@ -238,6 +238,10 @@ class LeadAdmin(admin.ModelAdmin):
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
             lead.update_from_shipstation()
+
+    def update_pi_delivered(self, request, queryset):
+        for lead in queryset:
+            lead.update_pi_delivered()
 
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
