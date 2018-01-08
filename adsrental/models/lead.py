@@ -149,7 +149,7 @@ class Lead(models.Model, FulltextSearchMixin):
             if sf_lead.raspberry_pi and old_raspberry_pi and sf_lead.raspberry_pi.name != old_raspberry_pi.rpid:
                 old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
 
-            RaspberryPi.upsert_to_sf(sf_lead.id, sf_lead.raspberry_pi, old_raspberry_pi)
+            RaspberryPi.upsert_to_sf(sf_lead.raspberry_pi, old_raspberry_pi)
 
         for new_field, old_field in (
             (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
