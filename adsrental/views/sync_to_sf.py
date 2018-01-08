@@ -31,7 +31,7 @@ class SyncToSFView(View):
             try:
                 Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
             except Exception as e:
-                errors.append(sf_lead.id, str(e))
+                errors.append([sf_lead.id, str(e)])
 
         return JsonResponse({
             'all': all,
