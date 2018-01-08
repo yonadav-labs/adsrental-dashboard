@@ -11,7 +11,11 @@ from salesforce_handler.models import Lead as SFLead
 class SyncToSFView(View):
     def get(self, request):
         seconds_ago = int(request.GET.get('seconds_ago', '300'))
-        leads = Lead.objects.filter(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago))
+        all = request.GET.get('all')
+        if all:
+            leads = Lead.objects.all().select_related('raspberry_pi')
+        else:
+            leads = Lead.objects.filter(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago)).select_related('raspberry_pi')
         sf_leadids = []
         errors = []
         leads_map = {}
@@ -19,7 +23,10 @@ class SyncToSFView(View):
             sf_leadids.append(lead.leadid)
             leads_map[lead.leadid] = lead
 
-        sf_leads = SFLead.objects.filter(id__in=sf_leadids).simple_select_related('raspberry_pi')
+        if all:
+            sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
+        else:
+            sf_leads = SFLead.objects.filter(id__in=sf_leadids).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
             try:
                 Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
@@ -27,6 +34,7 @@ class SyncToSFView(View):
                 errors.append(sf_lead.id, str(e))
 
         return JsonResponse({
+            'all': all,
             'result': True,
             'leads_ids': [i.leadid for i in leads],
             'seconds_ago': seconds_ago,
