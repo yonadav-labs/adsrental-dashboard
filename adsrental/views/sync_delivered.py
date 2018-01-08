@@ -1,3 +1,4 @@
+import requests
 from django.views import View
 from django.http import JsonResponse
 
@@ -11,12 +12,15 @@ class SyncDeliveredView(View):
         not_delivered = []
         all = request.GET.get('all')
         if all:
-            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, usps_tracking_code__isnull=False)
+            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, facebook_account_status=Lead.STATUS_AVAILABLE, usps_tracking_code__isnull=False)
         else:
-            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, usps_tracking_code__isnull=False, pi_delivered=False)
+            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, facebook_account_status=Lead.STATUS_AVAILABLE, usps_tracking_code__isnull=False, pi_delivered=False)
         # raise ValueError(leads)
         for lead in leads:
-            lead.update_pi_delivered()
+            try:
+                lead.update_pi_delivered()
+            except requests.exceptions.ConnectionError:
+                pass
             if lead.pi_delivered:
                 delivered.append(lead.leadid)
             else:
