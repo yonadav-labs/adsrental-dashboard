@@ -14,7 +14,7 @@ class SyncDeliveredView(View):
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, usps_tracking_code__isnull=False)
         else:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, usps_tracking_code__isnull=False, pi_delivered=False)
-        raise ValueError(leads)
+        # raise ValueError(leads)
         for lead in leads:
             lead.update_pi_delivered()
             if lead.pi_delivered:
