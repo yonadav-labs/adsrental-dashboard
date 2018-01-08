@@ -10,6 +10,7 @@ class SyncDeliveredView(View):
         leads = []
         delivered = []
         not_delivered = []
+        errors = []
         all = request.GET.get('all')
         if all:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, facebook_account_status=Lead.STATUS_AVAILABLE, usps_tracking_code__isnull=False)
@@ -19,8 +20,8 @@ class SyncDeliveredView(View):
         for lead in leads:
             try:
                 lead.update_pi_delivered()
-            except requests.exceptions.ConnectionError:
-                pass
+            except requests.exceptions.ConnectionError as e:
+                errors.append([lead.leadid, str(e)])
             if lead.pi_delivered:
                 delivered.append(lead.leadid)
             else:
@@ -31,4 +32,5 @@ class SyncDeliveredView(View):
             'result': True,
             'delivered': delivered,
             'not_delivered': not_delivered,
+            'errors': errors,
         })
