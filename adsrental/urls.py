@@ -9,6 +9,7 @@ from adsrental.views.sync_from_shipstation import SyncFromShipStationView
 from adsrental.views.sync_delivered import SyncDeliveredView
 from adsrental.views.dashboard import DashboardView, CheckSentView
 from adsrental.views.rdp import RDPDownloadView
+from adsrental.views.farming import PiConfigView
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
@@ -27,4 +28,5 @@ urlpatterns = [
     url(r'^log/$', LogView.as_view(), name='log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^farming/pi_config/<rpid>/$', PiConfigView.as_view(), name='farming_pi_config'),
 ]

@@ -13,3 +13,4 @@ gevent==1.2.2
 django-salesforce==0.7.2
 django-bootstrap-form==3.3
 customerio==0.2.4
+shipstation==0.1.2
