@@ -28,5 +28,5 @@ urlpatterns = [
     url(r'^log/$', LogView.as_view(), name='log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
-    url(r'^farming/pi_config/<rpid>/$', PiConfigView.as_view(), name='farming_pi_config'),
+    url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),
 ]
