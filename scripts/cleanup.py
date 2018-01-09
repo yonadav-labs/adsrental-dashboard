@@ -2,7 +2,9 @@
 
 # aws ec2 describe-instances --max-items 1000 > ~/instances.json
 # aws ec2 describe-instances --max-items 1000 --starting-token eyJOZXh0VG9rZW4iOiBudWxsLCAiYm90b190cnVuY2F0ZV9hbW91bnQiOiAxMDAwfQ== > ~/instances2.json
-# ssh root@adsrental.com mysql -h 0.0.0.0 -P 13306 adsrental -e "select raspberry_pi_id from lead where status!='Banned' and raspberry_pi_id is not null;" > rpis.txt
+# mysql -u root -h 0.0.0.0 -P 13306 adsrental -e "select raspberry_pi_id from lead where status!='Banned' and raspberry_pi_id is not null;" > ~/rpis.txt
+# python ./scripts/cleanup.py ~/rpis.txt ~/instances.json | xargs -I % bash -c '%'
+# python ./scripts/cleanup.py ~/rpis.txt ~/instances2.json | xargs -I % bash -c '%'
 
 
 import sys
