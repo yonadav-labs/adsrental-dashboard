@@ -6,7 +6,7 @@ cd $ROOT_PATH
 ./scripts/wait-for-it.sh db:3306
 
 #create database if it is not there yet
-python -c 'import MySQLdb; MySQLdb.connect(user="root", host="db").cursor().execute("create database if not exists adsrental CHARACTER SET utf8;")'
+python -c 'import pymysql; pymysql.connect(user="root", host="db").cursor().execute("create database if not exists adsrental CHARACTER SET utf8;")'
 
 python manage.py collectstatic --noinput
 
