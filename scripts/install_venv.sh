@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ROOT_PATH=$(dirname $(dirname $0))
 cd $ROOT_PATH
 
@@ -8,6 +8,5 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-rm /usr/local/bin/python
-ln -s /app/venv/bin/python /usr/local/bin/python
+pip install flake8==3.4.1 autopep8==1.3.3
 pip install -r requirements/base.txt

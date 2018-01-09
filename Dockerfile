@@ -1,13 +1,24 @@
-FROM python:2.7
+FROM python:2.7-alpine3.7
 
 ENV PYTHONUNBUFFERED 1
 ENV ENV local
-RUN mkdir -p /app/scripts/
+
+RUN mkdir -p /app/
 WORKDIR /app
 
+RUN apk --no-cache add \
+    gcc \
+    musl-dev \
+    bash \
+&& echo "Installed build dependencies"
+
 ADD ./requirements /app/requirements/
-ADD ./scripts/install_venv.sh /app/scripts/install_venv.sh
-RUN ./scripts/install_venv.sh
+RUN pip install -r /app/requirements/base.txt
+
+RUN apk --no-cache del gcc musl-dev
+
+# ADD ./scripts/install_venv.sh /app/scripts/install_venv.sh
+# RUN ./scripts/install_venv.sh
 
 ADD ./manage.py /app/
 ADD ./cert /app/cert/

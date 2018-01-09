@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ROOT_PATH=$(dirname $(dirname $0))
 cd $ROOT_PATH
-
-source venv/bin/activate
 
 #waiting for db
 ./scripts/wait-for-it.sh db:3306
