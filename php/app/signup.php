@@ -20,7 +20,7 @@
 	}
 
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		$url = 'https://www.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
+		$url = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
 		
 		$data = $_POST;
 
