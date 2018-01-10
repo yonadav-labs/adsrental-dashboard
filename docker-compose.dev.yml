@@ -12,6 +12,7 @@ services:
     ports:
       - "13306:3306"
   php:
+    restart: on-failure
     build: php
     volumes:
       - ./php/cert/:/var/www/html/cert/
