@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
         print time.clock(), 'Starting'
 
-        leads = SFLead.objects.all().simple_select_related('raspberry_pi')
+        leads = SFLead.objects.filter(status__in=['Qualified', 'In-Progress']).simple_select_related('raspberry_pi')
         rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi]
         banned_rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi and i.status == 'Banned']
         launched_rpid = []
