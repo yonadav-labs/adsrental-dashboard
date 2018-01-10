@@ -43,13 +43,22 @@ class Command(BaseCommand):
             # elif counter % 100 == 0:
             #     print '{} instances processed'.format(counter)
 
+            instance_id = instance.id
+            public_dns_name = instance.public_dns_name
             instance_rpid = None
+            instance_state = instance.state['Name']
+
             if instance.tags:
                 for tagpair in instance.tags:
                     if tagpair['Key'] == 'Name':
                         instance_rpid = tagpair['Value']
+            else:
+                print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped as it has no tags'
+                if terminate:
+                    instance.terminate()
+                if stop:
+                    instance.stop()
 
-            instance_state = instance.state['Name']
             if instance_rpid:
                 launched_rpid.append(instance_rpid)
 
@@ -57,8 +66,6 @@ class Command(BaseCommand):
                 continue
 
             launched_rpid.append(instance_rpid)
-            instance_id = instance.id
-            public_dns_name = instance.public_dns_name
 
             if instance_rpid in banned_rpids:
                 print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped'
