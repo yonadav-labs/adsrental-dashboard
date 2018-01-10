@@ -24,8 +24,9 @@ class Command(BaseCommand):
 
         print time.clock(), 'Starting'
 
-        leads = SFLead.objects.filter(status__in=['Qualified', 'In-Progress']).simple_select_related('raspberry_pi')
-        rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi]
+        leads = SFLead.objects.filter().simple_select_related('raspberry_pi')
+        # rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi]
+        required_rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi and i.status in ('Qualified', 'In-Progress')]
         banned_rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi and i.status == 'Banned']
         launched_rpid = []
 
@@ -67,7 +68,7 @@ class Command(BaseCommand):
 
             launched_rpid.append(instance_rpid)
 
-            if instance_rpid in banned_rpids:
+            if instance_rpid not in required_rpids:
                 print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped'
                 if terminate:
                     instance.terminate()
@@ -75,7 +76,7 @@ class Command(BaseCommand):
                     instance.stop()
                 stopped_rpids.append(instance_rpid)
 
-        for rpid in rpids:
+        for rpid in required_rpids:
             if rpid in banned_rpids:
                 continue
             if rpid in launched_rpid:
