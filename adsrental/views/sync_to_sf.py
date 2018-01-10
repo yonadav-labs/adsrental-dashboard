@@ -42,6 +42,7 @@ class SyncToSFView(View):
             'all': all,
             'result': True,
             'leads_ids': [i.leadid for i in leads],
+            'sfleads_ids': [i.name for i in sf_leads],
             'seconds_ago': seconds_ago,
             'errors': errors,
         })
