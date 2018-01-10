@@ -17,8 +17,8 @@ class SyncToSFView(View):
             leads = Lead.objects.all().select_related('raspberry_pi')
         else:
             leads = Lead.objects.filter(
-                Q({'updated__gte': timezone.now() - datetime.timedelta(seconds=seconds_ago)}) |
-                Q({'raspberry_pi__updated__gte': timezone.now() - datetime.timedelta(seconds=seconds_ago)})
+                Q(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago)) |
+                Q(raspberry_pi__updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago))
             ).select_related('raspberry_pi')
         sf_leadids = []
         errors = []
