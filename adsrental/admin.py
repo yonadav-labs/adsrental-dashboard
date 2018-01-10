@@ -210,19 +210,23 @@ class LeadAdmin(admin.ModelAdmin):
         if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.get_first_seen())
+        first_seen = obj.raspberry_pi.get_first_seen()
+        return u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen))
 
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.get_last_seen())
+        last_seen = obj.raspberry_pi.get_last_seen()
+
+        return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
 
     def tunnel_last_tested(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.tunnel_last_tested is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.get_tunnel_last_tested())
+        tunnel_last_tested = obj.raspberry_pi.get_tunnel_last_tested()
+        return u'<span title="{}">{}</span>'.format(tunnel_last_tested, naturaltime(tunnel_last_tested))
 
     def facebook_account_column(self, obj):
         return '{} {}'.format(
@@ -286,10 +290,13 @@ class LeadAdmin(admin.ModelAdmin):
     raspberry_pi_link.allow_tags = True
     first_seen.empty_value_display = 'Never'
     first_seen.admin_order_field = 'raspberry_pi__first_seen'
+    first_seen.allow_tags = True
     last_seen.empty_value_display = 'Never'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
+    last_seen.allow_tags = True
     tunnel_last_tested.empty_value_display = 'Never'
     tunnel_last_tested.admin_order_field = 'raspberry_pi__tunnel_last_tested'
+    tunnel_last_tested.allow_tags = True
     facebook_account_column.short_description = 'Facebook Account'
     facebook_account_column.allow_tags = True
     google_account_column.admin_order_field = 'facebook_account'

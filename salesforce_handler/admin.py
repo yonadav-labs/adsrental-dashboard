@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from .models import Lead, RaspberryPi, Ec2Instance, BrowserExtension
 
@@ -39,8 +40,14 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi.tunnel_online if obj.raspberry_pi else False
 
     def last_seen(self, obj):
-        return obj.raspberry_pi.last_seen if obj.raspberry_pi else None
+        if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
+            return None
 
+        last_seen = obj.raspberry_pi.last_seen
+
+        return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
+
+    last_seen.allow_tags = True
     email_field.allow_tags = True
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
