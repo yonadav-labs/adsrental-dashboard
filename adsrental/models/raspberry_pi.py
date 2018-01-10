@@ -50,7 +50,18 @@ class RaspberryPi(models.Model):
         return self.rpid
 
     @staticmethod
-    def upsert_from_sf(sf_raspberry_pi, raspberry_pi):
+    def get_max_datetime(a, b):
+        if not a:
+            return b
+        if not b:
+            return a
+        if a > b:
+            return a
+
+        return b
+
+    @classmethod
+    def upsert_from_sf(cls, sf_raspberry_pi, raspberry_pi):
         if raspberry_pi is None:
             raspberry_pi = RaspberryPi(
                 rpid=sf_raspberry_pi.name,
@@ -59,12 +70,16 @@ class RaspberryPi(models.Model):
             )
             raspberry_pi.save()
 
+        first_seen = cls.get_max_datetime(raspberry_pi.first_seen, sf_raspberry_pi.first_seen)
+        last_seen = cls.get_max_datetime(raspberry_pi.last_seen, sf_raspberry_pi.last_seen)
+        tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)
+
         for new_field, old_field in (
             (sf_raspberry_pi.linked_lead_id, raspberry_pi.leadid, ),
             (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
-            (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
-            (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),
-            (sf_raspberry_pi.tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
+            (first_seen, raspberry_pi.first_seen, ),
+            (last_seen, raspberry_pi.last_seen, ),
+            (tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
         ):
             if new_field != old_field:
                 break
@@ -74,41 +89,34 @@ class RaspberryPi(models.Model):
         raspberry_pi.leadid = sf_raspberry_pi.linked_lead_id
         raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
         # raspberry_pi.ec2_hostname = sf_raspberry_pi.ec2
-        if sf_raspberry_pi.first_seen is not None:
-            if raspberry_pi.first_seen is None or sf_raspberry_pi.first_seen > raspberry_pi.first_seen:
-                raspberry_pi.first_seen = sf_raspberry_pi.first_seen
-        if sf_raspberry_pi.last_seen is not None:
-            if raspberry_pi.last_seen is None or sf_raspberry_pi.last_seen > raspberry_pi.last_seen:
-                raspberry_pi.last_seen = sf_raspberry_pi.last_seen
-        if sf_raspberry_pi.tunnel_last_tested is not None:
-            if raspberry_pi.tunnel_last_tested is None or sf_raspberry_pi.tunnel_last_tested > raspberry_pi.tunnel_last_tested:
-                raspberry_pi.tunnel_last_tested = sf_raspberry_pi.tunnel_last_tested
+        raspberry_pi.first_seen = first_seen
+        raspberry_pi.last_seen = last_seen
+        raspberry_pi.tunnel_last_tested = tunnel_last_tested
+
         raspberry_pi.save()
         return raspberry_pi
 
-    @staticmethod
-    def upsert_to_sf(sf_raspberry_pi, raspberry_pi):
+    @classmethod
+    def upsert_to_sf(cls, sf_raspberry_pi, raspberry_pi):
+        first_seen = cls.get_max_datetime(raspberry_pi.first_seen, sf_raspberry_pi.first_seen)
+        last_seen = cls.get_max_datetime(raspberry_pi.last_seen, sf_raspberry_pi.last_seen)
+        tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)
+
         for new_field, old_field in (
             (sf_raspberry_pi.linked_lead_id, raspberry_pi.leadid, ),
             (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
-            (sf_raspberry_pi.first_seen, raspberry_pi.first_seen, ),
-            (sf_raspberry_pi.last_seen, raspberry_pi.last_seen, ),
-            (sf_raspberry_pi.tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
+            (sf_raspberry_pi.first_seen, first_seen, ),
+            (sf_raspberry_pi.last_seen, last_seen, ),
+            (sf_raspberry_pi.tunnel_last_tested, tunnel_last_tested, ),
         ):
             if new_field != old_field:
                 break
         else:
             return raspberry_pi
 
-        if raspberry_pi.first_seen is not None:
-            if sf_raspberry_pi.first_seen is None or raspberry_pi.first_seen > sf_raspberry_pi.first_seen:
-                sf_raspberry_pi.first_seen = raspberry_pi.first_seen
-        if raspberry_pi.last_seen is not None:
-            if sf_raspberry_pi.last_seen is None or raspberry_pi.last_seen > sf_raspberry_pi.last_seen:
-                sf_raspberry_pi.last_seen = raspberry_pi.last_seen
-        if raspberry_pi.tunnel_last_tested is not None:
-            if sf_raspberry_pi.tunnel_last_tested is None or raspberry_pi.tunnel_last_tested > sf_raspberry_pi.tunnel_last_tested:
-                sf_raspberry_pi.tunnel_last_tested = raspberry_pi.tunnel_last_tested
+        sf_raspberry_pi.first_seen = first_seen
+        sf_raspberry_pi.last_seen = last_seen
+        sf_raspberry_pi.tunnel_last_tested = tunnel_last_tested
         sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
         sf_raspberry_pi.save()
 
