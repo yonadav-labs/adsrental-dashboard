@@ -3,6 +3,7 @@ import datetime
 from django.views import View
 from django.http import JsonResponse
 from django.utils import timezone
+from django.db.models import Q
 
 from adsrental.models import Lead
 from salesforce_handler.models import Lead as SFLead
@@ -15,7 +16,10 @@ class SyncToSFView(View):
         if all:
             leads = Lead.objects.all().select_related('raspberry_pi')
         else:
-            leads = Lead.objects.filter(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago)).select_related('raspberry_pi')
+            leads = Lead.objects.filter(
+                Q({'updated__gte': timezone.now() - datetime.timedelta(seconds=seconds_ago)}) |
+                Q({'raspberry_pi__updated__gte': timezone.now() - datetime.timedelta(seconds=seconds_ago)})
+            ).select_related('raspberry_pi')
         sf_leadids = []
         errors = []
         leads_map = {}
