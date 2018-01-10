@@ -33,7 +33,7 @@ class Command(BaseCommand):
         stopped_rpids = []
         started_rpids = []
 
-        print time.clock(), 'Got SF data'
+        print time.clock(), 'Got SF data, {} insstances has to be existing'.format(len(required_rpids))
 
         # print banned_rpids
 
