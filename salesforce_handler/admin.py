@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 from .models import Lead, RaspberryPi, Ec2Instance, BrowserExtension
 
@@ -8,8 +9,15 @@ class LeadAdmin(admin.ModelAdmin):
     # list_select_related = (
     #     'raspberry_pi',
     # )
-    list_display = ('name', 'account_name', 'email', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'utm_source', 'bundler_paid', 'wrong_password', 'last_seen', )
-    search_fields = ['name', 'email', ]
+    list_display = ('id', 'name', 'account_name', 'email_field', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'utm_source', 'bundler_paid', 'wrong_password', 'last_seen', )
+    search_fields = ['name', 'email', 'account_name', ]
+
+    def email_field(self, obj):
+        return '{} (<a href="{}?q={}" target="_blank">Local</a>)'.format(
+            obj.email,
+            reverse('admin:adsrental_lead_changelist'),
+            obj.email,
+        )
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super(LeadAdmin, self).get_search_results(request, queryset, search_term)
@@ -33,6 +41,9 @@ class LeadAdmin(admin.ModelAdmin):
     def last_seen(self, obj):
         return obj.raspberry_pi.last_seen if obj.raspberry_pi else None
 
+    email_field.allow_tags = True
+    email_field.short_description = 'Email'
+    email_field.admin_order_field = 'email'
     online.boolean = True
     tunnel_online.boolean = True
 

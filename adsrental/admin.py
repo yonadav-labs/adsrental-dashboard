@@ -164,8 +164,9 @@ class LeadAdmin(admin.ModelAdmin):
         'leadid',
         # 'usps_tracking_code',
         'account_name',
-        'name', 'status',
-        'email',
+        'name',
+        'status',
+        'email_field',
         'phone',
         'google_account_column',
         'facebook_account_column',
@@ -187,7 +188,17 @@ class LeadAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'updated', )
 
     def name(self, obj):
-        return '{} {}'.format(obj.first_name, obj.last_name)
+        return '{} {}'.format(
+            obj.first_name,
+            obj.last_name,
+        )
+
+    def email_field(self, obj):
+        return '{} (<a href="{}?q={}" target="_blank">SF</a>)'.format(
+            obj.email,
+            reverse('admin:salesforce_handler_lead_changelist'),
+            obj.email,
+        )
 
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
@@ -264,6 +275,9 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             lead.update_pi_delivered()
 
+    email_field.allow_tags = True
+    email_field.short_description = 'Email'
+    email_field.admin_order_field = 'email'
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
     tunnel_online.boolean = True
