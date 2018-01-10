@@ -30,7 +30,8 @@ class SyncToSFView(View):
         if all:
             sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
         else:
-            sf_leads = SFLead.objects.filter(id__in=sf_leadids).simple_select_related('raspberry_pi')
+            sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
+            sf_leads = [i for i in sf_leads if id in sf_leadids]
         for sf_lead in sf_leads:
             try:
                 Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
