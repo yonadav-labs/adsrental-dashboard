@@ -83,6 +83,17 @@ class Command(BaseCommand):
                     InstanceType='t2.micro',
                     SecurityGroupIds=['sg-18528a63'],
                     UserData=rpid,
+                    TagSpecifications=[
+                        {
+                            'ResourceType': 'instance',
+                            'Tags': [
+                                {
+                                    'Key': 'Name',
+                                    'Value': rpid,
+                                },
+                            ]
+                        },
+                    ],
                 )
             started_rpids.append(rpid)
 
