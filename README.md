@@ -21,17 +21,37 @@ sudo chmod a+x /usr/local/bin/docker-compose
 ### Local development mode
 
 ```bash
+./scripts/install_venv.sh
 docker-compose up --build
-```
-
-### Push docker image to ECR
-
-```bash
-docker-compose run web /app/scripts/image_push.sh
 ```
 
 ### Local production-like mode (remote DB)
 
 ```bash
-docker-compose -f docker-compose.dev.yml up --build
+docker-compose -f docker-compose.localdev.yml up --build
+```
+
+### Deploy
+
+```bash
+cd ~
+git clone git@github.com:ads-inc/dashboard.git
+ln -s ~/dashboard/scripts/pull.sh pull.sh
+./pull.sh
+```
+
+### RDP client
+
+Use it to run automated commands or just quickly connect to EC2
+
+```bash
+./scripts/rdp.py <rpid>
+```
+
+### Fix EC2
+
+Use this command to sync up running EC2 with ones you need
+
+```bash
+docker-compose run web python manage.py fix_ec2 --launch --terminate
 ```
