@@ -2,6 +2,7 @@ version: '3'
 
 services:
   db:
+    restart: on-failure
     image: mysql
     environment:
       MYSQL_DATABASE: adsrental
@@ -27,6 +28,7 @@ services:
       - db:db
       - web:web
   web:
+    restart: on-failure
     build: .
     command: /app/scripts/server.sh
     environment:
