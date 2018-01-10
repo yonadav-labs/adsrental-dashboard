@@ -53,18 +53,12 @@ class Command(BaseCommand):
                 for tagpair in instance.tags:
                     if tagpair['Key'] == 'Name':
                         instance_rpid = tagpair['Value']
-            else:
-                if instance_state != 'terminated':
-                    print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped as it has no tags'
-                    if terminate:
-                        instance.terminate()
-                    if stop:
-                        instance.stop()
 
             if instance_rpid:
                 launched_rpid.append(instance_rpid)
 
             if not instance_rpid or not instance_rpid.startswith('RP'):
+                print 'Unknown instance', public_dns_name, instance_rpid
                 continue
 
             launched_rpid.append(instance_rpid)
@@ -109,5 +103,5 @@ class Command(BaseCommand):
 
         print 'Stopped', stopped_rpids
         print 'Lauched', started_rpids
-        print 'Total', len(launched_rpid) + len(started_rpids)
+        print 'Total', len(launched_rpid)
         print time.clock(), 'finished'
