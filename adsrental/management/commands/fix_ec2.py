@@ -33,7 +33,7 @@ class Command(BaseCommand):
         stopped_rpids = []
         started_rpids = []
 
-        print time.clock(), 'Got SF data, {} insstances has to be existing'.format(len(required_rpids))
+        print time.clock(), 'Got SF data, {} instances have to be existing'.format(len(required_rpids))
 
         # print banned_rpids
 
@@ -54,11 +54,12 @@ class Command(BaseCommand):
                     if tagpair['Key'] == 'Name':
                         instance_rpid = tagpair['Value']
             else:
-                print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped as it has no tags'
-                if terminate:
-                    instance.terminate()
-                if stop:
-                    instance.stop()
+                if instance_state != 'terminated':
+                    print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped as it has no tags'
+                    if terminate:
+                        instance.terminate()
+                    if stop:
+                        instance.stop()
 
             if instance_rpid:
                 launched_rpid.append(instance_rpid)
@@ -69,12 +70,13 @@ class Command(BaseCommand):
             launched_rpid.append(instance_rpid)
 
             if instance_rpid not in required_rpids:
-                print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped'
-                if terminate:
-                    instance.terminate()
-                if stop:
-                    instance.stop()
-                stopped_rpids.append(instance_rpid)
+                if instance_state != 'terminated':
+                    print instance_id, public_dns_name, instance_rpid, instance_state, 'will be stopped'
+                    if terminate:
+                        instance.terminate()
+                    if stop:
+                        instance.stop()
+                    stopped_rpids.append(instance_rpid)
 
         for rpid in required_rpids:
             if rpid in banned_rpids:
