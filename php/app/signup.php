@@ -1,7 +1,4 @@
-<?
-	header("Location: /app/signup/");
-	die();
-?>
+
 
 <?php
 	require_once("include/jsonhelpers.inc");
