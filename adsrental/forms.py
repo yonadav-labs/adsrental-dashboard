@@ -1,4 +1,6 @@
 from django import forms
+from snowpenguin.django.recaptcha2.fields import ReCaptchaField
+from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
 
 class DashboardForm(forms.Form):
@@ -53,3 +55,76 @@ class DashboardForm(forms.Form):
     banned = forms.ChoiceField(label='Banned', choices=BANNED_CHOICES, required=False)
     pi_delivered = forms.ChoiceField(label='Delivered', choices=PI_DELIVERED_CHOICES, required=False)
     account_type = forms.ChoiceField(label='Account Type', choices=ACCOUNT_TYPE_CHOICES, required=False)
+
+
+class SignupForm(forms.Form):
+    STATE_CHOICES = (
+        ('Alabama', 'Alabama', ),
+        ('Alaska', 'Alaska', ),
+        ('Arizona', 'Arizona', ),
+        ('Arkansas', 'Arkansas', ),
+        ('California', 'California', ),
+        ('Colorado', 'Colorado', ),
+        ('Connecticut', 'Connecticut', ),
+        ('Delaware', 'Delaware', ),
+        ('Florida', 'Florida', ),
+        ('Georgia', 'Georgia', ),
+        ('Hawaii', 'Hawaii', ),
+        ('Idaho', 'Idaho', ),
+        ('Illinois', 'Illinois', ),
+        ('Indiana', 'Indiana', ),
+        ('Iowa', 'Iowa', ),
+        ('Kansas', 'Kansas', ),
+        ('Kentucky', 'Kentucky', ),
+        ('Louisiana', 'Louisiana', ),
+        ('Maine', 'Maine', ),
+        ('Maryland', 'Maryland', ),
+        ('Massachusetts', 'Massachusetts', ),
+        ('Michigan', 'Michigan', ),
+        ('Minnesota', 'Minnesota', ),
+        ('Mississippi', 'Mississippi', ),
+        ('Missouri', 'Missouri', ),
+        ('Montana', 'Montana', ),
+        ('Nebraska', 'Nebraska', ),
+        ('Nevada', 'Nevada', ),
+        ('New Hampshire', 'New Hampshire', ),
+        ('New Jersey', 'New Jersey', ),
+        ('New Mexico', 'New Mexico', ),
+        ('New York', 'New York', ),
+        ('North Carolina', 'North Carolina', ),
+        ('North Dakota', 'North Dakota', ),
+        ('Ohio', 'Ohio', ),
+        ('Oklahoma', 'Oklahoma', ),
+        ('Oregon', 'Oregon', ),
+        ('Pennsylvania', 'Pennsylvania', ),
+        ('Rhode Island', 'Rhode Island', ),
+        ('South Carolina', 'South Carolina', ),
+        ('South Dakota', 'South Dakota', ),
+        ('Tennessee', 'Tennessee', ),
+        ('Texas', 'Texas', ),
+        ('Utah', 'Utah', ),
+        ('Vermont', 'Vermont', ),
+        ('Virginia', 'Virginia', ),
+        ('Washington', 'Washington', ),
+        ('West Virginia', 'West Virginia', ),
+        ('Wisconsin', 'Wisconsin', ),
+        ('Wyoming', 'Wyoming', ),
+    )
+
+    email = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    phone = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    facebook_profile_url = forms.CharField(required=True, widget=forms.URLInput(attrs={'size': 40}))
+    fb_email = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    fb_secret = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    fb_friends = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'size': 40}))
+    street = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    city = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    state = forms.ChoiceField(choices=STATE_CHOICES, required=True)
+    postal_code = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
+    registered_isp = forms.CharField(required=False)
+    accept = forms.BooleanField(required=True)
+    photo_id = forms.FileField(widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
+    captcha = ReCaptchaField(widget=ReCaptchaWidget())
+    utm_source = forms.CharField(widget=forms.HiddenInput())

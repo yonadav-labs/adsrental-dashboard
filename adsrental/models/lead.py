@@ -45,6 +45,7 @@ class Lead(models.Model, FulltextSearchMixin):
     fb_email = models.CharField(max_length=255, blank=True, null=True)
     fb_secret = models.CharField(max_length=255, blank=True, null=True)
     is_sync_adsdb = models.BooleanField(default=False)
+    photo_id = models.FileField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     pi_sent = models.DateTimeField(null=True, blank=True)

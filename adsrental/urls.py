@@ -10,6 +10,8 @@ from adsrental.views.sync_delivered import SyncDeliveredView
 from adsrental.views.dashboard import DashboardView, CheckSentView
 from adsrental.views.rdp import RDPDownloadView
 from adsrental.views.farming import PiConfigView
+from adsrental.views.signup import SignupView
+from adsrental.views.photo_id import PhotoIdView
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
@@ -29,4 +31,6 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),
+    url(r'^signup/$', SignupView.as_view(), name='signup'),
+    url(r'^photo/(?P<b64_email>.*)/$', PhotoIdView.as_view(), name='photo_id'),
 ]
