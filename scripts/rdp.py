@@ -3,7 +3,10 @@ import os
 import sys
 import boto3
 
-rpid = sys.argv[1]
+try:
+    rpid = sys.argv[1]
+except:
+    rpid = raw_input('Enter RPID: ')
 
 boto_client = boto3.Session(
     aws_access_key_id='AKIAJ3IUVXDRV2ZS2QLQ',
