@@ -13,6 +13,7 @@ class SyncToSFView(View):
     def get(self, request):
         seconds_ago = int(request.GET.get('seconds_ago', '300'))
         all = request.GET.get('all')
+        test = request.GET.get('test')
         if all:
             leads = Lead.objects.all().select_related('raspberry_pi')
         else:
@@ -20,6 +21,13 @@ class SyncToSFView(View):
                 Q(updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago)) |
                 Q(raspberry_pi__updated__gte=timezone.now() - datetime.timedelta(seconds=seconds_ago))
             ).select_related('raspberry_pi')
+
+        if test:
+            return JsonResponse({
+                'all': all,
+                'len': len(leads),
+                'leads': leads,
+            })
         sf_leadids = []
         errors = []
         leads_map = {}
