@@ -6,6 +6,10 @@ from django.apps import apps
 
 
 class RaspberryPi(models.Model):
+    online_hours_ttl = 6
+    tunnel_online_hours_ttl = 1
+    last_offline_reported_hours_ttl = 4
+
     rpid = models.CharField(primary_key=True, max_length=255)
     leadid = models.CharField(max_length=255, blank=True, null=True)
     ipaddress = models.CharField(max_length=255, blank=True, null=True)
@@ -13,6 +17,7 @@ class RaspberryPi(models.Model):
     first_seen = models.DateTimeField(blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True, db_index=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
+    last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -20,13 +25,13 @@ class RaspberryPi(models.Model):
         if self.last_seen is None:
             return False
 
-        return (timezone.now() - self.get_last_seen()).total_seconds() < 1 * 60 * 60
+        return (timezone.now() - self.get_last_seen()).total_seconds() < self.online_hours_ttl * 60 * 60
 
     def tunnel_online(self):
         if self.tunnel_last_tested is None:
             return False
 
-        return (timezone.now() - self.get_tunnel_last_tested()).total_seconds() < 1 * 60 * 60
+        return (timezone.now() - self.get_tunnel_last_tested()).total_seconds() < self.tunnel_online_hours_ttl * 60 * 60
 
     def get_first_seen(self):
         if self.first_seen is None:

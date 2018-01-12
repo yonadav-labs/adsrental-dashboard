@@ -12,6 +12,7 @@ from adsrental.views.rdp import RDPDownloadView
 from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
+from adsrental.views.sync_offline import SyncOfflineView
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
@@ -22,6 +23,7 @@ urlpatterns = [
     url(r'^sync/delivered/$', SyncDeliveredView.as_view(), name='sync_delivered'),
     url(r'^sync/to_sf/$', SyncToSFView.as_view(), name='sync_to_sf'),
     url(r'^sync/to_adsdb/$', SyncToAdsdbView.as_view(), name='sync_to_adsdb'),
+    url(r'^sync/offline/$', SyncOfflineView.as_view(), name='sync_offline'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
     url(r'^thankyou/(?P<b64_email>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^thankyou.html$', MainView.as_view(), name='main'),

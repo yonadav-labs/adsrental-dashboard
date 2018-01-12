@@ -4,11 +4,10 @@ import requests
 from xml.etree import ElementTree
 from django.utils import timezone
 from django.db import models
-from django.conf import settings
-import customerio
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.mixins import FulltextSearchMixin
+from adsrental.utils import CustomerIOClient
 
 
 class Lead(models.Model, FulltextSearchMixin):
@@ -193,10 +192,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.save()
 
     def send_customer_io_event(self, event, **kwargs):
-        if not settings.CUSTOMERIO_ENABLED:
-            return
-        cio = customerio.CustomerIO(settings.CUSTOMERIO_SITE_ID, settings.CUSTOMERIO_API_KEY)
-        cio.track(customer_id=self.leadid, name=event, **kwargs)
+        CustomerIOClient().send_lead_event(self, event, **kwargs)
 
     def update_pi_delivered(self):
         if not self.usps_tracking_code:
