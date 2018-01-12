@@ -40,6 +40,12 @@ ln -s ~/dashboard/scripts/pull.sh pull.sh
 ./pull.sh
 ```
 
+Install crontab
+
+```bash
+cat crontab.txt | crontab
+```
+
 ### RDP client
 
 Use it to run automated commands or just quickly connect to EC2
