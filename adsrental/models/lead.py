@@ -181,8 +181,8 @@ class Lead(models.Model, FulltextSearchMixin):
         if data is None:
             data = requests.get(
                 'https://ssapi.shipstation.com/shipments',
-                params={'shipDateStart': '2017-12-30'},
-                # params={'orderNumber': self.account_name},
+                # params={'shipDateStart': '2017-12-30'},
+                params={'orderNumber': self.account_name},
                 auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
             ).json().get('shipments')
             data = data[0] if data else {}
@@ -217,7 +217,7 @@ class Lead(models.Model, FulltextSearchMixin):
             pass
 
         if self.pi_delivered != pi_delivered:
+            self.pi_delivered = pi_delivered
             if self.pi_delivered:
                 self.send_customer_io_event('delivered')
-            self.pi_delivered = pi_delivered
             self.save()
