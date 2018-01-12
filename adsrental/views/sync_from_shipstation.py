@@ -13,6 +13,7 @@ class SyncFromShipStationView(View):
         leads = []
         order_numbers = []
         days_ago = int(request.GET.get('days_ago', '1'))
+        force = request.GET.get('force')
         if request.GET.get('all'):
             leads = Lead.objects.filter(pi_delivered=False, status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS])
             for lead in leads:
@@ -33,6 +34,8 @@ class SyncFromShipStationView(View):
                 order_number = row['orderNumber']
                 lead = Lead.objects.filter(account_name=order_number).first()
                 if lead:
+                    if force:
+                        lead.usps_tracking_code = None
                     lead.update_from_shipstation(row)
                     order_numbers.append(order_number)
 
