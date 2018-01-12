@@ -74,10 +74,10 @@ class SignupView(View):
                 form=form,
             ))
 
-        time.sleep(1)
-        sf_lead = SFLead.objects.filter(email=data['email']).first()
-        if not sf_lead:
-            return HttpResponseRedirect('/thankyou.php?email={}'.format(data['email']))
+        sf_lead = None
+        while not sf_lead:
+            sf_lead = SFLead.objects.filter(email=data['email']).first()
+            time.sleep(1)
 
         lead = Lead.objects.filter(email=data['email']).first()
         lead = Lead.upsert_from_sf(sf_lead, lead)
