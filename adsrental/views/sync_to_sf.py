@@ -1,4 +1,6 @@
 import datetime
+from multiprocessing.pool import ThreadPool
+from itertools import chain, islice
 
 from django.views import View
 from django.http import JsonResponse
@@ -7,6 +9,12 @@ from django.db.models import Q
 
 from adsrental.models import Lead
 from salesforce_handler.models import Lead as SFLead
+
+
+def chunks(iterable, size=10):
+    iterator = iter(iterable)
+    for first in iterator:
+        yield chain([first], islice(iterator, size - 1))
 
 
 class SyncToSFView(View):
@@ -28,29 +36,38 @@ class SyncToSFView(View):
                 'len': len(leads),
                 'leads': [i.email for i in leads],
             })
-        sf_leadids = []
-        errors = []
-        leads_map = {}
-        for lead in leads:
-            sf_leadids.append(lead.leadid)
-            leads_map[lead.leadid] = lead
 
-        if all:
-            sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
-        else:
-            sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
-            sf_leads = [i for i in sf_leads if i.id in sf_leadids]
-        for sf_lead in sf_leads:
-            try:
-                Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
-            except Exception as e:
-                errors.append([sf_lead.id, str(e)])
+        errors = []
+        sf_leadids = []
+        lead_emails = []
+        for lead_chunk in chunks(leads, 10):
+            leads_map = {}
+            for lead in lead_chunk:
+                sf_leadids.append(lead.leadid)
+                leads_map[lead.email] = lead
+            print leads_map
+
+            sf_leads = SFLead.objects.filter(email__in=leads_map.keys()).simple_select_related('raspberry_pi')
+            pool = ThreadPool(processes=10)
+            leads_queue = [(sf_lead, leads_map.get(sf_lead.email)) for sf_lead in sf_leads]
+            res = pool.map(Lead.upsert_to_sf_thread, leads_queue)
+            for i in res:
+                if not i:
+                    errors.append('Unknown')
+            pool.close()
+            lead_emails.extend(leads_map.keys())
+
+        # for sf_lead in sf_leads:
+        #     try:
+        #         Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
+        #     except Exception as e:
+        #         errors.append([sf_lead.id, str(e)])
 
         return JsonResponse({
             'all': all,
             'result': True,
-            'leads_ids': [i.leadid for i in leads],
-            'sfleads_ids': len([i.id for i in sf_leads]),
             'seconds_ago': seconds_ago,
+            'lead_emails': lead_emails,
+            'lead_count': len(lead_emails),
             'errors': errors,
         })

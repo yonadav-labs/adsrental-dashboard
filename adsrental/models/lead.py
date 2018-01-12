@@ -141,6 +141,10 @@ class Lead(models.Model, FulltextSearchMixin):
         return lead
 
     @staticmethod
+    def upsert_to_sf_thread(params):
+        return Lead.upsert_to_sf(*params)
+
+    @staticmethod
     def upsert_to_sf(sf_lead, lead):
         if sf_lead.raspberry_pi:
             old_raspberry_pi = lead.raspberry_pi if lead else None
@@ -161,9 +165,10 @@ class Lead(models.Model, FulltextSearchMixin):
         else:
             return lead
 
-        sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
-        sf_lead.raspberry_pi.delivered = lead.pi_delivered
-        sf_lead.raspberry_pi.save()
+        if sf_lead.raspberry_pi:
+            sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
+            sf_lead.raspberry_pi.delivered = lead.pi_delivered
+            sf_lead.raspberry_pi.save()
 
     def update_from_shipstation(self, data=None):
         if data is None:
