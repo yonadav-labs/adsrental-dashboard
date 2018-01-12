@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^sync/to_sf/$', SyncToSFView.as_view(), name='sync_to_sf'),
     url(r'^sync/to_adsdb/$', SyncToAdsdbView.as_view(), name='sync_to_adsdb'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
+    url(r'^thankyou/(?P<b64_email>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^thankyou.html$', MainView.as_view(), name='main'),
     url(r'^dashboard/$', DashboardView.as_view(), name='dashboard'),
     url(r'^dashboard/check_sent/$', CheckSentView.as_view(), name='dashboard_check_sent'),

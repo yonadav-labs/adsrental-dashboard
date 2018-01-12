@@ -4593,6 +4593,7 @@ class Lead(models.Model):
     dns_anonymization_updated = models.BooleanField(custom=True, db_column='DNS_Anonymization_Updated__c', verbose_name='DNS Anonymization Updated', default=models.DEFAULTED_ON_CREATE)
     wrong_password = models.BooleanField(custom=True, db_column='Wrong_Password__c', verbose_name='Wrong Password', default=models.DEFAULTED_ON_CREATE)
     bundler_paid = models.BooleanField(custom=True, db_column='Bundler_Paid__c', verbose_name='Bundler Paid', default=models.DEFAULTED_ON_CREATE)
+    splashtop_id = models.CharField(custom=True, db_column='Splashtop_Id__c', max_length=255, verbose_name='Splashtop ID', blank=True, null=True)
     not_banned_status = models.CharField(custom=True, max_length=20, verbose_name='NotBannedStatus', help_text='When Lead becomes Banned, previous Status is saved here to be restored later once Lead is unbanned.', blank=True, null=True)
     class Meta(models.Model.Meta):
         db_table = 'Lead'
