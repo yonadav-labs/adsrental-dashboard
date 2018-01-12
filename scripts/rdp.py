@@ -34,6 +34,10 @@ print 'instance', rpid, instance, instance.public_dns_name
 
 hostname = instance.public_dns_name
 
-command = 'rdpy-rdpclient.py -u Administrator -p Dk.YDq8pXQS-R5ZAn84Lgma9rFvGlfvL {}:23255'.format(hostname)
+command = 'rdpy-rdpclient.py -w {width} -l {height} -u Administrator -p Dk.YDq8pXQS-R5ZAn84Lgma9rFvGlfvL {hostname}:23255'.format(
+    width=1024,
+    height=800,
+    hostname=hostname,
+)
 print command
 os.system(command)
