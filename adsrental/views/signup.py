@@ -89,4 +89,6 @@ class SignupView(View):
         #     isp='',
         #     remote_addr=request.META.get('REMOTE_ADDR'),
         # ))
+
+        lead.send_customer_io_event('lead_approved', account_type='facebook')
         return HttpResponseRedirect('/thankyou.php?email={}'.format(data['email']))
