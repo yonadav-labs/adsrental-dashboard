@@ -170,6 +170,8 @@ class Lead(models.Model, FulltextSearchMixin):
             sf_lead.raspberry_pi.delivered = lead.pi_delivered
             sf_lead.raspberry_pi.save()
 
+        return lead
+
     def update_from_shipstation(self, data=None):
         if data is None:
             data = requests.get(

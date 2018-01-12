@@ -18,6 +18,9 @@ def chunks(iterable, size=10):
 
 
 class SyncToSFView(View):
+    threads_count = 10
+    chunk_size = 50
+
     def get(self, request):
         seconds_ago = int(request.GET.get('seconds_ago', '300'))
         all = request.GET.get('all')
@@ -40,7 +43,7 @@ class SyncToSFView(View):
         errors = []
         sf_leadids = []
         lead_emails = []
-        for lead_chunk in chunks(leads, 10):
+        for lead_chunk in chunks(leads, self.chunk_size):
             leads_map = {}
             for lead in lead_chunk:
                 sf_leadids.append(lead.leadid)
@@ -48,7 +51,7 @@ class SyncToSFView(View):
             print leads_map
 
             sf_leads = SFLead.objects.filter(email__in=leads_map.keys()).simple_select_related('raspberry_pi')
-            pool = ThreadPool(processes=10)
+            pool = ThreadPool(processes=self.threads_count)
             leads_queue = [(sf_lead, leads_map.get(sf_lead.email)) for sf_lead in sf_leads]
             res = pool.map(Lead.upsert_to_sf_thread, leads_queue)
             for i in res:
