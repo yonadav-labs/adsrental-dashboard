@@ -18,7 +18,7 @@ def chunks(iterable, size=10):
 
 
 class SyncToSFView(View):
-    threads_count = 20
+    threads_count = 10
     chunk_size = 50
 
     def get(self, request):
