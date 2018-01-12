@@ -12,6 +12,7 @@ class SyncFromShipStationView(View):
     def get(self, request):
         leads = []
         order_numbers = []
+        orders_new = []
         days_ago = int(request.GET.get('days_ago', '1'))
         force = request.GET.get('force')
         if request.GET.get('all'):
@@ -36,11 +37,14 @@ class SyncFromShipStationView(View):
                 if lead:
                     if force:
                         lead.usps_tracking_code = None
+                    if not lead.usps_tracking_code:
+                        orders_new.append(order_number)
                     lead.update_from_shipstation(row)
                     order_numbers.append(order_number)
 
         return JsonResponse({
             'result': True,
             'order_numbers': order_numbers,
+            'orders_new': orders_new,
             'days_ago': days_ago,
         })
