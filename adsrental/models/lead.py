@@ -143,7 +143,7 @@ class Lead(models.Model, FulltextSearchMixin):
     @staticmethod
     def upsert_to_sf_thread(params):
         try:
-            lead = Lead.upsert_to_sf(*params)
+            Lead.upsert_to_sf(*params)
         except Exception as e:
             return {'email': params[1].email, 'error': str(e), 'result': False}
 
