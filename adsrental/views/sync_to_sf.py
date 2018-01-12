@@ -26,7 +26,7 @@ class SyncToSFView(View):
             return JsonResponse({
                 'all': all,
                 'len': len(leads),
-                'leads': leads,
+                'leads': [i.email for i in leads],
             })
         sf_leadids = []
         errors = []
