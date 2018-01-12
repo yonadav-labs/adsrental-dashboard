@@ -75,9 +75,14 @@ class SignupView(View):
             ))
 
         sf_lead = None
-        while not sf_lead:
+        attempts = 0
+        while not sf_lead and attempts < 10:
             sf_lead = SFLead.objects.filter(email=data['email']).first()
             time.sleep(1)
+            attempts = attempts + 1
+
+        if attempts == 10:
+            return HttpResponseRedirect('/thankyou.php?email={}'.format(data['email']))
 
         lead = Lead.objects.filter(email=data['email']).first()
         lead = Lead.upsert_from_sf(sf_lead, lead)
