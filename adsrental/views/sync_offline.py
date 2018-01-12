@@ -18,7 +18,8 @@ class SyncOfflineView(View):
             email='edebruin217@gmail.com',
             raspberry_pi__last_seen__lt=now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
             raspberry_pi__last_offline_reported__lt=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
-            # pi_delivered=True,
+            pi_delivered=True,
+            raspberry_pi__first_seen__isnull=False,
             status=Lead.STATUS_QUALIFIED,
         ).select_related('raspberry_pi'):
             offline_hours_ago = 1
