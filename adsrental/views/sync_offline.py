@@ -24,7 +24,7 @@ class SyncOfflineView(View):
         ).select_related('raspberry_pi'):
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
-                offline_hours_ago = (now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60
+                offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
             if not test:
                 customerio_client.send_lead_event(lead, 'offline', hours=offline_hours_ago)
                 reported_offline_leads.append(lead.email)
