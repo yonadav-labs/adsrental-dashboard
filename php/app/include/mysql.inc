@@ -23,13 +23,13 @@
 
 		if ($updateTunnelLastTested)
 		{
-			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, tunnel_last_tested, `created`, `updated`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now') " .
-				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst, `updated` = $sqlNowUtcToPst, tunnel_last_tested = $sqlNowUtcToPst, `last_offline_reported` = $sqlNowUtcToPst";
+			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, tunnel_last_tested, `created`, `updated`, `last_offline_reported`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now', '$now') " .
+				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst, `updated` = $sqlNowUtcToPst, tunnel_last_tested = $sqlNowUtcToPst";
 		}
 		else
 		{
-			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, `created`, `updated`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now') " .
-				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst, `updated` = $sqlNowUtcToPst, `last_offline_reported` = $sqlNowUtcToPst";
+			$sql = "INSERT INTO `raspberry_pi` (`rpid`, ipaddress, first_seen, last_seen, `created`, `updated`, `last_offline_reported`) VALUES('$rpid', '$_SERVER[REMOTE_ADDR]', $sqlNowUtcToPst, $sqlNowUtcToPst, '$now', '$now', '$now') " .
+				   "ON DUPLICATE KEY UPDATE `ipaddress` = '$_SERVER[REMOTE_ADDR]', last_seen = $sqlNowUtcToPst, `updated` = $sqlNowUtcToPst";
 		}
 
 		if (!$result = $mysqli->query($sql))
