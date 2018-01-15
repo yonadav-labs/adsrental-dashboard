@@ -8,7 +8,7 @@ from django.apps import apps
 class RaspberryPi(models.Model):
     online_hours_ttl = 6
     tunnel_online_hours_ttl = 1
-    last_offline_reported_hours_ttl = 4
+    last_offline_reported_hours_ttl = 4 * 24
 
     rpid = models.CharField(primary_key=True, max_length=255)
     leadid = models.CharField(max_length=255, blank=True, null=True)
