@@ -22,7 +22,7 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_IN_PROGRESS, 'In-Progress'),
     ]
 
-    leadid = models.CharField(primary_key=True, max_length=255)
+    leadid = models.CharField(primary_key=True, max_length=255, db_index=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
@@ -138,6 +138,9 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.fb_secret = sf_lead.fb_secret
         lead.save()
         return lead
+
+    def name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
 
     @staticmethod
     def upsert_to_sf_thread(params):

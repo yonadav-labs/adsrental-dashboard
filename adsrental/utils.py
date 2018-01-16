@@ -1,6 +1,8 @@
-from django.conf import settings
+import json
 
+from django.conf import settings
 import customerio
+from adsrental.models.customerio_event import CustomerIOEvent
 
 
 class CustomerIOClient(object):
@@ -14,6 +16,11 @@ class CustomerIOClient(object):
         return self.client
 
     def send_lead_event(self, lead, event, **kwargs):
+        CustomerIOEvent(
+            lead=lead,
+            name=event,
+            data=json.dumps(kwargs),
+        ).save()
         if self.client:
             self.client.track(customer_id=lead.leadid, name=event, **kwargs)
 
