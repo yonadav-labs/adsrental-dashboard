@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import adsrental.models.mixins
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
