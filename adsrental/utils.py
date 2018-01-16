@@ -19,7 +19,7 @@ class CustomerIOClient(object):
         CustomerIOEvent(
             lead=lead,
             name=event,
-            data=json.dumps(kwargs),
+            kwargs=json.dumps(kwargs),
         ).save()
         if self.client:
             self.client.track(customer_id=lead.leadid, name=event, **kwargs)
