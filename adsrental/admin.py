@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 
 from django.contrib import admin
@@ -188,7 +190,7 @@ class LeadAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'updated', )
 
     def name(self, obj):
-        return '{} {}'.format(
+        return u'{} {}'.format(
             obj.first_name,
             obj.last_name,
         )
