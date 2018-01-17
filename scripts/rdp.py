@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 import os
-import sys
 import boto3
+import argparse
 
-try:
-    rpid = sys.argv[1]
-except:
+parser = argparse.ArgumentParser(description='Connect to RDP by RPID or email.')
+parser.add_argument('rpid', help='RPID for Raspberry Pi')
+# parser.add_argument('--email', help='Lead email')
+args = parser.parse_args()
+
+rpid = None
+if args.rpid:
+    rpid = args.rpid
+
+if not rpid:
     rpid = raw_input('Enter RPID: ')
 
 boto_client = boto3.Session(
