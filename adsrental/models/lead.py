@@ -4,6 +4,7 @@ import requests
 from xml.etree import ElementTree
 from django.utils import timezone
 from django.db import models
+from django.conf import settings
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.mixins import FulltextSearchMixin
@@ -185,7 +186,7 @@ class Lead(models.Model, FulltextSearchMixin):
                 'https://ssapi.shipstation.com/shipments',
                 # params={'shipDateStart': '2017-12-30'},
                 params={'orderNumber': self.account_name},
-                auth=requests.auth.HTTPBasicAuth('483e019cf2244e9484a98c913e8691b0', '4903c001173546828752c30887c9b3f9'),
+                auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
             ).json().get('shipments')
             data = data[0] if data else {}
         if data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):

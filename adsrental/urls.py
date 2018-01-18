@@ -13,6 +13,7 @@ from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sync_offline import SyncOfflineView
+from adsrental.views.sf import SFToShipstationView
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
@@ -36,4 +37,5 @@ urlpatterns = [
     url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),
     url(r'^signup/$', SignupView.as_view(), name='signup'),
     url(r'^photo/(?P<b64_email>.*)/$', PhotoIdView.as_view(), name='photo_id'),
+    url(r'^sf/to_shipstation/$', SFToShipstationView.as_view(), name='sf_to_shipstation'),
 ]

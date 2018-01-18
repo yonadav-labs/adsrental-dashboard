@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent
 from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
+from adsrental.utils import ShipStationClient
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -186,7 +187,7 @@ class LeadAdmin(admin.ModelAdmin):
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
-    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation', 'update_pi_delivered')
+    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation', 'update_pi_delivered', 'create_shipstation_order')
     readonly_fields = ('created', 'updated', )
 
     def name(self, obj):
@@ -280,6 +281,18 @@ class LeadAdmin(admin.ModelAdmin):
     def update_pi_delivered(self, request, queryset):
         for lead in queryset:
             lead.update_pi_delivered()
+
+    def create_shipstation_order(self, request, queryset):
+        for lead in queryset:
+            sf_lead = SFLead.objects.filter(email=lead.email).first()
+            if not sf_lead:
+                continue
+
+            if not sf_lead.raspberry_pi:
+                continue
+
+            shipstation_client = ShipStationClient()
+            shipstation_client.add_sf_raspberry_pi_order(sf_lead)
 
     email_field.allow_tags = True
     email_field.short_description = 'Email'

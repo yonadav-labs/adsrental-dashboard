@@ -4602,7 +4602,6 @@ class Lead(models.Model):
         # keyPrefix = '00Q'
 
 
-
 class LeadFeed(models.Model):
     parent = models.ForeignKey(Lead, models.DO_NOTHING, sf_read_only=models.READ_ONLY)  # Master Detail Relationship *
     type = models.CharField(max_length=40, verbose_name='Feed Item Type', sf_read_only=models.READ_ONLY, choices=[('TrackedChange', 'Tracked Change'), ('UserStatus', 'User Status'), ('TextPost', 'Text Post'), ('AdvancedTextPost', 'Advanced Text Post'), ('LinkPost', 'Link Post'), ('ContentPost', 'Content Post'), ('PollPost', 'Poll'), ('RypplePost', 'Work.com Thanks'), ('ProfileSkillPost', 'Profile Skill Post'), ('DashboardComponentSnapshot', 'Dashboard Component Snapshot'), ('ApprovalPost', 'Approval Post'), ('CaseCommentPost', 'Case Comment Feed'), ('ReplyPost', 'Reply Post'), ('EmailMessageEvent', 'Email Message Feed'), ('CallLogPost', 'Call Log Feed'), ('ChangeStatusPost', 'Change Status Feed'), ('AttachArticleEvent', 'Attached Article'), ('MilestoneEvent', 'Milestone Event'), ('ActivityEvent', 'Activity Change'), ('ChatTranscriptPost', 'Chat Transcript Post'), ('CollaborationGroupCreated', 'Collaboration Group Created'), ('CollaborationGroupUnarchived', 'Collaboration Group Reactivated'), ('SocialPost', 'Social Post'), ('QuestionPost', 'Question Post'), ('FacebookPost', 'Facebook Post'), ('BasicTemplateFeedItem', 'Basic Template Post'), ('CreateRecordEvent', 'Created Record'), ('CanvasPost', 'Canvas'), ('AnnouncementPost', 'a')], blank=True, null=True)
