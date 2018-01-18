@@ -8,6 +8,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent
 from salesforce_handler.models import Lead as SFLead
@@ -286,13 +287,25 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             sf_lead = SFLead.objects.filter(email=lead.email).first()
             if not sf_lead:
+                messages.error(request, 'Lead () does not exist in SF, skipping'.format(lead.email))
+                continue
+
+            if sf_lead.raspberry_pi:
+                messages.warning(request, 'Lead {} has RPI assigned already, skipping'.format(lead.email))
                 continue
 
             if not sf_lead.raspberry_pi:
-                continue
+                sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
+                sf_lead.raspberry_pi.linked_lead = sf_lead
+                sf_lead.raspberry_pi.save()
+                sf_lead.save()
+                messages.success(request, 'Lead {} has new Raspberry Pi assigned'.format(lead.email))
+
+            Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=sf_lead.email).first())
 
             shipstation_client = ShipStationClient()
-            shipstation_client.add_sf_raspberry_pi_order(sf_lead)
+            shipstation_client.add_sf_lead_order(sf_lead)
+            messages.success(request, 'Lead {} order created'.format(lead.email))
 
     email_field.allow_tags = True
     email_field.short_description = 'Email'

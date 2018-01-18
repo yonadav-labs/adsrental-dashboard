@@ -2,6 +2,8 @@ from django.views import View
 from django.http import JsonResponse
 
 from salesforce_handler.models import Lead as SFLead
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
+from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
 
 
@@ -15,14 +17,21 @@ class SFToShipstationView(View):
                 'reason': 'Lead with given email not found',
             })
 
-        if not sf_lead.raspberry_pi:
+        if sf_lead.raspberry_pi:
             return JsonResponse({
                 'result': False,
-                'reason': 'No Raspberry Pi assigned',
+                'reason': 'Raspberry Pi exists',
             })
 
+        sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
+        sf_lead.raspberry_pi.linked_lead = sf_lead
+        sf_lead.raspberry_pi.save()
+        sf_lead.save()
+
+        Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=email).first())
+
         shipstation_client = ShipStationClient()
-        order = shipstation_client.add_sf_raspberry_pi_order(sf_lead)
+        order = shipstation_client.add_sf_lead_order(sf_lead)
 
         return JsonResponse({
             'result': True,

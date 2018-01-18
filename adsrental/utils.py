@@ -1,8 +1,9 @@
 import json
 
+import requests
 from django.conf import settings
 import customerio
-from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress
+from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
 
 from adsrental.models.customerio_event import CustomerIOEvent
 
@@ -37,8 +38,8 @@ class ShipStationClient(object):
     def get_client(self):
         return self.client
 
-    def add_sf_raspberry_pi_order(self, sf_lead):
-        order = ShipStationOrder(order_key=sf_lead.sf_raspberry_pi.name, order_number=sf_lead.account_name)
+    def add_sf_lead_order(self, sf_lead):
+        order = ShipStationOrder(order_key=sf_lead.raspberry_pi.name, order_number=sf_lead.account_name)
         order.set_customer_details(
             username='{} {}'.format(sf_lead.first_name, sf_lead.last_name),
             email=sf_lead.email,
@@ -50,12 +51,43 @@ class ShipStationClient(object):
             street1=sf_lead.street,
             city=sf_lead.city,
             postal_code=sf_lead.postal_code,
-            country=sf_lead.country,
+            # country=sf_lead.country,
+            country='US',
             state=sf_lead.state,
             phone=sf_lead.phone or sf_lead.mobile_phone,
         )
         order.set_shipping_address(shipping_address)
+        order.set_billing_address(shipping_address)
+
+        item = ShipStationItem(
+            name=sf_lead.raspberry_pi.name,
+            quantity=1,
+            unit_price=0,
+        )
+        item.set_weight(ShipStationWeight(units='ounces', value=0))
+        order.add_item(item)
+
+        order.set_status('awaiting_shipment')
 
         self.client.add_order(order)
-        self.client.submit_orders()
+        self.submit_orders()
         return order
+
+    def submit_orders(self):
+        for order in self.client.orders:
+            self.post(
+                endpoint='/orders/createorder',
+                data=json.dumps(order.as_dict())
+            )
+
+    def post(self, endpoint='', data=None):
+        url = '{}{}'.format(self.client.url, endpoint)
+        headers = {'content-type': 'application/json'}
+        r = requests.post(
+            url,
+            auth=(self.client.key, self.client.secret),
+            data=data,
+            headers=headers
+        )
+        if r.status_code not in [200, 201]:
+            raise ValueError('Shipstation Error', r.status_code, r.text)
