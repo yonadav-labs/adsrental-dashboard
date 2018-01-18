@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import os
-import boto3
 import argparse
+
+import boto3
+
 
 parser = argparse.ArgumentParser(description='Connect to RDP by RPID or email.')
 parser.add_argument('rpid', help='RPID for Raspberry Pi')
@@ -10,7 +12,10 @@ args = parser.parse_args()
 
 rpid = None
 if args.rpid:
-    rpid = args.rpid
+    if args.rpid.isdigit():
+        rpid = 'RP%08d' % int(args.rpid)
+    else:
+        rpid = args.rpid
 
 if not rpid:
     rpid = raw_input('Enter RPID: ')
