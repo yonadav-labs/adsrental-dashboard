@@ -290,10 +290,6 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.error(request, 'Lead () does not exist in SF, skipping'.format(lead.email))
                 continue
 
-            if sf_lead.raspberry_pi:
-                messages.warning(request, 'Lead {} has RPI assigned already, skipping'.format(lead.email))
-                continue
-
             if not sf_lead.raspberry_pi:
                 sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
                 sf_lead.raspberry_pi.linked_lead = sf_lead
@@ -304,6 +300,10 @@ class LeadAdmin(admin.ModelAdmin):
             Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=sf_lead.email).first())
 
             shipstation_client = ShipStationClient()
+            if shipstation_client.get_sf_lead_order_data(sf_lead):
+                messages.info(request, 'Lead {} order already exists'.format(lead.email))
+                continue
+
             shipstation_client.add_sf_lead_order(sf_lead)
             messages.success(request, 'Lead {} order created'.format(lead.email))
 

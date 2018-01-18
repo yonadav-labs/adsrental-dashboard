@@ -189,7 +189,7 @@ class Lead(models.Model, FulltextSearchMixin):
                 auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
             ).json().get('shipments')
             data = data[0] if data else {}
-        if data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
+        if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
             self.send_customer_io_event('shipped', tracking_code=self.usps_tracking_code)
             # self.pi_delivered = True

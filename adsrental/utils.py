@@ -91,3 +91,12 @@ class ShipStationClient(object):
         )
         if r.status_code not in [200, 201]:
             raise ValueError('Shipstation Error', r.status_code, r.text)
+
+    def get_sf_lead_order_data(self, sf_lead):
+        data = requests.get(
+            'https://ssapi.shipstation.com/orders',
+            params={'orderNumber': sf_lead.account_name},
+            auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
+        ).json().get('orders')
+        data = data[0] if data else None
+        return data

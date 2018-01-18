@@ -17,20 +17,21 @@ class SFToShipstationView(View):
                 'reason': 'Lead with given email not found',
             })
 
-        if sf_lead.raspberry_pi:
-            return JsonResponse({
-                'result': False,
-                'reason': 'Raspberry Pi exists',
-            })
-
-        sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
-        sf_lead.raspberry_pi.linked_lead = sf_lead
-        sf_lead.raspberry_pi.save()
-        sf_lead.save()
+        if not sf_lead.raspberry_pi:
+            sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
+            sf_lead.raspberry_pi.linked_lead = sf_lead
+            sf_lead.raspberry_pi.save()
+            sf_lead.save()
 
         Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=email).first())
 
         shipstation_client = ShipStationClient()
+        if shipstation_client.get_sf_lead_order_data(sf_lead):
+            return JsonResponse({
+                'result': False,
+                'reason': 'Order already exists',
+            })
+
         order = shipstation_client.add_sf_lead_order(sf_lead)
 
         return JsonResponse({
