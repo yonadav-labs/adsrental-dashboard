@@ -134,7 +134,8 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.bundler_paid = sf_lead.bundler_paid
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
-        lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
+        if not lead.tested:
+            lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
         lead.fb_email = sf_lead.fb_email
         lead.fb_secret = sf_lead.fb_secret
         lead.save()
