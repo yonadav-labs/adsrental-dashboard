@@ -10,9 +10,9 @@ python -c 'import pymysql; pymysql.connect(user="root", host="db").cursor().exec
 
 #install DB and fixtures
 # python manage.py makemigrations adsrental
-python manage.py migrate adsrental
-python manage.py migrate
-python manage.py loaddata adsrental/fixtures/fixtures.json
+# python manage.py migrate adsrental
+# python manage.py migrate
+# python manage.py loaddata adsrental/fixtures/fixtures.json
 
 while true; do
   echo "Re-starting Django runserver"
