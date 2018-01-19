@@ -19,8 +19,8 @@ class SyncFromSFView(View):
 
         if request.GET.get('lead_id'):
             sf_lead_id = request.GET.get('lead_id')
-            sf_lead = SFLead.objects.get(id=sf_lead_id).simple_select_related('raspberry_pi')
-            lead = Lead.objects.filter(leadid=sf_lead.sf_lead_id).first()
+            sf_lead = SFLead.objects.get(id=sf_lead_id)
+            lead = Lead.objects.filter(leadid=sf_lead_id).first()
             Lead.upsert_from_sf(sf_lead, lead)
             return JsonResponse({
                 'result': True,
