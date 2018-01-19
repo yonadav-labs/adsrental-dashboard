@@ -10,7 +10,7 @@ class RaspberryPi(models.Model):
     tunnel_online_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
-    rpid = models.CharField(primary_key=True, max_length=255)
+    rpid = models.CharField(primary_key=True, max_length=255, unique=True)
     leadid = models.CharField(max_length=255, blank=True, null=True)
     ipaddress = models.CharField(max_length=255, blank=True, null=True)
     ec2_hostname = models.CharField(max_length=255, blank=True, null=True)
