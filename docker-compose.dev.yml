@@ -36,7 +36,7 @@ services:
     environment:
       ENV: dev
     volumes:
-      - ./php/log/:/app/log/
+      - /mnt/volume-nyc3-01/log/:/app/log/
     depends_on:
       - db
     links:
