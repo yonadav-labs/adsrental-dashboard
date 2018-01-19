@@ -4,8 +4,10 @@ from django.views import View
 from django.http import JsonResponse
 from django.utils import timezone
 
-from adsrental.models import Lead
+from adsrental.models.lead import Lead
+from adsrental.models.raspberry_pi import RaspberryPi
 from salesforce_handler.models import Lead as SFLead
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class SyncFromSFView(View):
@@ -14,6 +16,26 @@ class SyncFromSFView(View):
         sf_leads = []
         sf_leads_ids = []
         seconds_ago = 15
+
+        if request.GET.get('leadid'):
+            sf_lead_id = request.GET.get('leadid')
+            sf_lead = SFLead.objects.get(id=sf_lead_id).simple_select_related('raspberry_pi')
+            lead = Lead.objects.filter(email=sf_lead.email).first()
+            Lead.upsert_from_sf(sf_lead, lead)
+            return JsonResponse({
+                'result': True,
+                'leadid': sf_lead_id,
+            })
+        if request.GET.get('rpid'):
+            rpid = request.GET.get('rpid')
+            sf_raspberry_pi = SFRaspberryPi.objects.get(name=rpid)
+            rasberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            RaspberryPi.upsert_from_sf(sf_raspberry_pi, rasberry_pi)
+            return JsonResponse({
+                'result': True,
+                'rpid': rpid,
+            })
+
         if request.GET.get('all'):
             sf_leads = SFLead.objects.all().simple_select_related('raspberry_pi')
             leads = Lead.objects.all().select_related('raspberry_pi')
