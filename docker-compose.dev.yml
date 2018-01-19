@@ -35,6 +35,8 @@ services:
     command: /app/scripts/server.sh
     environment:
       ENV: dev
+    volumes:
+      - ./php/log/:/app/log/
     depends_on:
       - db
     links:

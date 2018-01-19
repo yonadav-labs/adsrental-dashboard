@@ -1,9 +1,58 @@
+import os
+
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.utils import timezone
+
+from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class LogView(View):
+    LOG_PATH = '/app/log/{rpid}/{date}.log'
+
+    def add_log(self, request, rpid, message):
+        ip_address = request.META.get('REMOTE_ADDR')
+        now = timezone.now()
+        log_path = LogView.LOG_PATH.format(rpid=rpid, date=now.strftime('%Y%m%d'))
+        if not os.path.exists(os.path.dirname(log_path)):
+            os.makedirs(os.path.dirname(log_path))
+        with open(log_path, 'a') as f:
+            f.write('{ts}: {ip}: {message}\n'.format(
+                ts=now.strftime('%Y-%m-%d %H:%M:%S'),
+                ip=ip_address,
+                message=message,
+            ))
+
     def get(self, request):
-        return JsonResponse({
-            'result': True,
-        })
+        rpid = request.GET.get('rpid')
+        if not rpid:
+            return JsonResponse({'result': False})
+
+        if 'm' in request.GET:
+            message = request.GET.get('m')
+            self.add_log(request, rpid, 'Client >>> {}'.format(message))
+
+        if 'h' in request.GET:
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            return HttpResponse(raspberry_pi.ec2_hostname or '')
+
+        if 'o' in request.GET:
+            ip_address = request.META.get('REMOTE_ADDR')
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            raspberry_pi.update_ping()
+            raspberry_pi.ipaddress = ip_address
+            raspberry_pi.save()
+
+            self.add_log(request, rpid, 'Tunnel Online')
+            return JsonResponse({'result': True, 'ip_address': ip_address})
+
+        if 'p' in request.GET:
+            ip_address = request.META.get('REMOTE_ADDR')
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            raspberry_pi.update_ping()
+            raspberry_pi.save()
+
+            self.add_log(request, rpid, 'PING')
+            return JsonResponse({'result': True, 'ip_address': ip_address})
+
+        return JsonResponse({'result': False})

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import datetime
+
 from django.utils import timezone
 from django.db import models
 from django.apps import apps
@@ -7,6 +9,7 @@ from django.apps import apps
 
 class RaspberryPi(models.Model):
     online_hours_ttl = 6
+    first_tested_hours_ttl = 1
     tunnel_online_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
@@ -15,11 +18,28 @@ class RaspberryPi(models.Model):
     ipaddress = models.CharField(max_length=255, blank=True, null=True)
     ec2_hostname = models.CharField(max_length=255, blank=True, null=True)
     first_seen = models.DateTimeField(blank=True, null=True)
+    first_tested = models.DateTimeField(blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True, db_index=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def update_ping(self):
+        now = timezone.now()
+        if not self.first_tested:
+            self.first_tested = now
+            return True
+
+        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
+            return False
+
+        if not self.first_seen:
+            self.first_seen = now
+            return True
+
+        self.last_seen = now
+        return True
 
     def online(self):
         if self.last_seen is None:

@@ -39,6 +39,7 @@ services:
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - ./sf_dump/:/app/sf_dump/
+      - ./php/log/:/app/log/
     depends_on:
       - db
     links:
