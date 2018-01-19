@@ -26,7 +26,7 @@ class LogView(View):
     def get(self, request):
         rpid = request.GET.get('rpid')
         if not rpid:
-            return JsonResponse({'result': False})
+            return JsonResponse({'result': False, 'reason': 'RPID not found'})
 
         if 'm' in request.GET:
             message = request.GET.get('m')
@@ -65,4 +65,4 @@ class LogView(View):
 
             return JsonResponse({'result': True, 'ip_address': ip_address})
 
-        return JsonResponse({'result': False})
+        return JsonResponse({'result': False, 'reason': 'Unknown command'})
