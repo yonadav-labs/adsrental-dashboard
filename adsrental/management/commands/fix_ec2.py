@@ -108,6 +108,9 @@ class Command(BaseCommand):
                     instance.stop()
                 continue
 
+            if not lead:
+                continue
+
             if terminate_stopped and lead.status in [Lead.STATUS_BANNED] and instance_state == 'stopped':
                 print 'BANNED (TERM):', instance_id, instance_rpid, ' belongs to banned lead and it is ', instance_state, ', terminating'
                 terminated_rpids.append(instance_rpid)
