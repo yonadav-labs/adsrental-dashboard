@@ -119,6 +119,7 @@ class RaspberryPi(models.Model):
         else:
             return raspberry_pi
 
+        sf_raspberry_pi.linked_lead_id = raspberry_pi.leadid
         sf_raspberry_pi.first_seen = first_seen
         sf_raspberry_pi.last_seen = last_seen
         sf_raspberry_pi.tunnel_last_tested = tunnel_last_tested
