@@ -31,6 +31,7 @@ class LogView(View):
         if 'm' in request.GET:
             message = request.GET.get('m')
             self.add_log(request, rpid, 'Client >>> {}'.format(message))
+            return JsonResponse({'result': True, 'source': 'client'})
 
         if 'h' in request.GET:
             raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
@@ -50,7 +51,7 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'Tunnel Tested')
 
-            return JsonResponse({'result': True, 'ip_address': ip_address})
+            return JsonResponse({'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
         if 'p' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
@@ -63,6 +64,6 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Tested')
 
-            return JsonResponse({'result': True, 'ip_address': ip_address})
+            return JsonResponse({'result': True, 'ip_address': ip_address, 'source': 'ping'})
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})
