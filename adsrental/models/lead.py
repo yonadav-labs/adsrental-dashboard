@@ -170,6 +170,7 @@ class Lead(models.Model, FulltextSearchMixin):
         for new_field, old_field in (
             (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
             (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
+            (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
         ):
             if new_field != old_field:
                 break
@@ -179,6 +180,7 @@ class Lead(models.Model, FulltextSearchMixin):
         if sf_lead.raspberry_pi:
             sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
             sf_lead.raspberry_pi.delivered = lead.pi_delivered
+            sf_lead.raspberry_pi.tested = lead.tested
             sf_lead.raspberry_pi.save()
 
         return lead
