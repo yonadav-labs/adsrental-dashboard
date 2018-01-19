@@ -131,7 +131,7 @@ class Command(BaseCommand):
                     instance.stop()
 
             if fix_ips and lead.raspberry_pi.ec2_hostname != public_dns_name and public_dns_name:
-                print 'DATA: Updating data for RPID old: ', instance_rpid, lead.raspberry_pi.ec2_hostname, 'new:', public_dns_name
+                print 'DATA: Updating data for RPID', instance_rpid, ', old:', lead.raspberry_pi.ec2_hostname, 'new:', public_dns_name
                 lead.raspberry_pi.ec2_hostname = public_dns_name
                 lead.raspberry_pi.ipaddress = public_ip_address
                 lead.raspberry_pi.save()
