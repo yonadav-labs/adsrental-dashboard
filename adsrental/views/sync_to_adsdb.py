@@ -11,7 +11,7 @@ class SyncToAdsdbView(View):
         leads = Lead.objects.filter(status=Lead.STATUS_IN_PROGRESS, is_sync_adsdb=False, fb_email__isnull=False).select_related('raspberry_pi')
         saved_emails = []
         responses = []
-        for lead in leads[:10]:
+        for lead in leads:
             data = dict(
                 first_name=lead.first_name,
                 last_name=lead.last_name,
