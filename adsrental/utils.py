@@ -19,6 +19,16 @@ class CustomerIOClient(object):
     def get_client(self):
         return self.client
 
+    def send_lead(self, lead):
+        if self.client:
+            self.client.identify(
+                id=lead.leadid,
+                First_Name=lead.first_name,
+                Last_Name=lead.last_name,
+                email=lead.email,
+                Company='[Empty]'
+            )
+
     def send_lead_event(self, lead, event, **kwargs):
         CustomerIOEvent(
             lead=lead,
