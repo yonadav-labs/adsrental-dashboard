@@ -349,13 +349,13 @@ class LeadAdmin(admin.ModelAdmin):
                     continue
                 instance_exists = True
                 if instance_state == 'running':
-                    messages.info(request, '{} EC2 instance is already {}, to stop in use "Start EC2 instance action" and call this command again after 1 minute'.format(lead.str(), instance_state))
+                    messages.info(request, '{} EC2 instance {} is already {}, to stop in use "Start EC2 instance action" and call this command again after 1 minute'.format(lead.str(), rpid, instance_state))
                     # instance.stop()
                 elif instance_state == 'stopped':
-                    messages.success(request, '{} EC2 instance is now {}, sent start command'.format(lead.str(), instance_state))
+                    messages.success(request, '{} EC2 instance {} is now {}, sent start command'.format(lead.str(), rpid, instance_state))
                     instance.start()
                 else:
-                    messages.warning(request, '{} EC2 instance is now {}, cannot do anything now'.format(lead.str(), instance_state))
+                    messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
 
             if not instance_exists:
                 boto_resource.create_instances(
@@ -378,7 +378,7 @@ class LeadAdmin(admin.ModelAdmin):
                         },
                     ],
                 )
-                messages.success(request, '{} EC2 instance did not exist, starting a new one'.format(lead.str()))
+                messages.success(request, '{} EC2 instance {} did not exist, starting a new one'.format(lead.str(), rpid))
                 continue
 
     def stop_ec2(self, request, queryset):
@@ -404,12 +404,12 @@ class LeadAdmin(admin.ModelAdmin):
                     continue
                 instance_exists = True
                 if instance_state == 'running':
-                    messages.info(request, '{} EC2 instance was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), instance_state))
+                    messages.info(request, '{} EC2 instance {} was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), rpid, instance_state))
                 else:
-                    messages.warning(request, '{} EC2 instance is now {}, cannot do anything now'.format(lead.str(), instance_state))
+                    messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
 
             if not instance_exists:
-                messages.success(request, '{} EC2 instance does not exist, call "Start EC2" command to start one'.format(lead.str()))
+                messages.success(request, '{} EC2 instance {} does not exist, call "Start EC2" command to start one'.format(lead.str(), rpid))
                 continue
 
     start_ec2.short_description = 'Start EC2 instance (use it to check state)'
