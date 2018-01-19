@@ -8350,6 +8350,9 @@ class User(models.Model):
         verbose_name_plural = 'Users'
         # keyPrefix = '005'
 
+    def __str__(self):
+        return '{} ({})'.format(self.username, self.id)
+
 
 
 class UserAppInfo(models.Model):
