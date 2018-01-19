@@ -347,6 +347,10 @@ class LeadAdmin(admin.ModelAdmin):
                 instance_state = instance.state['Name']
                 if instance_state == 'terminated':
                     continue
+                if instance_exists:
+                    working_instances = [i for i in instances if i.state['Name'] != 'terminated']
+                    messages.error(request, '{} {} has {} instances assigned, check AWS!!!'.format(lead.str(), rpid, len(working_instances)))
+                    break
                 instance_exists = True
                 if instance_state == 'running':
                     messages.info(request, '{} EC2 instance {} is already {}, to stop in use "Start EC2 instance action" and call this command again after 1 minute'.format(lead.str(), rpid, instance_state))
@@ -356,7 +360,6 @@ class LeadAdmin(admin.ModelAdmin):
                     instance.start()
                 else:
                     messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
-                break
 
             if not instance_exists:
                 boto_resource.create_instances(
@@ -403,12 +406,15 @@ class LeadAdmin(admin.ModelAdmin):
                 instance_state = instance.state['Name']
                 if instance_state == 'terminated':
                     continue
+                if instance_exists:
+                    working_instances = [i for i in instances if i.state['Name'] != 'terminated']
+                    messages.error(request, '{} {} has {} instances assigned, check AWS!!!'.format(lead.str(), rpid, len(working_instances)))
+                    break
                 instance_exists = True
                 if instance_state == 'running':
                     messages.info(request, '{} EC2 instance {} was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), rpid, instance_state))
                 else:
                     messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
-                break
 
             if not instance_exists:
                 messages.success(request, '{} EC2 instance {} does not exist, call "Start EC2" command to start one'.format(lead.str(), rpid))
