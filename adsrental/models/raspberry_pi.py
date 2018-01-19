@@ -5,6 +5,7 @@ import datetime
 from django.utils import timezone
 from django.db import models
 from django.apps import apps
+from django.conf import settings
 
 
 class RaspberryPi(models.Model):
@@ -148,6 +149,7 @@ class RaspberryPi(models.Model):
         sf_raspberry_pi.last_seen = last_seen
         sf_raspberry_pi.tunnel_last_tested = tunnel_last_tested
         sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
+        sf_raspberry_pi.last_modified_by_id = settings.SALESFORCE_API_USER_ID
         sf_raspberry_pi.save()
 
     def get_lead(self):
