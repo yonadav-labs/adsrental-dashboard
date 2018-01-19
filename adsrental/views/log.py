@@ -40,10 +40,16 @@ class LogView(View):
             ip_address = request.META.get('REMOTE_ADDR')
             raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
             raspberry_pi.update_ping()
+            if not raspberry_pi.first_seen:
+                self.add_log(request, rpid, 'Tested')
             raspberry_pi.ipaddress = ip_address
             raspberry_pi.save()
 
-            self.add_log(request, rpid, 'Tunnel Online')
+            if raspberry_pi.first_seen:
+                self.add_log(request, rpid, 'Tunnel Online')
+            else:
+                self.add_log(request, rpid, 'Tunnel Tested')
+
             return JsonResponse({'result': True, 'ip_address': ip_address})
 
         if 'p' in request.GET:
@@ -52,7 +58,11 @@ class LogView(View):
             raspberry_pi.update_ping()
             raspberry_pi.save()
 
-            self.add_log(request, rpid, 'PING')
+            if raspberry_pi.first_seen:
+                self.add_log(request, rpid, 'PING')
+            else:
+                self.add_log(request, rpid, 'PING Tested')
+
             return JsonResponse({'result': True, 'ip_address': ip_address})
 
         return JsonResponse({'result': False})
