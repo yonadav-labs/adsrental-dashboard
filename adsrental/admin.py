@@ -9,11 +9,12 @@ from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.conf import settings
 
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent
 from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
-from adsrental.utils import ShipStationClient
+from adsrental.utils import ShipStationClient, BotoResource
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -185,10 +186,20 @@ class LeadAdmin(admin.ModelAdmin):
         'bundler_paid',
         'tested',
     )
-    list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
+    list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
+                   WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     select_related = ('raspberry_pi', )
-    search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
-    actions = ('update_from_salesforce', 'update_salesforce', 'update_from_shipstation', 'update_pi_delivered', 'create_shipstation_order')
+    search_fields = ('leadid', 'account_name', 'first_name',
+                     'last_name', 'raspberry_pi__rpid', 'email', )
+    actions = (
+        'update_from_salesforce',
+        'update_salesforce',
+        'update_from_shipstation',
+        'update_pi_delivered',
+        'create_shipstation_order',
+        'start_ec2',
+        'stop_ec2',
+    )
     readonly_fields = ('created', 'updated', )
 
     def name(self, obj):
@@ -260,7 +271,8 @@ class LeadAdmin(admin.ModelAdmin):
             leads_map[lead.leadid] = lead
             sf_lead_ids.append(lead.leadid)
 
-        sf_leads = SFLead.objects.filter(id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+        sf_leads = SFLead.objects.filter(
+            id__in=sf_lead_ids).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
             Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
 
@@ -271,7 +283,8 @@ class LeadAdmin(admin.ModelAdmin):
             leads_map[lead.leadid] = lead
             sf_lead_ids.append(lead.leadid)
 
-        sf_leads = SFLead.objects.filter(id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+        sf_leads = SFLead.objects.filter(
+            id__in=sf_lead_ids).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
             Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
 
@@ -287,26 +300,120 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             sf_lead = SFLead.objects.filter(email=lead.email).first()
             if not sf_lead:
-                messages.error(request, 'Lead () does not exist in SF, skipping'.format(lead.email))
+                messages.error(
+                    request, 'Lead () does not exist in SF, skipping'.format(lead.email))
                 continue
 
             if not sf_lead.raspberry_pi:
-                sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
+                sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(
+                    linked_lead__isnull=True).first()
                 sf_lead.raspberry_pi.linked_lead = sf_lead
                 sf_lead.raspberry_pi.save()
                 sf_lead.save()
-                messages.success(request, 'Lead {} has new Raspberry Pi assigned'.format(lead.email))
+                messages.success(
+                    request, 'Lead {} has new Raspberry Pi assigned'.format(lead.email))
 
-            Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=sf_lead.email).first())
+            Lead.upsert_from_sf(sf_lead, Lead.objects.filter(
+                email=sf_lead.email).first())
 
             shipstation_client = ShipStationClient()
             if shipstation_client.get_sf_lead_order_data(sf_lead):
-                messages.info(request, 'Lead {} order already exists'.format(lead.email))
+                messages.info(
+                    request, 'Lead {} order already exists'.format(lead.email))
                 continue
 
             shipstation_client.add_sf_lead_order(sf_lead)
-            messages.success(request, 'Lead {} order created'.format(lead.email))
+            messages.success(
+                request, '{} order created'.format(lead.str()))
 
+    def start_ec2(self, request, queryset):
+        boto_resource = BotoResource().get_resource()
+        for lead in queryset:
+            if not lead.raspberry_pi:
+                messages.warning(request, '{} has no Raspberry Pi assiigned, skipping'.format(lead.str()))
+
+            rpid = lead.raspberry_pi.rpid
+
+            instances = boto_resource.instances.filter(
+                Filters=[
+                    {
+                        'Name': 'tag:Name',
+                        'Values': [rpid],
+                    },
+                ],
+            )
+            instance_exists = False
+            for instance in instances:
+                instance_state = instance.state['Name']
+                if instance_state == 'terminated':
+                    continue
+                instance_exists = True
+                if instance_state == 'running':
+                    messages.info(request, '{} EC2 instance is already {}, to stop in use "Start EC2 instance action" and call this command again after 1 minute'.format(lead.str(), instance_state))
+                    # instance.stop()
+                elif instance_state == 'stopped':
+                    messages.success(request, '{} EC2 instance is now {}, sent start command'.format(lead.str(), instance_state))
+                    instance.start()
+                else:
+                    messages.warning(request, '{} EC2 instance is now {}, cannot do anything now'.format(lead.str(), instance_state))
+
+            if not instance_exists:
+                boto_resource.create_instances(
+                    ImageId=settings.AWS_IMAGE_AMI,
+                    MinCount=1,
+                    MaxCount=1,
+                    KeyName='AI Farming Key',
+                    InstanceType='t2.micro',
+                    SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
+                    UserData=rpid,
+                    TagSpecifications=[
+                        {
+                            'ResourceType': 'instance',
+                            'Tags': [
+                                {
+                                    'Key': 'Name',
+                                    'Value': rpid,
+                                },
+                            ]
+                        },
+                    ],
+                )
+                messages.success(request, '{} EC2 instance did not exist, starting a new one'.format(lead.str()))
+                continue
+
+    def stop_ec2(self, request, queryset):
+        boto_resource = BotoResource().get_resource()
+        for lead in queryset:
+            if not lead.raspberry_pi:
+                messages.warning(request, '{} has no Raspberry Pi assiigned, skipping'.format(lead.str()))
+
+            rpid = lead.raspberry_pi.rpid
+
+            instances = boto_resource.instances.filter(
+                Filters=[
+                    {
+                        'Name': 'tag:Name',
+                        'Values': [rpid],
+                    },
+                ],
+            )
+            instance_exists = False
+            for instance in instances:
+                instance_state = instance.state['Name']
+                if instance_state == 'terminated':
+                    continue
+                instance_exists = True
+                if instance_state == 'running':
+                    messages.info(request, '{} EC2 instance was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), instance_state))
+                else:
+                    messages.warning(request, '{} EC2 instance is now {}, cannot do anything now'.format(lead.str(), instance_state))
+
+            if not instance_exists:
+                messages.success(request, '{} EC2 instance does not exist, call "Start EC2" command to start one'.format(lead.str()))
+                continue
+
+    start_ec2.short_description = 'Start EC2 instance (use it to check state)'
+    stop_ec2.short_description = 'Stop EC2 instance'
     email_field.allow_tags = True
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
@@ -335,9 +442,11 @@ class LeadAdmin(admin.ModelAdmin):
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen', 'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
+    list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen',
+                    'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
-    list_filter = (RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, )
+    list_filter = (RaspberryPiOnlineListFilter,
+                   RaspberryPiTunnelOnlineListFilter, )
     actions = ('update_from_salesforce', 'update_to_salesforce', )
     readonly_fields = ('created', 'updated', )
 
@@ -374,10 +483,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
             sf_raspberry_pi_names.append(raspberry_pi.rpid)
 
-        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=sf_raspberry_pi_names)
+        sf_raspberry_pis = SFRaspberryPi.objects.filter(
+            name__in=sf_raspberry_pi_names)
 
         for sf_raspberry_pi in sf_raspberry_pis:
-            RaspberryPi.upsert_from_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
+            RaspberryPi.upsert_from_sf(
+                sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
 
     def update_to_salesforce(self, request, queryset):
         sf_raspberry_pi_names = []
@@ -386,10 +497,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
             sf_raspberry_pi_names.append(raspberry_pi.rpid)
 
-        sf_raspberry_pis = SFRaspberryPi.objects.filter(name__in=sf_raspberry_pi_names)
+        sf_raspberry_pis = SFRaspberryPi.objects.filter(
+            name__in=sf_raspberry_pi_names)
 
         for sf_raspberry_pi in sf_raspberry_pis:
-            RaspberryPi.upsert_to_sf(sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
+            RaspberryPi.upsert_to_sf(
+                sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
 
     online.boolean = True
     tunnel_online.boolean = True
@@ -401,7 +514,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 class CustomerIOEventAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
     list_display = ('id', 'lead', 'lead_name', 'lead_email', 'name', 'created')
-    search_fields = ('lead__email', 'lead__first_name', 'lead__last_name', 'name', )
+    search_fields = ('lead__email', 'lead__first_name',
+                     'lead__last_name', 'name', )
     list_filter = ('name', )
     readonly_fields = ('created', )
 

@@ -143,6 +143,9 @@ class Lead(models.Model, FulltextSearchMixin):
     def name(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
+    def str(self):
+        return 'Lead {} ({})'.format(self.name(), self.email)
+
     @staticmethod
     def upsert_to_sf_thread(params):
         try:

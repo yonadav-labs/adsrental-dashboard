@@ -80,12 +80,12 @@ class Command(BaseCommand):
             print rpid, 'will be launched'
             if launch:
                 boto_client.create_instances(
-                    ImageId='ami-68e20f10',
+                    ImageId=settings.AWS_IMAGE_AMI,
                     MinCount=1,
                     MaxCount=1,
                     KeyName='AI Farming Key',
                     InstanceType='t2.micro',
-                    SecurityGroupIds=['sg-18528a63'],
+                    SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
                     UserData=rpid,
                     TagSpecifications=[
                         {

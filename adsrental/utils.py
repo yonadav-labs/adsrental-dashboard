@@ -1,6 +1,7 @@
 import json
 
 import requests
+import boto3
 from django.conf import settings
 import customerio
 from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
@@ -100,3 +101,14 @@ class ShipStationClient(object):
         ).json().get('orders')
         data = data[0] if data else None
         return data
+
+
+class BotoResource(object):
+    def __init__(self):
+        self.resource = boto3.Session(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        ).resource('ec2', region_name=settings.AWS_REGION)
+
+    def get_resource(self):
+        return self.resource
