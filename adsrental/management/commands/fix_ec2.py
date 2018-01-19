@@ -41,7 +41,7 @@ class Command(BaseCommand):
         ).resource('ec2', region_name=settings.AWS_REGION)
 
         leads = Lead.objects.filter(raspberry_pi__isnull=False).select_related('raspberry_pi')
-        required_leads = [i for i in leads if i.status in (Lead.STATUS_QUALIFIED, Lead.STATUS_IN_PROGRESS)]
+        required_leads = [i for i in leads if i.status in (Lead.STATUS_QUALIFIED, Lead.STATUS_IN_PROGRESS, Lead.STATUS_AVAILABLE)]
         # rpids = [i.raspberry_pi.name for i in leads if i.raspberry_pi]
         # required_rpids = [i.raspberry_pi.rpid for i in leads if i.raspberry_pi and i.status in ('Qualified', 'In-Progress')]
         # banned_rpids = [i.raspberry_pi.rpid for i in leads if i.raspberry_pi and i.status == 'Banned']
