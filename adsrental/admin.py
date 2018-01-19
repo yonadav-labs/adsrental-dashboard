@@ -356,6 +356,7 @@ class LeadAdmin(admin.ModelAdmin):
                     instance.start()
                 else:
                     messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
+                break
 
             if not instance_exists:
                 boto_resource.create_instances(
@@ -407,6 +408,7 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.info(request, '{} EC2 instance {} was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), rpid, instance_state))
                 else:
                     messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
+                break
 
             if not instance_exists:
                 messages.success(request, '{} EC2 instance {} does not exist, call "Start EC2" command to start one'.format(lead.str(), rpid))
