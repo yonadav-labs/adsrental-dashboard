@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^dashboard/check_sent/$', CheckSentView.as_view(), name='dashboard_check_sent'),
     url(r'^log.php', LogView.as_view(), name='log'),
     url(r'^log/$', LogView.as_view(), name='log'),
+    url(r'^log/rlog.php$', LogView.as_view(), name='log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),
