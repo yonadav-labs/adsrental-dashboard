@@ -21,5 +21,6 @@ exec gunicorn config.wsgi:application \
     --worker-class gevent \
     --bind 0.0.0.0:8007 \
     --workers 3 \
-    --timeout 300
+    --timeout 3000 \
+    --error-logfile=-
 
