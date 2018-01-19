@@ -29,6 +29,9 @@ class RaspberryPi(models.Model):
         now = timezone.now()
         if not self.first_tested:
             self.first_tested = now
+            if self.lead:
+                self.lead.tested = True
+                self.lead.save()
             return True
 
         if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
@@ -36,6 +39,7 @@ class RaspberryPi(models.Model):
 
         if not self.first_seen:
             self.first_seen = now
+            self.last_seen = now
             return True
 
         self.last_seen = now
