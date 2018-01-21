@@ -133,8 +133,6 @@ class Command(BaseCommand):
                 running_rpids.append(instance_rpid)
 
             lead = leads_rpid_map.get(instance_rpid)
-            if not instance_lead_email:
-                self.set_instance_tag(boto_client, instance, 'Email', lead.email)
             if terminate_stopped and not lead and instance_state == 'stopped':
                 print 'NO LEAD (TERM):', instance_id, instance_rpid, ' has no corresponding lead and it is', instance_state, ', terminating'
                 if execute:
@@ -149,6 +147,11 @@ class Command(BaseCommand):
 
             if not lead:
                 continue
+
+            if not instance_lead_email:
+                print 'ADD EMAIL:', instance_id, instance_rpid, ' add tag Email =', lead.email
+                if execute:
+                    self.set_instance_tag(boto_client, instance, 'Email', lead.email)
 
             if terminate_stopped and lead.status in [Lead.STATUS_BANNED] and instance_state == 'stopped':
                 print 'BANNED (TERM):', instance_id, instance_rpid, ' belongs to banned lead and it is ', instance_state, ', terminating'
