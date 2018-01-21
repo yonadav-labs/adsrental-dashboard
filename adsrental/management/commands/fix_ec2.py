@@ -78,6 +78,13 @@ class Command(BaseCommand):
         started_rpids = []
         duplicate_rpids = []
         running_rpids = []
+        instance_states_counter = {
+            'running': 0,
+            'stopping': 0,
+            'terminated': 0,
+            'stopped': 0,
+            'pending': 0,
+        }
 
         # print banned_rpids
 
@@ -93,6 +100,7 @@ class Command(BaseCommand):
             public_ip_address = instance.public_ip_address
             instance_rpid = None
             instance_state = instance.state['Name']
+            instance_states_counter[instance_state] += 1
 
             if instance_state == 'terminated':
                 continue
@@ -206,5 +214,5 @@ class Command(BaseCommand):
             print 'Started', len(started_rpids), started_rpids
         if duplicate_rpids:
             print 'Duplicates', len(duplicate_rpids), duplicate_rpids
-        print 'Total', len(launched_rpid)
+        print instance_states_counter
         print time.clock(), 'finished'
