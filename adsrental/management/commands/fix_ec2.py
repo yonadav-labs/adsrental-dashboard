@@ -111,7 +111,7 @@ class Command(BaseCommand):
                 if stop_duplicates and not is_duplicate:
                     print 'MARK DUPLICATE:', public_dns_name, instance_rpid, ', adding duplicate tag'
                     if execute:
-                        instance.set_instance_tag(boto_client, instance, 'Duplicate', 'true')
+                        self.set_instance_tag(boto_client, instance, 'Duplicate', 'true')
                 if stop_duplicates and instance_state == 'running':
                     print 'DUPLICATE:', public_dns_name, instance_rpid, ', stopping'
                     duplicate_rpids.append(instance_rpid)
