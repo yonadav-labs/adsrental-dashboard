@@ -201,7 +201,8 @@ class LeadAdmin(admin.ModelAdmin):
         'create_shipstation_order',
         'start_ec2',
         'stop_ec2',
-        'troubleshoot_tunnel',
+        'troubleshoot',
+        'restart_raspberry_pi',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -427,7 +428,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.success(request, '{} EC2 instance {} does not exist, call "Start EC2" command to start one'.format(lead.str(), rpid))
                 continue
 
-    def troubleshoot_tunnel(self, request, queryset):
+    def troubleshoot(self, request, queryset):
         boto_resource = BotoResource().get_resource()
         private_key = paramiko.RSAKey.from_private_key_file("/app/cert/farmbot.pem")
         ssh = paramiko.SSHClient()
@@ -450,7 +451,7 @@ class LeadAdmin(admin.ModelAdmin):
                     instance = i
 
             if instance is None:
-                messages.error(request, 'Lead {} has to correspoding EC2 instance. Use "Launch EC2" command'.format(lead.email))
+                messages.error(request, 'Lead {} has to correspoding EC2 instance. Use "Start EC2 instance" command'.format(lead.email))
                 continue
 
             public_dns_name = instance.public_dns_name
@@ -464,7 +465,7 @@ class LeadAdmin(admin.ModelAdmin):
                 lead.raspberry_pi.save()
 
             if instance_state != 'running':
-                messages.error(request, 'Lead {} has to running EC2 instance. Use "Launch EC2" command'.format(lead.email))
+                messages.error(request, 'Lead {} has to running EC2 instance. Use "Start EC2 instance" command'.format(lead.email))
                 continue
 
             response = None
@@ -509,6 +510,12 @@ class LeadAdmin(admin.ModelAdmin):
 
             messages.success(request, 'Lead {} EC2 and RaspberryPi are performing normally.'.format(lead.email))
             ssh.close()
+
+    def restart_raspberry_pi(self, request, queryset):
+        for lead in queryset:
+            lead.raspberry_pi.restart_tunnel = True
+            lead.raspberry_pi.save()
+        messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     start_ec2.short_description = 'Start EC2 instance (use it to check state)'
     stop_ec2.short_description = 'Stop EC2 instance'

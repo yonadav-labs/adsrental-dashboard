@@ -3,6 +3,7 @@ import os
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
+from django.conf import settings
 
 from adsrental.models.raspberry_pi import RaspberryPi
 
@@ -68,6 +69,7 @@ class LogView(View):
             if raspberry_pi.restart_required:
                 restart_required = True
                 raspberry_pi.restart_required = False
+                raspberry_pi.version = settings.RASPBERRY_PI_VERSION
                 raspberry_pi.save()
 
             return JsonResponse({
