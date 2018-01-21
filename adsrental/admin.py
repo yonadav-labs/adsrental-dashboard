@@ -485,7 +485,7 @@ class LeadAdmin(admin.ModelAdmin):
             cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             if '0x1' not in ssh_stdout.read():
-                messages.warning('Lead {} EC2 proxy settings look incorrect. Auto-fixing.'.format(lead.email))
+                messages.warning(request, 'Lead {} EC2 proxy settings look incorrect. Auto-fixing.'.format(lead.email))
                 cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
                 ssh.exec_command(cmd_to_execute)
                 cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
@@ -501,7 +501,7 @@ class LeadAdmin(admin.ModelAdmin):
                 continue
 
             if lead.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                messages.warning('Lead {} has outdated RaspberryPi firmware. Updating it and restarting.'.format(lead.email))
+                messages.warning(request, 'Lead {} has outdated RaspberryPi firmware. Updating it and restarting.'.format(lead.email))
                 cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
                 ssh.exec_command(cmd_to_execute)
                 lead.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
