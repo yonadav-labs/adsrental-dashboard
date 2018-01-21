@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.conf import settings
 
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.utils import BotoResource
 
 
 class LogView(View):
