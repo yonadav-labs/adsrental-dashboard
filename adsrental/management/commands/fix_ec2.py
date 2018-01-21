@@ -203,6 +203,10 @@ class Command(BaseCommand):
                                         'Key': 'Name',
                                         'Value': rpid,
                                     },
+                                    {
+                                        'Key': 'Email',
+                                        'Value': lead.email,
+                                    },
                                 ]
                             },
                         ],
