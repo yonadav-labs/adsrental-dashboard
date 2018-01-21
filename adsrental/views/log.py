@@ -45,12 +45,12 @@ class LogView(View):
             raspberry_pi.update_ping()
             if not raspberry_pi.first_seen:
                 self.add_log(request, rpid, 'Tested')
-            if raspberry_pi.ipaddress != ip_address:
-                instance = BotoResource().get_instance(rpid)
-                if instance:
-                    raspberry_pi.ec2_hostname = instance.public_dns_name
-                    raspberry_pi.ipaddress = instance.public_ip_address
-                    raspberry_pi.save()
+            # if raspberry_pi.ipaddress != ip_address:
+            #     instance = BotoResource().get_instance(rpid)
+            #     if instance:
+            #         raspberry_pi.ec2_hostname = instance.public_dns_name
+            #         raspberry_pi.ipaddress = instance.public_ip_address
+            #         raspberry_pi.save()
 
             if raspberry_pi.first_seen:
                 self.add_log(request, rpid, 'Tunnel Online')
