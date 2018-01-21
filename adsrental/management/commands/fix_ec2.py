@@ -43,7 +43,11 @@ class Command(BaseCommand):
         if not key_found:
             tags.append({'Key': key, 'Value': value})
 
-        boto_client.create_tags(Resources=[instance.id], Tags=tags)
+        try:
+            boto_client.create_tags(Resources=[instance.id], Tags=tags)
+        except:
+            print 'Cound not add tag for', instance.id, key, '=', value
+            pass
 
     def handle(
         self,
@@ -148,7 +152,7 @@ class Command(BaseCommand):
             if not lead:
                 continue
 
-            if not instance_lead_email:
+            if not instance_lead_email and lead.email:
                 print 'ADD EMAIL:', instance_id, instance_rpid, ' add tag Email =', lead.email
                 if execute:
                     self.set_instance_tag(boto_client, instance, 'Email', lead.email)
