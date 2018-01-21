@@ -498,7 +498,7 @@ class LeadAdmin(admin.ModelAdmin):
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             netstat_out = ssh_stdout.read()
             if ':2046' not in netstat_out:
-                if lead.raspberry_pi_version == '1.0.0':
+                if lead.raspberry_pi.version == '1.0.0':
                     messages.error(request, 'Lead {} RaspberryPi SSH seems to be down. Please ask {} to reset Pi manually'.format(lead.email, lead.name()))
                 else:
                     messages.error(request, 'Lead {} RaspberryPi SSH seems to be down. Use "Restart Raspberry Pi" command'.format(lead.email))
