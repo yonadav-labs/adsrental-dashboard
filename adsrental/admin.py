@@ -378,6 +378,10 @@ class LeadAdmin(admin.ModelAdmin):
                                     'Key': 'Name',
                                     'Value': rpid,
                                 },
+                                {
+                                    'Key': 'Email',
+                                    'Value': lead.email,
+                                },
                             ]
                         },
                     ],
