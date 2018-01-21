@@ -458,7 +458,7 @@ class LeadAdmin(admin.ModelAdmin):
             instance_state = instance.state['Name']
 
             if lead.raspberry_pi.ec2_hostname != public_dns_name:
-                messages.warning('Lead {} EC2 hostname data looks incorrect. Auto-fixing.'.format(lead.email))                
+                messages.warning('Lead {} EC2 hostname data looks incorrect. Auto-fixing.'.format(lead.email))
                 lead.raspberry_pi.ec2_hostname = public_dns_name
                 lead.raspberry_pi.ipaddress = public_ip_address
                 lead.raspberry_pi.save()
