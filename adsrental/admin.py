@@ -458,6 +458,7 @@ class LeadAdmin(admin.ModelAdmin):
             instance_state = instance.state['Name']
 
             if lead.raspberry_pi.ec2_hostname != public_dns_name:
+                messages.warning('Lead {} EC2 hostname data looks incorrect. Auto-fixing.'.format(lead.email))                
                 lead.raspberry_pi.ec2_hostname = public_dns_name
                 lead.raspberry_pi.ipaddress = public_ip_address
                 lead.raspberry_pi.save()
@@ -470,23 +471,21 @@ class LeadAdmin(admin.ModelAdmin):
             try:
                 response = requests.get('http://{}:13608'.format(public_dns_name), timeout=10)
             except Exception:
-                messages.error('Lead {} EC2 web interface looks down or just slow. Consider stopping and starting instance.'.format(lead.email))
+                messages.error(request, 'Lead {} EC2 web interface looks down or just slow. Consider stopping and starting instance.'.format(lead.email))
 
             if response and instance.id not in response.text:
-                messages.error('Lead {} EC2 web interface returns wrong data. Consider stopping and starting instance.'.format(lead.email))
+                messages.error(request, 'Lead {} EC2 web interface returns wrong data. Consider stopping and starting instance.'.format(lead.email))
 
-            cmd_to_execute = 'netstat'
             try:
                 ssh.connect(public_dns_name, username='Administrator', port=40594, pkey=private_key, timeout=5)
-                ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             except Exception:
-                messages.error('Lead {} EC2 SSH seems to be down. Consider stopping and starting it again.'.format(lead.email, lead.name()))
+                messages.error(request, 'Lead {} EC2 SSH seems to be down. Consider stopping and starting it again.'.format(lead.email, lead.name()))
                 continue
 
             cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             if '0x1' not in ssh_stdout.read():
-                messages.info('Lead {} EC2 proxy settings look incorrect. Auto-fixing.'.format(lead.email))
+                messages.warning('Lead {} EC2 proxy settings look incorrect. Auto-fixing.'.format(lead.email))
                 cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
                 ssh.exec_command(cmd_to_execute)
                 cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
@@ -494,20 +493,21 @@ class LeadAdmin(admin.ModelAdmin):
                 cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
                 ssh.exec_command(cmd_to_execute)
 
+            cmd_to_execute = 'netstat'
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             netstat_out = ssh_stdout.read()
-            # print 'OUT', netstat_out
             if ':2046' not in netstat_out:
-                messages.error('Lead {} RaspberryPi SSH seems to be down. Please ask {} to reset Pi manually'.format(lead.email, lead.name()))
+                messages.error(request, 'Lead {} RaspberryPi SSH seems to be down. Please ask {} to reset Pi manually'.format(lead.email, lead.name()))
                 continue
 
             if lead.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                messages.info('Lead {} has outdated RaspberryPi firmware. Updating it and restarting.'.format(lead.email))
+                messages.warning('Lead {} has outdated RaspberryPi firmware. Updating it and restarting.'.format(lead.email))
                 cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
                 ssh.exec_command(cmd_to_execute)
                 lead.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
                 lead.raspberry_pi.save()
 
-            messages.success('Lead {} EC2 and RaspberryPi are performing normally.'.format(lead.email))
+            messages.success(request, 'Lead {} EC2 and RaspberryPi are performing normally.'.format(lead.email))
             ssh.close()
 
     start_ec2.short_description = 'Start EC2 instance (use it to check state)'
