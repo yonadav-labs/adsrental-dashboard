@@ -107,6 +107,7 @@ class Command(BaseCommand):
 
             instance_rpid = self.get_instance_tag(instance, 'Name')
             is_duplicate = self.get_instance_tag(instance, 'Duplicate')
+            instance_lead_email = self.get_instance_tag(instance, 'Email')
             if is_duplicate and instance_state == 'running':
                 print 'DUPLICATE:', public_dns_name, instance_rpid, ', stopping'
                 continue
@@ -132,6 +133,8 @@ class Command(BaseCommand):
                 running_rpids.append(instance_rpid)
 
             lead = leads_rpid_map.get(instance_rpid)
+            if not instance_lead_email:
+                self.set_instance_tag(boto_client, instance, 'Email', lead.email)
             if terminate_stopped and not lead and instance_state == 'stopped':
                 print 'NO LEAD (TERM):', instance_id, instance_rpid, ' has no corresponding lead and it is', instance_state, ', terminating'
                 if execute:
