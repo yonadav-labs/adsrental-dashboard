@@ -64,10 +64,10 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Tested')
 
-            restart_requred = False
-            if raspberry_pi.restart_requred:
-                restart_requred = True
-                raspberry_pi.restart_requred = False
+            restart_required = False
+            if raspberry_pi.restart_required:
+                restart_required = True
+                raspberry_pi.restart_required = False
                 raspberry_pi.save()
 
             update_required = False
@@ -80,7 +80,7 @@ class LogView(View):
                 'result': True,
                 'ip_address': ip_address,
                 'source': 'ping',
-                'restart': restart_requred,
+                'restart': restart_required,
                 'pull': update_required,
             })
 
