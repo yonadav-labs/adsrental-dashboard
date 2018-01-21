@@ -6,8 +6,8 @@ import boto3
 
 
 parser = argparse.ArgumentParser(description='Connect to RDP by RPID or email.')
-parser.add_argument('rpid', help='RPID for Raspberry Pi')
-# parser.add_argument('--email', help='Lead email')
+parser.add_argument('--rpid', help='RPID for Raspberry Pi')
+parser.add_argument('--email', help='Lead email')
 args = parser.parse_args()
 
 rpid = None
@@ -17,7 +17,7 @@ if args.rpid:
     else:
         rpid = args.rpid
 
-if not rpid:
+if not args.rpid and not args.email:
     rpid = raw_input('Enter RPID: ')
 
 boto_client = boto3.Session(
@@ -25,15 +25,24 @@ boto_client = boto3.Session(
     aws_secret_access_key='Tvoa63VvoXN550C053pUQ3U0zOcqF8OipDef+pcS',
 ).resource('ec2', region_name='us-west-2')
 
-
-instances = boto_client.instances.filter(
-    Filters=[
-        {
-            'Name': 'tag:Name',
-            'Values': [rpid],
-        },
-    ],
-)
+if args.email:
+    instances = boto_client.instances.filter(
+        Filters=[
+            {
+                'Name': 'tag:Email',
+                'Values': [args.email],
+            },
+        ],
+    )
+else:
+    instances = boto_client.instances.filter(
+        Filters=[
+            {
+                'Name': 'tag:Name',
+                'Values': [rpid],
+            },
+        ],
+    )
 
 if not instances:
     print('No instances')
@@ -42,7 +51,7 @@ if not instances:
 instance = None
 for i in instances:
     instance = i
-print 'instance', rpid, instance, instance.public_dns_name
+print 'Connecting to instance', instance.id, instance.tags, instance.public_dns_name
 
 hostname = instance.public_dns_name
 
