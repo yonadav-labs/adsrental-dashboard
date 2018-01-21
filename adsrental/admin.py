@@ -459,7 +459,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
     list_filter = (RaspberryPiOnlineListFilter,
                    RaspberryPiTunnelOnlineListFilter, )
-    actions = ('update_from_salesforce', 'update_to_salesforce', )
+    actions = (
+        'update_from_salesforce',
+        'update_to_salesforce',
+        'restart_tunnel',
+        'update_and_reboot',
+    )
     readonly_fields = ('created', 'updated', )
 
     def online(self, obj):
@@ -515,6 +520,18 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         for sf_raspberry_pi in sf_raspberry_pis:
             RaspberryPi.upsert_to_sf(
                 sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
+
+    def restart_tunnel(self, request, queryset):
+        for raspberry_pi in queryset:
+            raspberry_pi.restart_tunnel = True
+            raspberry_pi.save()
+        messages.info(request, 'Restart successfully requested')
+
+    def update_and_reboot(self, request, queryset):
+        for raspberry_pi in queryset:
+            raspberry_pi.update_required = True
+            raspberry_pi.save()
+        messages.info(request, 'Update successfully requested')
 
     online.boolean = True
     tunnel_online.boolean = True
