@@ -22,6 +22,29 @@ class Command(BaseCommand):
         parser.add_argument('--execute', action='store_true')
         parser.add_argument('--progress', action='store_true')
 
+    def get_instance_tag(self, instance, key):
+        if not instance.tags:
+            return None
+
+        for tagpair in instance.tags:
+            if tagpair['Key'] == key:
+                return tagpair['Value']
+
+        return None
+
+    def set_instance_tag(self, boto_client, instance, key, value):
+        tags = instance.tags or []
+        key_found = False
+        for tagpair in tags:
+            if tagpair['Key'] == key:
+                key_found = True
+                tagpair['Value'] = value
+                break
+        if not key_found:
+            tags.append({'Key': key, 'Value': value})
+
+        boto_client.create_tags(Resources=[instance.id], Tags=tags)
+
     def handle(
         self,
         launch_required,
@@ -74,16 +97,21 @@ class Command(BaseCommand):
             if instance_state == 'terminated':
                 continue
 
-            if instance.tags:
-                for tagpair in instance.tags:
-                    if tagpair['Key'] == 'Name':
-                        instance_rpid = tagpair['Value']
+            instance_rpid = self.get_instance_tag(instance, 'Name')
+            is_duplicate = self.get_instance_tag(instance, 'Duplicate')
+            if is_duplicate and instance_state == 'running':
+                print 'DUPLICATE:', public_dns_name, instance_rpid, ', stopping'
+                continue
 
             if not instance_rpid or not instance_rpid.startswith('RP'):
                 # print 'Unknown instance', public_dns_name, instance_rpid
                 continue
 
-            if instance_rpid in running_rpids:
+            if is_duplicate or instance_rpid in running_rpids:
+                if stop_duplicates and not is_duplicate:
+                    print 'MARK DUPLICATE:', public_dns_name, instance_rpid, ', adding duplicate tag'
+                    if execute:
+                        instance.set_instance_tag(boto_client, instance, 'Duplicate', 'true')
                 if stop_duplicates and instance_state == 'running':
                     print 'DUPLICATE:', public_dns_name, instance_rpid, ', stopping'
                     duplicate_rpids.append(instance_rpid)
