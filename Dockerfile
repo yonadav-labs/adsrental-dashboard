@@ -10,6 +10,9 @@ RUN apk --no-cache add \
     gcc \
     musl-dev \
     bash \
+    libffi-dev \
+    make \
+    openssl-dev \
 && echo "Installed build dependencies"
 
 ADD ./requirements /app/requirements/

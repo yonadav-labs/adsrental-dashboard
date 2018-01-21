@@ -14,3 +14,4 @@ django-bootstrap-form==3.3
 customerio==0.2.4
 shipstation==0.1.2
 django-recaptcha2==1.0.3
+paramiko==2.4.0
