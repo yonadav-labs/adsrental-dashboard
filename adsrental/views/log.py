@@ -64,6 +64,24 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Tested')
 
-            return JsonResponse({'result': True, 'ip_address': ip_address, 'source': 'ping', 'restart': False, 'pull': False})
+            restart_requred = False
+            if raspberry_pi.restart_requred:
+                restart_requred = True
+                raspberry_pi.restart_requred = False
+                raspberry_pi.save()
+
+            update_required = False
+            if raspberry_pi.update_required:
+                update_required = True
+                raspberry_pi.update_required = False
+                raspberry_pi.save()
+
+            return JsonResponse({
+                'result': True,
+                'ip_address': ip_address,
+                'source': 'ping',
+                'restart': restart_requred,
+                'pull': update_required,
+            })
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})
