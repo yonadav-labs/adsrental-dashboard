@@ -386,6 +386,10 @@ class LeadAdmin(admin.ModelAdmin):
                                     'Key': 'Email',
                                     'Value': lead.email,
                                 },
+                                {
+                                    'Key': 'Duplicate',
+                                    'Value': 'false',
+                                },
                             ]
                         },
                     ],

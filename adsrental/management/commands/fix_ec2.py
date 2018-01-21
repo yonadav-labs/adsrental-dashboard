@@ -110,7 +110,7 @@ class Command(BaseCommand):
                 continue
 
             instance_rpid = self.get_instance_tag(instance, 'Name')
-            is_duplicate = self.get_instance_tag(instance, 'Duplicate')
+            is_duplicate = self.get_instance_tag(instance, 'Duplicate') == 'true'
             instance_lead_email = self.get_instance_tag(instance, 'Email')
             if is_duplicate and instance_state == 'running':
                 print 'DUPLICATE:', public_dns_name, instance_rpid, ', stopping'
@@ -213,6 +213,10 @@ class Command(BaseCommand):
                                     {
                                         'Key': 'Email',
                                         'Value': lead.email,
+                                    },
+                                    {
+                                        'Key': 'Duplicate',
+                                        'Value': 'false',
                                     },
                                 ]
                             },

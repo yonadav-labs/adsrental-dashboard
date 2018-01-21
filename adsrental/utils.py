@@ -122,3 +122,52 @@ class BotoResource(object):
 
     def get_resource(self, service='ec2'):
         return self.session.resource(service, region_name=settings.AWS_REGION)
+
+    def get_instance(self, rpid):
+        instances = self.get_resource('ec2').instances.filter(
+            Filters=[
+                {
+                    'Name': 'tag:Name',
+                    'Values': [rpid],
+                },
+            ],
+        )
+        for instance in instances:
+            instance_state = instance.state['Name']
+            if self.get_instance_tag(instance, 'Duplicate') == 'true':
+                continue
+            if instance_state != 'running':
+                continue
+
+            return instance
+
+        return None
+
+    @staticmethod
+    def get_instance_tag(instance, key):
+        if not instance.tags:
+            return None
+
+        for tagpair in instance.tags:
+            if tagpair['Key'] == key:
+                return tagpair['Value']
+
+        return None
+
+    @staticmethod
+    def set_instance_tag(boto_client, instance, key, value):
+        tags = instance.tags or []
+        key_found = False
+        for tagpair in tags:
+            if tagpair['Key'] == key:
+                key_found = True
+                tagpair['Value'] = value
+                break
+        if not key_found:
+            tags.append({'Key': key, 'Value': value})
+
+        try:
+            boto_client.create_tags(Resources=[instance.id], Tags=tags)
+        except:
+            print 'Cound not add tag for', instance.id, key, '=', value
+            pass
