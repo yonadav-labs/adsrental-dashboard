@@ -70,18 +70,11 @@ class LogView(View):
                 raspberry_pi.restart_required = False
                 raspberry_pi.save()
 
-            update_required = False
-            if raspberry_pi.update_required:
-                update_required = True
-                raspberry_pi.update_required = False
-                raspberry_pi.save()
-
             return JsonResponse({
                 'result': True,
                 'ip_address': ip_address,
                 'source': 'ping',
                 'restart': restart_required,
-                'pull': update_required,
             })
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})

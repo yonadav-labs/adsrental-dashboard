@@ -463,7 +463,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'update_from_salesforce',
         'update_to_salesforce',
         'restart_tunnel',
-        'update_and_reboot',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -525,13 +524,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         for raspberry_pi in queryset:
             raspberry_pi.restart_tunnel = True
             raspberry_pi.save()
-        messages.info(request, 'Restart successfully requested')
-
-    def update_and_reboot(self, request, queryset):
-        for raspberry_pi in queryset:
-            raspberry_pi.update_required = True
-            raspberry_pi.save()
-        messages.info(request, 'Update successfully requested')
+        messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
     online.boolean = True
     tunnel_online.boolean = True
