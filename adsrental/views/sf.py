@@ -25,6 +25,7 @@ class SFToShipstationView(View):
 
         sf_lead = SFLead.objects.filter(email=email).first()
         Lead.upsert_to_sf(sf_lead, lead)
+        sf_lead = SFLead.objects.filter(email=email).first()
 
         shipstation_client = ShipStationClient()
         if shipstation_client.get_sf_lead_order_data(sf_lead):
