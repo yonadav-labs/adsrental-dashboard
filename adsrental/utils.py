@@ -14,7 +14,8 @@ class CustomerIOClient(object):
         self.client = None
         if not settings.CUSTOMERIO_ENABLED:
             return
-        self.client = customerio.CustomerIO(settings.CUSTOMERIO_SITE_ID, settings.CUSTOMERIO_API_KEY)
+        self.client = customerio.CustomerIO(
+            settings.CUSTOMERIO_SITE_ID, settings.CUSTOMERIO_API_KEY)
 
     def get_client(self):
         return self.client
@@ -44,13 +45,15 @@ class CustomerIOClient(object):
 
 class ShipStationClient(object):
     def __init__(self):
-        self.client = ShipStation(key=settings.SHIPSTATION_API_KEY, secret=settings.SHIPSTATION_API_SECRET)
+        self.client = ShipStation(
+            key=settings.SHIPSTATION_API_KEY, secret=settings.SHIPSTATION_API_SECRET)
 
     def get_client(self):
         return self.client
 
     def add_sf_lead_order(self, sf_lead):
-        order = ShipStationOrder(order_key=sf_lead.raspberry_pi.name, order_number=sf_lead.account_name)
+        order = ShipStationOrder(
+            order_key=sf_lead.raspberry_pi.name, order_number=sf_lead.account_name)
         order.set_customer_details(
             username='{} {}'.format(sf_lead.first_name, sf_lead.last_name),
             email=sf_lead.email,
@@ -107,7 +110,8 @@ class ShipStationClient(object):
         data = requests.get(
             'https://ssapi.shipstation.com/orders',
             params={'orderNumber': sf_lead.account_name},
-            auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
+            auth=requests.auth.HTTPBasicAuth(
+                settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
         ).json().get('orders')
         data = data[0] if data else None
         return data
@@ -123,7 +127,8 @@ class BotoResource(object):
 
     def get_resource(self, service='ec2'):
         if not self.resources.get(service):
-            resource = self.session.resource(service, region_name=settings.AWS_REGION)
+            resource = self.session.resource(
+                service, region_name=settings.AWS_REGION)
             self.resources[service] = resource
 
         return self.resources[service]
@@ -145,7 +150,7 @@ class BotoResource(object):
 
             if instance_state != 'running':
                 continue
-            
+
             return instance
 
         for instance in instances_list:
@@ -154,7 +159,7 @@ class BotoResource(object):
 
             if self.get_instance_tag(instance, 'Duplicate') == 'true':
                 continue
-            
+
             return instance
 
         for instance in instances_list:
@@ -188,7 +193,8 @@ class BotoResource(object):
             tags.append({'Key': key, 'Value': value})
 
         try:
-            self.get_resource('ec2').create_tags(Resources=[instance.id], Tags=tags)
+            self.get_resource('ec2').create_tags(
+                Resources=[instance.id], Tags=tags)
         except:
             print 'Cound not add tag for', instance.id, key, '=', value
             pass
