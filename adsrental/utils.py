@@ -165,26 +165,6 @@ class BotoResource(object):
 
         return False
 
-    def get_running_instance(self, rpid):
-        instances = self.get_resource('ec2').instances.filter(
-            Filters=[
-                {
-                    'Name': 'tag:Name',
-                    'Values': [rpid],
-                },
-            ],
-        )
-        for instance in instances:
-            instance_state = instance.state['Name']
-            if self.get_instance_tag(instance, 'Duplicate') == 'true':
-                continue
-            if instance_state != 'running':
-                continue
-
-            return instance
-
-        return None
-
     @staticmethod
     def get_instance_tag(instance, key):
         if not instance.tags:

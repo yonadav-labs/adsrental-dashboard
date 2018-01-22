@@ -46,7 +46,7 @@ class LogView(View):
             if not raspberry_pi.first_seen:
                 self.add_log(request, rpid, 'Tested')
             if raspberry_pi.ipaddress != ip_address:
-                instance = BotoResource().get_running_instance(rpid)
+                instance = BotoResource().get_first_rpid_instance(rpid)
                 if instance:
                     raspberry_pi.ec2_hostname = instance.public_dns_name
                     raspberry_pi.ipaddress = instance.public_ip_address
