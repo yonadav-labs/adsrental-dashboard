@@ -331,7 +331,8 @@ class LeadAdmin(admin.ModelAdmin):
                 request, '{} order created'.format(lead.str()))
 
     def start_ec2(self, request, queryset):
-        boto_resource = BotoResource().get_resource()
+        boto_session = BotoResource()
+        boto_resource = boto_session.get_resource('ec2')
         for lead in queryset:
             if not lead.raspberry_pi:
                 messages.warning(request, '{} has no Raspberry Pi assiigned, skipping'.format(lead.str()))
@@ -366,34 +367,7 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
 
             if not instance_exists:
-                boto_resource.create_instances(
-                    ImageId=settings.AWS_IMAGE_AMI,
-                    MinCount=1,
-                    MaxCount=1,
-                    KeyName='AI Farming Key',
-                    InstanceType='t2.micro',
-                    SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
-                    UserData=rpid,
-                    TagSpecifications=[
-                        {
-                            'ResourceType': 'instance',
-                            'Tags': [
-                                {
-                                    'Key': 'Name',
-                                    'Value': rpid,
-                                },
-                                {
-                                    'Key': 'Email',
-                                    'Value': lead.email,
-                                },
-                                {
-                                    'Key': 'Duplicate',
-                                    'Value': 'false',
-                                },
-                            ]
-                        },
-                    ],
-                )
+                boto_session.launch_instance(rpid, lead.email)
                 messages.success(request, '{} EC2 instance {} did not exist, starting a new one'.format(lead.str(), rpid))
                 continue
 

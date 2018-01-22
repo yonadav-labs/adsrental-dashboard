@@ -119,11 +119,33 @@ class BotoResource(object):
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
+        self.resources = {}
 
     def get_resource(self, service='ec2'):
-        return self.session.resource(service, region_name=settings.AWS_REGION)
+        if not self.resources.get(service):
+            resource = self.session.resource(service, region_name=settings.AWS_REGION)
+            self.resources[service] = resource
 
-    def get_instance(self, rpid):
+        return self.resources[service]
+
+    def get_first_rpid_instance(self, rpid):
+        instances = self.get_resource('ec2').instances.filter(
+            Filters=[
+                {
+                    'Name': 'tag:Name',
+                    'Values': [rpid],
+                },
+            ],
+        )
+        for instance in instances:
+            instance_state = instance.state['Name']
+            if instance_state == 'terminated':
+                continue
+            return instance
+
+        return False
+
+    def get_running_instance(self, rpid):
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
                 {
@@ -154,8 +176,7 @@ class BotoResource(object):
 
         return None
 
-    @staticmethod
-    def set_instance_tag(boto_client, instance, key, value):
+    def set_instance_tag(self, instance, key, value):
         tags = instance.tags or []
         key_found = False
         for tagpair in tags:
@@ -167,7 +188,37 @@ class BotoResource(object):
             tags.append({'Key': key, 'Value': value})
 
         try:
-            boto_client.create_tags(Resources=[instance.id], Tags=tags)
+            self.get_resource('ec2').create_tags(Resources=[instance.id], Tags=tags)
         except:
             print 'Cound not add tag for', instance.id, key, '=', value
             pass
+
+    def launch_instance(self, rpid, email):
+        return self.get_resource('ec2').create_instances(
+            ImageId=settings.AWS_IMAGE_AMI,
+            MinCount=1,
+            MaxCount=1,
+            KeyName='AI Farming Key',
+            InstanceType='t2.micro',
+            SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
+            UserData=rpid,
+            TagSpecifications=[
+                {
+                    'ResourceType': 'instance',
+                    'Tags': [
+                        {
+                            'Key': 'Name',
+                            'Value': rpid,
+                        },
+                        {
+                            'Key': 'Email',
+                            'Value': email,
+                        },
+                        {
+                            'Key': 'Duplicate',
+                            'Value': 'false',
+                        },
+                    ]
+                },
+            ],
+        )

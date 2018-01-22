@@ -5,6 +5,8 @@ from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
+from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.utils import BotoResource
 
 
 class SFToShipstationView(View):
@@ -38,3 +40,19 @@ class SFToShipstationView(View):
             'result': True,
             'order': order.order_key,
         })
+
+
+class SFLaunchRaspberryPiInstance(View):
+    def get(self, request):
+        rpid = request.GET.get('rpid')
+        raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+        if not raspberry_pi:
+            return JsonResponse({'result': False, 'reason': 'RPID not found'})
+
+        boto_session = BotoResource()
+        instance = boto_session.get_first_rpid_instance(rpid)
+        if instance:
+            return JsonResponse({'result': False, 'launched': False, 'exists': instance.id, 'state': instance.state['Name']})
+
+        boto_session.launch_instance(rpid, raspberry_pi.lead.email if raspberry_pi.lead else '')
+        return JsonResponse({'result': True, 'launched': True})
