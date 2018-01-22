@@ -1,6 +1,8 @@
 <?php
-
-ini_set('display_errors', 1);
+	echo "old code";
+	die();
+	
+	ini_set('display_errors', 1);
 
 	require_once(__DIR__ . "/../include/config.php");
 	require_once(__DIR__ . "/../include/salesforce.inc");
