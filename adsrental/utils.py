@@ -137,7 +137,20 @@ class BotoResource(object):
                 },
             ],
         )
-        for instance in instances:
+        instances_list = [i for i in instances]
+        for instance in instances_list:
+            instance_state = instance.state['Name']
+            if instance_state == 'running':
+                return instance
+
+        for instance in instances_list:
+            if instance_state == 'terminated':
+                continue
+
+            if self.get_instance_tag(instance, 'Duplicate') != 'true':
+                return instance
+
+        for instance in instances_list:
             instance_state = instance.state['Name']
             if instance_state == 'terminated':
                 continue

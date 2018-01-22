@@ -52,7 +52,12 @@ class SFLaunchRaspberryPiInstance(View):
         boto_session = BotoResource()
         instance = boto_session.get_first_rpid_instance(rpid)
         if instance:
-            return JsonResponse({'result': False, 'launched': False, 'exists': instance.id, 'state': instance.state['Name']})
+            instance_state = instance.state['Name']
+            started = False
+            if instance_state == 'stopped':
+                instance.start()
+                started = True
+            return JsonResponse({'result': False, 'launched': False, 'exists': instance.id, 'state': instance.state['Name'], 'started': started})
 
         boto_session.launch_instance(rpid, raspberry_pi.lead.email if raspberry_pi.lead else '')
         return JsonResponse({'result': True, 'launched': True})
