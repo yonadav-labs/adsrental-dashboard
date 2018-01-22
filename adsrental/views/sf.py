@@ -12,20 +12,20 @@ from adsrental.utils import BotoResource
 class SFToShipstationView(View):
     def get(self, request):
         email = request.GET.get('email')
-        sf_lead = SFLead.objects.filter(email=email).first()
-        if not sf_lead:
+        lead = Lead.objects.filter(email=email).first()
+        if not lead:
             return JsonResponse({
                 'result': False,
                 'reason': 'Lead with given email not found',
             })
 
-        if not sf_lead.raspberry_pi:
-            sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(linked_lead__isnull=True).first()
-            sf_lead.raspberry_pi.linked_lead = sf_lead
-            sf_lead.raspberry_pi.save()
-            sf_lead.save()
+        if not lead.raspberry_pi:
+            lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True).first()
+            lead.raspberry_pi.save()
+            lead.save()
 
-        Lead.upsert_from_sf(sf_lead, Lead.objects.filter(email=email).first())
+        sf_lead = SFLead.objects.filter(email=email).first()
+        Lead.upsert_to_sf(sf_lead, lead)
 
         shipstation_client = ShipStationClient()
         if shipstation_client.get_sf_lead_order_data(sf_lead):
