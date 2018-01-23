@@ -219,10 +219,10 @@ class EC2Instance(models.Model):
         if self.rpid and not self.rpid.startswith('RP'):
             return False
 
-        self.troubleshoot_proxy()
         self.troubleshoot_status()
         self.troubleshoot_web()
         self.troubleshoot_ssh()
+        self.troubleshoot_proxy()
 
         self.save()
         return True
