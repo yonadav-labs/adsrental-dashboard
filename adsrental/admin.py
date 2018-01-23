@@ -13,7 +13,7 @@ from django.conf import settings
 import requests
 import paramiko
 
-from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent
+from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent, EC2Instance
 from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.utils import ShipStationClient, BotoResource
@@ -268,6 +268,15 @@ class LeadAdmin(admin.ModelAdmin):
             rpid=obj.raspberry_pi,
         )
 
+    def ec2_instance_link(self, obj):
+        if obj.ec2_instance is None:
+            return None
+        return '<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+            url=reverse('admin:adsrental_ec2instance_changelist'),
+            ec2_instance=obj.ec2_instance,
+            q=obj.ec2_instance.instance_id,
+        )
+
     def update_from_salesforce(self, request, queryset):
         sf_lead_ids = []
         leads_map = {}
@@ -498,6 +507,8 @@ class LeadAdmin(admin.ModelAdmin):
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
+    ec2_instance_link.short_description = 'EC2 instance'
+    ec2_instance_link.allow_tags = True
     start_ec2.short_description = 'Start EC2 instance (use it to check state)'
     stop_ec2.short_description = 'Stop EC2 instance'
     email_field.allow_tags = True
@@ -622,7 +633,38 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
         return obj.lead.name()
 
 
+class EC2InstanceAdmin(admin.ModelAdmin):
+    model = CustomerIOEvent
+    list_display = ('id', 'instance_id', 'lead_link', 'links', 'rpid', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
+    list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
+    readonly_fields = ('created', 'updated', )
+    actions = ('troubleshoot', )
+
+    def lead_link(self, obj):
+        if obj.lead is None:
+            return obj.email
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+            url=reverse('admin:adsrental_lead_changelist'),
+            lead=obj.lead.email,
+            q=obj.lead.email,
+        )
+
+    def links(self, obj):
+        return '<a target="_blank" href="{url}">RDP</a>'.format(
+            url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
+        )
+
+    def troubleshoot(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.troubleshoot()
+
+    lead_link.short_description = 'Lead'
+    lead_link.allow_tags = True
+    links.allow_tags = True
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
 admin.site.register(CustomerIOEvent, CustomerIOEventAdmin)
+admin.site.register(EC2Instance, EC2InstanceAdmin)

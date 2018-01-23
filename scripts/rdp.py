@@ -55,10 +55,12 @@ print 'Connecting to instance', instance.id, instance.tags, instance.public_dns_
 
 hostname = instance.public_dns_name
 
-command = 'rdpy-rdpclient.py -w {width} -l {height} -u Administrator -p Dk.YDq8pXQS-R5ZAn84Lgma9rFvGlfvL {hostname}:23255'.format(
+password = 'AdsInc18'
+command = 'rdpy-rdpclient.py -w {width} -l {height} -u Administrator -p {password} {hostname}:23255'.format(
     width=1024,
     height=800,
     hostname=hostname,
+    password=password,
 )
 print command
 os.system(command)
