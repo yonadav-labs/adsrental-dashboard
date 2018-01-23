@@ -217,7 +217,7 @@ class EC2Instance(models.Model):
             return False
 
         self.update_from_boto(boto_instance)
-        if self.rpid and not self.rpid.startswith('RP'):
+        if not self.rpid or not self.rpid.startswith('RP'):
             return False
 
         self.troubleshoot_status()
