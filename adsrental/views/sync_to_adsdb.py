@@ -27,7 +27,7 @@ class SyncToAdsdbView(View):
             # import json
             # raise ValueError(json.dumps(data))
             response = requests.post(
-                'https://www.adsdb.io/api/v1/accounts/create-s',
+                'https://staging.adsdb.io/api/v1/accounts/create-s',
                 json=[data],
                 auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
             )
