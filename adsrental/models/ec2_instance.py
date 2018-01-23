@@ -33,7 +33,7 @@ class EC2Instance(models.Model):
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    lead = models.ForeignKey('adsrental.Lead', blank=True, null=True)
+    lead = models.OneToOneField('adsrental.Lead', blank=True, null=True)
     hostname = models.CharField(max_length=255, blank=True, null=True)
     ip_address = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
@@ -47,8 +47,10 @@ class EC2Instance(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def get_boto_instance(self):
-        instances = BotoResource().get_resource('ec2').instances.filter(
+    def get_boto_instance(self, boto_resource=None):
+        if not boto_resource:
+            boto_resource = BotoResource().get_resource('ec2')
+        instances = boto_resource.instances.filter(
             Filters=[
                 {
                     'Name': 'instance-id',
@@ -67,15 +69,33 @@ class EC2Instance(models.Model):
             self.save()
             return
 
-        if boto_instance.public_dns_name != self.hostname:
-            self.hostname = boto_instance.public_dns_name
-        if boto_instance.public_ip_address != self.ip_address:
-            self.ip_address = boto_instance.public_ip_address
+        Lead = apps.get_app_config('adsrental').get_model('Lead')
+        tags_changed = False
+        rpid = self.get_tag(boto_instance, 'Name')
+        lead_email = self.get_tag(boto_instance, 'Email')
+        is_duplicate = self.get_tag(boto_instance, 'Duplicate') == 'true'
+        lead = Lead.objects.filter(email=lead_email).first() if not is_duplicate else None
+        try:
+            if lead and lead.ec2instance and lead.ec2instance != self:
+                tags_changed = True
+                is_duplicate = True
+                lead = None
+        except EC2Instance.DoesNotExist:
+            pass
 
+        self.email = lead_email
+        self.rpid = rpid
+        self.lead = lead
+        self.is_duplicate = is_duplicate
+        self.hostname = boto_instance.public_dns_name
+        self.ip_address = boto_instance.public_ip_address
         self.status = boto_instance.state['Name']
         self.last_synced = timezone.now()
 
         self.save()
+
+        if tags_changed:
+            self.set_ec2_tags()
 
     def __str__(self):
         return '{} ({})'.format(self.instance_id, self.status)
@@ -87,8 +107,9 @@ class EC2Instance(models.Model):
         ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=5)
         return ssh
 
-    def ssh_execute(self, cmd, input=None):
-        ssh = self.get_ssh()
+    def ssh_execute(self, cmd, input=None, ssh=None):
+        if not ssh:
+            ssh = self.get_ssh()
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd)
         if input:
             for line in input:
@@ -114,22 +135,34 @@ class EC2Instance(models.Model):
     def create_from_boto(cls, boto_instance):
         Lead = apps.get_app_config('adsrental').get_model('Lead')
         lead_email = cls.get_tag(boto_instance, 'Email')
+        rpid = cls.get_tag(boto_instance, 'Name')
         is_duplicate = cls.get_tag(boto_instance, 'Duplicate') == 'true'
-        lead = None
-        if not is_duplicate:
-            lead = Lead.objects.filter(email=lead_email).first()
+        tags_changed = False
+        lead = Lead.objects.filter(email=lead_email).first() if not is_duplicate else None
+        try:
+            if lead and lead.ec2instance:
+                tags_changed = True
+                is_duplicate = True
+                lead = None
+        except EC2Instance.DoesNotExist:
+            pass
+
         item = cls(
             instance_id=boto_instance.id,
             hostname=boto_instance.public_dns_name,
             ip_address=boto_instance.public_ip_address,
             status=boto_instance.state['Name'],
-            email=cls.get_tag(boto_instance, 'Email'),
-            rpid=cls.get_tag(boto_instance, 'Name'),
+            email=lead_email,
+            rpid=rpid,
             is_duplicate=is_duplicate,
             password=settings.OLD_EC2_ADMIN_PASSWORD,
             lead=lead,
         )
         item.save()
+
+        if tags_changed:
+            item.set_ec2_tags()
+
         return item
 
     def terminate(self):
@@ -183,11 +216,16 @@ class EC2Instance(models.Model):
             self.mark_as_missing()
             return False
 
+        if self.rpid and not self.rpid.startswith('RP'):
+            return False
+
+        self.troubleshoot_proxy()
         self.troubleshoot_status()
         self.troubleshoot_web()
         self.troubleshoot_ssh()
 
         self.save()
+        return True
 
     def troubleshoot_status(self):
         Lead = apps.get_app_config('adsrental').get_model('Lead')
@@ -228,6 +266,20 @@ class EC2Instance(models.Model):
         self.ssh_up = True
         self.tunnel_up = ':2046' in output
 
+    def troubleshoot_proxy(self):
+        ssh = self.get_ssh()
+        cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
+        output = self.ssh_execute(cmd_to_execute, ssh=ssh)
+        if '0x1' in output:
+            return
+
+        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
+        ssh.exec_command(cmd_to_execute)
+        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
+        ssh.exec_command(cmd_to_execute)
+        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
+        ssh.exec_command(cmd_to_execute)
+
     def change_password(self):
         if self.password == settings.EC2_ADMIN_PASSWORD:
             return
@@ -238,3 +290,14 @@ class EC2Instance(models.Model):
 
         self.password = settings.EC2_ADMIN_PASSWORD
         self.save()
+
+    def set_ec2_tags(self):
+        tags = []
+        if self.is_duplicate:
+            tags.append({'Key': 'Duplicate', 'Value': 'true'})
+        if self.email:
+            tags.append({'Key': 'Email', 'Value': self.email})
+        if self.rpid:
+            tags.append({'Key': 'Name', 'Value': self.rpid})
+        boto_resource = BotoResource().get_resource('ec2')
+        boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)

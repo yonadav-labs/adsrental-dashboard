@@ -178,6 +178,7 @@ class LeadAdmin(admin.ModelAdmin):
         'google_account_column',
         'facebook_account_column',
         'raspberry_pi_link',
+        'ec2_instance_link',
         'first_seen',
         'last_seen',
         'tunnel_last_tested',
@@ -269,12 +270,12 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def ec2_instance_link(self, obj):
-        if obj.ec2_instance is None:
+        if obj.ec2instance is None:
             return None
         return '<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
             url=reverse('admin:adsrental_ec2instance_changelist'),
-            ec2_instance=obj.ec2_instance,
-            q=obj.ec2_instance.instance_id,
+            ec2_instance=obj.ec2instance,
+            q=obj.ec2instance.instance_id,
         )
 
     def update_from_salesforce(self, request, queryset):
@@ -638,8 +639,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'instance_id', 'lead_link', 'links', 'rpid', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
-    search_fields = ('id', 'email', 'rpid', )
-    actions = ('troubleshoot', 'update_password', )
+    search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
+    actions = ('troubleshoot', 'update_password', 'update_ec2_tags', )
 
     def lead_link(self, obj):
         if obj.lead is None:
@@ -662,6 +663,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def update_password(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.change_password()
+
+    def update_ec2_tags(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.set_ec2_tags()
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
