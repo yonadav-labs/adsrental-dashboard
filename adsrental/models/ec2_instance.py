@@ -222,7 +222,10 @@ class EC2Instance(models.Model):
         self.troubleshoot_status()
         self.troubleshoot_web()
         self.troubleshoot_ssh()
-        self.troubleshoot_proxy()
+        try:
+            self.troubleshoot_proxy()
+        except:
+            pass
 
         self.save()
         return True
@@ -267,9 +270,6 @@ class EC2Instance(models.Model):
         self.tunnel_up = ':2046' in output
 
     def troubleshoot_proxy(self):
-        if not self.ssh_up:
-            return
-
         cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
         output = self.ssh_execute(cmd_to_execute)
         if '0x1' in output:
