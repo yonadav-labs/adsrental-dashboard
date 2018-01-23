@@ -183,10 +183,25 @@ class EC2Instance(models.Model):
             self.mark_as_missing()
             return False
 
+        self.troubleshoot_status()
         self.troubleshoot_web()
         self.troubleshoot_ssh()
 
         self.save()
+
+    def troubleshoot_status(self):
+        Lead = apps.get_app_config('adsrental').get_model('Lead')
+        if self.status == self.STATUS_RUNNING:
+            if not self.is_duplicate:
+                self.stop()
+                return
+            if not self.lead or self.lead.status == Lead.STATUS_BANNED:
+                self.stop()
+                return
+        if self.status == self.STATUS_STOPPED:
+            if not self.is_duplicate and self.lead or self.lead.status != Lead.STATUS_BANNED:
+                self.start()
+                return
 
     def troubleshoot_web(self):
         response = None
@@ -217,8 +232,7 @@ class EC2Instance(models.Model):
         if self.password == settings.EC2_ADMIN_PASSWORD:
             return
         try:
-            output = self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
-            print output
+            self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
         except:
             raise
 

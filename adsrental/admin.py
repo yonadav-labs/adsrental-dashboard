@@ -638,7 +638,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'instance_id', 'lead_link', 'links', 'rpid', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
-    actions = ('troubleshoot', )
+    search_fields = ('id', 'email', 'rpid', )
+    actions = ('troubleshoot', 'update_password', )
 
     def lead_link(self, obj):
         if obj.lead is None:
@@ -657,6 +658,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def troubleshoot(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.troubleshoot()
+
+    def update_password(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.change_password()
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
