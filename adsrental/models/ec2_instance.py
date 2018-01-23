@@ -267,18 +267,19 @@ class EC2Instance(models.Model):
         self.tunnel_up = ':2046' in output
 
     def troubleshoot_proxy(self):
-        ssh = self.get_ssh()
         cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
-        output = self.ssh_execute(cmd_to_execute, ssh=ssh)
+        output = self.ssh_execute(cmd_to_execute)
         if '0x1' in output:
             return
 
+        ssh = self.get_ssh()
         cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
         ssh.exec_command(cmd_to_execute)
         cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
         ssh.exec_command(cmd_to_execute)
         cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
         ssh.exec_command(cmd_to_execute)
+        ssh.close()
 
     def change_password(self):
         if self.password == settings.EC2_ADMIN_PASSWORD:
