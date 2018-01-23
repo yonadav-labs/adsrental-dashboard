@@ -216,6 +216,7 @@ class EC2Instance(models.Model):
             self.mark_as_missing()
             return False
 
+        self.update_from_boto(boto_instance)
         if self.rpid and not self.rpid.startswith('RP'):
             return False
 
