@@ -206,8 +206,6 @@ class EC2Instance(models.Model):
             self.troubleshoot_proxy()
         except:
             pass
-        self.troubleshoot_old_pi_version()
-        self.fix_issues()
 
         self.save()
         return True
@@ -283,7 +281,8 @@ class EC2Instance(models.Model):
         if not self.raspberry_pi:
             return
 
-        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION and self.tunnel_up:
+            self.troubleshoot_old_pi_version()
             return
 
         if not self.tunnel_up or not self.ssh_up:
