@@ -68,7 +68,7 @@ class EC2Instance(models.Model):
         if not boto_instance:
             self.status = self.STATUS_MISSING
             self.save()
-            return
+            return self
 
         Lead = apps.get_app_config('adsrental').get_model('Lead')
         tags_changed = False
@@ -98,6 +98,8 @@ class EC2Instance(models.Model):
 
         if tags_changed:
             self.set_ec2_tags()
+
+        return self
 
     def __str__(self):
         return '{} ({})'.format(self.instance_id, self.status)

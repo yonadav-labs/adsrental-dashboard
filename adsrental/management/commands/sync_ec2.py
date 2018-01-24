@@ -11,11 +11,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--all', action='store_true')
         parser.add_argument('--pending', action='store_true')
+        parser.add_argument('--terminate-stopped', action='store_true')
 
     def handle(
         self,
         all,
         pending,
+        terminate_stopped,
         **kwargs
     ):
         boto_resource = BotoResource().get_resource()
@@ -25,11 +27,22 @@ class Command(BaseCommand):
             )
 
             counter = 0
+            instance_ids = []
             for boto_instance in boto_instances:
                 counter += 1
                 if counter % 100 == 0:
                     print 'PROCESSED:', counter
-                EC2Instance.upsert_from_boto(boto_instance)
+                instance_ids.append(boto_instance.id)
+                instance = EC2Instance.upsert_from_boto(boto_instance)
+                if terminate_stopped:
+                    if instance and instance.status == EC2Instance.STATUS_STOPPED:
+                        print 'TERMINATE:', instance.email, instance.rpid, instance.is_duplicate
+                        instance.terminate()
+
+            instances = EC2Instance.objects.all()
+            for instance in instances:
+                if instance.instance_id not in instance_ids:
+                    instance.delete()
 
         if pending:
             instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING])
