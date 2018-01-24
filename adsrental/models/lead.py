@@ -46,6 +46,7 @@ class Lead(models.Model, FulltextSearchMixin):
     fb_secret = models.CharField(max_length=255, blank=True, null=True)
     is_sync_adsdb = models.BooleanField(default=False)
     photo_id = models.FileField(blank=True, null=True)
+    splashtop_id = models.CharField(max_length=255, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     pi_sent = models.DateTimeField(null=True, blank=True)
@@ -111,6 +112,7 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
             (sf_lead.fb_email, lead.fb_email, ),
             (sf_lead.fb_secret, lead.fb_secret, ),
+            (sf_lead.splashtop_id, lead.splashtop_id, ),
         ):
             if new_field != old_field:
                 break
@@ -132,6 +134,7 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.raspberry_pi = raspberry_pi
         lead.wrong_password = sf_lead.wrong_password
         lead.bundler_paid = sf_lead.bundler_paid
+        lead.splashtop_id = sf_lead.splashtop_id
         lead.facebook_account_status = sf_lead.facebook_account_status
         lead.google_account_status = sf_lead.google_account_status
         if not lead.tested:

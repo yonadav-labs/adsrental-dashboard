@@ -5,7 +5,7 @@ import time
 
 from django.views import View
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
@@ -109,4 +109,4 @@ class SignupView(View):
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
         customerio_client.send_lead_event(lead, 'lead_approved', account_type='facebook')
-        return HttpResponseRedirect('/thankyou.php?email={}'.format(data['email']))
+        return redirect('thankyou_email', b64_email=base64.b64encode(lead.email))

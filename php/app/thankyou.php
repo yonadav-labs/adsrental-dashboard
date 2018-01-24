@@ -86,7 +86,7 @@
 		<?php } ?>
 	</div>
 	<footer class="container">
-		<p>© Adsrental 2017</p>
+		<p>© RentYourSocialMedia 2018</p>
 	</footer>
 </body>
 

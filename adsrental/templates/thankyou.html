@@ -42,7 +42,7 @@
 			<li>
 				Please input the
 				<span class="image_hover">Splashtop ID (hover to see how to find it)</span>
-				<img class="image_thumbnail" src="static/images/splashtop.png" />
+				<img class="image_thumbnail" src="/static/images/splashtop.png" />
 				assigned to your computer in the box below. Follow the screen shots above to locate it on your computer.
 			</li>
 			<li>
@@ -54,20 +54,21 @@
 		</ol>
 	</div>
 	<div class="container">
-		<?php if ($_GET["email"]) { ?>
+		{% if email %}
 			<div class="container">
-				<form action="" method="POST">
-					<input type="hidden" name="email" value="<?php echo $_GET["email"] ?>" />
-					<input type="text" name="Splashtop_Id__c" value="" required placeholder="Splashtop ID" />
-					<button>Submit</button>
+				<form method="POST">
+					{% csrf_token %}
+					<input type="hidden" name="email" value="{{email}}" />
+					<input type="text" name="splashtop_id" value="" required placeholder="Splashtop ID" />
+					<button class="click-btn">Submit</button>
 				</form>
 			</div>
-		<?php } else { ?>
+		{% else %}
 			<h3>Thank you! Our agent will contact you shortly.</h3>
-		<?php } ?>
+		{% endif %}
 	</div>
 	<footer class="container">
-		<p>© Adsrental 2017</p>
+		<p>© RentYourSocialMedia 2018</p>
 	</footer>
 </body>
 
