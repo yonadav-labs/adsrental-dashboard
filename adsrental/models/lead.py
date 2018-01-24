@@ -7,6 +7,7 @@ from django.db import models
 from django.conf import settings
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.utils import CustomerIOClient
 
@@ -68,21 +69,15 @@ class Lead(models.Model, FulltextSearchMixin):
 
     @staticmethod
     def upsert_from_sf(sf_lead, lead):
-        raspberry_pi = None
-        if sf_lead.raspberry_pi:
-            old_raspberry_pi = lead.raspberry_pi if lead else None
-            if sf_lead.raspberry_pi and not old_raspberry_pi:
-                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
-
-            if sf_lead.raspberry_pi and old_raspberry_pi and sf_lead.raspberry_pi.name != old_raspberry_pi.rpid:
-                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
-
-            raspberry_pi = RaspberryPi.upsert_from_sf(sf_lead.raspberry_pi, old_raspberry_pi)
-
         if lead is None:
             lead = Lead(
                 leadid=sf_lead.id,
             )
+
+        local_raspberry_pi = lead.raspberry_pi if lead else None
+        local_raspberry_pi_rpid = local_raspberry_pi.rpid if local_raspberry_pi else None
+        remote_raspberry_pi = sf_lead.raspberry_pi if sf_lead else None
+        remote_raspberry_pi_rpid = remote_raspberry_pi.name if remote_raspberry_pi else None
 
         address = ', '.join([
             sf_lead.street or '',
@@ -104,7 +99,7 @@ class Lead(models.Model, FulltextSearchMixin):
             # (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
             (sf_lead.utm_source, lead.utm_source, ),
             (sf_lead.google_account, lead.google_account, ),
-            (raspberry_pi.pk if raspberry_pi else None, lead.raspberry_pi.pk if lead.raspberry_pi else None, ),
+            (remote_raspberry_pi_rpid, local_raspberry_pi_rpid, ),
             (sf_lead.wrong_password, lead.wrong_password, ),
             (sf_lead.bundler_paid, lead.bundler_paid, ),
             (sf_lead.facebook_account_status, lead.facebook_account_status, ),
@@ -131,7 +126,7 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.utm_source = sf_lead.utm_source
         lead.google_account = sf_lead.google_account
         lead.facebook_account = sf_lead.facebook_account
-        lead.raspberry_pi = raspberry_pi
+        lead.raspberry_pi = RaspberryPi.objects.filter(rpid=remote_raspberry_pi_rpid).first()
         lead.wrong_password = sf_lead.wrong_password
         lead.bundler_paid = sf_lead.bundler_paid
         lead.splashtop_id = sf_lead.splashtop_id
@@ -161,25 +156,27 @@ class Lead(models.Model, FulltextSearchMixin):
 
     @staticmethod
     def upsert_to_sf(sf_lead, lead):
-        if sf_lead.raspberry_pi:
-            old_raspberry_pi = lead.raspberry_pi if lead else None
-            if sf_lead.raspberry_pi and not old_raspberry_pi:
-                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
-
-            if sf_lead.raspberry_pi and old_raspberry_pi and sf_lead.raspberry_pi.name != old_raspberry_pi.rpid:
-                old_raspberry_pi = RaspberryPi.objects.filter(rpid=sf_lead.raspberry_pi.name).first()
-
-            RaspberryPi.upsert_to_sf(sf_lead.raspberry_pi, old_raspberry_pi)
+        local_raspberry_pi = lead.raspberry_pi if lead else None
+        local_raspberry_pi_rpid = local_raspberry_pi.rpid if local_raspberry_pi else None
+        remote_raspberry_pi = sf_lead.raspberry_pi if sf_lead else None
+        remote_raspberry_pi_rpid = remote_raspberry_pi.name if remote_raspberry_pi else None
 
         for new_field, old_field in (
             (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
             (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
+            (sf_lead.splashtop_id, lead.splashtop_id, ),
+            (local_raspberry_pi_rpid, remote_raspberry_pi_rpid, ),
         ):
             if new_field != old_field:
                 break
         else:
             return lead
+
+        if local_raspberry_pi_rpid != remote_raspberry_pi_rpid:
+            sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
+            sf_lead.splashtop_id = lead.splashtop_id
+            sf_lead.save()
 
         if sf_lead.raspberry_pi:
             sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
