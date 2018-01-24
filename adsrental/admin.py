@@ -636,11 +636,11 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
-    list_display = ('id', 'instance_id', 'lead_link', 'links', 'rpid', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
+    list_display = ('id', 'instance_id', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
-    actions = ('troubleshoot', 'update_password', 'update_ec2_tags', )
+    actions = ('troubleshoot', 'troubleshoot_fix', 'update_password', 'update_ec2_tags', )
 
     def lead_link(self, obj):
         if obj.lead is None:
@@ -651,14 +651,33 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             q=obj.lead.email,
         )
 
-    def links(self, obj):
-        return '<a target="_blank" href="{url}">RDP</a>'.format(
-            url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
+    def raspberry_pi_link(self, obj):
+        if obj.raspberry_pi is None:
+            return obj.rpid
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            lead=obj.raspberry_pi.rpid,
+            q=obj.raspberry_pi.rpid,
         )
+
+    def links(self, obj):
+        links = []
+        if self.raspberry_pi:
+            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+                url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
+            ))
+            links.append('<a target="_blank" href="/log/{rpid}">Logs</a>'.format(
+                rpid=obj.rpid,
+            ))
+        return ', '.join(links)
 
     def troubleshoot(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.troubleshoot()
+
+    def troubleshoot_fix(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.troubleshoot_fix()
 
     def update_password(self, request, queryset):
         for ec2_instance in queryset:
@@ -670,6 +689,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
+    raspberry_pi_link.short_description = 'RaspberryPi'
+    raspberry_pi_link.allow_tags = True
     links.allow_tags = True
 
 

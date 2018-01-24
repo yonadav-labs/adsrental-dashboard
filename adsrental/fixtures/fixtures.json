@@ -3,8 +3,8 @@
     "model": "sites.site",
     "pk": 1,
     "fields": {
-      "name": "Adsrental Dashboard",
-      "domain": "adsrental.com"
+      "name": "RentYourSocialMedia Dashboard",
+      "domain": "rentyoursocialmedia.com"
     }
   },
   {

@@ -89,18 +89,6 @@
                         //document.getElementById("00N46000009wiZg").value = document.getElementById("00N46000009wiZg").value.toLowerCase();
                     }
 
-                    function validateFields() {
-                        //formatFields();
-                        fillUtmSourceField();
-
-                        return true;
-                    }
-
-                    function fillUtmSourceField() {
-                        console.log(localStorage.getItem("utm_source"));
-                        document.getElementsByName("utm_source")[0].value = localStorage.getItem("utm_source") || "localhost";
-                    }
-
                     function geoCodeAddress() {
                         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0
                         var address = [
@@ -156,7 +144,7 @@
                     });
                 </script>
 
-                <form id="registerForm" action="" method="POST" enctype="multipart/form-data" onsubmit="return validateFields()">
+                <form id="registerForm" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <!-- Shipping Country -->
                     {{ form.utm_source }}

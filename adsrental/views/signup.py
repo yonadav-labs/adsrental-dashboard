@@ -4,7 +4,7 @@ import base64
 import time
 
 from django.views import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from adsrental.forms import SignupForm
@@ -15,11 +15,21 @@ from adsrental.utils import CustomerIOClient
 
 class SignupView(View):
     def get(self, request):
+        if 'utm_source' in request.GET:
+            request.session['utm_source'] = request.GET.get('utm_source')
+
+        utm_source = request.session.get('utm_source')
+        if not utm_source:
+            return HttpResponse('')
+
         return render(request, 'signup.html', dict(
             user=request.user,
+            utm_source=request.GET.get('utm_source'),
             isp='',
             remote_addr=request.META.get('REMOTE_ADDR'),
-            form=SignupForm(),
+            form=SignupForm(initial={
+                'utm_source': utm_source,
+            }),  
         ))
 
     def post(self, request):

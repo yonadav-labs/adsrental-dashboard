@@ -3,6 +3,7 @@ import json
 import requests
 import boto3
 from django.conf import settings
+from django.apps import apps
 import customerio
 from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
 
@@ -200,7 +201,7 @@ class BotoResource(object):
             pass
 
     def launch_instance(self, rpid, email):
-        return self.get_resource('ec2').create_instances(
+        boto_instance = self.get_resource('ec2').create_instances(
             ImageId=settings.AWS_IMAGE_AMI,
             MinCount=1,
             MaxCount=1,
@@ -228,3 +229,5 @@ class BotoResource(object):
                 },
             ],
         )
+        EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
+        EC2Instance.upsert_from_boto(boto_instance)

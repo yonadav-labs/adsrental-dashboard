@@ -63,8 +63,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         return ' '.join([
-            '<a href="https://adsrental.com/log/{}" target="_blank">Logs</a>'.format(obj.name),
-            '<a href="https://adsrental.com/rdp.php?i={}&h={}" target="_blank">RDP</a>'.format(obj.name, obj.name),
+            '<a href="/log/{}" target="_blank">Logs</a>'.format(obj.name),
+            '<a href="/rdp.php?i={}&h={}" target="_blank">RDP</a>'.format(obj.name, obj.name),
         ])
 
     links.allow_tags = True

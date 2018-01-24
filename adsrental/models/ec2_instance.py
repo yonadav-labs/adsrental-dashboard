@@ -34,6 +34,7 @@ class EC2Instance(models.Model):
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     lead = models.OneToOneField('adsrental.Lead', blank=True, null=True)
+    raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', blank=True, null=True)
     hostname = models.CharField(max_length=255, blank=True, null=True)
     ip_address = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
@@ -86,6 +87,7 @@ class EC2Instance(models.Model):
         self.email = lead_email
         self.rpid = rpid
         self.lead = lead
+        self.raspberry_pi = lead and lead.raspberry_pi
         self.is_duplicate = is_duplicate
         self.hostname = boto_instance.public_dns_name
         self.ip_address = boto_instance.public_ip_address
@@ -132,38 +134,15 @@ class EC2Instance(models.Model):
         return None
 
     @classmethod
-    def create_from_boto(cls, boto_instance):
-        Lead = apps.get_app_config('adsrental').get_model('Lead')
-        lead_email = cls.get_tag(boto_instance, 'Email')
-        rpid = cls.get_tag(boto_instance, 'Name')
-        is_duplicate = cls.get_tag(boto_instance, 'Duplicate') == 'true'
-        tags_changed = False
-        lead = Lead.objects.filter(email=lead_email).first() if not is_duplicate else None
-        try:
-            if lead and lead.ec2instance:
-                tags_changed = True
-                is_duplicate = True
-                lead = None
-        except EC2Instance.DoesNotExist:
-            pass
+    def upsert_from_boto(cls, boto_instance, instance=None):
+        if not instance:
+            instance = cls.objects.filter(instance_id=boto_instance.id).first()
+        if not instance:
+            instance = cls(
+                instance_id=boto_instance.id,
+            )
 
-        item = cls(
-            instance_id=boto_instance.id,
-            hostname=boto_instance.public_dns_name,
-            ip_address=boto_instance.public_ip_address,
-            status=boto_instance.state['Name'],
-            email=lead_email,
-            rpid=rpid,
-            is_duplicate=is_duplicate,
-            password=settings.OLD_EC2_ADMIN_PASSWORD,
-            lead=lead,
-        )
-        item.save()
-
-        if tags_changed:
-            item.set_ec2_tags()
-
-        return item
+        return instance.update_from_boto(boto_instance)
 
     def terminate(self):
         boto_instance = self.get_boto_instance()
@@ -227,6 +206,8 @@ class EC2Instance(models.Model):
             self.troubleshoot_proxy()
         except:
             pass
+        self.troubleshoot_old_pi_version()
+        self.fix_issues()
 
         self.save()
         return True
@@ -284,6 +265,30 @@ class EC2Instance(models.Model):
         cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
         ssh.exec_command(cmd_to_execute)
         ssh.close()
+
+    def troubleshoot_old_pi_version(self):
+        if not self.raspberry_pi:
+            return
+
+        if not self.tunnel_up:
+            return
+
+        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+            cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+            self.ssh_execute(cmd_to_execute)
+            self.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
+            self.raspberry_pi.save()
+
+    def troubleshoot_fix(self):
+        if not self.raspberry_pi:
+            return
+
+        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+            return
+
+        if not self.tunnel_up or not self.ssh_up:
+            self.raspberry_pi.restart_required = True
+            self.raspberry_pi.save()
 
     def change_password(self):
         if self.password == settings.EC2_ADMIN_PASSWORD:

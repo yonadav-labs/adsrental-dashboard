@@ -17,7 +17,7 @@ from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 import django.contrib.auth.views as auth_views
 
 urlpatterns = [
-    url(r'^$', MainView.as_view(), name='home'),
+    url(r'^$', SignupView.as_view(), name='home'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
     url(r'^sync/from_sf/$', SyncFromSFView.as_view(), name='sync_from_sf'),
     url(r'^sync/from_shipstation/$', SyncFromShipStationView.as_view(), name='sync_from_shipstation'),
