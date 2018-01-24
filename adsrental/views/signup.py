@@ -29,7 +29,7 @@ class SignupView(View):
             remote_addr=request.META.get('REMOTE_ADDR'),
             form=SignupForm(initial={
                 'utm_source': utm_source,
-            }),  
+            }),
         ))
 
     def post(self, request):
