@@ -42,7 +42,7 @@ class EC2Instance(models.Model):
     tunnel_up = models.BooleanField(default=False)
     web_up = models.BooleanField(default=False)
     ssh_up = models.BooleanField(default=False)
-    password = models.CharField(max_length=255, default=settings.OLD_EC2_ADMIN_PASSWORD)
+    password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD)
     last_synced = models.DateTimeField(default=timezone.now)
     last_troubleshoot = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
