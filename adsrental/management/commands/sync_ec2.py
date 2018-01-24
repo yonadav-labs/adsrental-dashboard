@@ -27,7 +27,7 @@ class Command(BaseCommand):
             counter = 0
             for boto_instance in boto_instances:
                 counter += 1
-                if counter % 100:
+                if counter % 100 == 0:
                     print 'PROCESSED:', counter
                 EC2Instance.upsert_from_boto(boto_instance)
 
