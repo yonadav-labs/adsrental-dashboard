@@ -662,7 +662,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
-        if self.raspberry_pi:
+        if obj.raspberry_pi:
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
             ))
