@@ -340,9 +340,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def restart_ec2(self, request, queryset):
         for lead in queryset:
-            lead.ec2_instance.stop()
+            lead.ec2instance.stop()
             time.sleep(30)
-            lead.ec2_instance.start()
+            lead.ec2instance.start()
 
     def troubleshoot(self, request, queryset):
         boto_resource = BotoResource().get_resource()
@@ -588,6 +588,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'update_ec2_tags',
         'check_status',
         'check_missing',
+        'restart',
     )
 
     def lead_link(self, obj):
@@ -641,6 +642,15 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
         for ec2_instance in queryset:
             ec2_instance.update_from_boto()
+
+    def restart(self, request, queryset):
+        if queryset.count() > 10:
+            queryset = EC2Instance.objects.all()
+
+        for ec2_instance in queryset:
+            ec2_instance.stop()
+            time.sleep(30)
+            ec2_instance.start()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
