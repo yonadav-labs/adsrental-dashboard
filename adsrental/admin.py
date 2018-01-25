@@ -454,7 +454,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
-    start_ec2.short_description = 'RestaStartrt EC2 instance'
+    start_ec2.short_description = 'Start EC2 instance'
     restart_ec2.short_description = 'Restart EC2 instance'
     email_field.allow_tags = True
     email_field.short_description = 'Email'
