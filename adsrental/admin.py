@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import time
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -200,10 +201,11 @@ class LeadAdmin(admin.ModelAdmin):
         'update_from_shipstation',
         'update_pi_delivered',
         'create_shipstation_order',
-        'start_ec2',
-        'stop_ec2',
+        'restart_ec2',
         'troubleshoot',
         'restart_raspberry_pi',
+        'ban',
+        'unban',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -336,81 +338,11 @@ class LeadAdmin(admin.ModelAdmin):
             messages.success(
                 request, '{} order created: {}'.format(lead.str(), order.order_key))
 
-    def start_ec2(self, request, queryset):
-        boto_session = BotoResource()
-        boto_resource = boto_session.get_resource('ec2')
+    def restart_ec2(self, request, queryset):
         for lead in queryset:
-            if not lead.raspberry_pi:
-                messages.warning(request, '{} has no Raspberry Pi assiigned, skipping'.format(lead.str()))
-
-            rpid = lead.raspberry_pi.rpid
-
-            instances = boto_resource.instances.filter(
-                Filters=[
-                    {
-                        'Name': 'tag:Name',
-                        'Values': [rpid],
-                    },
-                ],
-            )
-            instance_exists = False
-            for instance in instances:
-                instance_state = instance.state['Name']
-                if instance_state == 'terminated':
-                    continue
-                if instance_exists:
-                    working_instances = [i for i in instances if i.state['Name'] != 'terminated']
-                    messages.error(request, '{} {} has {} instances assigned, check AWS!!!'.format(lead.str(), rpid, len(working_instances)))
-                    break
-                instance_exists = True
-                if instance_state == 'running':
-                    messages.info(request, '{} EC2 instance {} is already {}, to stop in use "Start EC2 instance action" and call this command again after 1 minute'.format(lead.str(), rpid, instance_state))
-                    # instance.stop()
-                elif instance_state == 'stopped':
-                    messages.success(request, '{} EC2 instance {} is now {}, sent start command'.format(lead.str(), rpid, instance_state))
-                    instance.start()
-                else:
-                    messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
-
-            if not instance_exists:
-                boto_session.launch_instance(rpid, lead.email)
-                messages.success(request, '{} EC2 instance {} did not exist, starting a new one'.format(lead.str(), rpid))
-                continue
-
-    def stop_ec2(self, request, queryset):
-        boto_resource = BotoResource().get_resource()
-        for lead in queryset:
-            if not lead.raspberry_pi:
-                messages.warning(request, '{} has no Raspberry Pi assiigned, skipping'.format(lead.str()))
-
-            rpid = lead.raspberry_pi.rpid
-
-            instances = boto_resource.instances.filter(
-                Filters=[
-                    {
-                        'Name': 'tag:Name',
-                        'Values': [rpid],
-                    },
-                ],
-            )
-            instance_exists = False
-            for instance in instances:
-                instance_state = instance.state['Name']
-                if instance_state == 'terminated':
-                    continue
-                if instance_exists:
-                    working_instances = [i for i in instances if i.state['Name'] != 'terminated']
-                    messages.error(request, '{} {} has {} instances assigned, check AWS!!!'.format(lead.str(), rpid, len(working_instances)))
-                    break
-                instance_exists = True
-                if instance_state == 'running':
-                    messages.info(request, '{} EC2 instance {} was {}, sent stop signal, call "Start EC2" command after 1 minute'.format(lead.str(), rpid, instance_state))
-                else:
-                    messages.warning(request, '{} EC2 instance {} is now {}, cannot do anything now'.format(lead.str(), rpid, instance_state))
-
-            if not instance_exists:
-                messages.success(request, '{} EC2 instance {} does not exist, call "Start EC2" command to start one'.format(lead.str(), rpid))
-                continue
+            lead.ec2_instance.stop()
+            time.sleep(30)
+            lead.ec2_instance.start()
 
     def troubleshoot(self, request, queryset):
         boto_resource = BotoResource().get_resource()
@@ -504,10 +436,23 @@ class LeadAdmin(admin.ModelAdmin):
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
+    def ban(self, request, queryset):
+        for lead in queryset:
+            lead.status = Lead.STATUS_BANNED
+            lead.ec2instance = None
+            lead.save()
+            messages.info(request, 'Lead {} is banned.'.format(lead.email))
+
+    def unban(self, request, queryset):
+        for lead in queryset:
+            lead.status = Lead.STATUS_QUALIFIED
+            lead.save()
+            EC2Instance.launch_for_lead(lead)
+            messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
-    start_ec2.short_description = 'Start EC2 instance (use it to check state)'
-    stop_ec2.short_description = 'Stop EC2 instance'
+    restart_ec2.short_description = 'Restart EC2 instance'
     email_field.allow_tags = True
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
@@ -695,7 +640,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             queryset = EC2Instance.objects.all()
 
         for ec2_instance in queryset:
-            ec2_instance.troubleshoot_status()
+            ec2_instance.update_from_boto()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
