@@ -695,7 +695,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             ec2_instance.set_ec2_tags()
 
     def check_status(self, request, queryset):
-        if queryset.count() < 10:
+        if queryset.count() > 10:
             queryset = EC2Instance.objects.all()
 
         for ec2_instance in queryset:
