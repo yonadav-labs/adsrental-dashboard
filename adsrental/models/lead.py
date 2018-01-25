@@ -114,6 +114,13 @@ class Lead(models.Model, FulltextSearchMixin):
         else:
             return lead
 
+        new_raspberry_pi = RaspberryPi.objects.filter(rpid=remote_raspberry_pi_rpid).first()
+        try:
+            if new_raspberry_pi and new_raspberry_pi.lead and new_raspberry_pi.lead.pk != lead.pk:
+                new_raspberry_pi = None
+        except Lead.DoesNotExist:
+            pass
+
         lead.first_name = sf_lead.first_name
         lead.last_name = sf_lead.last_name
         lead.email = sf_lead.email
@@ -126,7 +133,7 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.utm_source = sf_lead.utm_source
         lead.google_account = sf_lead.google_account
         lead.facebook_account = sf_lead.facebook_account
-        lead.raspberry_pi = RaspberryPi.objects.filter(rpid=remote_raspberry_pi_rpid).first()
+        lead.raspberry_pi = new_raspberry_pi
         lead.wrong_password = sf_lead.wrong_password
         lead.bundler_paid = sf_lead.bundler_paid
         lead.splashtop_id = sf_lead.splashtop_id
@@ -173,10 +180,9 @@ class Lead(models.Model, FulltextSearchMixin):
         else:
             return lead
 
-        if local_raspberry_pi_rpid != remote_raspberry_pi_rpid:
-            sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
-            sf_lead.splashtop_id = lead.splashtop_id
-            sf_lead.save()
+        sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
+        sf_lead.splashtop_id = lead.splashtop_id
+        sf_lead.save()
 
         if sf_lead.raspberry_pi:
             sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
