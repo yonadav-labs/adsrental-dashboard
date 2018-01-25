@@ -201,7 +201,7 @@ class BotoResource(object):
             pass
 
     def launch_instance(self, rpid, email):
-        instance = self.get_resource('ec2').get_first_rpid_instance(rpid)
+        instance = self.get_first_rpid_instance(rpid)
         if not instance:
             boto_instance = self.get_resource('ec2').create_instances(
                 ImageId=settings.AWS_IMAGE_AMI,
