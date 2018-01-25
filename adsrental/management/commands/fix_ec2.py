@@ -5,6 +5,7 @@ from django.conf import settings
 import boto3
 
 from adsrental.models.lead import Lead
+from adsrental.utils import BotoResource
 
 
 class Command(BaseCommand):
@@ -187,6 +188,7 @@ class Command(BaseCommand):
 
         print 'Finished EC2 processing'
 
+        boto_resource = BotoResource()
         if launch_missing:
             for lead in required_leads:
                 rpid = lead.raspberry_pi.rpid
@@ -194,34 +196,7 @@ class Command(BaseCommand):
                     continue
                 print 'START NEW:', rpid, 'will be launched for', lead.email
                 if execute:
-                    boto_client.create_instances(
-                        ImageId=settings.AWS_IMAGE_AMI,
-                        MinCount=1,
-                        MaxCount=1,
-                        KeyName='AI Farming Key',
-                        InstanceType='t2.micro',
-                        SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
-                        UserData=rpid,
-                        TagSpecifications=[
-                            {
-                                'ResourceType': 'instance',
-                                'Tags': [
-                                    {
-                                        'Key': 'Name',
-                                        'Value': rpid,
-                                    },
-                                    {
-                                        'Key': 'Email',
-                                        'Value': lead.email,
-                                    },
-                                    {
-                                        'Key': 'Duplicate',
-                                        'Value': 'false',
-                                    },
-                                ]
-                            },
-                        ],
-                    )
+                    boto_resource.launch_instance(rpid, lead.email)
                 started_rpids.append(rpid)
 
         if stopped_rpids:
