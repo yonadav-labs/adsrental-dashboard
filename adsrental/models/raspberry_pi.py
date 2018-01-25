@@ -26,7 +26,7 @@ class RaspberryPi(models.Model):
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
     restart_required = models.BooleanField(default=False)
-    version = models.CharField(max_length=20, default='1.0.0')
+    version = models.CharField(max_length=20, default=settings.IMAGE_RASPBERRY_PI_VERSION)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
