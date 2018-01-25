@@ -200,6 +200,7 @@ class LeadAdmin(admin.ModelAdmin):
         'update_from_shipstation',
         'update_pi_delivered',
         'create_shipstation_order',
+        'start_ec2',
         'restart_ec2',
         'troubleshoot',
         'restart_raspberry_pi',
@@ -337,6 +338,10 @@ class LeadAdmin(admin.ModelAdmin):
             messages.success(
                 request, '{} order created: {}'.format(lead.str(), order.order_key))
 
+    def start_ec2(self, request, queryset):
+        for lead in queryset:
+            EC2Instance.launch_for_lead(self)
+
     def restart_ec2(self, request, queryset):
         for lead in queryset:
             lead.ec2instance.restart()
@@ -449,6 +454,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
+    start_ec2.short_description = 'RestaStartrt EC2 instance'
     restart_ec2.short_description = 'Restart EC2 instance'
     email_field.allow_tags = True
     email_field.short_description = 'Email'
