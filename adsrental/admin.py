@@ -640,7 +640,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
-    actions = ('troubleshoot', 'troubleshoot_fix', 'update_password', 'update_ec2_tags', )
+    actions = (
+        'troubleshoot',
+        'troubleshoot_fix',
+        'update_password',
+        'update_ec2_tags',
+        'check_status',
+        'check_missing',
+    )
 
     def lead_link(self, obj):
         if obj.lead is None:
@@ -686,6 +693,22 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def update_ec2_tags(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.set_ec2_tags()
+
+    def check_status(self, request, queryset):
+        if queryset.count() < 10:
+            queryset = EC2Instance.objects.all()
+
+        for ec2_instance in queryset:
+            self.troubleshoot_status()
+
+    def check_missing(self, request, queryset):
+        leads = Lead.objects.filter(
+            ec2instance__isnull=True,
+            raspberry_pi__isnull=False,
+            status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS],
+        )
+        for lead in leads:
+            BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True

@@ -201,33 +201,35 @@ class BotoResource(object):
             pass
 
     def launch_instance(self, rpid, email):
-        boto_instance = self.get_resource('ec2').create_instances(
-            ImageId=settings.AWS_IMAGE_AMI,
-            MinCount=1,
-            MaxCount=1,
-            KeyName='AI Farming Key',
-            InstanceType='t2.micro',
-            SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
-            UserData=rpid,
-            TagSpecifications=[
-                {
-                    'ResourceType': 'instance',
-                    'Tags': [
-                        {
-                            'Key': 'Name',
-                            'Value': rpid,
-                        },
-                        {
-                            'Key': 'Email',
-                            'Value': email,
-                        },
-                        {
-                            'Key': 'Duplicate',
-                            'Value': 'false',
-                        },
-                    ]
-                },
-            ],
-        )
+        instance = self.get_resource('ec2').get_first_rpid_instance(rpid)
+        if not instance:
+            boto_instance = self.get_resource('ec2').create_instances(
+                ImageId=settings.AWS_IMAGE_AMI,
+                MinCount=1,
+                MaxCount=1,
+                KeyName='AI Farming Key',
+                InstanceType='t2.micro',
+                SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
+                UserData=rpid,
+                TagSpecifications=[
+                    {
+                        'ResourceType': 'instance',
+                        'Tags': [
+                            {
+                                'Key': 'Name',
+                                'Value': rpid,
+                            },
+                            {
+                                'Key': 'Email',
+                                'Value': email,
+                            },
+                            {
+                                'Key': 'Duplicate',
+                                'Value': 'false',
+                            },
+                        ]
+                    },
+                ],
+            )
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         EC2Instance.upsert_from_boto(boto_instance)
