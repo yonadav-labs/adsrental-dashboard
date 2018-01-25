@@ -221,7 +221,7 @@ class BotoResource(object):
                             },
                             {
                                 'Key': 'Email',
-                                'Value': email,
+                                'Value': email or '',
                             },
                             {
                                 'Key': 'Duplicate',
