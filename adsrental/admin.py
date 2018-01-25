@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import time
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -340,9 +339,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def restart_ec2(self, request, queryset):
         for lead in queryset:
-            lead.ec2instance.stop()
-            time.sleep(30)
-            lead.ec2instance.start()
+            lead.ec2instance.restart()
 
     def troubleshoot(self, request, queryset):
         boto_resource = BotoResource().get_resource()
@@ -586,9 +583,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'troubleshoot_fix',
         'update_password',
         'update_ec2_tags',
-        'check_status',
+        'get_currect_state',
         'check_missing',
         'restart',
+        'start',
+        'stop',
     )
 
     def lead_link(self, obj):
@@ -636,7 +635,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         for ec2_instance in queryset:
             ec2_instance.set_ec2_tags()
 
-    def check_status(self, request, queryset):
+    def get_currect_state(self, request, queryset):
         if queryset.count() > 10:
             queryset = EC2Instance.objects.all()
 
@@ -644,13 +643,16 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             ec2_instance.update_from_boto()
 
     def restart(self, request, queryset):
-        if queryset.count() > 10:
-            queryset = EC2Instance.objects.all()
+        for ec2_instance in queryset:
+            ec2_instance.restart()
 
+    def start(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.start()
+
+    def stop(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.stop()
-            time.sleep(30)
-            ec2_instance.start()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(

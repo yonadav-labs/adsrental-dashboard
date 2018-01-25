@@ -6,6 +6,7 @@ from django.apps import apps
 from django.utils import timezone
 import paramiko
 import requests
+import time
 
 from adsrental.utils import BotoResource
 
@@ -192,28 +193,45 @@ class EC2Instance(models.Model):
         self.save()
         return True
 
-    def start(self):
+    def start(self, blocking=False):
         boto_instance = self.get_boto_instance()
-        if not boto_instance:
-            self.mark_as_missing()
+        self.update_from_boto(boto_instance)
+        if self.status != self.STATUS_STOPPED:
             return False
 
         boto_instance.start()
-        self.status = self.STATUS_PENDING
-        self.save()
+        if blocking:
+            while True:
+                boto_instance = self.get_boto_instance()
+                status = boto_instance.state['Name']
+                if status == self.STATUS_RUNNING:
+                    self.update_from_boto(boto_instance)
+                    break
+                time.sleep(10)
+
         return True
 
-    def stop(self):
-        if self.lead:
-            return False
+    def restart(self):
+        self.stop(blocking=True)
+        self.start(blocking=True)
+        return True
+
+    def stop(self, blocking=False):
         boto_instance = self.get_boto_instance()
-        if not boto_instance:
-            self.mark_as_missing()
+        self.update_from_boto(boto_instance)
+        if self.status != self.STATUS_RUNNING:
             return False
 
         boto_instance.stop()
-        self.status = self.STATUS_STOPPED
-        self.save()
+        if blocking:
+            while True:
+                boto_instance = self.get_boto_instance()
+                status = boto_instance.state['Name']
+                if status == self.STATUS_STOPPED:
+                    self.update_from_boto(boto_instance)
+                    break
+                time.sleep(10)
+
         return True
 
     def mark_as_missing(self):
