@@ -318,7 +318,7 @@ class LeadAdmin(admin.ModelAdmin):
                 lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP').first()
                 lead.save()
                 messages.success(
-                    request, 'Lead {} has new Raspberry Pi assigned'.format(lead.email))
+                    request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
 
             sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
             RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
@@ -452,6 +452,7 @@ class LeadAdmin(admin.ModelAdmin):
             EC2Instance.launch_for_lead(lead)
             messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
+    create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
     start_ec2.short_description = 'Start EC2 instance'
