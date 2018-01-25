@@ -75,7 +75,7 @@ class EC2Instance(models.Model):
         rpid = self.get_tag(boto_instance, 'Name')
         lead_email = self.get_tag(boto_instance, 'Email')
         is_duplicate = self.get_tag(boto_instance, 'Duplicate') == 'true'
-        lead = Lead.objects.filter(email=lead_email).first() if not is_duplicate else None
+        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if not is_duplicate else None
         try:
             if lead and lead.ec2instance and lead.ec2instance != self:
                 tags_changed = True
