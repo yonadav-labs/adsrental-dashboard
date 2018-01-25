@@ -232,6 +232,8 @@ class BotoResource(object):
                 ],
             )
             instance = self.get_first_rpid_instance(rpid)
+            if not instance:
+                raise ValueError(instance)
 
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         EC2Instance.upsert_from_boto(instance)
