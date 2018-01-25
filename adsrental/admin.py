@@ -312,23 +312,17 @@ class LeadAdmin(admin.ModelAdmin):
 
     def create_shipstation_order(self, request, queryset):
         for lead in queryset:
-            sf_lead = SFLead.objects.filter(email=lead.email).first()
-            if not sf_lead:
-                messages.error(
-                    request, 'Lead () does not exist in SF, skipping'.format(lead.email))
-                continue
-
-            if not sf_lead.raspberry_pi:
-                sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(
-                    linked_lead__isnull=True).first()
-                sf_lead.raspberry_pi.linked_lead = sf_lead
-                sf_lead.raspberry_pi.save()
-                sf_lead.save()
+            if not lead.raspberry_pi:
+                lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP').first()
+                lead.save()
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned'.format(lead.email))
 
-            Lead.upsert_from_sf(sf_lead, Lead.objects.filter(
-                email=sf_lead.email).first())
+            sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
+            RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
+            sf_lead = SFLead.objects.filter(email=lead.email).first()
+            Lead.upsert_to_sf(sf_lead, lead)
+            sf_lead = SFLead.objects.filter(email=lead.email).first()
 
             shipstation_client = ShipStationClient()
             if shipstation_client.get_sf_lead_order_data(sf_lead):
@@ -336,9 +330,9 @@ class LeadAdmin(admin.ModelAdmin):
                     request, 'Lead {} order already exists'.format(lead.email))
                 continue
 
-            shipstation_client.add_sf_lead_order(sf_lead)
+            order = shipstation_client.add_sf_lead_order(sf_lead)
             messages.success(
-                request, '{} order created'.format(lead.str()))
+                request, '{} order created: {}'.format(lead.str(), order.order_key))
 
     def start_ec2(self, request, queryset):
         boto_session = BotoResource()
@@ -708,16 +702,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS],
         )
         for lead in leads:
-            instance = EC2Instance.objects.filter(rpid=lead.raspberry_pi.rpid).first()
-            if instance and instance.is_active():
-                instance.is_duplicate = False
-                instance.lead = lead
-                instance.email = lead.email
-                instance.set_ec2_tags()
-                instance.save()
-                instance.start()
-            else:
-                BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
+            EC2Instance.launch_for_lead(lead)
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True

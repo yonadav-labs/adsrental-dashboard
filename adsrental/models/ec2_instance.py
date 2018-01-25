@@ -31,6 +31,7 @@ class EC2Instance(models.Model):
         (STATUS_MISSING, 'Missing', ),
         (STATUS_SHUTTING_DOWN, 'Shutting down', ),
     )
+    STATUSES_ACTIVE = [STATUS_RUNNING, STATUS_STOPPED, STATUS_PENDING, STATUS_STOPPING]
 
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True)
@@ -49,6 +50,37 @@ class EC2Instance(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    @classmethod
+    def launch_for_lead(cls, lead):
+        if not lead.raspberry_pi:
+            return None
+        instance = cls.objects.filter(lead=lead).first()
+        if instance:
+            instance.update_from_boto(instance.get_boto_instance())
+            if instance.status == EC2Instance.STATUS_STOPPED:
+                instance.is_duplicate = False
+                instance.lead = lead
+                instance.email = lead.email
+                instance.set_ec2_tags()
+                instance.save()
+                instance.start()
+
+            return instance
+
+        rpid = lead.raspberry_pi.rpid
+        instance = cls.objects.filter(rpid=rpid, status__in=cls.STATUSES_ACTIVE).first()
+        if instance:
+            instance.update_from_boto(instance.get_boto_instance())
+            instance.is_duplicate = False
+            instance.lead = lead
+            instance.email = lead.email
+            instance.set_ec2_tags()
+            instance.save()
+            instance.start()
+            return instance
+
+        return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
+
     def get_boto_instance(self, boto_resource=None):
         if not boto_resource:
             boto_resource = BotoResource().get_resource('ec2')
@@ -64,7 +96,10 @@ class EC2Instance(models.Model):
             return instance
 
     def is_active(self):
-        return self.status not in [self.STATUS_SHUTTING_DOWN, self.STATUS_TERMINATED]
+        return self.status in self.STATUSES_ACTIVE
+
+    def is_running(self):
+        return self.status == self.STATUS_RUNNING
 
     def update_from_boto(self, boto_instance=None):
         if not boto_instance:
@@ -153,6 +188,7 @@ class EC2Instance(models.Model):
 
         boto_instance.terminate()
         self.status = self.STATUS_TERMINATED
+        self.lead = None
         self.save()
         return True
 

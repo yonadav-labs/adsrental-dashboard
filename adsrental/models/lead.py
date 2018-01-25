@@ -5,6 +5,7 @@ from xml.etree import ElementTree
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
+from django.apps import apps
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
@@ -23,6 +24,8 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
     ]
+
+    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
@@ -233,3 +236,19 @@ class Lead(models.Model, FulltextSearchMixin):
             if self.pi_delivered:
                 self.send_customer_io_event('delivered')
             self.save()
+
+    def check_ec2_status(self):
+        ec2_instance = None
+        try:
+            ec2_instance = self.ec2instance
+        except:
+            pass
+
+        EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
+        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
+            EC2Instance.launch_for_lead(self)
+        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance.is_running():
+            raise ValueError()
+            EC2Instance.launch_for_lead(self)
+        if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
+            ec2_instance.stop()
