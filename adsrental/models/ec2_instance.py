@@ -21,6 +21,7 @@ class EC2Instance(models.Model):
     STATUS_PENDING = 'pending'
     STATUS_STOPPING = 'stopping'
     STATUS_MISSING = 'missing'
+    STATUS_SHUTTING_DOWN = 'shutting-down'
     STATUS_CHOICES = (
         (STATUS_RUNNING, 'Running', ),
         (STATUS_STOPPED, 'Stopped', ),
@@ -28,6 +29,7 @@ class EC2Instance(models.Model):
         (STATUS_PENDING, 'Pending', ),
         (STATUS_STOPPING, 'Stopping', ),
         (STATUS_MISSING, 'Missing', ),
+        (STATUS_SHUTTING_DOWN, 'Shutting down', ),
     )
 
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
@@ -62,6 +64,12 @@ class EC2Instance(models.Model):
         for instance in instances:
             return instance
 
+    def is_active(self, status=None):
+        if not status:
+            status = self.status
+
+        return status not in [self.STATUS_SHUTTING_DOWN, self.STATUS_TERMINATED]
+
     def update_from_boto(self, boto_instance=None):
         if not boto_instance:
             boto_instance = self.get_boto_instance()
@@ -75,19 +83,13 @@ class EC2Instance(models.Model):
         rpid = self.get_tag(boto_instance, 'Name')
         lead_email = self.get_tag(boto_instance, 'Email')
         is_duplicate = self.get_tag(boto_instance, 'Duplicate') == 'true'
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if not is_duplicate else None
-        try:
-            if lead and lead.ec2instance and lead.ec2instance != self:
-                tags_changed = True
-                is_duplicate = True
-                lead = None
-        except EC2Instance.DoesNotExist:
-            pass
+        instance_state = boto_instance.state['Name']
+        is_running = self.is_active(instance_state)
+        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if is_running else None
 
         self.email = lead_email
         self.rpid = rpid
         self.lead = lead
-        self.raspberry_pi = lead and lead.raspberry_pi
         self.is_duplicate = is_duplicate
         self.hostname = boto_instance.public_dns_name
         self.ip_address = boto_instance.public_ip_address
@@ -267,29 +269,33 @@ class EC2Instance(models.Model):
         ssh.close()
 
     def troubleshoot_old_pi_version(self):
-        if not self.raspberry_pi:
+        if not self.lead or not self.lead.raspberry_pi:
             return
 
         if not self.tunnel_up:
             return
 
-        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+        raspberry_pi = self.lead.raspberry_pi
+
+        if raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             self.ssh_execute(cmd_to_execute)
-            self.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
-            self.raspberry_pi.save()
+            raspberry_pi.version = settings.RASPBERRY_PI_VERSION
+            raspberry_pi.save()
 
     def troubleshoot_fix(self):
-        if not self.raspberry_pi:
+        if not self.lead or not self.lead.raspberry_pi:
             return
 
-        if self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION and self.tunnel_up:
+        raspberry_pi = self.lead.raspberry_pi
+
+        if raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION and self.tunnel_up:
             self.troubleshoot_old_pi_version()
             return
 
         if not self.tunnel_up or not self.ssh_up:
-            self.raspberry_pi.restart_required = True
-            self.raspberry_pi.save()
+            raspberry_pi.restart_required = True
+            raspberry_pi.save()
 
     def change_password(self):
         if self.password == settings.EC2_ADMIN_PASSWORD:

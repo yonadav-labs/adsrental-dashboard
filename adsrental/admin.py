@@ -699,7 +699,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             queryset = EC2Instance.objects.all()
 
         for ec2_instance in queryset:
-            self.troubleshoot_status()
+            ec2_instance.troubleshoot_status()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
@@ -708,13 +708,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS],
         )
         for lead in leads:
-            instance = EC2Instance.obejcts.filter(rpid=lead.raspberry_pi_rpid).first()
+            instance = EC2Instance.objects.filter(rpid=lead.raspberry_pi_rpid).first()
             if instance:
                 instance.is_duplicate = False
                 instance.lead = lead
                 instance.email = lead.email
                 instance.set_ec2_tags()
                 instance.save()
+                instance.start()
             else:
                 BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 

@@ -35,13 +35,15 @@ class Command(BaseCommand):
                 instance_ids.append(boto_instance.id)
                 instance = EC2Instance.upsert_from_boto(boto_instance)
                 if terminate_stopped:
-                    if instance and instance.status == EC2Instance.STATUS_STOPPED:
-                        print 'TERMINATE:', instance.email, instance.rpid, instance.is_duplicate
+                    if instance and instance.status == EC2Instance.STATUS_STOPPED and not instance.lead:
+                        print 'TERMINATE:', instance.lead, instance.email, instance.rpid, instance.is_duplicate
                         instance.terminate()
 
             instances = EC2Instance.objects.all()
             for instance in instances:
                 if instance.instance_id not in instance_ids:
+                    instance.lead = None
+                    instance.save()
                     instance.delete()
 
         if pending:
