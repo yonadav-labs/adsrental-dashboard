@@ -265,9 +265,10 @@ class LeadAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.raspberry_pi is None:
             return None
-        return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>)'.format(
+        return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
             rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
             url=reverse('admin:adsrental_raspberrypi_changelist'),
+            config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
             rpid=obj.raspberry_pi,
         )
 
