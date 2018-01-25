@@ -237,6 +237,8 @@ class BotoResource(object):
 
         if instance.is_duplicate:
             instance.is_duplicate = False
+            instance.set_ec2_tags()
+
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         instance = EC2Instance.upsert_from_boto(instance)
         return instance
