@@ -708,7 +708,15 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS],
         )
         for lead in leads:
-            BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
+            instance = EC2Instance.obejcts.filter(rpid=lead.raspberry_pi_rpid).first()
+            if instance:
+                instance.is_duplicate = False
+                instance.lead = lead
+                instance.email = lead.email
+                instance.set_ec2_tags()
+                instance.save()
+            else:
+                BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True

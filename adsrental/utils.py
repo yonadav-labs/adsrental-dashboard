@@ -236,11 +236,5 @@ class BotoResource(object):
                 raise ValueError(instance)
 
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
-        Lead = apps.get_app_config('adsrental').get_model('Lead')
         instance = EC2Instance.upsert_from_boto(instance)
-        if instance.is_duplicate:
-            instance.is_duplicate = False
-            instance.lead = Lead.objects.filter(raspberry_pi__rpid=instance.rpid).first()
-            instance.set_ec2_tags()
-            instance.save()
         return instance
