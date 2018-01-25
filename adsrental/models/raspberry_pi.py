@@ -7,6 +7,8 @@ from django.db import models
 from django.apps import apps
 from django.conf import settings
 
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
+
 
 class RaspberryPi(models.Model):
     online_hours_ttl = 6
@@ -130,6 +132,9 @@ class RaspberryPi(models.Model):
 
     @classmethod
     def upsert_to_sf(cls, sf_raspberry_pi, raspberry_pi):
+        if not sf_raspberry_pi:
+            sf_raspberry_pi = SFRaspberryPi()
+
         first_seen = cls.get_max_datetime(raspberry_pi.first_seen, sf_raspberry_pi.first_seen)
         last_seen = cls.get_max_datetime(raspberry_pi.last_seen, sf_raspberry_pi.last_seen)
         tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)

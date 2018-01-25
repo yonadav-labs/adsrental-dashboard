@@ -2,6 +2,7 @@ from django.views import View
 from django.http import JsonResponse
 
 from salesforce_handler.models import Lead as SFLead
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
 from adsrental.models.raspberry_pi import RaspberryPi
@@ -19,10 +20,11 @@ class SFToShipstationView(View):
             })
 
         if not lead.raspberry_pi:
-            lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True).first()
-            raise ValueError(lead.raspberry_pi.rpid)
+            lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP').first()
             lead.save()
 
+        sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
+        RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
         sf_lead = SFLead.objects.filter(email=email).first()
         Lead.upsert_to_sf(sf_lead, lead)
         sf_lead = SFLead.objects.filter(email=email).first()
