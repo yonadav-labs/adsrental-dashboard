@@ -36,7 +36,6 @@ class EC2Instance(models.Model):
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     lead = models.OneToOneField('adsrental.Lead', blank=True, null=True)
-    raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', blank=True, null=True)
     hostname = models.CharField(max_length=255, blank=True, null=True)
     ip_address = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
@@ -160,8 +159,6 @@ class EC2Instance(models.Model):
         return True
 
     def start(self):
-        if self.is_duplicate:
-            return False
         boto_instance = self.get_boto_instance()
         if not boto_instance:
             self.mark_as_missing()

@@ -636,7 +636,7 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
-    list_display = ('id', 'instance_id', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'is_duplicate', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
+    list_display = ('id', 'instance_id', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
@@ -659,17 +659,17 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         )
 
     def raspberry_pi_link(self, obj):
-        if obj.raspberry_pi is None:
+        if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
         return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
-            lead=obj.raspberry_pi.rpid,
-            q=obj.raspberry_pi.rpid,
+            lead=obj.lead.raspberry_pi.rpid,
+            q=obj.lead.raspberry_pi.rpid,
         )
 
     def links(self, obj):
         links = []
-        if obj.raspberry_pi:
+        if obj.lead and obj.lead.raspberry_pi:
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
             ))
