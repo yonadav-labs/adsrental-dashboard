@@ -155,7 +155,7 @@ class BotoResource(object):
             return instance
 
         for instance in instances_list:
-            if instance_state == 'terminated':
+            if instance_state == 'terminated' or instance_state == 'shutting-down':
                 continue
 
             if self.get_instance_tag(instance, 'Duplicate') == 'true':
@@ -165,7 +165,7 @@ class BotoResource(object):
 
         for instance in instances_list:
             instance_state = instance.state['Name']
-            if instance_state == 'terminated':
+            if instance_state == 'terminated' or instance_state == 'shutting-down':
                 continue
             return instance
 

@@ -63,11 +63,8 @@ class EC2Instance(models.Model):
         for instance in instances:
             return instance
 
-    def is_active(self, status=None):
-        if not status:
-            status = self.status
-
-        return status not in [self.STATUS_SHUTTING_DOWN, self.STATUS_TERMINATED]
+    def is_active(self):
+        return self.status not in [self.STATUS_SHUTTING_DOWN, self.STATUS_TERMINATED]
 
     def update_from_boto(self, boto_instance=None):
         if not boto_instance:
@@ -83,8 +80,10 @@ class EC2Instance(models.Model):
         lead_email = self.get_tag(boto_instance, 'Email')
         is_duplicate = self.get_tag(boto_instance, 'Duplicate') == 'true'
         instance_state = boto_instance.state['Name']
-        is_running = self.is_active(instance_state)
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if is_running else None
+        self.status = instance_state
+        is_active = self.is_active()
+
+        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if is_active else None
 
         self.email = lead_email
         self.rpid = rpid
@@ -92,7 +91,6 @@ class EC2Instance(models.Model):
         self.is_duplicate = is_duplicate
         self.hostname = boto_instance.public_dns_name
         self.ip_address = boto_instance.public_ip_address
-        self.status = boto_instance.state['Name']
         self.last_synced = timezone.now()
 
         self.save()
