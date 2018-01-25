@@ -236,4 +236,4 @@ class BotoResource(object):
                 raise ValueError(instance)
 
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
-        EC2Instance.upsert_from_boto(instance)
+        return EC2Instance.upsert_from_boto(instance)
