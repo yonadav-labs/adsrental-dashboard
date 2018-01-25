@@ -203,7 +203,7 @@ class BotoResource(object):
     def launch_instance(self, rpid, email):
         instance = self.get_first_rpid_instance(rpid)
         if not instance:
-            boto_instance = self.get_resource('ec2').create_instances(
+            self.get_resource('ec2').create_instances(
                 ImageId=settings.AWS_IMAGE_AMI,
                 MinCount=1,
                 MaxCount=1,
@@ -231,5 +231,7 @@ class BotoResource(object):
                     },
                 ],
             )
+            instance = self.get_first_rpid_instance(rpid)
+
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
-        EC2Instance.upsert_from_boto(boto_instance)
+        EC2Instance.upsert_from_boto(instance)
