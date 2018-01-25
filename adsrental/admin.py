@@ -324,6 +324,8 @@ class LeadAdmin(admin.ModelAdmin):
             Lead.upsert_to_sf(sf_lead, lead)
             sf_lead = SFLead.objects.filter(email=lead.email).first()
 
+            EC2Instance.launch_for_lead(lead)
+
             shipstation_client = ShipStationClient()
             if shipstation_client.get_sf_lead_order_data(sf_lead):
                 messages.info(

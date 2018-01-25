@@ -2,11 +2,11 @@ from django.views import View
 from django.http import JsonResponse
 
 from salesforce_handler.models import Lead as SFLead
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
+from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.utils import BotoResource
+from adsrental.models.ec2_instance import EC2Instance
 
 
 class SFToShipstationView(View):
@@ -37,6 +37,7 @@ class SFToShipstationView(View):
             })
 
         order = shipstation_client.add_sf_lead_order(sf_lead)
+        EC2Instance.launch_for_lead(lead)
 
         return JsonResponse({
             'result': True,
@@ -47,19 +48,10 @@ class SFToShipstationView(View):
 class SFLaunchRaspberryPiInstance(View):
     def get(self, request):
         rpid = request.GET.get('rpid')
-        raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
-        if not raspberry_pi:
+        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+        if not lead:
             return JsonResponse({'result': False, 'reason': 'RPID not found'})
 
-        boto_session = BotoResource()
-        instance = boto_session.get_first_rpid_instance(rpid)
-        if instance:
-            instance_state = instance.state['Name']
-            started = False
-            if instance_state == 'stopped':
-                instance.start()
-                started = True
-            return JsonResponse({'result': False, 'launched': False, 'exists': instance.id, 'state': instance.state['Name'], 'started': started})
+        EC2Instance.launch_for_lead(lead)
 
-        boto_session.launch_instance(rpid, raspberry_pi.lead.email if raspberry_pi.lead else '')
         return JsonResponse({'result': True, 'launched': True})
