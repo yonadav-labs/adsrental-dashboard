@@ -6,7 +6,7 @@ from adsrental.models.ec2_instance import EC2Instance
 
 class RDPDownloadView(View):
     def get(self, request, rpid):
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
+        ec2_instance = EC2Instance.objects.filter(rpid=rpid, lead__isnull=False).first()
         if not ec2_instance:
             return HttpResponse('EC2 instance {} does not exist'.format(rpid))
 
