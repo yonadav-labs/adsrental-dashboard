@@ -1,12 +1,17 @@
 from django.views import View
 from django.http import FileResponse, HttpResponse
 
-from adsrental.models.ec2_instance import EC2Instance
+from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class RDPDownloadView(View):
     def get(self, request, rpid):
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid, lead__isnull=False).first()
+        raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+        ec2_instance = None
+        try:
+            ec2_instance = raspberry_pi.lead.ec2instance
+        except:
+            pass
         if not ec2_instance:
             return HttpResponse('EC2 instance {} does not exist'.format(rpid))
 
