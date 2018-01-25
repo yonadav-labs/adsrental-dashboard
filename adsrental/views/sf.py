@@ -20,7 +20,7 @@ class SFToShipstationView(View):
 
         if not lead.raspberry_pi:
             lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True).first()
-            lead.raspberry_pi.save()
+            lead.save()
 
         sf_lead = SFLead.objects.filter(email=email).first()
         Lead.upsert_to_sf(sf_lead, lead)
