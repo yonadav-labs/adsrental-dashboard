@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Reports{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <form role="form" action="" method="GET" class="form-horizontal">
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+    </form>
+</div>
+
+    <table id="results" class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'account_name' %}">Account</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
+                <th>Online days</th>
+                <th>Offline days</th>
+                <th>Wrong password days</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        {% for entry in entries %}
+            <tbody>
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ entry.account_name }}</td>
+                    <td>{{ entry.first_name }} {{ entry.last_name }}</td>
+                    <td>{{ entry.status }}</td>
+                    <td>{{ entry.online_days }}</td>
+                    <td>{{ entry.offline_days }}</td>
+                    <td>{{ entry.wrong_password_days }}</td>
+                    <td>{{ entry.amount }}</td>
+                </tr>
+            </tbody>
+        {% empty %}
+            <tfoot>
+                <tr>
+                    <th colspan="100">No entries found</th>
+                </tr>
+            </tfoot>
+        {% endfor %}
+    </table>
+    {% if entries.has_other_pages %}
+      <ul class="pagination">
+        {% if entries.has_previous %}
+          <li><a href="{% relative_url request.GET.urlencode 'page' entries.previous_page_number %}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in entries.paginator.page_range %}
+          {% if entries.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="{% relative_url request.GET.urlencode 'page' i %}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if entries.has_next %}
+          <li><a href="{% relative_url request.GET.urlencode 'page' entries.next_page_number %}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
+{% endblock %}

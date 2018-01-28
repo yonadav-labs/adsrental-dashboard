@@ -8,6 +8,7 @@ from adsrental.views.sync_to_adsdb import SyncToAdsdbView
 from adsrental.views.sync_from_shipstation import SyncFromShipStationView
 from adsrental.views.sync_delivered import SyncDeliveredView
 from adsrental.views.dashboard import DashboardView, CheckSentView
+from adsrental.views.report import ReportView
 from adsrental.views.rdp import RDPDownloadView
 from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
     url(r'^thankyou/(?P<b64_email>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^thankyou.html$', MainView.as_view(), name='main'),
+    url(r'^report/$', ReportView.as_view(), name='report'),
     url(r'^dashboard/$', DashboardView.as_view(), name='dashboard'),
     url(r'^dashboard/check_sent/$', CheckSentView.as_view(), name='dashboard_check_sent'),
     url(r'^log.php', LogView.as_view(), name='log'),

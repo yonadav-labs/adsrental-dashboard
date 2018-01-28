@@ -128,3 +128,12 @@ class SignupForm(forms.Form):
     photo_id = forms.FileField(widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
     captcha = ReCaptchaField(widget=ReCaptchaWidget())
     utm_source = forms.CharField(widget=forms.HiddenInput())
+
+
+class ReportForm(forms.Form):
+    MONTH_CURRENT = '2018-01-01'
+    MONTH_CHOICES = (
+        (MONTH_CURRENT, 'Jan 2018', ),
+        ('2018-02-01', 'Feb 2018', ),
+    )
+    month = forms.ChoiceField(choices=MONTH_CHOICES)
