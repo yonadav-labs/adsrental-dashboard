@@ -13,6 +13,7 @@
                 </p>
                 <p>
                   <a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a>
+                  <a class="btn btn-default btn-lg" href="{% url "report" %}" role="button">Go to reports »</a>
                 </p>
                 {% if user.is_superuser %}
                   <p>
