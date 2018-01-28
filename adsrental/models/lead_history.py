@@ -44,7 +44,10 @@ class LeadHistory(models.Model):
         return self.checks_wrong_password
 
     @classmethod
-    def get_queryset_for_month(cls, year, month):
+    def get_queryset_for_month(cls, year, month, lead_ids=None):
         date__gte = datetime.date(year, month, 1)
         date__lt = datetime.date(year, month, 1) + relativedelta(months=1)
-        return cls.objects.filter(date__gte=date__gte, date__lt=date__lt).select_related('lead')
+        result = cls.objects.filter(date__gte=date__gte, date__lt=date__lt)
+        if lead_ids:
+            result = result.filter(lead_id__in=lead_ids)
+        return result

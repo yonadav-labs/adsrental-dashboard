@@ -12,11 +12,17 @@ from adsrental.forms import ReportForm
 class ReportView(View):
     items_per_page = 100
 
-    def get_entries(self, user, year, month):
+    def get_entries(self, user, year, month, search):
         lead_queryset = Lead.objects.filter()
         if user.utm_source:
             lead_queryset = lead_queryset.filter(utm_source=user.utm_source)
-        lead_history_queryset = LeadHistory.get_queryset_for_month(year, month)
+        if search:
+            lead_queryset = lead_queryset.filter(Lead.get_fulltext_filter(search, ['raspberry_pi__rpid', 'first_name', 'last_name', 'email', 'phone']))
+
+        lead_id = None
+        if lead_queryset.count() < 50:
+            lead_id = [i.pk for i in lead_queryset]
+        lead_history_queryset = LeadHistory.get_queryset_for_month(year, month, lead_id)
         leads_map = {}
         for lead in lead_queryset:
             lead.online_days = 0
@@ -32,6 +38,7 @@ class ReportView(View):
                 lead.online_days += 1
             else:
                 lead.offline_days += 1
+            lead.amount = 25. * lead.online_days / (lead.online_days + lead.offline_days)
 
         return leads_map.values()
 
@@ -43,7 +50,7 @@ class ReportView(View):
         entries = []
         if form.is_valid():
             year, month = [int(i) for i in form.cleaned_data['month'].split('-')]
-            entries = self.get_entries(request.user, year, month)
+            entries = self.get_entries(request.user, year, month, form.cleaned_data['search'])
 
         page = request.GET.get('page', 1)
         paginator = Paginator(entries, self.items_per_page)

@@ -136,4 +136,6 @@ class ReportForm(forms.Form):
         (MONTH_CURRENT, 'Jan 2018', ),
         ('2018-02', 'Feb 2018', ),
     )
-    month = forms.ChoiceField(choices=MONTH_CHOICES)
+
+    search = forms.CharField(label='Search', required=False)
+    month = forms.ChoiceField(choices=MONTH_CHOICES, required=False)
