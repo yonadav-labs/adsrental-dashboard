@@ -131,9 +131,9 @@ class SignupForm(forms.Form):
 
 
 class ReportForm(forms.Form):
-    MONTH_CURRENT = '2018-01-01'
+    MONTH_CURRENT = '2018-01'
     MONTH_CHOICES = (
         (MONTH_CURRENT, 'Jan 2018', ),
-        ('2018-02-01', 'Feb 2018', ),
+        ('2018-02', 'Feb 2018', ),
     )
     month = forms.ChoiceField(choices=MONTH_CHOICES)

@@ -38,7 +38,7 @@ class ReportView(View):
     @method_decorator(login_required)
     def get(self, request):
         form = ReportForm(request.GET, initial=dict(
-            month=ReportView.MONTH_CURRENT,
+            month=ReportForm.MONTH_CURRENT,
         ))
         entries = []
         if form.is_valid():
