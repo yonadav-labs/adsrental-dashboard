@@ -519,7 +519,20 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
-    list_display = ('id', 'instance_id', 'hostname', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
+    list_display = (
+        'id',
+        'instance_id',
+        'hostname',
+        'version',
+        'lead_link',
+        'links',
+        'raspberry_pi_link',
+        'status',
+        'last_troubleshoot',
+        'tunnel_up',
+        'web_up',
+        'ssh_up',
+    )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )

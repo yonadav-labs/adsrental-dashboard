@@ -1,7 +1,9 @@
 from multiprocessing.pool import ThreadPool
 from itertools import chain, islice
+import datetime
 
 from django.db import connection
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 
 from adsrental.models.lead import Lead
@@ -32,15 +34,25 @@ class Command(BaseCommand):
         parser.add_argument('--fix', action='store_true')
         parser.add_argument('--threads', type=int, default=10)
         parser.add_argument('--chunk-size', type=int, default=10)
+        parser.add_argument('--older-minutes', type=int, default=0)
 
     def handle(
         self,
         fix,
         threads,
         chunk_size,
+        older_minutes,
         **kwargs
     ):
-        leads = Lead.objects.filter(raspberry_pi__isnull=False, status__in=Lead.STATUSES_ACTIVE).order_by('-pk').select_related('ec2instance', 'raspberry_pi')
+        leads = Lead.objects.filter(
+            raspberry_pi__isnull=False,
+            status__in=Lead.STATUSES_ACTIVE,
+        )
+        if older_minutes:
+            leads = leads.filter(
+                ec2_instance__last_troubleshoot___lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
+            )
+        leads = leads.order_by('-pk').select_related('ec2instance', 'raspberry_pi')
         total = leads.count()
         counter = 0
         for lead_chunk in chunks(leads, chunk_size):
