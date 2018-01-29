@@ -20,9 +20,9 @@ def troubleshoot(args):
         ec2_instance.troubleshoot()
         # if fix:
         #     ec2_instance.troubleshoot_fix()
-    result = lead.find_errors()
+    errors = lead.find_errors()
     connection.close()
-    return result
+    return lead, errors
 
 
 class Command(BaseCommand):
@@ -30,8 +30,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--fix', action='store_true')
-        parser.add_argument('--threads', type='int', default=10)
-        parser.add_argument('--chunk-size', type='int', default=10)
+        parser.add_argument('--threads', type=int, default=10)
+        parser.add_argument('--chunk-size', type=int, default=10)
 
     def handle(
         self,
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         chunk_size,
         **kwargs
     ):
-        leads = Lead.objects.filter(raspberry_pi__isnull=False, status__in=Lead.STATUSES_ACTIVE).order_by('-id')
+        leads = Lead.objects.filter(raspberry_pi__isnull=False, status__in=Lead.STATUSES_ACTIVE).order_by('-pk').select_related('ec2instance', 'raspberry_pi')
         total = leads.count()
         counter = 0
         for lead_chunk in chunks(leads, chunk_size):
@@ -49,6 +49,6 @@ class Command(BaseCommand):
             print 'Start pool: {} / {}'.format(counter, total)
             results = pool.map(troubleshoot, lead_queue)
             counter += len(lead_queue)
-            print 'End pool: {} / {}'.format(counter, total)
-            for result in results:
-                print '\n'.join(result)
+            for lead, errors in results:
+                error_strs = ['Lead {}: {}'.format(lead.name(), error) for error in errors]
+                print '\n'.join(error_strs)
