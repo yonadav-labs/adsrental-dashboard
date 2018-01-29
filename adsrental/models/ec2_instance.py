@@ -272,13 +272,12 @@ class EC2Instance(models.Model):
         return True
 
     def troubleshoot_status(self):
-        Lead = apps.get_app_config('adsrental').get_model('Lead')
         if self.status == self.STATUS_RUNNING:
-            if not self.lead or self.lead.status == Lead.STATUS_BANNED:
+            if not self.lead.is_active():
                 self.stop()
                 return
         if self.status == self.STATUS_STOPPED:
-            if not self.is_duplicate and self.lead or self.lead.status != Lead.STATUS_BANNED:
+            if self.lead and self.lead.is_active():
                 self.start()
                 return
 

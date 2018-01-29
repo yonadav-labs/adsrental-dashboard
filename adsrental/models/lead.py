@@ -259,6 +259,9 @@ class Lead(models.Model, FulltextSearchMixin):
             pass
         return ec2_instance
 
+    def is_active(self):
+        return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
+
     def find_errors(self):
         errors = []
         ec2_instance = self.get_ec2_instance()
