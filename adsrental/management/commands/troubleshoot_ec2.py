@@ -15,7 +15,7 @@ def chunks(iterable, size=10):
 class Command(BaseCommand):
     help = 'Troubleshoot EC2 instances to DB'
     threads_count = 10
-    chunk_size = 50
+    chunk_size = 10
 
     def add_arguments(self, parser):
         parser.add_argument('--fix', action='store_true')
