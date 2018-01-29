@@ -48,6 +48,7 @@ class EC2Instance(models.Model):
     password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD)
     last_synced = models.DateTimeField(default=timezone.now)
     last_troubleshoot = models.DateTimeField(default=timezone.now)
+    version = models.CharField(max_length=255, default='2.4.6')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

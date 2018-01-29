@@ -189,7 +189,7 @@ class LeadAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
                    WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
-    select_related = ('raspberry_pi', )
+    select_related = ('raspberry_pi', 'ec2instance')
     search_fields = ('leadid', 'account_name', 'first_name',
                      'last_name', 'raspberry_pi__rpid', 'email', )
     actions = (
