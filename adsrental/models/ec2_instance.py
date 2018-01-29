@@ -242,7 +242,8 @@ class EC2Instance(models.Model):
         self.save()
 
     @classmethod
-    def cls_troubleshoot(cls, instance, fix):
+    def cls_troubleshoot(cls, args):
+        instance, fix = args
         instance.troubleshoot()
         if fix:
             instance.troubleshoot_fix()
