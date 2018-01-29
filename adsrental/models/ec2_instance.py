@@ -241,14 +241,6 @@ class EC2Instance(models.Model):
         self.web_up = False
         self.save()
 
-    @classmethod
-    def cls_troubleshoot(cls, args):
-        instance, fix = args
-        instance.troubleshoot()
-        if fix:
-            instance.troubleshoot_fix()
-        return instance
-
     def troubleshoot(self):
         self.last_troubleshoot = timezone.now()
         boto_instance = self.get_boto_instance()
