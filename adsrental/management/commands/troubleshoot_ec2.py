@@ -26,11 +26,14 @@ class Command(BaseCommand):
         **kwargs
     ):
         instances = EC2Instance.objects.all().order_by('-id')
+        total = instances.count()
+        counter = 0
         for instance_chunk in chunks(instances, self.chunk_size):
             pool = ThreadPool(processes=self.threads_count)
             instance_queue = [(i, fix) for i in instance_chunk]
-            print 'Start pool'
-            res = pool.map(EC2Instance.cls_troubleshoot, instance_queue)
-            print 'End pool'
-            for result in res:
-                print res
+            print 'Start pool: {} / {}'.format(counter, total)
+            pool.map(EC2Instance.cls_troubleshoot, instance_queue)
+            counter += len(instance_queue)
+            print 'End pool: {} / {}'.format(counter, total)
+            # for result in res:
+            #     print res

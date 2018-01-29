@@ -267,13 +267,15 @@ class Lead(models.Model, FulltextSearchMixin):
             errors.append('Lead is active and has RPI assigned, but no EC2 instance')
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and ec2_instance and not ec2_instance.is_running():
             errors.append('Lead is active and has RPI assigned, but  EC is not running')
+        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not self.raspberry_pi.online():
+            errors.append('Lead is active and has RPI and EC2 assigned, but RPi is not running. RPi should be restarted.')
 
         if ec2_instance and not ec2_instance.ssh_up:
             errors.append('SSH connection to EC2 instance failed. EC2 should be restarted.')
         if ec2_instance and not ec2_instance.web_up:
             errors.append('EC2 web interface is not responding. EC2 should be restarted.')
         if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
-            errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted')
+            errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted.')
         if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
             errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI instrnet connection and restart it.')
 
