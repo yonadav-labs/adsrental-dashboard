@@ -275,7 +275,7 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not self.raspberry_pi.online():
             errors.append('Lead is active and has RPI and EC2 assigned, but RPi is not running. RPi should be restarted.')
 
-        if ec2_instance and ec2_instance.is_runnung():
+        if ec2_instance and ec2_instance.is_running():
             if not ec2_instance.ssh_up:
                 errors.append('SSH connection to EC2 instance failed. EC2 should be restarted.')
             if not ec2_instance.web_up:
