@@ -538,9 +538,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def lead_link(self, obj):
         if obj.lead is None:
             return obj.email
-        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}">{lead} {status}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=obj.lead.email,
+            status='(active)' if obj.lead.is_active() else '',
             q=obj.lead.email,
         )
 
