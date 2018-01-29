@@ -523,6 +523,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
+    list_select_related = ('lead', 'lead__raspberry_pi', )
     actions = (
         'troubleshoot',
         'troubleshoot_fix',
