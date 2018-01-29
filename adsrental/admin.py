@@ -563,6 +563,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             links.append('<a target="_blank" href="/log/{rpid}">Logs</a>'.format(
                 rpid=obj.rpid,
             ))
+
+        links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
+            hostname=obj.hostname,
+        ))
+        links.append('<a target="_blank" href="http://{hostname}:13608">CURL</a>'.format(
+            hostname=obj.hostname,
+        ))
         return ', '.join(links)
 
     def troubleshoot(self, request, queryset):
