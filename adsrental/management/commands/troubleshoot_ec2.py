@@ -4,7 +4,7 @@ from itertools import chain, islice
 from django.db import connection
 from django.core.management.base import BaseCommand
 
-from adsrental.models.ec2_instance import EC2Instance
+from adsrental.models.lead import Lead
 
 
 def chunks(iterable, size=10):
@@ -14,35 +14,41 @@ def chunks(iterable, size=10):
 
 
 def troubleshoot(args):
-    instance, fix = args
-    instance.troubleshoot()
-    # if fix:
-    #     instance.troubleshoot_fix()
+    lead, fix = args
+    ec2_instance = lead.get_ec2_instance()
+    if ec2_instance:
+        ec2_instance.troubleshoot()
+        # if fix:
+        #     ec2_instance.troubleshoot_fix()
+    result = lead.find_errors()
     connection.close()
+    return result
 
 
 class Command(BaseCommand):
     help = 'Troubleshoot EC2 instances to DB'
-    threads_count = 10
-    chunk_size = 10
 
     def add_arguments(self, parser):
         parser.add_argument('--fix', action='store_true')
+        parser.add_argument('--threads', type='int', default=10)
+        parser.add_argument('--chunk-size', type='int', default=10)
 
     def handle(
         self,
         fix,
+        threads,
+        chunk_size,
         **kwargs
     ):
-        instances = EC2Instance.objects.all().order_by('-id')
-        total = instances.count()
+        leads = Lead.objects.filter(raspberry_pi__isnull=False, status__in=Lead.STATUSES_ACTIVE).order_by('-id')
+        total = leads.count()
         counter = 0
-        for instance_chunk in chunks(instances, self.chunk_size):
-            pool = ThreadPool(processes=self.threads_count)
-            instance_queue = [(i, fix) for i in instance_chunk]
+        for lead_chunk in chunks(leads, chunk_size):
+            pool = ThreadPool(processes=threads)
+            lead_queue = [(i, fix) for i in lead_chunk]
             print 'Start pool: {} / {}'.format(counter, total)
-            pool.map(troubleshoot, instance_queue)
-            counter += len(instance_queue)
+            results = pool.map(troubleshoot, lead_queue)
+            counter += len(lead_queue)
             print 'End pool: {} / {}'.format(counter, total)
-            # for result in res:
-            #     print res
+            for result in results:
+                print '\n'.join(result)
