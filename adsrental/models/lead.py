@@ -238,11 +238,9 @@ class Lead(models.Model, FulltextSearchMixin):
             self.save()
 
     def check_ec2_status(self):
-        ec2_instance = None
-        try:
-            ec2_instance = self.ec2instance
-        except:
-            pass
+        ec2_instance = self.get_ec2_instance()
+        if not ec2_instance:
+            return
 
         ec2_instance.update_from_boto()
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
@@ -253,13 +251,17 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
             ec2_instance.stop()
 
-    def find_errors(self):
-        errors = []
+    def get_ec2_instance(self):
         ec2_instance = None
         try:
             ec2_instance = self.ec2instance
         except:
             pass
+        return ec2_instance
+
+    def find_errors(self):
+        errors = []
+        ec2_instance = self.get_ec2_instance()
 
         if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
             errors.append('Lead is not active but instance is running')

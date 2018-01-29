@@ -200,7 +200,8 @@ class LeadAdmin(admin.ModelAdmin):
         'create_shipstation_order',
         'start_ec2',
         'restart_ec2',
-        'troubleshoot',
+        'troubleshoot_ec2',
+        'show_errors',
         'restart_raspberry_pi',
         'force_update_raspberry_pi',
         'ban',
@@ -346,7 +347,13 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             lead.ec2instance.restart()
 
-    def troubleshoot(self, request, queryset):
+    def troubleshoot_ec2(self, request, queryset):
+        for lead in queryset:
+            ec2_instance = lead.get_ec2_instance()
+            if ec2_instance:
+                ec2_instance.troubleshoot()
+
+    def show_errors(self, request, queryset):
         for lead in queryset:
             errors = lead.find_errors()
             if errors:
