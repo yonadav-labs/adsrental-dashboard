@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.ec2_instance import EC2Instance
 from adsrental.utils import BotoResource
 
 
@@ -36,8 +37,11 @@ class LogView(View):
             return JsonResponse({'result': True, 'source': 'client'})
 
         if 'h' in request.GET:
-            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
-            return HttpResponse(raspberry_pi.ec2_hostname or '')
+            ec2_instance = EC2Instance.objects.filter(lead__raspberry_pi__rpid=rpid).first()
+            if ec2_instance:
+                return HttpResponse(ec2_instance.hostname)
+            else:
+                return HttpResponse('')
 
         if 'o' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
