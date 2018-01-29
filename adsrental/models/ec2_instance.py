@@ -274,7 +274,7 @@ class EC2Instance(models.Model):
     def troubleshoot_status(self):
         if self.status == self.STATUS_RUNNING:
             if not self.lead.is_active():
-                self.stop()
+                # self.stop()
                 return
         if self.status == self.STATUS_STOPPED:
             if self.lead and self.lead.is_active():
