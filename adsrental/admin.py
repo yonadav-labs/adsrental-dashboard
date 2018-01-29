@@ -436,7 +436,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
-            lead.raspberry_pi.restart_tunnel = True
+            lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
@@ -563,7 +563,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def restart_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
-            raspberry_pi.restart_tunnel = True
+            raspberry_pi.restart_required = True
             raspberry_pi.save()
         messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
