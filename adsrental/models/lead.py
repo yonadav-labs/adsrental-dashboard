@@ -278,16 +278,16 @@ class Lead(models.Model, FulltextSearchMixin):
             errors.append('EC2 web interface is not responding. EC2 should be restarted.')
         if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
             errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted.')
-        if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
-            errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI instrnet connection and restart it.')
+        if ec2_instance and not ec2_instance.tunnel_up and not self.raspberry_pi.online():
+            errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI internet connection and restart it.')
 
         if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
             errors.append('RPi still runs old version {}. Autoupdating it over tunnel.'.format(self.raspberry_pi.version))
         if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
             errors.append('RPi still runs old version {}. Tunnel is down, ask {} to reset RPi manually.'.format(self.raspberry_pi.version, self.name()))
         if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-            errors.append('RPi still runs version {} and seems to be online. RPi updater will update it soon.'.format(self.raspberry_pi.version))
+            errors.append('RPi still runs version {} and is online. RPi updater will update it soon.'.format(self.raspberry_pi.version))
         if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-            errors.append('RPi still runs version {} but seems to be offline. RPi updater will update it soon.'.format(self.raspberry_pi.version))
+            errors.append('RPi still runs version {} but is offline. RPi updater will update it soon.'.format(self.raspberry_pi.version))
 
         return errors
