@@ -204,6 +204,7 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_ec2',
         'troubleshoot',
         'restart_raspberry_pi',
+        'force_update_raspberry_pi',
         'ban',
         'unban',
     )
@@ -438,6 +439,14 @@ class LeadAdmin(admin.ModelAdmin):
             lead.raspberry_pi.restart_tunnel = True
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
+
+    def force_update_raspberry_pi(self, request, queryset):
+        for lead in queryset:
+            raspberry_pi = lead.raspberry_pi
+            cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+            lead.ec2instance.ssh_execute(cmd_to_execute)
+            raspberry_pi.version = settings.RASPBERRY_PI_VERSION
+            raspberry_pi.save()
 
     def ban(self, request, queryset):
         for lead in queryset:
