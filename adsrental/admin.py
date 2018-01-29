@@ -10,13 +10,11 @@ from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.conf import settings
-import requests
-import paramiko
 
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent, EC2Instance
 from salesforce_handler.models import Lead as SFLead
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
-from adsrental.utils import ShipStationClient, BotoResource
+from adsrental.utils import ShipStationClient
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -349,90 +347,13 @@ class LeadAdmin(admin.ModelAdmin):
             lead.ec2instance.restart()
 
     def troubleshoot(self, request, queryset):
-        boto_resource = BotoResource().get_resource()
-        private_key = paramiko.RSAKey.from_private_key_file("/app/cert/farmbot.pem")
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
         for lead in queryset:
-            print lead, lead.email
-            instances = boto_resource.instances.filter(
-                Filters=[
-                    {
-                        'Name': 'tag:Email',
-                        'Values': [lead.email],
-                    },
-                ],
-            )
-            instance = None
-            for i in instances:
-                duplicate_tags = filter(lambda x: x['Key'] == 'Duplicate' and x['Value'] == 'true', i.tags or [])
-                if not duplicate_tags:
-                    instance = i
-
-            if instance is None:
-                messages.error(request, 'Lead {} has to correspoding EC2 instance. Use "Start EC2 instance" command'.format(lead.email))
-                continue
-
-            public_dns_name = instance.public_dns_name
-            public_ip_address = instance.public_ip_address
-            instance_state = instance.state['Name']
-
-            if lead.raspberry_pi.ec2_hostname != public_dns_name:
-                messages.warning('Lead {} EC2 hostname data looks incorrect. Auto-fixing.'.format(lead.email))
-                lead.raspberry_pi.ec2_hostname = public_dns_name
-                lead.raspberry_pi.ipaddress = public_ip_address
-                lead.raspberry_pi.save()
-
-            if instance_state != 'running':
-                messages.error(request, 'Lead {} has to running EC2 instance. Use "Start EC2 instance" command'.format(lead.email))
-                continue
-
-            response = None
-            try:
-                response = requests.get('http://{}:13608'.format(public_dns_name), timeout=10)
-            except Exception:
-                messages.error(request, 'Lead {} EC2 web interface looks down or just slow. Consider stopping and starting instance.'.format(lead.email))
-
-            if response and instance.id not in response.text:
-                messages.error(request, 'Lead {} EC2 web interface returns wrong data. Consider stopping and starting instance.'.format(lead.email))
-
-            try:
-                ssh.connect(public_dns_name, username='Administrator', port=40594, pkey=private_key, timeout=5)
-            except Exception:
-                messages.error(request, 'Lead {} EC2 SSH seems to be down. Consider stopping and starting it again.'.format(lead.email, lead.name()))
-                continue
-
-            cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
-            if '0x1' not in ssh_stdout.read():
-                messages.warning(request, 'Lead {} EC2 proxy settings look incorrect. Auto-fixing.'.format(lead.email))
-                cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
-                ssh.exec_command(cmd_to_execute)
-                cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
-                ssh.exec_command(cmd_to_execute)
-                cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
-                ssh.exec_command(cmd_to_execute)
-
-            cmd_to_execute = 'netstat'
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
-            netstat_out = ssh_stdout.read()
-            if ':2046' not in netstat_out:
-                if lead.raspberry_pi.version == '1.0.0':
-                    messages.error(request, 'Lead {} RaspberryPi SSH seems to be down. Please ask {} to reset Pi manually'.format(lead.email, lead.name()))
-                else:
-                    messages.error(request, 'Lead {} RaspberryPi SSH seems to be down. Use "Restart Raspberry Pi" command'.format(lead.email))
-                continue
-
-            if lead.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                messages.warning(request, 'Lead {} has outdated RaspberryPi firmware. Updating it and restarting.'.format(lead.email))
-                cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
-                ssh.exec_command(cmd_to_execute)
-                lead.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
-                lead.raspberry_pi.save()
-
-            messages.success(request, 'Lead {} EC2 and RaspberryPi are performing normally.'.format(lead.email))
-            ssh.close()
+            errors = lead.find_errors()
+            if errors:
+                for error in errors:
+                    messages.error(request, 'Lead {}: {}'.format(lead.name(), error))
+            else:
+                messages.success(request, 'Lead {}: doing great'.format(lead.name()))
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
@@ -591,7 +512,7 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
 
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
-    list_display = ('id', 'instance_id', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
+    list_display = ('id', 'instance_id', 'hostname', 'lead_link', 'links', 'raspberry_pi_link', 'status', 'last_troubleshoot', 'tunnel_up', 'web_up', 'ssh_up', )
     list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )

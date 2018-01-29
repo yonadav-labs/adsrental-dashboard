@@ -244,11 +244,46 @@ class Lead(models.Model, FulltextSearchMixin):
         except:
             pass
 
+        ec2_instance.update_from_boto()
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
             EC2Instance.launch_for_lead(self)
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance.is_running():
-            raise ValueError()
             EC2Instance.launch_for_lead(self)
         if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
             ec2_instance.stop()
+
+    def find_errors(self):
+        errors = []
+        ec2_instance = None
+        try:
+            ec2_instance = self.ec2instance
+        except:
+            pass
+
+        if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
+            errors.append('Lead is not active but instance is running')
+        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
+            errors.append('Lead is active and has RPI assigned, but no EC2 instance')
+        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and ec2_instance and not ec2_instance.is_running():
+            errors.append('Lead is active and has RPI assigned, but  EC is not running')
+
+        if ec2_instance and not ec2_instance.ssh_up:
+            errors.append('SSH connection to EC2 instance failed. EC2 should be restarted.')
+        if ec2_instance and not ec2_instance.web_up:
+            errors.append('EC2 web interface is not responding. EC2 should be restarted.')
+        if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
+            errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted')
+        if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi.online():
+            errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI instrnet connection and restart it.')
+
+        if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+            errors.append('RPi still runs old version {}. Autoupdating it over tunnel.'.format(self.raspberry_pi.version))
+        if ec2_instance and not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
+            errors.append('RPi still runs old version {}. Tunnel is down, ask {} to reset RPi manually.'.format(self.raspberry_pi.version, self.name()))
+        if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
+            errors.append('RPi still runs version {} and seems to be online. RPi updater will update it soon.'.format(self.raspberry_pi.version))
+        if ec2_instance and ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
+            errors.append('RPi still runs version {} but seems to be offline. RPi updater will update it soon.'.format(self.raspberry_pi.version))
+
+        return errors
