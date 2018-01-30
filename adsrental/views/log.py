@@ -1,4 +1,5 @@
 import os
+import json
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
@@ -49,9 +50,10 @@ class LogView(View):
             ip_address = request.META.get('REMOTE_ADDR')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
             if not lead:
-                return JsonResponse({
+                return self.json_response(request, rpid, {
                     'result': False,
                     'reason': 'Lead not found',
+                    'rpid': rpid,
                     'source': 'tunnel',
                 })
 
@@ -71,7 +73,7 @@ class LogView(View):
                 self.add_log(request, rpid, 'Updating EC2 IP address to {}'.format(ip_address))
                 ec2_instance.update_from_boto()
 
-            return JsonResponse({'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
+            return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
         if 'p' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
@@ -79,9 +81,10 @@ class LogView(View):
             version = request.GET.get('version')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
             if not lead:
-                return JsonResponse({
+                return self.json_response(request, rpid, {
                     'result': False,
                     'reason': 'Lead not found',
+                    'rpid': rpid,
                     'source': 'ping',
                 })
 
@@ -115,7 +118,7 @@ class LogView(View):
                 raspberry_pi.restart_required = False
                 raspberry_pi.save()
 
-            return JsonResponse({
+            return self.json_response(request, rpid, {
                 'result': True,
                 'ip_address': ip_address,
                 'source': 'ping',
@@ -123,3 +126,7 @@ class LogView(View):
             })
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})
+
+    def json_response(self, request, rpid, data):
+        self.add_log(request, rpid, 'Response: {}'.format(json.dumps(data)))
+        return JsonResponse(data)
