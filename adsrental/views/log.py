@@ -94,9 +94,9 @@ class LogView(View):
             raspberry_pi.save()
 
             if raspberry_pi.first_seen:
-                self.add_log(request, rpid, 'PING')
+                self.add_log(request, rpid, 'PING {} for {}'.format(version, hostname))
             else:
-                self.add_log(request, rpid, 'PING Tested')
+                self.add_log(request, rpid, 'PING Test {} for {}'.format(version, hostname))
 
             if version and raspberry_pi.version != version:
                 self.add_log(request, rpid, 'RaspberryPI updated to {}'.format(version))
