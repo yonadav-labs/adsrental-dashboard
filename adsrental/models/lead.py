@@ -300,8 +300,10 @@ class Lead(models.Model, FulltextSearchMixin):
         errors = []
         if self.status == Lead.STATUS_QUALIFIED and not self.raspberry_pi:
             errors.append('Lead is qualified but RaspberryPi is not assigned')
-        if self.is_active() and self.raspberry_pi and not self.raspberry_pi.online():
-            errors.append('Lead is active but RaspberryPi is offline')
+        # if self.is_active() and self.raspberry_pi and not self.raspberry_pi.online():
+        #     errors.append('Lead is active but RaspberryPi is offline')
+        if self.status == Lead.STATUS_QUALIFIED and not self.raspberry_pi.first_tested:
+            errors.append('Lead is qualified but RaspberryPi is not tested')
 
         return errors
 
