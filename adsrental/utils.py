@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 import boto3
@@ -231,9 +232,10 @@ class BotoResource(object):
                     },
                 ],
             )
+            time.sleep(5)
             instance = self.get_first_rpid_instance(rpid)
             if not instance:
-                raise ValueError(instance)
+                raise ValueError('Boto did not create isntance. Try again.')
 
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         instance = EC2Instance.upsert_from_boto(instance)
