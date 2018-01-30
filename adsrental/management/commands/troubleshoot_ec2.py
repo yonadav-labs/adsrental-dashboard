@@ -35,6 +35,7 @@ class Command(BaseCommand):
         parser.add_argument('--threads', type=int, default=20)
         parser.add_argument('--chunk-size', type=int, default=20)
         parser.add_argument('--older-minutes', type=int, default=0)
+        parser.add_argument('--online-only', action='store_true')
         parser.add_argument('--tunnel-only', action='store_true')
         parser.add_argument('--ssh-only', action='store_true')
         parser.add_argument('--web-only', action='store_true')
@@ -46,6 +47,7 @@ class Command(BaseCommand):
         threads,
         chunk_size,
         older_minutes,
+        online_only,
         tunnel_only,
         ssh_only,
         web_only,
@@ -73,6 +75,8 @@ class Command(BaseCommand):
                 ec2instance__web_up=False,
             )
         leads = [i for i in leads.order_by('-pk').select_related('ec2instance', 'raspberry_pi')]
+        if online_only:
+            leads = [i for i in leads if i.raspberry_pi.online()]
         if skip:
             leads = leads[skip:]
             print 'Skip first', skip, 'entries'
