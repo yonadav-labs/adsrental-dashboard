@@ -263,14 +263,20 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def raspberry_pi_link(self, obj):
-        if obj.raspberry_pi is None:
-            return None
-        return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
-            rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
-            url=reverse('admin:adsrental_raspberrypi_changelist'),
-            config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
-            rpid=obj.raspberry_pi,
-        )
+        result = []
+        if obj.raspberry_pi:
+            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
+                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
+                url=reverse('admin:adsrental_raspberrypi_changelist'),
+                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
+                rpid=obj.raspberry_pi,
+                errors
+            ))
+
+        for error in obj.find_raspberry_pi_errors():
+            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
+
+        return '\n'.join(result)
 
     def ec2_instance_link(self, obj):
         if obj.ec2instance is None:

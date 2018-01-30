@@ -262,7 +262,7 @@ class Lead(models.Model, FulltextSearchMixin):
     def is_active(self):
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
 
-    def find_errors(self):
+    def find_ec2_instance_errors(self):
         errors = []
         ec2_instance = self.get_ec2_instance()
 
@@ -295,3 +295,15 @@ class Lead(models.Model, FulltextSearchMixin):
                 errors.append('RPi still runs version {} but is offline. RPi updater will update it soon.'.format(self.raspberry_pi.version))
 
         return errors
+
+    def find_raspberry_pi_errors(self):
+        errors = []
+        if self.status == Lead.STATUS_QUALIFIED and not self.raspberry_pi:
+            errors.append('Lead is qualified but RaspberryPi is not assigned')
+        if self.is_active() and self.raspberry_pi and not self.raspberry_pi.online():
+            errors.append('Lead is active but RaspberryPi is offline')
+
+        return errors
+
+    def find_errors(self):
+        return self.find_ec2_instance_errors() + self.find_raspberry_pi_errors()
