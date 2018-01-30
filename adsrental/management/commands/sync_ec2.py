@@ -64,7 +64,7 @@ class Command(BaseCommand):
                     instance.start(blocking=True)
                     print 'UPDATED:', instance
 
-            leads = Lead.objects.all().select_related('raspberry_pi', 'ec2instance')
+            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, ec2instance__isnull=True).select_related('raspberry_pi', 'ec2instance')
             for lead in leads:
                 if lead.is_active() and not lead.get_ec2_instance():
                     EC2Instance.launch_for_lead(lead)
