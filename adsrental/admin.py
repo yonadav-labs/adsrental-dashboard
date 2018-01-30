@@ -278,13 +278,19 @@ class LeadAdmin(admin.ModelAdmin):
         return '\n'.join(result)
 
     def ec2_instance_link(self, obj):
-        if obj.ec2instance is None:
-            return None
-        return '<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
-            url=reverse('admin:adsrental_ec2instance_changelist'),
-            ec2_instance=obj.ec2instance,
-            q=obj.ec2instance.instance_id,
-        )
+        result = []
+        ec2_instance = obj.get_ec2_instance()
+        if ec2_instance:
+            result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+                url=reverse('admin:adsrental_ec2instance_changelist'),
+                ec2_instance=ec2_instance,
+                q=ec2_instance.instance_id,
+            ))
+
+        for error in obj.find_ec2_instance_errors():
+            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
+
+        return '\n'.join(result)
 
     def update_from_salesforce(self, request, queryset):
         sf_lead_ids = []
