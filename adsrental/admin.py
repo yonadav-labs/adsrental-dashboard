@@ -185,7 +185,6 @@ class LeadAdmin(admin.ModelAdmin):
         'wrong_password',
         'pi_delivered',
         'bundler_paid',
-        'tested',
     )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
                    WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
