@@ -79,6 +79,10 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Tested')
 
+            if version and raspberry_pi.version != version:
+                raspberry_pi.version = version
+                raspberry_pi.save()
+
             restart_required = False
             if version and settings.RASPBERRY_PI_VERSION > version:
                 self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
