@@ -25,9 +25,7 @@
 		<th>Lead</th>
 		<th>Raspberry Pi</th>
 		<th>Online</th>
-		<th>Tunnel Online</th>
-		<th>First Seen</th>
-		<th>Last Seen</th>
+		<th>First Tested</th>
 		<th>Tunnel Last Tested</th>
 		<th>RDP</th>
 	</tr>
@@ -41,7 +39,7 @@
 	
 	require_once("include/mysql.inc");
 	
-	$rows = mysqlSelectAllRaspberryPis("24.234.215.233");
+	$rows = mysqlSelectTestingRaspberryPis();
 	
 	$rowNumber = 1;
 	
@@ -52,22 +50,15 @@
 			mysqlUpdateRaspberryPiEC2Hostname($row["rpid"]);
 		}*/
 		
-		if (!$row["online"])
-		{
-			continue;
-		}
-		
 		echo "<tr>\n";
 		echo "<td>" . sprintf("%02d", $rowNumber) . "</td>";
 		echo "<td title='" . print_r($row, true) ."'>" . $row["account_name"] . "</td>";
 		echo "<td><a href='https://na40.salesforce.com/$row[leadid]' target='_blank'>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
 		echo "<td><a href='https://adsrental.com/log/$row[rpid]' target='_blank' title='IP ADDRESS: $row[ipaddress]' alt='IP ADDRESS: $row[ipaddress]'>$row[rpid]</a></td>";
 		echo "<td>" . ($row["online"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";
-		echo "<td>" . ($row["tunnel_online"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : ($row["online"] ? "<a href=\"http://$row[ec2_hostname]:13608/start-tunnel\" target=\"_blank\"><span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span></a>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>")) . "</td>";
-		echo "<td>" . $row["first_seen"] . "</td>";
-		echo "<td>" . $row["last_seen"] . "</td>";
+		echo "<td>" . $row["first_tested"] . "</td>";
 		echo "<td>" . $row["tunnel_last_tested"] . "</td>";
-		echo "<td><a href='https://adsrental.com/rdp.php?i=$row[rpid]&h=$row[rpid]'>$row[rpid]</a></td>";
+		echo "<td><a href='https://adsrental.com/app/rdp/$row[rpid]/' target='_blank'>$row[rpid]</a></td>";
 		echo "</tr>\n";
 		
 		$rowNumber++;

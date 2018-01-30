@@ -188,4 +188,30 @@ EOD;
 		return $result;
 	}
 
+	function mysqlSelectTestingRaspberryPis()
+	{
+		global $sqlNowUtcToPst;
+
+		$mysqli = mysqlConnect();
+
+		if ($mysqli->connect_errno)
+		{
+			echo "MySQL Connection Error.";
+			exit;
+		}
+
+		$where = "WHERE first_tested IS NOT NULL and last_seen IS NULL";
+		$sql = "SELECT a.*, b.*, TIMESTAMPDIFF(SECOND, first_tested, DATE_SUB(NOW(), INTERVAL 7 HOUR)) < 300 AS online FROM `raspberry_pi` AS a LEFT JOIN lead as b ON (a.leadid = b.leadid) $where ORDER BY first_tested DESC";
+
+		if (!$result = $mysqli->query($sql))
+		{
+			echo "Query Error: " . $mysqli->error;
+		}
+
+		//$result->free();
+		$mysqli->close();
+
+		return $result;
+	}
+
 ?>
