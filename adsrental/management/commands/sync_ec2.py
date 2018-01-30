@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from adsrental.models.ec2_instance import EC2Instance
+from adsrental.models.lead import Lead
 from adsrental.utils import BotoResource
 
 
@@ -62,3 +63,9 @@ class Command(BaseCommand):
                 if lead.is_active() and not instance.is_running():
                     instance.start(blocking=True)
                     print 'UPDATED:', instance
+
+            leads = Lead.objects.all().select_related('raspberry_pi', 'ec2instance')
+            for lead in leads:
+                if lead.is_active() and not lead.get_ec2_instance():
+                    EC2Instance.launch_for_lead(lead)
+                    print 'NEW:', lead.email
