@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 print 'UPDATED:', instance
 
         if missing:
-            instances = EC2Instance.objects.all().select_related('lead')
+            instances = EC2Instance.objects.filter(lead__isnull=False).select_related('lead')
             for instance in instances:
                 lead = instance.lead
                 if lead.is_active() and not instance.is_running():
