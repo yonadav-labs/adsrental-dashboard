@@ -270,7 +270,6 @@ class LeadAdmin(admin.ModelAdmin):
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
                 config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
                 rpid=obj.raspberry_pi,
-                errors
             ))
 
         for error in obj.find_raspberry_pi_errors():
