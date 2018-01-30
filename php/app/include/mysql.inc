@@ -175,7 +175,7 @@ EOD;
 			}
 		}
 
-		$sql = "SELECT a.*, b.*, DATE_SUB(NOW(), INTERVAL 7 HOUR) AS now_pst, TIMESTAMPDIFF(SECOND, last_seen, DATE_SUB(NOW(), INTERVAL 7 HOUR)) AS online_delta, TIMESTAMPDIFF(SECOND, last_seen, DATE_SUB(NOW(), INTERVAL 7 HOUR)) < 300 AS online, TIMESTAMPDIFF(SECOND, tunnel_last_tested, DATE_SUB(NOW(), INTERVAL 7 HOUR)) AS tunnel_last_tested_delta, TIMESTAMPDIFF(SECOND, tunnel_last_tested, DATE_SUB(NOW(), INTERVAL 7 HOUR)) < 300 AS tunnel_online FROM `raspberry_pi` AS a LEFT JOIN lead as b ON (a.leadid = b.leadid) $where ORDER BY first_name, last_name";
+		$sql = "SELECT a.*, b.*, TIMESTAMPDIFF(SECOND, last_seen, DATE_SUB(NOW(), INTERVAL 1 HOUR)) AS online_delta, TIMESTAMPDIFF(SECOND, last_seen, DATE_SUB(NOW(), INTERVAL 1 HOUR)) < 300 AS online, TIMESTAMPDIFF(SECOND, tunnel_last_tested, DATE_SUB(NOW(), INTERVAL 1 HOUR)) AS tunnel_last_tested_delta, TIMESTAMPDIFF(SECOND, tunnel_last_tested, DATE_SUB(NOW(), INTERVAL 1 HOUR)) < 300 AS tunnel_online FROM `raspberry_pi` AS a LEFT JOIN lead as b ON (a.leadid = b.leadid) $where ORDER BY first_name, last_name";
 
 		if (!$result = $mysqli->query($sql))
 		{
@@ -201,7 +201,7 @@ EOD;
 		}
 
 		$where = "WHERE first_tested IS NOT NULL and last_seen IS NULL";
-		$sql = "SELECT a.*, b.*, TIMESTAMPDIFF(SECOND, first_tested, DATE_SUB(NOW(), INTERVAL 7 HOUR)) < 300 AS online FROM `raspberry_pi` AS a LEFT JOIN lead as b ON (a.leadid = b.leadid) $where ORDER BY first_tested DESC";
+		$sql = "SELECT a.*, b.*, TIMESTAMPDIFF(SECOND, first_tested, DATE_SUB(NOW(), INTERVAL 1 HOUR)) < 300 AS online FROM `raspberry_pi` AS a LEFT JOIN lead as b ON (a.leadid = b.leadid) $where ORDER BY first_tested DESC";
 
 		if (!$result = $mysqli->query($sql))
 		{
