@@ -33,7 +33,9 @@ class LogView(View):
 
         if 'm' in request.GET:
             return JsonResponse({'result': True, 'source': 'client'})
-            message = request.GET.get('m')
+
+        if 'client_log' in request.GET:
+            message = request.GET.get('client_log')
             self.add_log(request, rpid, 'Client >>> {}'.format(message))
             return JsonResponse({'result': True, 'source': 'client'})
 
