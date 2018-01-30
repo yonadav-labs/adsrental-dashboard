@@ -12,12 +12,14 @@ class Command(BaseCommand):
         parser.add_argument('--all', action='store_true')
         parser.add_argument('--pending', action='store_true')
         parser.add_argument('--terminate-stopped', action='store_true')
+        parser.add_argument('--missing', action='store_true')
 
     def handle(
         self,
         all,
         pending,
         terminate_stopped,
+        missing,
         **kwargs
     ):
         boto_resource = BotoResource().get_resource()
@@ -52,3 +54,11 @@ class Command(BaseCommand):
                 boto_instance = instance.get_boto_instance(boto_resource)
                 instance.update_from_boto(boto_instance)
                 print 'UPDATED:', instance
+
+        if missing:
+            instances = EC2Instance.objects.all().select_related('lead')
+            for instance in instances:
+                lead = instance.lead
+                if lead.is_active() and not instance.is_running():
+                    instance.start(blocking=True)
+                    print 'UPDATED:', instance
