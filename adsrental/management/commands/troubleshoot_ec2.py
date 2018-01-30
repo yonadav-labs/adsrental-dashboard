@@ -32,9 +32,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--fix', action='store_true')
-        parser.add_argument('--threads', type=int, default=10)
-        parser.add_argument('--chunk-size', type=int, default=10)
+        parser.add_argument('--threads', type=int, default=20)
+        parser.add_argument('--chunk-size', type=int, default=20)
         parser.add_argument('--older-minutes', type=int, default=0)
+        parser.add_argument('--tunnel-only', type=int, default=0)
+        parser.add_argument('--ssh-only', type=int, default=0)
+        parser.add_argument('--web-only', type=int, default=0)
         parser.add_argument('--skip', type=int, default=0)
 
     def handle(
@@ -43,6 +46,9 @@ class Command(BaseCommand):
         threads,
         chunk_size,
         older_minutes,
+        tunnel_only,
+        ssh_only,
+        web_only,
         skip,
         **kwargs
     ):
@@ -52,7 +58,19 @@ class Command(BaseCommand):
         )
         if older_minutes:
             leads = leads.filter(
-                ec2_instance__last_troubleshoot___lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
+                ec2instance__last_troubleshoot___lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
+            )
+        if tunnel_only:
+            leads = leads.filter(
+                ec2instance__tunnel_up=False,
+            )
+        if ssh_only:
+            leads = leads.filter(
+                ec2instance__ssh_up=False,
+            )
+        if web_only:
+            leads = leads.filter(
+                ec2instance__web_up=False,
             )
         leads = [i for i in leads.order_by('-pk').select_related('ec2instance', 'raspberry_pi')]
         if skip:
