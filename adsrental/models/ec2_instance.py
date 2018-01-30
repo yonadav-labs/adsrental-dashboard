@@ -144,7 +144,7 @@ class EC2Instance(models.Model):
         private_key = paramiko.RSAKey.from_private_key_file(settings.FARMBOT_KEY)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=5)
+        ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=10)
         return ssh
 
     def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
@@ -280,7 +280,7 @@ class EC2Instance(models.Model):
     def troubleshoot_web(self):
         response = None
         try:
-            response = requests.get('http://{}:13608'.format(self.hostname), timeout=5)
+            response = requests.get('http://{}:13608'.format(self.hostname), timeout=10)
         except Exception:
             self.web_up = False
             return
