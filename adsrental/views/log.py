@@ -5,9 +5,8 @@ from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.conf import settings
 
-from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.utils import BotoResource
 
 
 class LogView(View):
@@ -48,21 +47,29 @@ class LogView(View):
 
         if 'o' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
-            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+            if not lead:
+                return JsonResponse({
+                    'result': False,
+                    'reason': 'Lead not found',
+                    'source': 'tunnel',
+                })
+
+            raspberry_pi = lead.raspberry_pi
+            ec2_instance = lead.get_ec2_instance()
+
             raspberry_pi.update_ping()
             if not raspberry_pi.first_seen:
                 self.add_log(request, rpid, 'Tested')
-            if raspberry_pi.ipaddress != ip_address:
-                instance = BotoResource().get_first_rpid_instance(rpid)
-                if instance:
-                    raspberry_pi.ec2_hostname = instance.public_dns_name
-                    raspberry_pi.ipaddress = instance.public_ip_address
-                    raspberry_pi.save()
 
             if raspberry_pi.first_seen:
                 self.add_log(request, rpid, 'Tunnel Online')
             else:
                 self.add_log(request, rpid, 'Tunnel Tested')
+
+            if ec2_instance.ip_address != ip_address:
+                self.add_log(request, rpid, 'Updating EC2 IP address to {}'.format(ip_address))
+                ec2_instance.update_from_boto()
 
             return JsonResponse({'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
@@ -70,7 +77,16 @@ class LogView(View):
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
-            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+            if not lead:
+                return JsonResponse({
+                    'result': False,
+                    'reason': 'Lead not found',
+                    'source': 'ping',
+                })
+
+            raspberry_pi = lead.raspberry_pi
+            ec2_instance = lead.get_ec2_instance()
             raspberry_pi.update_ping()
             raspberry_pi.save()
 
@@ -80,6 +96,7 @@ class LogView(View):
                 self.add_log(request, rpid, 'PING Tested')
 
             if version and raspberry_pi.version != version:
+                self.add_log(request, rpid, 'RaspberryPI updated to {}'.format(version))
                 raspberry_pi.version = version
                 raspberry_pi.save()
 
@@ -88,7 +105,7 @@ class LogView(View):
                 self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
                 restart_required = True
 
-            if hostname and raspberry_pi.ec2_hostname != hostname:
+            if hostname and ec2_instance.hostname != hostname:
                 self.add_log(request, rpid, 'Hostname changed, restarting')
                 restart_required = True
 
@@ -96,7 +113,6 @@ class LogView(View):
                 self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
                 restart_required = True
                 raspberry_pi.restart_required = False
-                raspberry_pi.version = settings.RASPBERRY_PI_VERSION
                 raspberry_pi.save()
 
             return JsonResponse({
