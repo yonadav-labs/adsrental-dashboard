@@ -32,6 +32,7 @@ class LogView(View):
             return JsonResponse({'result': False, 'reason': 'RPID not found'})
 
         if 'm' in request.GET:
+            return JsonResponse({'result': True, 'source': 'client'})
             message = request.GET.get('m')
             self.add_log(request, rpid, 'Client >>> {}'.format(message))
             return JsonResponse({'result': True, 'source': 'client'})
