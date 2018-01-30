@@ -35,9 +35,9 @@ class Command(BaseCommand):
         parser.add_argument('--threads', type=int, default=20)
         parser.add_argument('--chunk-size', type=int, default=20)
         parser.add_argument('--older-minutes', type=int, default=0)
-        parser.add_argument('--tunnel-only', type=int, default=0)
-        parser.add_argument('--ssh-only', type=int, default=0)
-        parser.add_argument('--web-only', type=int, default=0)
+        parser.add_argument('--tunnel-only', action='store_true')
+        parser.add_argument('--ssh-only', action='store_true')
+        parser.add_argument('--web-only', action='store_true')
         parser.add_argument('--skip', type=int, default=0)
 
     def handle(
