@@ -66,6 +66,7 @@ class LogView(View):
 
         if 'p' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
+            hostname = request.GET.get('hostname')
             raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
             raspberry_pi.update_ping()
             raspberry_pi.save()
@@ -76,7 +77,12 @@ class LogView(View):
                 self.add_log(request, rpid, 'PING Tested')
 
             restart_required = False
+            if hostname and raspberry_pi.ec2_hostname != hostname:
+                self.add_log(request, rpid, 'Hostname changed, restarting')
+                restart_required = True
+
             if raspberry_pi.restart_required:
+                self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
                 restart_required = True
                 raspberry_pi.restart_required = False
                 raspberry_pi.version = settings.RASPBERRY_PI_VERSION
