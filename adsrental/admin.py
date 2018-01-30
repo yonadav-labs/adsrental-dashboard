@@ -562,10 +562,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
-        return '<a target="_blank" href="{url}?q={q}">{rpid} v. {version}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}">{rpid} v. {version} {status}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
             version=obj.lead.raspberry_pi.version,
+            status='(online)' if obj.lead.raspberry_pi.online() else '',
             q=obj.lead.raspberry_pi.rpid,
         )
 
