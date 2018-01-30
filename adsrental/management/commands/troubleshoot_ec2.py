@@ -35,6 +35,7 @@ class Command(BaseCommand):
         parser.add_argument('--threads', type=int, default=10)
         parser.add_argument('--chunk-size', type=int, default=10)
         parser.add_argument('--older-minutes', type=int, default=0)
+        parser.add_argument('--skip', type=int, default=0)
 
     def handle(
         self,
@@ -42,6 +43,7 @@ class Command(BaseCommand):
         threads,
         chunk_size,
         older_minutes,
+        skip,
         **kwargs
     ):
         leads = Lead.objects.filter(
@@ -52,8 +54,11 @@ class Command(BaseCommand):
             leads = leads.filter(
                 ec2_instance__last_troubleshoot___lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
             )
-        leads = leads.order_by('-pk').select_related('ec2instance', 'raspberry_pi')
-        total = leads.count()
+        leads = [i for i in leads.order_by('-pk').select_related('ec2instance', 'raspberry_pi')]
+        if skip:
+            leads = leads[skip:]
+            print 'Skip first', skip, 'entries'
+        total = len(leads)
         counter = 0
         for lead_chunk in chunks(leads, chunk_size):
             pool = ThreadPool(processes=threads)
