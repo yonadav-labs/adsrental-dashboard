@@ -98,6 +98,15 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Test {} for {}'.format(version, hostname))
 
+            if not version and ec2_instance.tunnel_up:
+                self.add_log(request, rpid, 'Trying to force update old version')
+                cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+                try:
+                    ssh = ec2_instance.get_ssh()
+                    ssh.exec_command(cmd_to_execute)
+                except:
+                    self.add_log(request, rpid, 'Update failed, tunnel is down')
+
             if version and raspberry_pi.version != version:
                 self.add_log(request, rpid, 'RaspberryPI updated to {}'.format(version))
                 raspberry_pi.version = version
