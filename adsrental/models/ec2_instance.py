@@ -147,7 +147,7 @@ class EC2Instance(models.Model):
         ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=5)
         return ssh
 
-    def ssh_execute(self, cmd, input=None, ssh=None):
+    def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
         if not ssh:
             ssh = self.get_ssh()
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd)
@@ -155,10 +155,13 @@ class EC2Instance(models.Model):
             for line in input:
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
-        stderr = ssh_stderr.read()
-        stdout = ssh_stdout.read()
-        ssh.close()
-        return 'OUT: {}\nERR: {}'.format(stdout, stderr)
+        if blocking:
+            stderr = ssh_stderr.read()
+            stdout = ssh_stdout.read()
+            ssh.close()
+            return 'OUT: {}\nERR: {}'.format(stdout, stderr)
+
+        return True
 
     @staticmethod
     def get_tag(boto_instance, key):
