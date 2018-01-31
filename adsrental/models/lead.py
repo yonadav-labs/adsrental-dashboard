@@ -187,6 +187,7 @@ class Lead(models.Model, FulltextSearchMixin):
         sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
         sf_lead.splashtop_id = lead.splashtop_id
         sf_lead.status = lead.status
+        sf_lead.last_modified_by_id = settings.SALESFORCE_API_USER_ID
         sf_lead.save()
 
         if sf_lead.raspberry_pi:
