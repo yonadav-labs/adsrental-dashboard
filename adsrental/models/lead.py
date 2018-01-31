@@ -71,6 +71,26 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
+    def ban(self):
+        if self.status == Lead.STATUS_BANNED:
+            return False
+        self.old_status = self.status
+        self.status = Lead.STATUS_BANNED
+        self.save()
+        self.ec2instance.stop()
+        return True
+
+    def unban(self, request, queryset):
+        if self.status != self.STATUS_BANNED:
+            return False
+        self.status = self.old_status or Lead.STATUS_QUALIFIED
+        if self.facebook_account:
+            self.facebook_account_status = Lead.STATUS_AVAILABLE
+        if self.google_account:
+            self.google_account_status = Lead.STATUS_AVAILABLE
+        self.save()
+        return True
+
     @staticmethod
     def upsert_from_sf(sf_lead, lead):
         if lead is None:

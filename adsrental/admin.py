@@ -388,26 +388,14 @@ class LeadAdmin(admin.ModelAdmin):
 
     def ban(self, request, queryset):
         for lead in queryset:
-            if lead.status == Lead.STATUS_BANNED:
-                continue
-            lead.old_status = lead.status
-            lead.status = Lead.STATUS_BANNED
-            lead.ec2instance = None
-            lead.save()
-            messages.info(request, 'Lead {} is banned.'.format(lead.email))
+            if lead.ban():
+                messages.info(request, 'Lead {} is banned.'.format(lead.email))
 
     def unban(self, request, queryset):
         for lead in queryset:
-            if lead.status != Lead.STATUS_BANNED:
-                continue
-            lead.status = lead.old_status or Lead.STATUS_QUALIFIED
-            if lead.facebook_account:
-                lead.facebook_account_status = Lead.STATUS_AVAILABLE
-            if lead.google_account:
-                lead.google_account_status = Lead.STATUS_AVAILABLE
-            lead.save()
-            EC2Instance.launch_for_lead(lead)
-            messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+            if lead.unban():
+                EC2Instance.launch_for_lead(lead)
+                messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
     create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
