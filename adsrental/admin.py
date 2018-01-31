@@ -388,6 +388,8 @@ class LeadAdmin(admin.ModelAdmin):
 
     def ban(self, request, queryset):
         for lead in queryset:
+            if lead.status == Lead.STATUS_BANNED:
+                continue
             lead.old_status = lead.status
             lead.status = Lead.STATUS_BANNED
             lead.ec2instance = None
@@ -396,6 +398,8 @@ class LeadAdmin(admin.ModelAdmin):
 
     def unban(self, request, queryset):
         for lead in queryset:
+            if lead.status != Lead.STATUS_BANNED:
+                continue
             lead.status = lead.old_status or Lead.STATUS_QUALIFIED
             if lead.facebook_account:
                 lead.facebook_account_status = Lead.STATUS_AVAILABLE
