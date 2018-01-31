@@ -171,6 +171,9 @@ class Lead(models.Model, FulltextSearchMixin):
         remote_raspberry_pi = sf_lead.raspberry_pi if sf_lead else None
         remote_raspberry_pi_rpid = remote_raspberry_pi.name if remote_raspberry_pi else None
 
+        if sf_lead.raspberry_pi and lead.raspberry_pi:
+            lead.raspberry_pi.upsert_to_sf(sf_lead.raspberry_pi, lead.raspberry_pi)
+
         for new_field, old_field in (
             (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
             (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
