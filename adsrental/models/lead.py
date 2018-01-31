@@ -80,7 +80,7 @@ class Lead(models.Model, FulltextSearchMixin):
         self.ec2instance.stop()
         return True
 
-    def unban(self, request, queryset):
+    def unban(self):
         if self.status != self.STATUS_BANNED:
             return False
         self.status = self.old_status or Lead.STATUS_QUALIFIED
