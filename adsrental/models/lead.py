@@ -31,6 +31,7 @@ class Lead(models.Model, FulltextSearchMixin):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
+    old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None)
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)

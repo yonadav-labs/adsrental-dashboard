@@ -388,6 +388,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def ban(self, request, queryset):
         for lead in queryset:
+            lead.old_status = lead.status
             lead.status = Lead.STATUS_BANNED
             lead.ec2instance = None
             lead.save()
@@ -395,7 +396,11 @@ class LeadAdmin(admin.ModelAdmin):
 
     def unban(self, request, queryset):
         for lead in queryset:
-            lead.status = Lead.STATUS_QUALIFIED
+            lead.status = lead.old_status or Lead.STATUS_QUALIFIED
+            if lead.facebook_account:
+                lead.facebook_account_status = Lead.STATUS_AVAILABLE
+            if lead.google_account:
+                lead.google_account_status = Lead.STATUS_AVAILABLE
             lead.save()
             EC2Instance.launch_for_lead(lead)
             messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
