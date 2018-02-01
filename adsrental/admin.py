@@ -9,7 +9,6 @@ from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.conf import settings
 
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent, EC2Instance
 from salesforce_handler.models import Lead as SFLead
