@@ -326,7 +326,7 @@ class LeadAdmin(admin.ModelAdmin):
     def create_shipstation_order(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
-                lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP').first()
+                lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).first()
                 lead.save()
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
