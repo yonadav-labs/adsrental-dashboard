@@ -36,7 +36,7 @@ class CustomerIOClient(object):
                 email=lead.email,
                 Activation_Link='https://adsrental.com/check.html?',
                 Reactivate_Url='https://adsrental.com/reactivate.html?',
-                created_at=str(int(time.time())),
+                created_at=lead.created.strftime('%s'),
                 Company='[Empty]',
 
             )
