@@ -52,8 +52,8 @@
 		echo "<tr>\n";
 		echo "<td>" . sprintf("%02d", $rowNumber) . "</td>";
 		echo "<td title='" . print_r($row, true) ."'>" . $row["account_name"] . "</td>";
-		echo "<td><a href='https://na40.salesforce.com/$row[leadid]' target='_blank'>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
-		echo "<td><a href='https://adsrental.com/log/$row[rpid]' target='_blank' title='IP ADDRESS: $row[ipaddress]' alt='IP ADDRESS: $row[ipaddress]'>$row[rpid]</a></td>";
+		echo "<td><a href='https://adsrental.com/app/admin/adsrental/lead/?q=$row[leadid]' target='_blank'>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
+		echo "<td><a href='https://adsrental.com/log/$row[rpid]' target='_blank' title='IP ADDRESS: $row[ipaddress]' alt='IP ADDRESS: $row[ipaddress]'>$row[rpid] Logs</a></td>";
 		echo "<td><span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span></td>";
 		echo "<td>" . $row["first_tested"] . "</td>";
 		echo "<td><a href='https://adsrental.com/app/rdp/$row[rpid]/' target='_blank'>$row[rpid]</a></td>";
