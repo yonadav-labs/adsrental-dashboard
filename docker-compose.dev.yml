@@ -41,5 +41,3 @@ services:
       - db
     links:
       - db:db
-    ports:
-      - "8007:8007"
