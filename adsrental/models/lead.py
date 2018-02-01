@@ -261,7 +261,7 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.pi_delivered != pi_delivered:
             self.pi_delivered = pi_delivered
             if self.pi_delivered:
-                self.send_customer_io_event('delivered')
+                self.send_customer_io_event('delivered', tracking_code=self.usps_tracking_code)
             self.save()
 
     def check_ec2_status(self):
