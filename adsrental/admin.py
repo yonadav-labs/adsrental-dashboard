@@ -432,7 +432,7 @@ class LeadAdmin(admin.ModelAdmin):
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_seen_field',
+    list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_tested_field', 'first_seen_field',
                     'last_seen_field', 'tunnel_last_tested_field', 'online', 'tunnel_online', )
     search_fields = ('leadid', 'rpid', )
     list_filter = (RaspberryPiOnlineListFilter,
@@ -477,6 +477,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def tunnel_online(self, obj):
         return obj.tunnel_online()
 
+    def first_tested_field(self, obj):
+        if not obj.first_tested:
+            return '<img src="/static/admin/img/icon-no.svg" title="Never" alt="False">'
+
+        return '<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(naturaltime(obj.first_tested))
+
     def first_seen_field(self, obj):
         if obj.first_seen is None:
             return None
@@ -511,6 +517,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     ec2_instance_link.allow_tags = True
     online.boolean = True
     tunnel_online.boolean = True
+    first_tested_field.short_description = 'Tested'
+    first_tested_field.allow_tags = True
     first_seen_field.short_description = 'First Seen'
     first_seen_field.empty_value_display = 'Never'
     first_seen_field.allow_tags = True
