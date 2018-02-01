@@ -24,9 +24,8 @@
 		<th>Account</th>
 		<th>Lead</th>
 		<th>Raspberry Pi</th>
-		<th>Online</th>
+		<th>Tested</th>
 		<th>First Tested</th>
-		<th>Tunnel Last Tested</th>
 		<th>RDP</th>
 	</tr>
 	
@@ -55,9 +54,8 @@
 		echo "<td title='" . print_r($row, true) ."'>" . $row["account_name"] . "</td>";
 		echo "<td><a href='https://na40.salesforce.com/$row[leadid]' target='_blank'>" . $row["first_name"] . " " . $row["last_name"] . "</td>";
 		echo "<td><a href='https://adsrental.com/log/$row[rpid]' target='_blank' title='IP ADDRESS: $row[ipaddress]' alt='IP ADDRESS: $row[ipaddress]'>$row[rpid]</a></td>";
-		echo "<td>" . ($row["online"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";
+		echo "<td><span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span></td>";
 		echo "<td>" . $row["first_tested"] . "</td>";
-		echo "<td>" . $row["tunnel_last_tested"] . "</td>";
 		echo "<td><a href='https://adsrental.com/app/rdp/$row[rpid]/' target='_blank'>$row[rpid]</a></td>";
 		echo "</tr>\n";
 		
