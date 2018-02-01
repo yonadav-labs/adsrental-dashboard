@@ -172,6 +172,7 @@ class LeadAdmin(admin.ModelAdmin):
         'status',
         'email_field',
         'phone',
+        'utm_source',
         'google_account_column',
         'facebook_account_column',
         'raspberry_pi_link',
