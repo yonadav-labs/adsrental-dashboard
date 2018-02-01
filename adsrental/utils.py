@@ -5,7 +5,6 @@ import requests
 import boto3
 from django.conf import settings
 from django.apps import apps
-from django.utils import timezone
 import customerio
 from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
 
@@ -37,7 +36,7 @@ class CustomerIOClient(object):
                 email=lead.email,
                 Activation_Link='https://adsrental.com/check.html?',
                 Reactivate_Url='https://adsrental.com/reactivate.html?',
-                created_at=timezone.now().strftime('%Y-%m-%d %H:%M:%S'),
+                created_at=str(int(time.time())),
                 Company='[Empty]',
 
             )
