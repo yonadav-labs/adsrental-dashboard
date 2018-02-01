@@ -22,9 +22,8 @@ def troubleshoot(args):
         ec2_instance.troubleshoot()
         # if fix:
         #     ec2_instance.troubleshoot_fix()
-    errors = lead.find_errors()
     connection.close()
-    return lead, errors
+    return lead, ec2_instance
 
 
 class Command(BaseCommand):
@@ -88,6 +87,9 @@ class Command(BaseCommand):
             print 'Start pool: {} / {}'.format(counter, total)
             results = pool.map(troubleshoot, lead_queue)
             counter += len(lead_queue)
-            for lead, errors in results:
-                error_strs = ['Lead {}: {}'.format(lead.name(), error) for error in errors]
-                print '\n'.join(error_strs)
+            for lead, ec2_instance in results:
+                if not ec2_instance:
+                    print lead.email, 'no ec2'
+                    continue
+
+                print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up
