@@ -10,11 +10,13 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
     NAME_DELIVERED = 'delivered'
     NAME_OFFLINE = 'offline'
     NAME_APPROVED = 'lead_approved'
+    NAME_BANNED = 'banned'
     NAME_CHOICES = [
         (NAME_SHIPPED, 'Shipped'),
         (NAME_DELIVERED, 'Delivered'),
         (NAME_OFFLINE, 'Offline'),
         (NAME_APPROVED, 'Approved'),
+        (NAME_BANNED, 'Banned'),
     ]
 
     lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None)

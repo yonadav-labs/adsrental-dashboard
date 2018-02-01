@@ -12,6 +12,12 @@ from adsrental.models.customerio_event import CustomerIOEvent
 
 
 class CustomerIOClient(object):
+    EVENT_SHIPPED = 'shipped'
+    EVENT_DELIVERED = 'delivered'
+    EVENT_OFFLINE = 'offline'
+    EVENT_APPROVED = 'lead_approved'
+    EVENT_BANNED = 'banned'
+
     def __init__(self):
         self.client = None
         if not settings.CUSTOMERIO_ENABLED:
@@ -31,6 +37,7 @@ class CustomerIOClient(object):
                 Last_Name=lead.last_name,
                 Phone=clean_phone,
                 Raspberry_Pi=lead.raspberry_pi.rpid if lead.raspberry_pi else '',
+                tracking_code=lead.usps_tracking_code,
                 Raspberry_Pi_Status='Online' if (lead.raspberry_pi and lead.raspberry_pi.online()) else 'Offline',
                 Status=lead.status,
                 email=lead.email,

@@ -82,7 +82,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.google_account_status = Lead.STATUS_BANNED
         self.save()
         self.ec2instance.stop()
-        self.send_customer_io_event('banned')
+        CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
         return True
 
     def unban(self):
@@ -238,12 +238,9 @@ class Lead(models.Model, FulltextSearchMixin):
             data = data[0] if data else {}
         if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
-            self.send_customer_io_event('shipped', tracking_code=self.usps_tracking_code)
+            CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_SHIPPED, tracking_code=self.usps_tracking_code)
             # self.pi_delivered = True
             self.save()
-
-    def send_customer_io_event(self, event, **kwargs):
-        CustomerIOClient().send_lead_event(self, event, **kwargs)
 
     def update_pi_delivered(self):
         if not self.usps_tracking_code:
@@ -266,7 +263,7 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.pi_delivered != pi_delivered:
             self.pi_delivered = pi_delivered
             if self.pi_delivered:
-                self.send_customer_io_event('delivered', tracking_code=self.usps_tracking_code)
+                CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_DELIVERED, tracking_code=self.usps_tracking_code)
             self.save()
 
     def check_ec2_status(self):

@@ -108,5 +108,5 @@ class SignupView(View):
 
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
-        customerio_client.send_lead_event(lead, 'lead_approved', account_type='facebook')
+        customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_APPROVED, account_type='facebook')
         return redirect('thankyou_email', b64_email=base64.b64encode(lead.email))

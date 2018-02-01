@@ -26,7 +26,7 @@ class SyncOfflineView(View):
             if lead.raspberry_pi.last_seen:
                 offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
             if not test:
-                customerio_client.send_lead_event(lead, 'offline', hours=offline_hours_ago)
+                customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
                 reported_offline_leads.append(lead.email)
                 lead.raspberry_pi.last_offline_reported = timezone.now()
                 lead.raspberry_pi.save()
