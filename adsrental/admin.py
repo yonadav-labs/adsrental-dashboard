@@ -389,6 +389,8 @@ class LeadAdmin(admin.ModelAdmin):
     def ban(self, request, queryset):
         for lead in queryset:
             if lead.ban():
+                if lead.get_ec2_instance():
+                    lead.get_ec2_instance().stop()
                 messages.info(request, 'Lead {} is banned.'.format(lead.email))
 
     def unban(self, request, queryset):

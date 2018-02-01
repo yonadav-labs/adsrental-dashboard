@@ -81,7 +81,6 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.google_account:
             self.google_account_status = Lead.STATUS_BANNED
         self.save()
-        self.ec2instance.stop()
         CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
         return True
 
@@ -93,6 +92,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.facebook_account_status = Lead.STATUS_AVAILABLE
         if self.google_account:
             self.google_account_status = Lead.STATUS_AVAILABLE
+        
         self.save()
         return True
 
