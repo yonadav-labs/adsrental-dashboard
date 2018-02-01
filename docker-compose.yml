@@ -41,8 +41,6 @@ services:
       - ./scripts/:/app/scripts/
       - ./sf_dump/:/app/sf_dump/
       - ./php/log/:/app/log/
-    ports:
-      - "8007:8007"
     depends_on:
       - db
     links:
