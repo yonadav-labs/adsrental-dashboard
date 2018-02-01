@@ -5,6 +5,7 @@ import requests
 import boto3
 from django.conf import settings
 from django.apps import apps
+from django.utils import timezone
 import customerio
 from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
 
@@ -23,13 +24,22 @@ class CustomerIOClient(object):
         return self.client
 
     def send_lead(self, lead):
+        clean_phone = '+1' + (''.join([i for i in lead.phone if i.isdigit()]))
         if self.client:
             self.client.identify(
                 id=lead.leadid,
                 First_Name=lead.first_name,
                 Last_Name=lead.last_name,
+                Phone=clean_phone,
+                Raspberry_Pi=lead.raspberry_pi.rpid if lead.raspberry_pi else '',
+                Raspberry_Pi_Status='Online' if (lead.raspberry_pi and lead.raspberry_pi.online()) else 'Offline',
+                Status=lead.status,
                 email=lead.email,
-                Company='[Empty]'
+                Activation_Link='https://adsrental.com/check.html?',
+                Reactivate_Url='https://adsrental.com/reactivate.html?',
+                created_at=timezone.now().strftime('%Y-%m-%d %H:%M:%S'),
+                Company='[Empty]',
+
             )
 
     def send_lead_event(self, lead, event, **kwargs):
