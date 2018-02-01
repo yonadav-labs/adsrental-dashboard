@@ -92,7 +92,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.facebook_account_status = Lead.STATUS_AVAILABLE
         if self.google_account:
             self.google_account_status = Lead.STATUS_AVAILABLE
-        
+
         self.save()
         return True
 
