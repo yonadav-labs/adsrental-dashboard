@@ -98,7 +98,7 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'PING Test {} for {}'.format(version, hostname))
 
-            if not version and ec2_instance.tunnel_up:
+            if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
                 cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
                 try:
