@@ -333,7 +333,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
 
-            sf_raspberry_pi = SFRaspberryPi.objects.filtleadider(name=lead.raspberry_pi.rpid).first()
+            sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
             RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
             sf_lead = SFLead.objects.filter(email=lead.email).first()
             Lead.upsert_to_sf(sf_lead, lead)
