@@ -4,7 +4,6 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
-from django.apps import apps
 from django.conf import settings
 
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
@@ -29,6 +28,21 @@ class RaspberryPi(models.Model):
     version = models.CharField(max_length=20, default=settings.IMAGE_RASPBERRY_PI_VERSION)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def get_lead(self):
+        try:
+            return self.lead
+        except:
+            pass
+
+        return None
+
+    def get_ec2_instance(self):
+        lead = self.get_lead()
+        if not lead:
+            return None
+
+        return lead.get_ec2_instance()
 
     def update_ping(self):
         now = timezone.now()
@@ -158,10 +172,6 @@ class RaspberryPi(models.Model):
         sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
         sf_raspberry_pi.last_modified_by_id = settings.SALESFORCE_API_USER_ID
         sf_raspberry_pi.save()
-
-    def get_lead(self):
-        Lead = apps.get_app_config('adsrental').get_model('Lead')
-        return Lead.objects.filter(leadid=self.leadid).first()
 
     class Meta:
         db_table = 'raspberry_pi'

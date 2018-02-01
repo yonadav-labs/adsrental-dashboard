@@ -188,7 +188,7 @@ class LeadAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
                    WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
-    select_related = ('raspberry_pi', 'ec2instance')
+    list_select_related = ('raspberry_pi', 'ec2instance', )
     search_fields = ('leadid', 'account_name', 'first_name',
                      'last_name', 'raspberry_pi__rpid', 'email', )
     actions = (
@@ -432,17 +432,44 @@ class LeadAdmin(admin.ModelAdmin):
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('rpid', 'leadid', 'ipaddress', 'ec2_hostname', 'first_seen',
-                    'last_seen', 'tunnel_last_tested', 'online', 'tunnel_online', )
-    search_fields = ('leadid', 'rpid', 'ec2_hostname', 'ipaddress', )
+    list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_seen_field',
+                    'last_seen_field', 'tunnel_last_tested_field', 'online', 'tunnel_online', )
+    search_fields = ('leadid', 'rpid', )
     list_filter = (RaspberryPiOnlineListFilter,
                    RaspberryPiTunnelOnlineListFilter, )
+    list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
-        'update_from_salesforce',
-        'update_to_salesforce',
         'restart_tunnel',
     )
     readonly_fields = ('created', 'updated', )
+
+    def lead_link(self, obj):
+        lead = obj.get_lead()
+        if lead is None:
+            return obj.leadid
+        return '<a target="_blank" href="{url}?q={q}">{lead} {status}</a>'.format(
+            url=reverse('admin:adsrental_lead_changelist'),
+            lead=lead.email,
+            status='(active)' if lead.is_active() else '',
+            q=lead.leadid,
+        )
+
+    def ec2_instance_link(self, obj):
+        ec2_instance = obj.get_ec2_instance()
+        if not ec2_instance:
+            return None
+        result = []
+        if ec2_instance:
+            result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+                url=reverse('admin:adsrental_ec2instance_changelist'),
+                ec2_instance=ec2_instance,
+                q=ec2_instance.instance_id,
+            ))
+
+        for error in obj.lead.find_ec2_instance_errors():
+            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
+
+        return '\n'.join(result)
 
     def online(self, obj):
         return obj.online()
@@ -450,53 +477,27 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def tunnel_online(self, obj):
         return obj.tunnel_online()
 
-    def first_seen(self, obj):
+    def first_seen_field(self, obj):
         if obj.first_seen is None:
             return None
 
-        return naturaltime(obj.raspberry_pi.get_first_seen())
+        first_seen = obj.get_first_seen()
+        return u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen))
 
-    def last_seen(self, obj):
+    def last_seen_field(self, obj):
         if obj.last_seen is None:
             return None
 
-        return obj.last_seen + ' ' + timezone.now()
+        last_seen = obj.get_last_seen()
 
-        return naturaltime(obj.raspberry_pi.get_last_seen())
+        return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
 
-    def tunnel_last_tested(self, obj):
+    def tunnel_last_tested_field(self, obj):
         if obj.tunnel_last_tested is None:
             return None
 
-        return naturaltime(obj.get_tunnel_last_tested())
-
-    def update_from_salesforce(self, request, queryset):
-        sf_raspberry_pi_names = []
-        raspberry_pis_map = {}
-        for raspberry_pi in queryset:
-            raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
-            sf_raspberry_pi_names.append(raspberry_pi.rpid)
-
-        sf_raspberry_pis = SFRaspberryPi.objects.filter(
-            name__in=sf_raspberry_pi_names)
-
-        for sf_raspberry_pi in sf_raspberry_pis:
-            RaspberryPi.upsert_from_sf(
-                sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
-
-    def update_to_salesforce(self, request, queryset):
-        sf_raspberry_pi_names = []
-        raspberry_pis_map = {}
-        for raspberry_pi in queryset:
-            raspberry_pis_map[raspberry_pi.rpid] = raspberry_pi
-            sf_raspberry_pi_names.append(raspberry_pi.rpid)
-
-        sf_raspberry_pis = SFRaspberryPi.objects.filter(
-            name__in=sf_raspberry_pi_names)
-
-        for sf_raspberry_pi in sf_raspberry_pis:
-            RaspberryPi.upsert_to_sf(
-                sf_raspberry_pi, raspberry_pis_map.get(sf_raspberry_pi.name))
+        tunnel_last_tested = obj.get_tunnel_last_tested()
+        return u'<span title="{}">{}</span>'.format(tunnel_last_tested, naturaltime(tunnel_last_tested))
 
     def restart_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
@@ -504,11 +505,21 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.save()
         messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
+    lead_link.short_description = 'Lead'
+    lead_link.allow_tags = True
+    ec2_instance_link.short_description = 'EC2 Instance'
+    ec2_instance_link.allow_tags = True
     online.boolean = True
     tunnel_online.boolean = True
-    first_seen.empty_value_display = 'Never'
-    last_seen.empty_value_display = 'Never'
-    tunnel_last_tested.empty_value_display = 'Never'
+    first_seen_field.short_description = 'First Seen'
+    first_seen_field.empty_value_display = 'Never'
+    first_seen_field.allow_tags = True
+    last_seen_field.short_description = 'Last Seen'
+    last_seen_field.empty_value_display = 'Never'
+    last_seen_field.allow_tags = True
+    tunnel_last_tested_field.short_description = 'Tunnel Last Tested'
+    tunnel_last_tested_field.empty_value_display = 'Never'
+    tunnel_last_tested_field.allow_tags = True
 
 
 class CustomerIOEventAdmin(admin.ModelAdmin):
