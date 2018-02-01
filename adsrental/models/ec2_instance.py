@@ -329,7 +329,6 @@ class EC2Instance(models.Model):
         if raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             self.ssh_execute(cmd_to_execute)
-            raspberry_pi.version = settings.RASPBERRY_PI_VERSION
             raspberry_pi.save()
 
     def troubleshoot_fix(self):

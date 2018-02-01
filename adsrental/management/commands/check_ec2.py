@@ -126,10 +126,9 @@ class Command(BaseCommand):
                     cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
                     ssh.exec_command(cmd_to_execute)
 
-            if update and ssh_tunnel_up and lead.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
-                ssh.exec_command(cmd_to_execute)
-                lead.raspberry_pi.version = settings.RASPBERRY_PI_VERSION
-                lead.raspberry_pi.save()
+                if update and ssh_tunnel_up and lead.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
+                    cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+                    ssh.exec_command(cmd_to_execute)
+                    lead.raspberry_pi.save()
 
             ssh.close()

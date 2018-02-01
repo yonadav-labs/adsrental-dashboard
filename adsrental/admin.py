@@ -383,7 +383,6 @@ class LeadAdmin(admin.ModelAdmin):
             raspberry_pi = lead.raspberry_pi
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             lead.ec2instance.ssh_execute(cmd_to_execute)
-            raspberry_pi.version = settings.RASPBERRY_PI_VERSION
             raspberry_pi.save()
 
     def ban(self, request, queryset):
