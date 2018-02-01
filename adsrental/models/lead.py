@@ -76,8 +76,13 @@ class Lead(models.Model, FulltextSearchMixin):
             return False
         self.old_status = self.status
         self.status = Lead.STATUS_BANNED
+        if self.facebook_account:
+            self.facebook_account_status = Lead.STATUS_BANNED
+        if self.google_account:
+            self.google_account_status = Lead.STATUS_BANNED
         self.save()
         self.ec2instance.stop()
+        self.send_customer_io_event('banned')
         return True
 
     def unban(self):
