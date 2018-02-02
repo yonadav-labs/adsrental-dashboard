@@ -177,6 +177,7 @@ class LeadAdmin(admin.ModelAdmin):
         'facebook_account_column',
         'raspberry_pi_link',
         'ec2_instance_link',
+        'tested',
         'first_seen',
         'last_seen',
         'tunnel_last_tested',
@@ -200,9 +201,7 @@ class LeadAdmin(admin.ModelAdmin):
         'start_ec2',
         'restart_ec2',
         'troubleshoot_ec2',
-        'show_errors',
         'restart_raspberry_pi',
-        'force_update_raspberry_pi',
         'ban',
         'unban',
         'prepare_for_reshipment',
@@ -227,6 +226,12 @@ class LeadAdmin(admin.ModelAdmin):
 
     def tunnel_online(self, obj):
         return obj.raspberry_pi.tunnel_online() if obj.raspberry_pi else False
+
+    def tested(self, obj):
+        if obj.raspberry_pi and obj.raspberry_pi.first_seen:
+            return True
+
+        return False
 
     def first_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
@@ -366,27 +371,11 @@ class LeadAdmin(admin.ModelAdmin):
             if ec2_instance:
                 ec2_instance.troubleshoot()
 
-    def show_errors(self, request, queryset):
-        for lead in queryset:
-            errors = lead.find_errors()
-            if errors:
-                for error in errors:
-                    messages.error(request, 'Lead {}: {}'.format(lead.name(), error))
-            else:
-                messages.success(request, 'Lead {}: doing great'.format(lead.name()))
-
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
-
-    def force_update_raspberry_pi(self, request, queryset):
-        for lead in queryset:
-            raspberry_pi = lead.raspberry_pi
-            cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
-            lead.ec2instance.ssh_execute(cmd_to_execute)
-            raspberry_pi.save()
 
     def ban(self, request, queryset):
         for lead in queryset:
