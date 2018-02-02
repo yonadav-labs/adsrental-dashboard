@@ -149,7 +149,7 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.last_name, lead.last_name, ),
             (sf_lead.email, lead.email, ),
             (sf_lead.phone, lead.phone, ),
-            (address, lead.address, ),
+            # (address, lead.address, ),
             (sf_lead.account_name, lead.account_name, ),
             (sf_lead.status, lead.status, ),
             # (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
@@ -165,6 +165,11 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.fb_email, lead.fb_email, ),
             (sf_lead.fb_secret, lead.fb_secret, ),
             (sf_lead.splashtop_id, lead.splashtop_id, ),
+            (sf_lead.street, lead.street, ),
+            (sf_lead.city, lead.city, ),
+            (sf_lead.state, lead.state, ),
+            (sf_lead.postal_code, lead.postal_code, ),
+            (sf_lead.country, lead.country, ),
         ):
             if new_field != old_field:
                 break
@@ -201,6 +206,11 @@ class Lead(models.Model, FulltextSearchMixin):
             lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
         lead.fb_email = sf_lead.fb_email
         lead.fb_secret = sf_lead.fb_secret
+        lead.street = sf_lead.street
+        lead.city = sf_lead.city
+        lead.state = sf_lead.state
+        lead.postal_code = sf_lead.postal_code
+        lead.country = sf_lead.country
         lead.save()
         return lead
 
