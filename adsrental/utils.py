@@ -71,7 +71,7 @@ class ShipStationClient(object):
 
     def add_lead_order(self, lead):
         order = ShipStationOrder(
-            order_key=lead.raspberry_pi.name, order_number=lead.account_name)
+            order_key=lead.raspberry_pi.rpid, order_number=lead.account_name)
         order.set_customer_details(
             username='{} {}'.format(lead.first_name, lead.last_name),
             email=lead.email,
