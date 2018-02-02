@@ -17,6 +17,7 @@ services:
       - ./php/cert/:/var/www/html/cert/
       - ./php/app/:/var/www/html/app/
       - ./php/log/:/var/www/html/log/
+      - ./media/:/var/www/media/
       - ./php/uploads/:/var/www/html/uploads/
       - ./php/apache_logs/:/var/log/apache2/
     ports:
