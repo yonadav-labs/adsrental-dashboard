@@ -348,9 +348,9 @@ class Lead(models.Model, FulltextSearchMixin):
                 errors.append('SSH connection to EC2 instance failed. EC2 should be restarted.')
             if not ec2_instance.web_up:
                 errors.append('EC2 web interface is not responding. EC2 should be restarted.')
-            if not ec2_instance.tunnel_up and self.raspberry_pi.online():
+            if not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online():
                 errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted.')
-            if not ec2_instance.tunnel_up and not self.raspberry_pi.online():
+            if not ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online():
                 errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI internet connection and restart it.')
 
             if ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
