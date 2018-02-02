@@ -12,7 +12,6 @@ from django.contrib import messages
 
 from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent, EC2Instance
 from salesforce_handler.models import Lead as SFLead
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.utils import ShipStationClient
 
 

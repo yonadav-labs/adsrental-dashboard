@@ -1,10 +1,8 @@
 from django.views import View
 from django.http import JsonResponse
 
-from salesforce_handler.models import Lead as SFLead
 from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 
