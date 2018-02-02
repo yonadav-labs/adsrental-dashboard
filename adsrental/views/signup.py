@@ -1,15 +1,13 @@
 import uuid
 import requests
 import base64
-import time
 
 from django.views import View
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
-from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import CustomerIOClient
 
 
@@ -85,23 +83,38 @@ class SignupView(View):
                 form=form,
             ))
 
-        sf_lead = None
-
-        time.sleep(5)
-        sf_lead = SFLead.objects.filter(email=data['email']).first()
-        if not sf_lead:
-            return HttpResponseRedirect('/thankyou.php?email={}'.format(data['email']))
-
         lead = Lead.objects.filter(email=data['email']).first()
-        lead = Lead.upsert_from_sf(sf_lead, lead)
-        lead.photo_id = data['photo_id']
+        if lead:
+            return redirect('thankyou_email', b64_email=base64.b64encode(lead.email))
+
+        address = ', '.join([
+            data['street'] or '',
+            data['city'] or '',
+            data['postal_code'] or '',
+            'United States',
+        ])
+        lead = Lead(
+            leadid=lead_id,
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            status=Lead.STATUS_AVAILABLE,
+            email=data['email'],
+            phone=data['phone'],
+            address=address,
+            utm_source=data['utm_source'],
+            facebook_account=True,
+            facebook_account_status=Lead.STATUS_AVAILABLE,
+            fb_email=base64.b64encode(data['fb_email']),
+            fb_secret=base64.b64encode(data['fb_secret']),
+            fb_friends=data['fb_friends'],
+            fb_profile_url=data['facebook_profile_url'],
+            street=data['street'],
+            city=data['city'],
+            postal_code=data['postal_code'],
+            country='United States',
+            photo_id=data['photo_id'],
+        )
         lead.save()
-        # return render(request, 'signup.html', dict(
-        #     user=request.user,
-        #     uid=str(uuid.uuid4()),
-        #     isp='',
-        #     remote_addr=request.META.get('REMOTE_ADDR'),
-        # ))
 
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
