@@ -69,6 +69,14 @@ class Lead(models.Model, FulltextSearchMixin):
     class Meta:
         db_table = 'lead'
 
+    def get_address(self):
+        return ', '.join([
+            self.street or '',
+            self.city or '',
+            self.postal_code or '',
+            self.country or '',
+        ])
+
     def get_pi_sent_this_month(self):
         if not self.pi_sent:
             return False
