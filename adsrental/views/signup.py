@@ -42,8 +42,9 @@ class SignupView(View):
             ))
 
         data = form.cleaned_data
-        # raise ValueError(data)
         lead_id = str(uuid.uuid4()).replace('-', '')
+        last_account_name = Lead.objects.all().order_by('-account_name').first().account_name
+        account_name = 'ACT%d' % (int(last_account_name.replace('ACT', '')) + 1)
 
         response = requests.post(
             'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
@@ -71,6 +72,7 @@ class SignupView(View):
                 'Facebook_Email__c': base64.b64encode(data['fb_email']),
                 'Facebook_Password__c': base64.b64encode(data['fb_secret']),
                 'Facebook_Friends__c': data['fb_friends'],
+                'Account_Name__c': account_name,
                 'email': data['email'],
                 'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(data['email'])),
             }
@@ -95,6 +97,7 @@ class SignupView(View):
         ])
         lead = Lead(
             leadid=lead_id,
+            account_name=account_name,
             first_name=data['first_name'],
             last_name=data['last_name'],
             status=Lead.STATUS_AVAILABLE,
