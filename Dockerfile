@@ -23,6 +23,7 @@ RUN apk --no-cache del gcc musl-dev
 # ADD ./scripts/install_venv.sh /app/scripts/install_venv.sh
 # RUN ./scripts/install_venv.sh
 
+RUN mkdir -p /app/media/
 ADD ./manage.py /app/
 ADD ./cert /app/cert/
 ADD ./config/ /app/config/
