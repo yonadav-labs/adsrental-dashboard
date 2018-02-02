@@ -151,7 +151,6 @@ class RaspberryPi(models.Model):
         tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)
 
         for new_field, old_field in (
-            (sf_raspberry_pi.linked_lead_id, raspberry_pi.leadid, ),
             (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
             (sf_raspberry_pi.first_seen, first_seen, ),
             (sf_raspberry_pi.last_seen, last_seen, ),
@@ -162,7 +161,6 @@ class RaspberryPi(models.Model):
         else:
             return raspberry_pi
 
-        sf_raspberry_pi.linked_lead_id = raspberry_pi.leadid
         sf_raspberry_pi.first_seen = first_seen
         sf_raspberry_pi.last_seen = last_seen
         sf_raspberry_pi.tunnel_last_tested = tunnel_last_tested

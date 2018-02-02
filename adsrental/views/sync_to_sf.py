@@ -41,12 +41,10 @@ class SyncToSFView(View):
             })
 
         errors = []
-        sf_leadids = []
         lead_emails = []
         for lead_chunk in chunks(leads, self.chunk_size):
             leads_map = {}
             for lead in lead_chunk:
-                sf_leadids.append(lead.leadid)
                 leads_map[lead.email] = lead
 
             sf_leads = SFLead.objects.filter(email__in=leads_map.keys()).simple_select_related('raspberry_pi')

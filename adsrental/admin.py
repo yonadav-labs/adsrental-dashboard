@@ -214,10 +214,10 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def email_field(self, obj):
-        return '{email} (<a href="{sf_url}?q={email}" target="_blank">SF Local</a>, <a href="https://na40.salesforce.com/{leadid}" target="_blank">SF</a>)'.format(
+        return '{email} (<a href="{sf_url}?q={email}" target="_blank">SF Local</a>, <a href="https://na40.salesforce.com/{sf_leadid}" target="_blank">SF</a>)'.format(
             email=obj.email,
             sf_url=reverse('admin:salesforce_handler_lead_changelist'),
-            leadid=obj.leadid,
+            sf_leadid=obj.sf_leadid,
         )
 
     def online(self, obj):
@@ -300,8 +300,8 @@ class LeadAdmin(admin.ModelAdmin):
         sf_lead_ids = []
         leads_map = {}
         for lead in queryset:
-            leads_map[lead.leadid] = lead
-            sf_lead_ids.append(lead.leadid)
+            leads_map[lead.sf_leadid] = lead
+            sf_lead_ids.append(lead.sf_leadid)
 
         sf_leads = SFLead.objects.filter(
             id__in=sf_lead_ids).simple_select_related('raspberry_pi')
@@ -312,8 +312,8 @@ class LeadAdmin(admin.ModelAdmin):
         sf_lead_ids = []
         leads_map = {}
         for lead in queryset:
-            leads_map[lead.leadid] = lead
-            sf_lead_ids.append(lead.leadid)
+            leads_map[lead.sf_leadid] = lead
+            sf_lead_ids.append(lead.sf_leadid)
 
         sf_leads = SFLead.objects.filter(
             id__in=sf_lead_ids).simple_select_related('raspberry_pi')
