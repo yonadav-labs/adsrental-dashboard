@@ -127,7 +127,7 @@ class Lead(models.Model, FulltextSearchMixin):
     def upsert_from_sf(sf_lead, lead):
         if lead is None:
             lead = Lead(
-                leadid=sf_lead.id,
+                email=sf_lead.email,
             )
 
         local_raspberry_pi = lead.raspberry_pi if lead else None
@@ -177,6 +177,7 @@ class Lead(models.Model, FulltextSearchMixin):
         except Lead.DoesNotExist:
             pass
 
+        lead.sf_leadid = sf_lead.id
         lead.first_name = sf_lead.first_name
         lead.last_name = sf_lead.last_name
         lead.email = sf_lead.email
