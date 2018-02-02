@@ -206,7 +206,7 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
             (sf_lead.splashtop_id, lead.splashtop_id, ),
             (local_raspberry_pi_rpid, remote_raspberry_pi_rpid, ),
-            (sf_lead.status, lead.status, ),
+            # (sf_lead.status, lead.status, ),
         ):
             if new_field != old_field:
                 break
@@ -215,7 +215,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
         sf_lead.splashtop_id = lead.splashtop_id
-        sf_lead.status = lead.status
+        # sf_lead.status = lead.status
         sf_lead.last_modified_by_id = settings.SALESFORCE_API_USER_ID
         sf_lead.save()
 
