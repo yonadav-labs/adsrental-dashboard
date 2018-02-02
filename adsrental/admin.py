@@ -205,6 +205,7 @@ class LeadAdmin(admin.ModelAdmin):
         'force_update_raspberry_pi',
         'ban',
         'unban',
+        'prepare_for_reshipment',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -399,6 +400,19 @@ class LeadAdmin(admin.ModelAdmin):
             if lead.unban():
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
+    def prepare_for_reshipment(self, request, queryset):
+        for lead in queryset:
+            raspberry_pi = lead.raspberry_pi
+            if raspberry_pi:
+                raspberry_pi.first_tested = None
+                raspberry_pi.last_seen = None
+                raspberry_pi.first_seen = None
+                raspberry_pi.tunnel_last_tested = None
+                raspberry_pi.save()
+                messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
+            else:
+                messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
     create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
