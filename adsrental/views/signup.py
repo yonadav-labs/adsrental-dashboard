@@ -113,6 +113,7 @@ class SignupView(View):
             fb_profile_url=data['facebook_profile_url'],
             street=data['street'],
             city=data['city'],
+            state=data['state'],
             postal_code=data['postal_code'],
             country='United States',
             photo_id=data['photo_id'],

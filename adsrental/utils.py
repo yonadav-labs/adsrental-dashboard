@@ -85,7 +85,7 @@ class ShipStationClient(object):
             postal_code=lead.postal_code,
             # country=sf_lead.country,
             country='US',
-            state=lead.state,
+            state=lead.state or '',
             phone=lead.phone or lead.mobile_phone,
         )
         order.set_shipping_address(shipping_address)

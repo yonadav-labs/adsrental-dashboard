@@ -47,11 +47,11 @@ class SyncFromSFView(View):
             last_touch_date_min = timezone.now() - datetime.timedelta(seconds=seconds_ago)
             sf_leads = SFLead.objects.filter(last_touch_date__gt=last_touch_date_min).simple_select_related('raspberry_pi')
             sf_leads_ids = [i.id for i in sf_leads]
-            leads = Lead.objects.filter(leadid__in=sf_leads_ids).select_related('raspberry_pi')
+            leads = Lead.objects.filter(sf_leadid__in=sf_leads_ids).select_related('raspberry_pi')
 
         leads_map = {}
         for lead in leads:
-            leads_map[lead.leadid] = lead
+            leads_map[lead.sf_leadid] = lead
 
         for sf_lead in sf_leads:
             Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
