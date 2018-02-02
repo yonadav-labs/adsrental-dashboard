@@ -215,10 +215,10 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def email_field(self, obj):
-        return '{} (<a href="{}?q={}" target="_blank">SF</a>)'.format(
-            obj.email,
-            reverse('admin:salesforce_handler_lead_changelist'),
-            obj.email,
+        return '{email} (<a href="{sf_url}?q={email}" target="_blank">SF Local</a>, <a href="https://na40.salesforce.com/{leadid}" target="_blank">SF</a>)'.format(
+            email=obj.email,
+            sf_url=reverse('admin:salesforce_handler_lead_changelist'),
+            leadid=obj.leadid,
         )
 
     def online(self, obj):
