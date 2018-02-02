@@ -41,6 +41,7 @@ services:
       - ./scripts/:/app/scripts/
       - ./sf_dump/:/app/sf_dump/
       - ./php/log/:/app/log/
+      - ./media/:/app/media/
     depends_on:
       - db
     links:
