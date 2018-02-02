@@ -3,19 +3,26 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from adsrental.forms import SignupForm
 
 
 def populate_addresses(apps, schema_editor):
     Lead = apps.get_model('adsrental', 'Lead')
     for lead in Lead.objects.all():
         address = lead.address
-        lead.country = address.split(',')[-1]
+        lead.country = address.split(',')[-1].strip()
         address = ','.join(address.split(',')[:-1])
-        lead.postal_code = address.split(',')[-1]
+        lead.postal_code = address.split(',')[-1].strip()
         address = ','.join(address.split(',')[:-1])
-        lead.city = address.split(',')[-1]
+        lead.state = address.split(',')[-1].strip()
+        if lead.state in dict(SignupForm.STATE_CHOICES).keys():
+            address = ','.join(address.split(',')[:-1])
+            lead.city = address.split(',')[-1].strip()
+        else:
+            lead.city = lead.state
+            lead.state = ''
         address = ','.join(address.split(',')[:-1])
-        lead.street = address
+        lead.street = address.strip()
         lead.save()
 
 
