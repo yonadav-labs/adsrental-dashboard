@@ -29,7 +29,7 @@ class Lead(models.Model, FulltextSearchMixin):
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True)
-    sf_leadid = models.CharField(max_length=255, blank=True, null=True)
+    sf_leadid = models.CharField(max_length=255, blank=True, null=True, unique=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
