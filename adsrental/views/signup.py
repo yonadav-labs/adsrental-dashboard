@@ -44,7 +44,7 @@ class SignupView(View):
         data = form.cleaned_data
         lead_id = str(uuid.uuid4()).replace('-', '')
         last_account_name = Lead.objects.all().order_by('-account_name').first().account_name
-        account_name = 'ACT%d' % (int(last_account_name.replace('ACT', '')) + 1)
+        account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
 
         response = requests.post(
             'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
