@@ -339,21 +339,15 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
 
-            sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
-            RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
-            sf_lead = SFLead.objects.filter(email=lead.email).first()
-            Lead.upsert_to_sf(sf_lead, lead)
-            sf_lead = SFLead.objects.filter(email=lead.email).first()
-
             EC2Instance.launch_for_lead(lead)
 
             shipstation_client = ShipStationClient()
-            if shipstation_client.get_sf_lead_order_data(sf_lead):
+            if shipstation_client.get_lead_order_data(lead):
                 messages.info(
                     request, 'Lead {} order already exists'.format(lead.email))
                 continue
 
-            order = shipstation_client.add_sf_lead_order(sf_lead)
+            order = shipstation_client.add_lead_order(lead)
             messages.success(
                 request, '{} order created: {}'.format(lead.str(), order.order_key))
 

@@ -69,30 +69,30 @@ class ShipStationClient(object):
     def get_client(self):
         return self.client
 
-    def add_sf_lead_order(self, sf_lead):
+    def add_lead_order(self, lead):
         order = ShipStationOrder(
-            order_key=sf_lead.raspberry_pi.name, order_number=sf_lead.account_name)
+            order_key=lead.raspberry_pi.name, order_number=lead.account_name)
         order.set_customer_details(
-            username='{} {}'.format(sf_lead.first_name, sf_lead.last_name),
-            email=sf_lead.email,
+            username='{} {}'.format(lead.first_name, lead.last_name),
+            email=lead.email,
         )
 
         shipping_address = ShipStationAddress(
-            name='{} {}'.format(sf_lead.first_name, sf_lead.last_name),
+            name='{} {}'.format(lead.first_name, lead.last_name),
             # company=sf_lead.company,
-            street1=sf_lead.street,
-            city=sf_lead.city,
-            postal_code=sf_lead.postal_code,
+            street1=lead.street,
+            city=lead.city,
+            postal_code=lead.postal_code,
             # country=sf_lead.country,
             country='US',
-            state=sf_lead.state,
-            phone=sf_lead.phone or sf_lead.mobile_phone,
+            state=lead.state,
+            phone=lead.phone or lead.mobile_phone,
         )
         order.set_shipping_address(shipping_address)
         order.set_billing_address(shipping_address)
 
         item = ShipStationItem(
-            name=sf_lead.raspberry_pi.name,
+            name=lead.raspberry_pi.rpid,
             quantity=1,
             unit_price=0,
         )
@@ -124,10 +124,10 @@ class ShipStationClient(object):
         if r.status_code not in [200, 201]:
             raise ValueError('Shipstation Error', r.status_code, r.text)
 
-    def get_sf_lead_order_data(self, sf_lead):
+    def get_lead_order_data(self, lead):
         data = requests.get(
             'https://ssapi.shipstation.com/orders',
-            params={'orderNumber': sf_lead.account_name},
+            params={'orderNumber': lead.account_name},
             auth=requests.auth.HTTPBasicAuth(
                 settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
         ).json().get('orders')

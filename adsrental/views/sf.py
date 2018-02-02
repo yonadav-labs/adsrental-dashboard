@@ -23,20 +23,14 @@ class SFToShipstationView(View):
             lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP').first()
             lead.save()
 
-        sf_raspberry_pi = SFRaspberryPi.objects.filter(name=lead.raspberry_pi.rpid).first()
-        RaspberryPi.upsert_to_sf(sf_raspberry_pi, lead.raspberry_pi)
-        sf_lead = SFLead.objects.filter(email=email).first()
-        Lead.upsert_to_sf(sf_lead, lead)
-        sf_lead = SFLead.objects.filter(email=email).first()
-
         shipstation_client = ShipStationClient()
-        if shipstation_client.get_sf_lead_order_data(sf_lead):
+        if shipstation_client.get_lead_order_data(lead):
             return JsonResponse({
                 'result': False,
                 'reason': 'Order already exists',
             })
 
-        order = shipstation_client.add_sf_lead_order(sf_lead)
+        order = shipstation_client.add_lead_order(lead)
         EC2Instance.launch_for_lead(lead)
 
         return JsonResponse({
