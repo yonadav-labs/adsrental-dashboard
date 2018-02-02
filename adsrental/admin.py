@@ -164,7 +164,7 @@ class CustomUserAdmin(UserAdmin):
 class LeadAdmin(admin.ModelAdmin):
     model = Lead
     list_display = (
-        'leadid',
+        'id_field',
         # 'usps_tracking_code',
         'account_name',
         'name',
@@ -206,6 +206,12 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_reshipment',
     )
     readonly_fields = ('created', 'updated', )
+
+    def id_field(self, obj):
+        if obj.sf_leadid:
+            return obj.sf_leadid
+
+        return ('LOCAL: {}'.format(obj.leadid))
 
     def name(self, obj):
         return u'{} {}'.format(
@@ -396,6 +402,7 @@ class LeadAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
+    id_field.short_description = 'ID'
     create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
