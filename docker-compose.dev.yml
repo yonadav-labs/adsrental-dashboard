@@ -37,6 +37,7 @@ services:
       ENV: dev
     volumes:
       - /mnt/volume-nyc3-01/log/:/app/log/
+      - /mnt/volume-nyc3-01/media/:/app/media/
     depends_on:
       - db
     links:
