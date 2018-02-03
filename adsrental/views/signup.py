@@ -1,5 +1,4 @@
 import uuid
-import requests
 import base64
 
 from django.views import View

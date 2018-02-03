@@ -51,10 +51,10 @@ class SyncFromSFView(View):
 
         leads_map = {}
         for lead in leads:
-            leads_map[lead.sf_leadid] = lead
+            leads_map[lead.email] = lead
 
         for sf_lead in sf_leads:
-            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
+            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.email))
 
         return JsonResponse({
             'result': True,
