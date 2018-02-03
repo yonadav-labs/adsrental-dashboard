@@ -145,6 +145,7 @@ class Lead(models.Model, FulltextSearchMixin):
         ])
 
         for new_field, old_field in (
+            (sf_lead.id, lead.sf_leadid, ),
             (sf_lead.first_name, lead.first_name, ),
             (sf_lead.last_name, lead.last_name, ),
             (sf_lead.email, lead.email, ),
