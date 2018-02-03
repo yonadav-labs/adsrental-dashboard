@@ -1,6 +1,7 @@
 from multiprocessing.pool import ThreadPool
 from itertools import chain, islice
 import datetime
+import time
 
 from django.db import connection
 from django.utils import timezone
@@ -16,6 +17,7 @@ def chunks(iterable, size=10):
 
 
 def troubleshoot(args):
+    t = time.time()
     lead, fix = args
     ec2_instance = lead.get_ec2_instance()
     if ec2_instance:
@@ -23,7 +25,8 @@ def troubleshoot(args):
         # if fix:
         #     ec2_instance.troubleshoot_fix()
     connection.close()
-    return lead, ec2_instance
+    print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up, 'took', int(time.time() - t), 'seconds'
+    return lead
 
 
 class Command(BaseCommand):
@@ -87,9 +90,9 @@ class Command(BaseCommand):
             print 'Start pool: {} / {}'.format(counter, total)
             results = pool.map(troubleshoot, lead_queue)
             counter += len(lead_queue)
-            for lead, ec2_instance in results:
-                if not ec2_instance:
-                    print lead.email, 'no ec2'
-                    continue
-
-                print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up
+            for lead in results:
+                pass
+                # if not ec2_instance:
+                #     print lead.email, 'no ec2'
+                #     continue
+                # print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up
