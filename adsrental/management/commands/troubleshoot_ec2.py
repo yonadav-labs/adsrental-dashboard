@@ -79,9 +79,11 @@ class Command(BaseCommand):
             leads = leads.filter(
                 ec2instance__web_up=False,
             )
-        leads = [i for i in leads.order_by('ec2instance__last_troubleshoot').select_related('ec2instance', 'raspberry_pi')]
         if online_only:
-            leads = [i for i in leads if i.raspberry_pi.online()]
+            leads = leads.filter(
+                raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=3),
+            )
+        leads = [i for i in leads.order_by('ec2instance__last_troubleshoot').select_related('ec2instance', 'raspberry_pi')]
         if skip:
             leads = leads[skip:]
             print 'Skip first', skip, 'entries'
