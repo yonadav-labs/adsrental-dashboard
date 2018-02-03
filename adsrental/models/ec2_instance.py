@@ -292,15 +292,20 @@ class EC2Instance(models.Model):
         self.web_up = True
 
     def troubleshoot_ssh(self):
+        output = ''
         try:
-            output = self.ssh_execute('netstat')
+            cmd_to_execute = '''ssh pi@localhost -p 2046 "cat /boot/pi.conf"'''
+            output = self.ssh_execute(cmd_to_execute)
         except:
             self.ssh_up = False
             self.tunnel_up = False
             return
 
         self.ssh_up = True
-        self.tunnel_up = ':2046' in output
+        if self.rpid in output:
+            self.tunnel_up = True
+        else:
+            self.tunnel_up = False
 
     def troubleshoot_proxy(self):
         cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
