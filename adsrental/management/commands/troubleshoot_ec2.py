@@ -28,7 +28,7 @@ def troubleshoot(args):
         # if fix:
         #     ec2_instance.troubleshoot_fix()
     connection.close()
-    print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up, 'took', int(time.time() - t), 'seconds'
+    print lead.email, 'UP' if ec2_instance and ec2_instance.tunnel_up else 'DOWN', 'took', int(time.time() - t), 'seconds'
     return lead
 
 
