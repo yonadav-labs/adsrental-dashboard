@@ -149,7 +149,10 @@ class EC2Instance(models.Model):
 
     def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
         if not ssh:
-            ssh = self.get_ssh()
+            try:
+                ssh = self.get_ssh()
+            except:
+                return None
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=10)
         if input:
             for line in input:
