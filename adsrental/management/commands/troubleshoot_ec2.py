@@ -65,7 +65,7 @@ class Command(BaseCommand):
         )
         if older_minutes:
             leads = leads.filter(
-                ec2instance__last_troubleshoot___lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
+                ec2instance__last_troubleshoot__lt=timezone.now() - datetime.timedelta(minutes=older_minutes),
             )
         if tunnel_only:
             leads = leads.filter(
