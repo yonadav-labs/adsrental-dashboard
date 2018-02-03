@@ -303,28 +303,28 @@ class LeadAdmin(admin.ModelAdmin):
         return '\n'.join(result)
 
     def update_from_salesforce(self, request, queryset):
-        sf_lead_ids = []
+        sf_lead_emails = []
         leads_map = {}
         for lead in queryset:
-            leads_map[lead.sf_leadid] = lead
-            sf_lead_ids.append(lead.sf_leadid)
+            leads_map[lead.email] = lead
+            sf_lead_emails.append(lead.email)
 
         sf_leads = SFLead.objects.filter(
-            id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+            email__in=sf_lead_emails).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
-            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.id))
+            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.email))
 
     def update_salesforce(self, request, queryset):
-        sf_lead_ids = []
+        sf_lead_emails = []
         leads_map = {}
         for lead in queryset:
-            leads_map[lead.sf_leadid] = lead
-            sf_lead_ids.append(lead.sf_leadid)
+            leads_map[lead.email] = lead
+            sf_lead_emails.append(lead.email)
 
         sf_leads = SFLead.objects.filter(
-            id__in=sf_lead_ids).simple_select_related('raspberry_pi')
+            email__in=sf_lead_emails).simple_select_related('raspberry_pi')
         for sf_lead in sf_leads:
-            Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.id))
+            Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.email))
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
