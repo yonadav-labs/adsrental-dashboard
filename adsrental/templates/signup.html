@@ -51,7 +51,7 @@
         <section id="sub-heading" class="role-element leadstyle-container">
             <div class="content-wrapper">
                 <script>
-                    var geoEncodingAddressCorrect = false;
+                    var map = null;
                     function geoCodeAddress() {
                         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0
                         var address = [
@@ -61,13 +61,13 @@
                             document.getElementsByName("postal_code")[0].value,
                         ].join(',');
 
-                        console.log(address);
-
                         getJSON("https://maps.googleapis.com/maps/api/geocode/json?address=" + address +
                             "&key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0",
                             function (response) {
-                                console.log(response);
-                                geoEncodingAddressCorrect = response.status != "ZERO_RESULTS";
+                                if (response.results){
+                                    var address = response.results[0];
+                                    map.panTo(address.geometry.location);
+                                }
                             });
                     }
 
@@ -109,7 +109,6 @@
 
                 <form id="registerForm" action="" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <!-- Shipping Country -->
                     {{ form.utm_source }}
 
                     <section id="start-today" class="role-element leadstyle-container" style="    background: #f0f5f7;">
@@ -243,7 +242,7 @@
             </div>
         </section>
 
-        <div id="map" style="margin: auto; height:100px; width:400px;"></div><br/><br/>
+        <div id="map" style="margin: auto; height:200px; max-width: 95%;"></div><br/><br/>
         <!-- brands -->
         <!-- footer -->
         <section id="footer" class="role-element leadstyle-container">
