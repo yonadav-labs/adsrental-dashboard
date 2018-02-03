@@ -34,7 +34,7 @@ h2,
 h3,
 p {
     word-wrap: break-word;
-    -webkit-line-break: after-white-space
+    line-break: after-white-space;
 }
 
 h1,
@@ -124,8 +124,6 @@ textarea:focus,
     margin: 0 auto;
     max-width: 1160px
 }
-
-.site-header {}
 
 .site-header .wrap {
     max-width: 1320px
@@ -461,7 +459,6 @@ p {
 }
 
 #how-works .right {
-    display: inline-block;
     float: right;
     position: relative;
     right: 0;
@@ -633,7 +630,6 @@ p {
 }
 
 #footer #socials {
-    display: inline-block;
     float: right;
     padding: 0 10px;
     position: relative;
@@ -1297,7 +1293,7 @@ p {
 }
 
 body.fb_hidden {
-    -webkit-transform: none;
+    transform: none;
     height: 100%;
     margin: 0;
     overflow: visible;
@@ -1362,7 +1358,7 @@ body.fb_hidden {
 }
 
 .fb_dialog_content .dialog_header {
-    -webkit-box-shadow: white 0 1px 1px -1px inset;
+    box-shadow: white 0 1px 1px -1px inset;
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#738ABA), to(#2C4987));
     border-bottom: 1px solid;
     border-color: #1d4088;
@@ -1398,9 +1394,9 @@ body.fb_hidden {
 .fb_dialog_content .touchable_button {
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4966A6), color-stop(.5, #355492), to(#2A4887));
     border: 1px solid #2f477a;
-    -webkit-background-clip: padding-box;
-    -webkit-border-radius: 3px;
-    -webkit-box-shadow: rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;
+    background-clip: padding-box;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, .117188) 0 1px 1px inset, rgba(255, 255, 255, .167969) 0 1px 0;
     display: inline-block;
     margin-top: 3px;
     max-width: 85px;
@@ -1582,7 +1578,6 @@ select {
     text-indent: 0px;
     text-rendering: auto;
     text-shadow: none;
-    text-size-adjust: 100%;
     text-transform: none;
     transition-delay: 0s, 0s;
     transition-duration: 0.15s, 0.15s;
