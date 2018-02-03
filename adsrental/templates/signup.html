@@ -1,4 +1,5 @@
 {% load recaptcha2 %}
+{% load bootstrap3 %}
 
 <!DOCTYPE html>
     <!-- saved from url=(0027)http://rentyouraccount.org/ -->
@@ -20,11 +21,13 @@
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0">
         </script>
         {% recaptcha_init %}
-
+        <script
+            src="https://code.jquery.com/jquery-1.12.4.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous"></script>
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
     </head>
-
-
-
 
     <body>
         <div id="StayFocusd-infobar" style="display: none; top: 0px;">
@@ -151,115 +154,107 @@
 
                     <section id="start-today" class="role-element leadstyle-container" style="    background: #f0f5f7;">
                         <div class="content-wrapper">
+                            {% if form_errors %}
+                                {% for error in form_errors %}
+                                    {% bootstrap_alert error alert_type='danger' %}
+                                {% endfor %}
+                            {% endif %}
 
                             <table style="margin: auto;">
 
                                 <tr>
-                                    <td style="text-align: left;"><label for="first_name">First Name</label></td>
+                                    <td class="form_label {% if form.first_name.field.required %}required{% endif %}">{{form.first_name.label}}</td>
                                     <td>
-                                            {{ form.first_name }}
-                                            {{ form.first_name.errors }}
+                                        {{ form.first_name }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;"><label for="last_name">Last Name</label></td>
+                                    <td class="form_label {% if form.last_name.field.required %}required{% endif %}">{{form.last_name.label}}</td>
                                     <td>
-                                            {{ form.last_name }}
-                                            {{ form.last_name.errors }}
+                                        {{ form.last_name }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;"><label for="email">Email</label></td>
+                                    <td class="form_label {% if form.email.field.required %}required{% endif %}">{{form.email.label}}</td>
                                     <td>
                                         {{ form.email }}
-                                        {{ form.email.errors }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;"><label for="phone">Phone</label></td>
+                                    <td class="form_label {% if form.phone.field.required %}required{% endif %}">{{form.phone.label}}</td>
                                     <td>
                                         {{ form.phone }}
-                                        {{ form.phone.errors }}
                                     </td>
                                 </tr>
                                 
                                 <tr>
-                                    <td style="text-align: left;">Facebook Profile Url</td>
+                                    <td class="form_label {% if form.facebook_profile_url.field.required %}required{% endif %}">{{form.facebook_profile_url.label}}</td>
                                     <td>
                                         {{ form.facebook_profile_url }}
-                                        {{ form.facebook_profile_url.errors }}
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td style="text-align: left;">Facebook Email</td>
-                                    <td>
-                                        {{ form.fb_email }}
-                                        {{ form.fb_email.errors }}
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td style="text-align: left;">Facebook Password</td>
-                                    <td>
-                                        {{ form.fb_secret }}
-                                        {{ form.fb_secret.errors }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="text-align: left;">Facebook Friends Count</td>
-                                    <td>
-                                        {{ form.fb_friends }}
-                                        {{ form.fb_friends.errors }}
                                     </td>
                                 </tr>
 
                                 <tr>
                                     <td colspan="2"><small>Go to facebook.com, and click your name in the upper left corner. Copy the url in the field for 'Facebook Profile Url'</small></td>
                                 </tr>
-
+                                
                                 <tr>
-                                    <td style="text-align: left;">Shipping Street</td>
+                                    <td class="form_label {% if form.fb_email.field.required %}required{% endif %}">{{form.fb_email.label}}</td>
                                     <td>
-                                        {{ form.street }}
-                                        {{ form.street.errors }}
+                                        {{ form.fb_email }}
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="form_label {% if form.fb_secret.field.required %}required{% endif %}">{{form.fb_secret.label}}</td>
+                                    <td>
+                                        {{ form.fb_secret }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;">Shipping City</td>
+                                    <td class="form_label {% if form.fb_friends.field.required %}required{% endif %}">{{form.fb_friends.label}}</td>
+                                    <td>
+                                        {{ form.fb_friends }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="form_label {% if form.street.field.required %}required{% endif %}">{{form.street.label}}</td>
+                                    <td>
+                                        {{ form.street }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="form_label {% if form.city.field.required %}required{% endif %}">{{form.city.label}}</td>
                                     <td>
                                         {{ form.city }}
-                                        {{ form.city.errors }}
                                     </td>
                                     
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;">Shipping State</td>
+                                    <td class="form_label {% if form.state.field.required %}required{% endif %}">{{form.state.label}}</td>
                                     <td>
                                         {{ form.state }}
-                                        {{ form.state.errors }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;">Shipping Zip</td>
+                                    <td class="form_label {% if form.postal_code.field.required %}required{% endif %}">{{form.postal_code.label}}</td>
                                     <td>
                                         {{ form.postal_code }}
-                                        {{ form.postal_code.errors }}
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: left;">Photo ID (JPG, PNG or PDF)</td>
+                                    <td class="form_label {% if form.photo_id.field.required %}required{% endif %}">{{form.photo_id.label}}</td>
                                     <td>
                                         {{ form.photo_id }}
-                                        {{ form.photo_id.errors }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -271,9 +266,9 @@
                                 </tr>
 
                                 <tr>
-                                    <td style="text-align: right;" colspan="2"><br/>
-                                    {{ form.captcha }}
-                                    {{ form.captcha.errors }}<br/></td>
+                                    <td style="text-align: right;" colspan="2">
+                                        {{ form.captcha }}
+                                    </td>
                                 </tr>
 
                             </table>

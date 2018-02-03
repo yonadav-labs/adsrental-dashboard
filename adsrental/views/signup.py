@@ -33,9 +33,14 @@ class SignupView(View):
         form = SignupForm(request.POST, request.FILES)
         if not form.is_valid():
             # raise ValueError(form.errors)
+            form_errors = []
+            for error_list in form.errors.values():
+                for error in error_list:
+                    form_errors.append(error)
             return render(request, 'signup.html', dict(
                 user=request.user,
                 isp='',
+                form_errors=form_errors,
                 remote_addr=request.META.get('REMOTE_ADDR'),
                 form=form,
             ))
@@ -80,7 +85,7 @@ class SignupView(View):
             photo_id=data['photo_id'],
         )
         lead.save()
-        lead.send_web_to_lead()
+        # lead.send_web_to_lead()
 
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)

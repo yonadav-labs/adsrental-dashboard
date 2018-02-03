@@ -1597,3 +1597,11 @@ select {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
 }
+
+.form_label {
+    text-align: left;
+}
+
+.form_label.required {
+    font-weight: bold;
+}

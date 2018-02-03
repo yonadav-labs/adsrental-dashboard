@@ -1,6 +1,10 @@
+import base64
+
 from django import forms
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
+
+from adsrental.models.lead import Lead
 
 
 class DashboardForm(forms.Form):
@@ -111,23 +115,63 @@ class SignupForm(forms.Form):
         ('Wyoming', 'Wyoming', ),
     )
 
-    email = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    phone = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    facebook_profile_url = forms.CharField(required=True, widget=forms.URLInput(attrs={'size': 40}))
-    fb_email = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    fb_secret = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    fb_friends = forms.IntegerField(required=True, widget=forms.NumberInput(attrs={'size': 40}))
-    street = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    city = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    state = forms.ChoiceField(choices=STATE_CHOICES, required=True)
-    postal_code = forms.CharField(required=True, widget=forms.TextInput(attrs={'size': 40}))
-    registered_isp = forms.CharField(required=False)
+    email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    phone = forms.CharField(label='Phone', required=True, widget=forms.TextInput(attrs={'size': 40, 'placeholder': '(734) 555-12-12'}))
+    facebook_profile_url = forms.CharField(label='Facebook Profile Url', required=True, widget=forms.URLInput(attrs={'size': 40}))
+    fb_email = forms.CharField(label='Facebook Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    fb_secret = forms.CharField(label='Facebook Password', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    fb_friends = forms.IntegerField(label='Facebook Friends Count', required=True, widget=forms.NumberInput(attrs={'size': 40}))
+    street = forms.CharField(label='Shipping Street', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    city = forms.CharField(label='Shipping City', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    state = forms.ChoiceField(label='Shipping State', choices=STATE_CHOICES, required=True)
+    postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40}))
     accept = forms.BooleanField(required=True)
-    photo_id = forms.FileField(widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
-    captcha = ReCaptchaField(widget=ReCaptchaWidget())
+    photo_id = forms.FileField(label='Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
+    captcha = ReCaptchaField(widget=ReCaptchaWidget(), required=False)
     utm_source = forms.CharField(widget=forms.HiddenInput())
+
+    def clean_phone(self):
+        value = self.cleaned_data['phone']
+        if value.startswith('+1'):
+            value = value[2:]
+
+        digits = ''.join([i for i in value if i.isdigit()])
+        if len(digits) != 10:
+            raise forms.ValidationError("Phone number should have 10 digits excluding +1 code")
+        return value
+
+    def clean_email(self):
+        value = self.cleaned_data['email']
+        existing_valus = [i[0] for i in Lead.objects.all().values_list('email')]
+        if value in existing_valus:
+            raise forms.ValidationError("This email is already registered")
+
+        return value
+
+    def clean_fb_friends(self):
+        value = self.cleaned_data['fb_friends']
+        if value == 0:
+            raise forms.ValidationError("Incorrect Facebook Friends Count")
+
+        return value
+
+    def clean_facebook_profile_url(self):
+        value = self.cleaned_data['facebook_profile_url']
+        existing_valus = [i[0] for i in Lead.objects.all().values_list('fb_profile_url')]
+        if value in existing_valus:
+            raise forms.ValidationError("This Facebook profile URL is already registered")
+
+        return value
+
+    def clean_fb_email(self):
+        value = self.cleaned_data['fb_email']
+        existing_valus = [i[0] for i in Lead.objects.all().values_list('fb_email')]
+        if base64.b64encode(value) in existing_valus:
+            raise forms.ValidationError("This Facebook email is already registered")
+
+        return value
 
 
 class ReportForm(forms.Form):

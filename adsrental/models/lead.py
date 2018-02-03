@@ -28,6 +28,15 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_IN_PROGRESS, 'In-Progress'),
     ]
 
+    COMPANY_EMPTY = '[Empty]'
+    COMPANY_ACM = 'ACM'
+    COMPANY_FBM = 'FBM'
+    COMPANY_CHOICES = (
+        (COMPANY_EMPTY, COMPANY_EMPTY),
+        (COMPANY_ACM, COMPANY_ACM),
+        (COMPANY_FBM, COMPANY_FBM),
+    )
+
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True)
@@ -60,7 +69,7 @@ class Lead(models.Model, FulltextSearchMixin):
     country = models.CharField(max_length=50, blank=True, null=True, default='United States')
     state = models.CharField(max_length=50, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
-    company = models.CharField(max_length=20, default='[Empty]')
+    company = models.CharField(max_length=20, default=COMPANY_EMPTY, choices=COMPANY_CHOICES)
     is_sync_adsdb = models.BooleanField(default=False)
     photo_id = models.FileField(blank=True, null=True)
     splashtop_id = models.CharField(max_length=255, blank=True, null=True)
