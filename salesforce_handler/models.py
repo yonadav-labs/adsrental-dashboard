@@ -4562,7 +4562,7 @@ class Lead(models.Model):
     browser_extension_installed = models.BooleanField(custom=True, db_column='Browser_Extension_Installed__c', verbose_name='Browser Extension Installed', sf_read_only=models.READ_ONLY)
     ad_account_status_last_checked = models.DateField(custom=True, db_column='Ad_Account_Status_Last_Checked__c', verbose_name='Ad Account Status Last Checked', sf_read_only=models.READ_ONLY, blank=True, null=True)
     fb_friends = models.DecimalField(custom=True, db_column='FB_friends__c', max_digits=18, decimal_places=0, verbose_name='FB friends', sf_read_only=models.READ_ONLY, blank=True, null=True)
-    account_name = models.CharField(custom=True, db_column='Account_Name__c', max_length=30, verbose_name='Account Name', sf_read_only=models.READ_ONLY)
+    account_name = models.CharField(custom=True, db_column='Account_Name__c', max_length=30, verbose_name='Account Name')
     activation_url = models.CharField(custom=True, db_column='Activation_Url__c', max_length=1300, verbose_name='Activation Url', sf_read_only=models.READ_ONLY, blank=True, null=True)
     banned_reason = models.CharField(custom=True, db_column='Banned_Reason__c', max_length=255, verbose_name='Banned Reason', choices=[('FAKE', 'FAKE'), ('BAD AD ACCOUNT', 'BAD AD ACCOUNT'), ('SAME COMPUTER', 'SAME COMPUTER'), ('OTHER', 'OTHER'), ('DUPLICATE', 'DUPLICATE')], blank=True, null=True)
     payment_first_name = models.CharField(custom=True, db_column='Payment_First_Name__c', max_length=255, verbose_name='Payment First Name', blank=True, null=True)

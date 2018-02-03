@@ -245,6 +245,9 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
             (sf_lead.splashtop_id, lead.splashtop_id, ),
+            (sf_lead.account_name, lead.account_name, ),
+            (sf_lead.first_name, lead.first_name, ),
+            (sf_lead.last_name, lead.last_name, ),
             (local_raspberry_pi_rpid, remote_raspberry_pi_rpid, ),
             # (sf_lead.status, lead.status, ),
         ):
@@ -257,6 +260,9 @@ class Lead(models.Model, FulltextSearchMixin):
         sf_lead.splashtop_id = lead.splashtop_id
         # sf_lead.status = lead.status
         sf_lead.last_modified_by_id = settings.SALESFORCE_API_USER_ID
+        sf_lead.account_name = lead.account_name
+        sf_lead.first_name = lead.first_name
+        sf_lead.last_name = lead.last_name
         sf_lead.save()
 
         if sf_lead.raspberry_pi:
