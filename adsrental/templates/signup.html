@@ -50,48 +50,8 @@
         <!-- sub-heading -->
         <section id="sub-heading" class="role-element leadstyle-container">
             <div class="content-wrapper">
-
-                <META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
-
                 <script>
-
                     var geoEncodingAddressCorrect = false;
-
-                    function capitalizeFirstLetter(string) {
-                        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-                    }
-
-                    function capitalizeFirstLetterOfEachElement(string) {
-                        var elements = string.split(/-| /);
-
-                        for (var i = 0; i < elements.length; i++) {
-                            elements[i] = capitalizeFirstLetter(elements[i]);
-                        }
-
-                        var newString = elements.join("|");
-                        var result = "";
-
-                        for (var i = 0; i < string.length; i++) {
-                            if (newString[i] == "|") {
-                                result += string[i];
-                            } else {
-                                result += newString[i];
-                            }
-                        }
-
-                        return result;
-                    }
-
-                    function formatFields() {
-                        document.getElementsByName("first_name")[0].value = capitalizeFirstLetterOfEachElement(document.getElementsByName(
-                            "first_name")[0].value);
-                        document.getElementsByName("last_name")[0].value = capitalizeFirstLetterOfEachElement(document.getElementsByName(
-                            "last_name")[0].value);
-                        document.getElementsByName("email")[0].value = document.getElementsByName("email")[0].value.toLowerCase();
-                        document.getElementsByName("facebook_profile_url")[0].value = document.getElementsByName("facebook_profile_url")[0].value.toLowerCase();
-                        //document.getElementById("00N46000009wiZg").value = document.getElementById("00N46000009wiZg").value.toLowerCase();
-                    }
-
                     function geoCodeAddress() {
                         //https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0
                         var address = [
@@ -99,7 +59,7 @@
                             document.getElementsByName("city")[0].value,
                             document.getElementsByName("state")[0].value,
                             document.getElementsByName("postal_code")[0].value,
-                        ].join(',')
+                        ].join(',');
 
                         console.log(address);
 

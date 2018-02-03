@@ -85,7 +85,7 @@ class SignupView(View):
             photo_id=data['photo_id'],
         )
         lead.save()
-        # lead.send_web_to_lead()
+        lead.send_web_to_lead()
 
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
