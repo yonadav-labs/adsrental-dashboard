@@ -150,17 +150,17 @@ class EC2Instance(models.Model):
     def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
         if not ssh:
             ssh = self.get_ssh()
-        try:
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=10)
-        except:
-            return ''
         if input:
             for line in input:
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
         if blocking:
-            stderr = ssh_stderr.read()
-            stdout = ssh_stdout.read()
+            try:
+                stderr = ssh_stderr.read()
+                stdout = ssh_stdout.read()
+            except:
+                return None
             ssh.close()
             return 'OUT: {}\nERR: {}'.format(stdout, stderr)
 
@@ -295,14 +295,16 @@ class EC2Instance(models.Model):
         self.web_up = True
 
     def troubleshoot_ssh(self):
-        cmd_to_execute = '''ssh pi@localhost -p 2046 "cat /boot/pi.conf"'''
-        output = self.ssh_execute(cmd_to_execute)
-        if not output:
+        output = self.ssh_execute('del pi.conf')
+        if output is None:
             self.ssh_up = False
             self.tunnel_up = False
             return
 
         self.ssh_up = True
+        self.ssh_execute('scp -P 2046 pi@localhost:/boot/pi.conf pi.conf')
+        output = self.ssh_execute('type pi.conf')
+
         if self.rpid in output:
             self.tunnel_up = True
         else:
