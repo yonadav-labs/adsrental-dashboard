@@ -49,12 +49,16 @@ class SyncFromSFView(View):
             sf_leads_ids = [i.id for i in sf_leads]
             leads = Lead.objects.filter(sf_leadid__in=sf_leads_ids).select_related('raspberry_pi')
 
-        leads_map = {}
+        leads_email_map = {}
+        leads_sfleadid_map = {}
         for lead in leads:
-            leads_map[lead.email] = lead
+            if lead.email:
+                leads_email_map[lead.email] = lead
+            if lead.sf_leadid:
+                leads_sfleadid_map[lead.sf_leadid] = lead
 
         for sf_lead in sf_leads:
-            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.email))
+            Lead.upsert_from_sf(sf_lead, leads_sfleadid_map.get(sf_lead.id) or leads_email_map.get(sf_lead.email))
 
         return JsonResponse({
             'result': True,
