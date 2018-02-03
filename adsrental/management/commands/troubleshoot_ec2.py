@@ -21,7 +21,10 @@ def troubleshoot(args):
     lead, fix = args
     ec2_instance = lead.get_ec2_instance()
     if ec2_instance:
-        ec2_instance.troubleshoot()
+        try:
+            ec2_instance.troubleshoot()
+        except:
+            print 'ERROR', lead.email
         # if fix:
         #     ec2_instance.troubleshoot_fix()
     connection.close()
