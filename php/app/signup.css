@@ -293,7 +293,8 @@ textarea:focus,
     padding-right: 0;
     padding-left: 0;
     padding-bottom: 50px;
-    text-transform: uppercase
+    text-transform: uppercase;
+    margin: 0 auto;
 }
 
 #my-banner h1 #accent {
