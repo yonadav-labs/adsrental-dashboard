@@ -42,52 +42,14 @@ class SignupView(View):
             ))
 
         data = form.cleaned_data
-        lead_id = str(uuid.uuid4()).replace('-', '')
-        last_account_name = Lead.objects.all().order_by('-account_name').first().account_name
-        account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
-
-        response = requests.post(
-            'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
-            data={
-                'oid': '00D460000015t1L',
-                'first_name': data['first_name'],
-                'last_name': data['last_name'],
-                'company': '[Empty]',
-                'city': data['city'],
-                'state': data['state'],
-                'phone': data['phone'],
-                'street': data['street'],
-                'country': 'United States',
-                'zip': data['postal_code'],
-                '00N4600000AuUxk': lead_id,
-                'debug': 1,
-                'debugEmail': 'volshebnyi@gmail.com',
-                '00N46000009vg39': request.META.get('REMOTE_ADDR'),
-                '00N46000009vg3J': 'ISP',
-                '00N46000009wgvp': data['facebook_profile_url'],
-                '00N46000009whHW': data['utm_source'],
-                '00N46000009whHb': request.META.get('HTTP_USER_AGENT'),
-                '00N4600000B0zip': 1,
-                '00N4600000B1Sup': 'Available',
-                'Facebook_Email__c': base64.b64encode(data['fb_email']),
-                'Facebook_Password__c': base64.b64encode(data['fb_secret']),
-                'Facebook_Friends__c': data['fb_friends'],
-                'Account_Name__c': account_name,
-                'email': data['email'],
-                'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(data['email'])),
-            }
-        )
-        if response.status_code != 200:
-            return render(request, 'signup.html', dict(
-                user=request.user,
-                isp='',
-                remote_addr=request.META.get('REMOTE_ADDR'),
-                form=form,
-            ))
 
         lead = Lead.objects.filter(email=data['email']).first()
         if lead:
             return redirect('thankyou_email', b64_email=base64.b64encode(lead.email))
+
+        lead_id = str(uuid.uuid4()).replace('-', '')
+        last_account_name = Lead.objects.all().order_by('-account_name').first().account_name
+        account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
 
         address = ', '.join([
             data['street'] or '',
@@ -119,6 +81,7 @@ class SignupView(View):
             photo_id=data['photo_id'],
         )
         lead.save()
+        lead.send_web_to_lead()
 
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)

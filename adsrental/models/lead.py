@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import base64
+
 import requests
 from xml.etree import ElementTree
 from django.utils import timezone
@@ -55,9 +57,10 @@ class Lead(models.Model, FulltextSearchMixin):
     fb_profile_url = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
-    country = models.CharField(max_length=50, blank=True, null=True)
+    country = models.CharField(max_length=50, blank=True, null=True, default='United States')
     state = models.CharField(max_length=50, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
+    company = models.CharField(max_length=20, default='[Empty]')
     is_sync_adsdb = models.BooleanField(default=False)
     photo_id = models.FileField(blank=True, null=True)
     splashtop_id = models.CharField(max_length=255, blank=True, null=True)
@@ -272,6 +275,40 @@ class Lead(models.Model, FulltextSearchMixin):
             sf_lead.raspberry_pi.save()
 
         return lead
+
+    def send_web_to_lead(self, request=None):
+        response = requests.post(
+            'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
+            data={
+                'oid': '00D460000015t1L',
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'company': self.company,
+                'city': self.city,
+                'state': self.status,
+                'phone': self.phone,
+                'street': self.street,
+                'country': self.country,
+                'zip': self.postal_code,
+                '00N4600000AuUxk': self.leadid,
+                'debug': 1,
+                'debugEmail': 'volshebnyi@gmail.com',
+                '00N46000009vg39': request and request.META.get('REMOTE_ADDR'),
+                '00N46000009vg3J': 'ISP',
+                '00N46000009wgvp': self.fb_profile_url,
+                '00N46000009whHW': self.utm_source,
+                '00N46000009whHb': request and request.META.get('HTTP_USER_AGENT'),
+                '00N4600000B0zip': 1,
+                '00N4600000B1Sup': 'Available',
+                'Facebook_Email__c': self.fb_email,
+                'Facebook_Password__c': self.fb_secret,
+                'Facebook_Friends__c': self.fb_friends,
+                'Account_Name__c': self.account_name,
+                'email': self.email,
+                'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(self.email)),
+            }
+        )
+        return response
 
     def update_from_shipstation(self, data=None):
         if data is None:
