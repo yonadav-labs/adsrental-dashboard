@@ -15,22 +15,18 @@ RUN apk --no-cache add \
     openssl-dev \
 && echo "Installed build dependencies"
 
-ADD ./requirements /app/requirements/
-RUN pip install -r /app/requirements/base.txt
+ADD ./requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 RUN apk --no-cache del gcc musl-dev
 
-# ADD ./scripts/install_venv.sh /app/scripts/install_venv.sh
-# RUN ./scripts/install_venv.sh
-
 RUN mkdir -p /app/media/
-ADD ./manage.py /app/
+ADD ./manage.py /app/manage.py
 ADD ./cert /app/cert/
 ADD ./config/ /app/config/
 ADD ./scripts/ /app/scripts/
 ADD ./salesforce_handler/ /app/salesforce_handler/
 ADD ./adsrental/ /app/adsrental/
-ADD ./sf_dump/ /app/sf_dump/
 
 EXPOSE 8007
 CMD ["/app/scripts/server.sh"]
