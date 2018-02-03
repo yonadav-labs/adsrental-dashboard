@@ -1,6 +1,8 @@
 
 import re
+import datetime
 
+from django.utils import timezone
 from django.db.models import Q
 
 
@@ -17,6 +19,13 @@ class FulltextSearchMixin(object):
         '''
 
         return [normspace('', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+
+    @classmethod
+    def get_timedelta_filter(cls, field_name, **kwargs):
+        now = timezone.now()
+        return Q(**{
+            field_name: now + datetime.timedelta(**kwargs),
+        })
 
     @classmethod
     def get_fulltext_filter(cls, query_string, search_fields):
