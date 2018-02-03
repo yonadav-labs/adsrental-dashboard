@@ -308,7 +308,7 @@ class EC2Instance(models.Model):
         self.ssh_execute('scp -P 2046 pi@localhost:/boot/pi.conf pi.conf')
         output = self.ssh_execute('type pi.conf')
 
-        if self.rpid in output:
+        if output and self.rpid in output:
             self.tunnel_up = True
         else:
             self.tunnel_up = False
