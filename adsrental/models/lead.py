@@ -37,7 +37,7 @@ class Lead(models.Model, FulltextSearchMixin):
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
-    account_name = models.CharField(max_length=255, blank=True, null=True)
+    account_name = models.CharField(max_length=255, blank=True, null=True, unique=True)
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True)
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     google_account = models.BooleanField(default=False)
