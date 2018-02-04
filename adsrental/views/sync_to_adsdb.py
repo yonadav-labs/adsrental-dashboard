@@ -3,8 +3,6 @@ from django.http import JsonResponse
 from django.utils import dateformat
 import requests
 
-from adsrental.models import Lead, Bundler
-
 
 class SyncToAdsdbView(View):
     def get(self, request):
