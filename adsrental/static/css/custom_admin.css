@@ -1,0 +1,26 @@
+#changelist table thead th {
+    padding: 0px;
+    font-size: 11px;
+}
+
+#changelist table thead th a {
+    padding: 8px 3px;
+}
+
+#changelist table tbody td {
+    padding: 8px 3px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+#changelist table tbody a {
+    font-size: 11px;
+}
+
+#content-main {
+    width: auto;
+}
+
+#content {
+    padding: 20px 0px;
+}

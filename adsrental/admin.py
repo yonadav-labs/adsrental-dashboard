@@ -709,10 +709,16 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
 
 class ReportLeadAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     list_display = (
         'sf_leadid',
         'first_name',
         'last_name',
+        'utm_source',
         'status',
         'street',
         'city',
