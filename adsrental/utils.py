@@ -44,7 +44,7 @@ class CustomerIOClient(object):
                 Activation_Link='https://adsrental.com/check.html?',
                 Reactivate_Url='https://adsrental.com/reactivate.html?',
                 created_at=lead.created.strftime('%s'),
-                Company='[Empty]',
+                Company=lead.company,
 
             )
 
