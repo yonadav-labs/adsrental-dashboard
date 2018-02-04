@@ -193,6 +193,7 @@ class LeadAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'ec2_instance_link',
         'tested',
+        'last_touch',
         'first_seen',
         'last_seen',
         'tunnel_last_tested',
@@ -205,8 +206,14 @@ class LeadAdmin(admin.ModelAdmin):
     list_filter = (StatusListFilter, OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
                    WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     list_select_related = ('raspberry_pi', 'ec2instance', )
-    search_fields = ('leadid', 'account_name', 'first_name',
-                     'last_name', 'raspberry_pi__rpid', 'email', )
+    search_fields = (
+        'leadid',
+        'account_name',
+        'first_name',
+        'last_name',
+        'raspberry_pi__rpid',
+        'email',
+    )
     actions = (
         'update_from_salesforce',
         'update_salesforce',
@@ -220,6 +227,7 @@ class LeadAdmin(admin.ModelAdmin):
         'ban',
         'unban',
         'prepare_for_reshipment',
+        'touch',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -240,6 +248,12 @@ class LeadAdmin(admin.ModelAdmin):
             email=obj.email,
             sf_url=reverse('admin:salesforce_handler_lead_changelist'),
             sf_leadid=obj.sf_leadid,
+        )
+
+    def last_touch(self, obj):
+        return '<span title="Touched {} times">{}</span>'.format(
+            obj.touch_count,
+            naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
         )
 
     def online(self, obj):
@@ -405,6 +419,11 @@ class LeadAdmin(admin.ModelAdmin):
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
+    def touch(self, request, queryset):
+        for lead in queryset:
+            lead.touch()
+            messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
+
     def prepare_for_reshipment(self, request, queryset):
         for lead in queryset:
             raspberry_pi = lead.raspberry_pi
@@ -418,6 +437,8 @@ class LeadAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
+    last_touch.allow_tags = True
+    last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
     create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
@@ -608,7 +629,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         )
 
     def raspberry_pi_link(self, obj):
-        if obj.lead is None or obj.lead.raspberry_pi is None:
+        if obj.lead is None or obj.raspberry_pi is None:
             return obj.rpid
         return '<a target="_blank" href="{url}?q={q}">{rpid} v. {version} {status}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
@@ -708,6 +729,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'wrong_password',
         'bundler_paid',
         'billed',
+        'last_touch',
         'first_seen',
         'last_seen',
     )
@@ -745,23 +767,32 @@ class ReportLeadAdmin(admin.ModelAdmin):
     def last_seen(self, obj):
         return obj.raspberry_pi and obj.raspberry_pi.last_seen
 
+    def last_touch(self, obj):
+        return '<span title="Touched {} times">{}</span>'.format(
+            obj.touch_count,
+            naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
+        )
+
     def raspberry_pi_link(self, obj):
         result = []
         if obj.raspberry_pi:
-            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
-                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
+            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
-                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
                 rpid=obj.raspberry_pi,
             ))
 
-        for error in obj.find_raspberry_pi_errors():
-            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
+        return result
 
+    last_touch.allow_tags = True
+    raspberry_pi_link.allow_tags = True
+
+    last_touch.admin_order_field = 'last_touch_date'
     raspberry_pi_link.admin_order_field = 'raspberry_pi__rpid'
     first_seen.admin_order_field = 'raspberry_pi__first_seen'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
     account_type.admin_order_field = 'facebook_account'
+
+    raspberry_pi_link.short_description = 'RPID'
 
 
 admin.site.register(User, CustomUserAdmin)

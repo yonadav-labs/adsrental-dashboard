@@ -59,6 +59,8 @@ class Lead(models.Model, FulltextSearchMixin):
     pi_delivered = models.BooleanField(default=False)
     billed = models.BooleanField(default=False)
     tested = models.BooleanField(default=False)
+    last_touch_date = models.DateTimeField(blank=True, null=True)
+    touch_count = models.IntegerField(default=0)
     facebook_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     fb_email = models.CharField(max_length=255, blank=True, null=True)
@@ -83,6 +85,11 @@ class Lead(models.Model, FulltextSearchMixin):
 
     class Meta:
         db_table = 'lead'
+
+    def touch(self):
+        self.last_touch_date = timezone.now()
+        self.touch_count += 1
+        self.save()
 
     def get_address(self):
         return ', '.join([
