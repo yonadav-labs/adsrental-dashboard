@@ -750,14 +750,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     list_select_related = ('raspberry_pi', )
     list_per_page = 500
 
-    def get_queryset(self, request):
-        qs = super(ReportLeadAdmin, self).get_queryset(request)
-        return qs.filter(
-            facebook_account=True,
-            # company=Lead.COMPANY_FBM,
-            status__in=Lead.STATUSES_ACTIVE,
-        )
-
     def rpid(self, obj):
         return obj.raspberry_pi and obj.raspberry_pi.rpid
 
