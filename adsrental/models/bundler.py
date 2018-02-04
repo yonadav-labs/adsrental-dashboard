@@ -18,4 +18,4 @@ class Bundler(models.Model):
         return cls.objects.filter(utm_source=int(utm_source_digits)).first()
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.utm_source, self.name)

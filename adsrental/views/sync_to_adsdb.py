@@ -22,7 +22,7 @@ class SyncToAdsdbView(View):
                 last_seen=dateformat.format(lead.raspberry_pi.last_seen, 'j E Y H:i') if lead.raspberry_pi and lead.raspberry_pi.last_seen else None,
                 phone=lead.phone,
                 ec2_hostname=lead.raspberry_pi.ec2_hostname if lead.raspberry_pi else None,
-                utm_source_id=bundler.adsdb_id if bundler else 22,
+                utm_source_id=22,
                 rp_id=lead.raspberry_pi.rpid if lead.raspberry_pi else None,
             )
             # import json
