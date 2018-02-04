@@ -54,6 +54,7 @@ class Lead(models.Model, FulltextSearchMixin):
     google_account = models.BooleanField(default=False)
     facebook_account = models.BooleanField(default=False)
     raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', null=True, blank=True, default=None)
+    bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None)
     wrong_password = models.BooleanField(default=False)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)

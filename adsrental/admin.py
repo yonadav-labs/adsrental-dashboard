@@ -10,7 +10,7 @@ from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from adsrental.models.lead import Lead, ReportProxyLead
-from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance
+from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler
 from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import ShipStationClient
 
@@ -794,9 +794,14 @@ class ReportLeadAdmin(admin.ModelAdmin):
     raspberry_pi_link.short_description = 'RPID'
 
 
+class BundlerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'utm_source', 'adsdb_id', )
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
 admin.site.register(CustomerIOEvent, CustomerIOEventAdmin)
 admin.site.register(EC2Instance, EC2InstanceAdmin)
 admin.site.register(ReportProxyLead, ReportLeadAdmin)
+admin.site.register(Bundler, BundlerAdmin)

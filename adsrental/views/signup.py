@@ -7,13 +7,15 @@ from django.shortcuts import render, redirect
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
+from adsrental.models.bundler import Bundler
 from adsrental.utils import CustomerIOClient
 
 
 class SignupView(View):
     def get(self, request):
         if 'utm_source' in request.GET:
-            request.session['utm_source'] = request.GET.get('utm_source')
+            utm_source = request.GET.get('utm_source')
+            request.session['utm_source'] = utm_source
 
         utm_source = request.session.get('utm_source')
         if not utm_source:
@@ -71,6 +73,7 @@ class SignupView(View):
             phone=data['phone'],
             address=address,
             utm_source=data['utm_source'],
+            bundler=Bundler.get_by_utm_source(data['utm_source']),
             facebook_account=True,
             facebook_account_status=Lead.STATUS_AVAILABLE,
             fb_email=base64.b64encode(data['fb_email']),
