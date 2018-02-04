@@ -748,6 +748,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'updated', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
     list_select_related = ('raspberry_pi', )
+    list_per_page = 500
 
     def get_queryset(self, request):
         qs = super(ReportLeadAdmin, self).get_queryset(request)
