@@ -12,7 +12,8 @@ class Bundler(models.Model):
 
     @classmethod
     def get_by_utm_source(cls, utm_source):
-        return cls.objects.filter(utm_source=utm_source.lower()).first()
+        return None
+        return cls.objects.filter(utm_source=utm_source).first()
 
     def __str__(self):
         return '{} ({})'.format(self.utm_source, self.name)
