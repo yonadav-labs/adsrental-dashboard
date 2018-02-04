@@ -12,7 +12,7 @@ class SyncToAdsdbView(View):
         saved_emails = []
         responses = []
         for lead in leads[:100]:
-            bundler = lead.bundler or Bundler.get_by_utm_source(lead.utm_source)
+            # bundler = lead.bundler or Bundler.get_by_utm_source(lead.utm_source)
             data = dict(
                 first_name=lead.first_name,
                 last_name=lead.last_name,
