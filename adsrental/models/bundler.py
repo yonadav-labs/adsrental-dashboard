@@ -12,10 +12,7 @@ class Bundler(models.Model):
 
     @classmethod
     def get_by_utm_source(cls, utm_source):
-        utm_source_digits = ''.join([i for i in utm_source if i.isdigit()])
-        if not utm_source_digits:
-            return None
-        return cls.objects.filter(utm_source=int(utm_source_digits)).first()
+        return cls.objects.filter(utm_source=utm_source.lower()).first()
 
     def __str__(self):
         return '{} ({})'.format(self.utm_source, self.name)
