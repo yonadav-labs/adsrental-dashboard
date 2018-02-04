@@ -9,14 +9,30 @@ from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-
-from adsrental.models import User, Lead, RaspberryPi, CustomerIOEvent, EC2Instance
+from adsrental.models.lead import Lead, ReportProxyLead
+from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance
 from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import ShipStationClient
 
 
+class StatusListFilter(SimpleListFilter):
+    title = 'Status'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return Lead.STATUS_CHOICES + [
+            ('Active',  'Active'),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Active':
+            return queryset.filter(status__in=Lead.STATUSES_ACTIVE)
+        if self.value():
+            return queryset.filter(status=self.value())
+
+
 class OnlineListFilter(SimpleListFilter):
-    title = 'EC2 online state'
+    title = 'RaspberryPi online state'
     parameter_name = 'online'
 
     def lookups(self, request, model_admin):
@@ -29,17 +45,17 @@ class OnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
         if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
         if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
 
 
 class RaspberryPiOnlineListFilter(SimpleListFilter):
-    title = 'EC2 online state'
+    title = 'RaspberryPi online state'
     parameter_name = 'online'
 
     def lookups(self, request, model_admin):
@@ -52,13 +68,13 @@ class RaspberryPiOnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(last_seen__gt=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
         if self.value() == 'offline':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
         if self.value() == 'offline_2days':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
 
 
 class TunnelOnlineListFilter(SimpleListFilter):
@@ -75,13 +91,13 @@ class TunnelOnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
         if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
         if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 5 * 24))
 
 
 class AccountTypeListFilter(SimpleListFilter):
@@ -115,13 +131,13 @@ class RaspberryPiTunnelOnlineListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'online':
-            return queryset.filter(tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
         if self.value() == 'offline':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14))
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
         if self.value() == 'offline_2days':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 2 * 24))
         if self.value() == 'offline_5days':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 5 * 24))
 
 
 class WrongPasswordListFilter(SimpleListFilter):
@@ -142,9 +158,9 @@ class WrongPasswordListFilter(SimpleListFilter):
         if self.value() == 'yes':
             return queryset.filter(wrong_password=True)
         if self.value() == 'yes_2days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 2 * 24))
+            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
         if self.value() == 'yes_5days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=14 + 5 * 24))
+            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
 
 
 class CustomUserAdmin(UserAdmin):
@@ -186,7 +202,7 @@ class LeadAdmin(admin.ModelAdmin):
         'pi_delivered',
         'bundler_paid',
     )
-    list_filter = ('status', OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
+    list_filter = (StatusListFilter, OnlineListFilter, TunnelOnlineListFilter, AccountTypeListFilter,
                    WrongPasswordListFilter, 'utm_source', 'bundler_paid', 'pi_delivered', 'tested', )
     list_select_related = ('raspberry_pi', 'ec2instance', )
     search_fields = ('leadid', 'account_name', 'first_name',
@@ -671,8 +687,86 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     links.allow_tags = True
 
 
+class ReportLeadAdmin(admin.ModelAdmin):
+    list_display = (
+        'sf_leadid',
+        'first_name',
+        'last_name',
+        'status',
+        'street',
+        'city',
+        'state',
+        'postal_code',
+        'account_type',
+        'company',
+        'email',
+        'phone',
+        'raspberry_pi_link',
+        'utm_source',
+        'pi_delivered',
+        'is_sync_adsdb',
+        'wrong_password',
+        'bundler_paid',
+        'billed',
+        'first_seen',
+        'last_seen',
+    )
+    list_filter = (
+        StatusListFilter,
+        'company',
+        AccountTypeListFilter,
+        RaspberryPiOnlineListFilter,
+    )
+    readonly_fields = ('created', 'updated', )
+    search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
+    list_select_related = ('raspberry_pi', )
+
+    def get_queryset(self, request):
+        qs = super(ReportLeadAdmin, self).get_queryset(request)
+        return qs.filter(
+            facebook_account=True,
+            # company=Lead.COMPANY_FBM,
+            status__in=Lead.STATUSES_ACTIVE,
+        )
+
+    def rpid(self, obj):
+        return obj.raspberry_pi and obj.raspberry_pi.rpid
+
+    def account_type(self, obj):
+        if obj.facebook_account:
+            return 'Facebook'
+        if obj.google_account:
+            return 'Google'
+        return 'n/a'
+
+    def first_seen(self, obj):
+        return obj.raspberry_pi and obj.raspberry_pi.first_seen
+
+    def last_seen(self, obj):
+        return obj.raspberry_pi and obj.raspberry_pi.last_seen
+
+    def raspberry_pi_link(self, obj):
+        result = []
+        if obj.raspberry_pi:
+            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
+                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
+                url=reverse('admin:adsrental_raspberrypi_changelist'),
+                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
+                rpid=obj.raspberry_pi,
+            ))
+
+        for error in obj.find_raspberry_pi_errors():
+            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
+
+    raspberry_pi_link.admin_order_field = 'raspberry_pi__rpid'
+    first_seen.admin_order_field = 'raspberry_pi__first_seen'
+    last_seen.admin_order_field = 'raspberry_pi__last_seen'
+    account_type.admin_order_field = 'facebook_account'
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
 admin.site.register(CustomerIOEvent, CustomerIOEventAdmin)
 admin.site.register(EC2Instance, EC2InstanceAdmin)
+admin.site.register(ReportProxyLead, ReportLeadAdmin)

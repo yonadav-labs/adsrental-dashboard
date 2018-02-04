@@ -17,6 +17,7 @@ RUN apk --no-cache add \
 
 ADD ./requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
+RUN pip install django-admin-tools==0.8.1
 
 RUN apk --no-cache del gcc musl-dev
 

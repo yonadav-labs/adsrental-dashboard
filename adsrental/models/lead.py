@@ -32,9 +32,9 @@ class Lead(models.Model, FulltextSearchMixin):
     COMPANY_ACM = 'ACM'
     COMPANY_FBM = 'FBM'
     COMPANY_CHOICES = (
-        (COMPANY_EMPTY, COMPANY_EMPTY),
         (COMPANY_ACM, COMPANY_ACM),
         (COMPANY_FBM, COMPANY_FBM),
+        (COMPANY_EMPTY, COMPANY_EMPTY),
     )
 
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
@@ -57,6 +57,7 @@ class Lead(models.Model, FulltextSearchMixin):
     wrong_password = models.BooleanField(default=False)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)
+    billed = models.BooleanField(default=False)
     tested = models.BooleanField(default=False)
     facebook_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
@@ -434,3 +435,10 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def find_errors(self):
         return self.find_ec2_instance_errors() + self.find_raspberry_pi_errors()
+
+
+class ReportProxyLead(Lead):
+    class Meta:
+        proxy = True
+        verbose_name = 'Report Lead'
+        verbose_name_plural = 'Report Leads'
