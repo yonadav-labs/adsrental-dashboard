@@ -230,6 +230,7 @@ class LeadAdmin(admin.ModelAdmin):
         'touch',
     )
     readonly_fields = ('created', 'updated', )
+    raw_id_fields = ('raspberry_pi', )
 
     def id_field(self, obj):
         if obj.sf_leadid:
