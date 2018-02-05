@@ -1,9 +1,10 @@
 from django.views import View
 from django.http import JsonResponse
 from django.utils import dateformat
+from django.conf import settings
 import requests
 
-from adsrental.models.lead import Lead
+from adsrental.models import Lead, Bundler
 
 
 class SyncToAdsdbView(View):
@@ -12,7 +13,8 @@ class SyncToAdsdbView(View):
         saved_emails = []
         responses = []
         for lead in leads[:100]:
-            # bundler = lead.bundler or Bundler.get_by_utm_source(lead.utm_source)
+            bundler = lead.bundler or Bundler.get_by_utm_source(lead.utm_source)
+            bundler_adsdb_id = bundler and bundler.adsdb_id
             data = dict(
                 first_name=lead.first_name,
                 last_name=lead.last_name,
@@ -22,7 +24,7 @@ class SyncToAdsdbView(View):
                 last_seen=dateformat.format(lead.raspberry_pi.last_seen, 'j E Y H:i') if lead.raspberry_pi and lead.raspberry_pi.last_seen else None,
                 phone=lead.phone,
                 ec2_hostname=lead.raspberry_pi.ec2_hostname if lead.raspberry_pi else None,
-                utm_source_id=22,
+                utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
                 rp_id=lead.raspberry_pi.rpid if lead.raspberry_pi else None,
             )
             # import json
