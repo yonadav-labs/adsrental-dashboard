@@ -795,7 +795,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
 
 class BundlerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'utm_source', 'adsdb_id', )
+    list_display = ('id', 'name', 'utm_source', 'adsdb_id', 'email', 'phone', )
 
 
 admin.site.register(User, CustomUserAdmin)
