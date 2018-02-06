@@ -265,7 +265,7 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi.tunnel_online() if obj.raspberry_pi else False
 
     def tested_field(self, obj):
-        if obj.raspberry_pi and obj.raspberry_pi.first_seen:
+        if obj.raspberry_pi and obj.raspberry_pi.first_tested:
             return True
 
         return False
