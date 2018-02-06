@@ -41,12 +41,12 @@ class Command(BaseCommand):
         if date:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
             d = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            if force:
+                LeadHistory.objects.filter(date=d).delete()
             for lead in leads:
-                lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
-                if lead_history:
-                    if force:
-                        lead_history.delete()
-                    else:
+                if not force:
+                    lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
+                    if lead_history:
                         continue
 
                 log_filename = '{}.log'.format(d.strftime('%Y%m%d'))
