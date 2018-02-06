@@ -82,7 +82,6 @@ class LogView(View):
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
             troubleshoot = request.GET.get('troubleshoot')
-            tunnel_up = request.GET.get('tunnel_up')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
             if not lead:
                 return self.json_response(request, rpid, {
@@ -101,9 +100,15 @@ class LogView(View):
 
             if troubleshoot and ec2_instance:
                 instance_id = request.GET.get('instance_id', '')
+                tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 ec2_instance.web_up = ec2_instance.instance_id == instance_id
+                ec2_instance.tunnel_up = tunnel_up
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
+
+                if not tunnel_up:
+                    self.add_log(request, rpid, 'Tunnel seems down, restarting')
+                    # restart_required = True
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
@@ -127,16 +132,6 @@ class LogView(View):
             if hostname and ec2_instance.hostname != hostname:
                 self.add_log(request, rpid, 'Hostname changed, restarting')
                 restart_required = True
-
-            if tunnel_up:
-                if tunnel_up == "1" and not ec2_instance.tunnel_up:
-                    ec2_instance.tunnel_up = True
-                    ec2_instance.save()
-                if tunnel_up == "0":
-                    ec2_instance.tunnel_up = False
-                    ec2_instance.save()
-                    self.add_log(request, rpid, 'Tunnel seems down, restarting')
-                    restart_required = True
 
             if raspberry_pi.restart_required:
                 self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
