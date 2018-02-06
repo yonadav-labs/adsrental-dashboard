@@ -32,6 +32,20 @@ class StatusListFilter(SimpleListFilter):
             return queryset.filter(status=self.value())
 
 
+class TouchCountListFilter(SimpleListFilter):
+    title = 'Touch Count'
+    parameter_name = 'touch_count'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('10', 'More than 10 only'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(touch_count__gte=int(self.value()))
+
+
 class OnlineListFilter(SimpleListFilter):
     title = 'RaspberryPi online state'
     parameter_name = 'online'
@@ -732,19 +746,19 @@ class ReportLeadAdmin(admin.ModelAdmin):
         # 'city',
         # 'state',
         # 'postal_code',
+        'pi_delivered',
+        'is_sync_adsdb',
         'account_type',
         'company',
         'email',
         # 'phone',
         'raspberry_pi_link',
         'utm_source',
-        'pi_delivered',
-        'is_sync_adsdb',
-        'wrong_password',
         'bundler_paid',
         'billed',
         'touch_count',
         'last_touch',
+        'wrong_password',
         'first_seen',
         'last_seen',
     )
@@ -753,6 +767,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'company',
         AccountTypeListFilter,
         RaspberryPiOnlineListFilter,
+        TouchCountListFilter,
     )
     readonly_fields = ('created', 'updated', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )

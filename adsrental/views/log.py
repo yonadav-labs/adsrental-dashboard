@@ -98,6 +98,8 @@ class LogView(View):
 
             self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
+            restart_required = False
+
             if troubleshoot and ec2_instance:
                 instance_id = request.GET.get('instance_id', '')
                 tunnel_up = request.GET.get('tunnel_up', '0') == '1'
@@ -124,7 +126,6 @@ class LogView(View):
                 raspberry_pi.version = version
                 raspberry_pi.save()
 
-            restart_required = False
             if version and settings.RASPBERRY_PI_VERSION > version:
                 self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
                 restart_required = True
