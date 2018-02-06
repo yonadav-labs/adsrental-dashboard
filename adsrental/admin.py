@@ -10,7 +10,7 @@ from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from adsrental.models.lead import Lead, ReportProxyLead
-from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler
+from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory
 from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import ShipStationClient
 
@@ -799,6 +799,10 @@ class BundlerAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'utm_source', 'adsdb_id', 'email', 'phone', )
 
 
+class LeadHistoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'lead', 'date', 'checks_offline', 'checks_online', 'checks_wrong_password', )
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
@@ -806,3 +810,4 @@ admin.site.register(CustomerIOEvent, CustomerIOEventAdmin)
 admin.site.register(EC2Instance, EC2InstanceAdmin)
 admin.site.register(ReportProxyLead, ReportLeadAdmin)
 admin.site.register(Bundler, BundlerAdmin)
+admin.site.register(LeadHistory, LeadHistoryAdmin)
