@@ -13,7 +13,7 @@ class ReportView(View):
     items_per_page = 100
 
     def get_entries(self, user, year, month, search):
-        lead_queryset = Lead.objects.filter()
+        lead_queryset = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False)
         if user.utm_source:
             lead_queryset = lead_queryset.filter(utm_source=user.utm_source)
         if search:
@@ -40,7 +40,9 @@ class ReportView(View):
                 lead.offline_days += 1
             lead.amount = 25. * lead.online_days / (lead.online_days + lead.offline_days)
 
-        return leads_map.values()
+        result = leads_map.values()
+        result.sort(key=lambda x: x.online_days, reverse=True)
+        return result
 
     @method_decorator(login_required)
     def get(self, request):
