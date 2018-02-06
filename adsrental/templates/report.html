@@ -37,12 +37,12 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ entry.account_name }}</td>
-                    <td>{{ entry.first_name }} {{ entry.last_name }}</td>
-                    <td>{{ entry.status }}</td>
-                    <td>{{ entry.online_days }}</td>
-                    <td>{{ entry.offline_days }}</td>
-                    <td>{{ entry.wrong_password_days }}</td>
-                    <td>${{ entry.amount|floatformat:2 }}</td>
+                    <td>{{ entry.lead.name }}</td>
+                    <td>{{ entry.lead.status }}</td>
+                    <td>{{ entry.days_online }}</td>
+                    <td>{{ entry.days_offline }}</td>
+                    <td>{{ entry.days_wrong_password }}</td>
+                    <td>${{ entry.get_amount|floatformat:2 }}</td>
                 </tr>
             </tbody>
         {% empty %}

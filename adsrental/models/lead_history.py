@@ -8,7 +8,7 @@ from django.db import models
 
 class LeadHistory(models.Model):
     lead = models.ForeignKey('adsrental.Lead')
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     checks_offline = models.IntegerField(default=0)
     checks_online = models.IntegerField(default=0)
     checks_wrong_password = models.IntegerField(default=0)
