@@ -864,6 +864,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             q=lead.leadid,
         )
 
+    lead_link.short_description = 'Lead'
+    lead_link.allow_tags = True
+
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
