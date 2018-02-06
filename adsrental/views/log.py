@@ -81,6 +81,7 @@ class LogView(View):
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
+            troubleshoot = request.GET.get('troubleshoot')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
             if not lead:
                 return self.json_response(request, rpid, {
@@ -96,6 +97,18 @@ class LogView(View):
             raspberry_pi.save()
 
             self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
+
+            if troubleshoot and ec2_instance:
+                tunnel_up = request.GET.get('tunnel_up')
+                instance_id = request.GET.get('instance_id')
+                if tunnel_up == "1":
+                    ec2_instance.tunnel_up = True
+                    ec2_instance.ssh_up = True
+                else:
+                    ec2_instance.tunnel_up = False
+
+                ec2_instance.web_up = ec2_instance.instance_id == instance_id
+                ec2_instance.save()
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
