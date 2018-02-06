@@ -108,6 +108,7 @@ class LogView(View):
                     ec2_instance.tunnel_up = False
 
                 ec2_instance.web_up = ec2_instance.instance_id == instance_id
+                ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
