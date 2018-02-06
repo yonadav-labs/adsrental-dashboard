@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
@@ -803,8 +804,43 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'lead', 'date', 'checks_offline', 'checks_online', 'checks_wrong_password', )
 
 
+class DateMonthListFilter(SimpleListFilter):
+    title = 'Date'
+    parameter_name = 'date'
+
+    def lookups(self, request, model_admin):
+        month_start = datetime.date.today().replace(day=1)
+        choices = []
+        for i in range(3):
+            d = month_start - relativedelta(months=i)
+            choices.append((d.strftime('%Y-%m-%d'), d.strftime('%b %Y')))
+
+        return choices
+
+    def queryset(self, request, queryset):
+        if self.value():
+            d = datetime.datetime.strptime(self.value(), '%Y-%m-%d').date()
+            return queryset.filter(date=d)
+
+
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
-    list_display = ('id', 'lead', 'date', 'days_online', 'days_offline', 'days_wrong_password', )
+    class Meta:
+        model = LeadHistoryMonth
+
+    list_per_page = 5000
+    list_display = ('id', 'lead', 'date', 'days_online', 'days_offline', 'days_wrong_password', 'amount', )
+    search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
+    list_filter = (DateMonthListFilter, )
+
+    def get_queryset(self, request):
+        queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
+        if 'date' not in request.GET:
+            queryset = queryset.filter(date=datetime.date.today().replace(day=1))
+
+        return queryset
+
+    def amount(self, obj):
+        return '${}'.format(round(obj.get_amount(), 2))
 
 
 admin.site.register(User, CustomUserAdmin)
