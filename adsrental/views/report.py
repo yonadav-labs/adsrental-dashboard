@@ -41,6 +41,7 @@ class ReportView(View):
             lead.amount = 25. * lead.online_days / (lead.online_days + lead.offline_days)
 
         result = leads_map.values()
+        result = filter(lambda x: x.online_days, result)
         result.sort(key=lambda x: x.online_days, reverse=True)
         return result
 
