@@ -5,9 +5,10 @@ from dateutil.relativedelta import relativedelta
 from django.db import models
 
 from adsrental.models.lead_history import LeadHistory
+from adsrental.models.mixins import FulltextSearchMixin
 
 
-class LeadHistoryMonth(models.Model):
+class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     lead = models.ForeignKey('adsrental.Lead')
     date = models.DateField(db_index=True)
     days_offline = models.IntegerField(default=0)

@@ -18,6 +18,8 @@ class ReportView(View):
         queryset = LeadHistoryMonth.objects.filter(date=date).select_related('lead')
         if user.utm_source:
             queryset = queryset.filter(lead__utm_source=user.utm_source)
+        if search:
+            queryset = queryset.filter(LeadHistoryMonth.get_fulltext_filter(search, ['lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone']))
 
         return queryset
 
