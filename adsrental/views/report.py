@@ -11,7 +11,7 @@ from adsrental.forms import ReportForm
 
 
 class ReportView(View):
-    items_per_page = 400
+    items_per_page = 3000
 
     def get_entries(self, user, year, month, search):
         date = datetime.date(year, month, 1)
