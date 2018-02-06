@@ -100,7 +100,7 @@ class LogView(View):
 
             if troubleshoot and ec2_instance:
                 tunnel_up = request.GET.get('tunnel_up')
-                instance_id = request.GET.get('instance_id')
+                instance_id = request.GET.get('instance_id', '')
                 if tunnel_up == "1":
                     ec2_instance.tunnel_up = True
                     ec2_instance.ssh_up = True
