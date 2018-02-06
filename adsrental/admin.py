@@ -823,6 +823,20 @@ class DateMonthListFilter(SimpleListFilter):
             return queryset.filter(date=d)
 
 
+class HistoryStatusListFilter(SimpleListFilter):
+    title = 'Status'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('hide_zeroes', 'Hide zeroes', ),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'hide_zeroes':
+            return queryset.filter(days_online__gt=0)
+
+
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
     class Meta:
         model = LeadHistoryMonth
@@ -830,7 +844,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     list_per_page = 5000
     list_display = ('id', 'lead', 'date', 'days_online', 'days_offline', 'days_wrong_password', 'amount', )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
-    list_filter = (DateMonthListFilter, )
+    list_filter = (DateMonthListFilter, HistoryStatusListFilter, )
 
     def get_queryset(self, request):
         queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)

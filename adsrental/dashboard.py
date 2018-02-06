@@ -11,6 +11,8 @@ And to activate the app index dashboard::
 """
 
 import urllib
+import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.utils.translation import ugettext_lazy as _
 try:
@@ -55,6 +57,18 @@ class CustomIndexDashboard(Dashboard):
                         account_type='google',
                         status='Active',
                         company='ACM',
+                    )),
+                )],
+                [_('Check Report for current month'), '{}?{}'.format(
+                    reverse('admin:adsrental_leadhistorymonth_changelist'),
+                    urllib.urlencode(dict(
+                        date=datetime.date.today().replace(day=1).strftime('%Y-%m-%d'),
+                    )),
+                )],
+                [_('Check Report for previous month'), '{}?{}'.format(
+                    reverse('admin:adsrental_leadhistorymonth_changelist'),
+                    urllib.urlencode(dict(
+                        date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime('%Y-%m-%d'),
                     )),
                 )],
             ]
