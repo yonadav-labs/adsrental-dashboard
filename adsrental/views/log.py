@@ -95,10 +95,7 @@ class LogView(View):
             raspberry_pi.update_ping()
             raspberry_pi.save()
 
-            if raspberry_pi.first_seen:
-                self.add_log(request, rpid, 'PING {} for {}'.format(version, hostname))
-            else:
-                self.add_log(request, rpid, 'PING Test {} for {}'.format(version, hostname))
+            self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
