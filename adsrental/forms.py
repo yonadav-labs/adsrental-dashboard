@@ -183,11 +183,18 @@ class SignupForm(forms.Form):
 
 
 class ReportForm(forms.Form):
-    MONTH_CURRENT = '2018-01'
+    MONTH_CURRENT = '2018-02'
     MONTH_CHOICES = (
-        (MONTH_CURRENT, 'Jan 2018', ),
+        ('2018-01', 'Jan 2018', ),
         ('2018-02', 'Feb 2018', ),
     )
 
     search = forms.CharField(label='Search', required=False)
     month = forms.ChoiceField(choices=MONTH_CHOICES, required=False)
+
+    def clean_month(self):
+        value = self.cleaned_data['month'].lower()
+        if not value:
+            return self.MONTH_CURRENT
+
+        return value
