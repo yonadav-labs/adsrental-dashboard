@@ -30,12 +30,14 @@ class Command(BaseCommand):
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
             for lead in leads:
                 LeadHistory.upsert_for_lead(lead)
+            return 'Done'
         if aggregate:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
             d = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else datetime.date.today()
             d = d.replace(day=1)
             for lead in leads:
                 LeadHistoryMonth.get_or_create(lead=lead, date=d).aggregate()
+            return 'Done'
         if date:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
             d = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -52,3 +54,4 @@ class Command(BaseCommand):
                 is_online = os.path.exists(log_path)
                 LeadHistory(lead=lead, date=d, checks_online=24 if is_online else 0, checks_offline=24 if not is_online else 0).save()
                 # print lead, is_online
+            return 'Done'

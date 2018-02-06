@@ -8,4 +8,4 @@
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/delivered/ &>/dev/null
 */10 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/offline/ &>/dev/null
 0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py sync_ec2 --all > /root/cron.log
-0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py lead_history > /root/cron.log
+0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py lead_history --now > /root/cron.log

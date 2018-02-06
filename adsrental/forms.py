@@ -191,6 +191,7 @@ class ReportForm(forms.Form):
 
     search = forms.CharField(label='Search', required=False)
     month = forms.ChoiceField(choices=MONTH_CHOICES, required=False)
+    hide_zeroes = forms.BooleanField(required=False)
 
     def clean_month(self):
         value = self.cleaned_data['month'].lower()
