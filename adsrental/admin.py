@@ -372,6 +372,10 @@ class LeadAdmin(admin.ModelAdmin):
                 lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
                 lead.save()
                 lead.raspberry_pi.leadid = lead.leadid
+                lead.raspberry_pi.first_seen = None
+                lead.raspberry_pi.last_seen = None
+                lead.raspberry_pi.first_tested = None
+                lead.raspberry_pi.tunnel_last_tested = None
                 lead.raspberry_pi.save()
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
