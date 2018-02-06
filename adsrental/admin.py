@@ -193,7 +193,7 @@ class LeadAdmin(admin.ModelAdmin):
         'facebook_account_column',
         'raspberry_pi_link',
         'ec2_instance_link',
-        'tested',
+        'tested_field',
         'last_touch',
         'first_seen',
         'last_seen',
@@ -264,7 +264,7 @@ class LeadAdmin(admin.ModelAdmin):
     def tunnel_online(self, obj):
         return obj.raspberry_pi.tunnel_online() if obj.raspberry_pi else False
 
-    def tested(self, obj):
+    def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_seen:
             return True
 
@@ -443,6 +443,8 @@ class LeadAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
+    tested_field.boolean = True
+    tested_field.short_description = 'Tested'
     last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
