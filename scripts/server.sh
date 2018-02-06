@@ -20,7 +20,7 @@ echo Starting Gunicorn.
 exec gunicorn config.wsgi:application \
     --worker-class gevent \
     --bind 0.0.0.0:8007 \
-    --workers 2 \
+    --workers 3 \
     --timeout 3000 \
     --graceful-timeout 3000 \
     --worker-connections 10000 \
