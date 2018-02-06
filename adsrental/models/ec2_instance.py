@@ -209,6 +209,8 @@ class EC2Instance(models.Model):
         if self.status != self.STATUS_STOPPED:
             return False
 
+        self.status = self.STATUS_PENDING
+        self.save()
         boto_instance.start()
         if blocking:
             while True:
@@ -232,6 +234,8 @@ class EC2Instance(models.Model):
         if self.status != self.STATUS_RUNNING:
             return False
 
+        self.status = self.STATUS_STOPPING
+        self.save()
         boto_instance.stop()
         if blocking:
             while True:
