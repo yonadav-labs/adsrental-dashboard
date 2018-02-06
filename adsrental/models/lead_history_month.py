@@ -9,6 +9,9 @@ from adsrental.models.mixins import FulltextSearchMixin
 
 
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
+    MAX_PAYMENT = 25.
+
+
     lead = models.ForeignKey('adsrental.Lead')
     date = models.DateField(db_index=True)
     days_offline = models.IntegerField(default=0)
@@ -46,4 +49,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         return cls(lead=lead, date=date_month)
 
     def get_amount(self):
-        return 25. * self.days_online / (self.days_online + self.days_offline)
+        if not self.days_online:
+            return 0
+        days_online_valid = max(self.days_online - self.days_wrong_password, 0)
+        days_total = self.days_online + self.days_offline
+        return self.MAX_PAYMENT * days_online_valid / days_total
