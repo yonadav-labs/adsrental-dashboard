@@ -842,7 +842,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         model = LeadHistoryMonth
 
     list_per_page = 5000
-    list_display = ('id', 'lead', 'date', 'days_online', 'days_offline', 'days_wrong_password', 'amount', )
+    list_display = ('id', 'lead_link', 'date', 'days_online', 'days_offline', 'days_wrong_password', 'amount', )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (DateMonthListFilter, HistoryStatusListFilter, )
 
@@ -855,6 +855,14 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def amount(self, obj):
         return '${}'.format(round(obj.get_amount(), 2))
+
+    def lead_link(self, obj):
+        lead = obj.lead
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+            url=reverse('admin:adsrental_lead_changelist'),
+            lead=lead.email,
+            q=lead.leadid,
+        )
 
 
 admin.site.register(User, CustomUserAdmin)
