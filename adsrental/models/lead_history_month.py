@@ -11,7 +11,6 @@ from adsrental.models.mixins import FulltextSearchMixin
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     MAX_PAYMENT = 25.
 
-
     lead = models.ForeignKey('adsrental.Lead')
     date = models.DateField(db_index=True)
     days_offline = models.IntegerField(default=0)
