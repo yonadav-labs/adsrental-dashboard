@@ -4,12 +4,14 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.contrib import admin
+from django.conf import settings
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+
 from adsrental.models.lead import Lead, ReportProxyLead
 from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory, LeadHistoryMonth
 from salesforce_handler.models import Lead as SFLead
@@ -608,6 +610,23 @@ class CustomerIOEventAdmin(admin.ModelAdmin):
         return obj.lead.name()
 
 
+class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
+    title = 'RaspberryPi online state'
+    parameter_name = 'online'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('online_5m', 'Online last 5 min'),
+            ('online', 'Online last hour'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'online_5m':
+            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=5))
+        if self.value() == 'online':
+            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
+
+
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
     list_display = (
@@ -622,9 +641,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'last_troubleshoot',
         'tunnel_up',
         'web_up',
-        'ssh_up',
+        # 'ssh_up',
     )
-    list_filter = ('status', 'ssh_up', 'tunnel_up', 'web_up', )
+    list_filter = (
+        'status',
+        'tunnel_up',
+        'web_up',
+        LeadRaspberryPiOnlineListFilter,
+    )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
     list_select_related = ('lead', 'lead__raspberry_pi', )
@@ -667,8 +691,9 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
             ))
-            links.append('<a target="_blank" href="/log/{rpid}">Logs</a>'.format(
+            links.append('<a target="_blank" href="/log/{rpid}/{date}.log">Today log</a>'.format(
                 rpid=obj.rpid,
+                date=timezone.now().strftime(settings.LOG_DATE_FORMAT),
             ))
 
         links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
