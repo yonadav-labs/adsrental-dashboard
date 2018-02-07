@@ -112,8 +112,11 @@ class LogView(View):
                 ec2_instance.save()
 
                 if not tunnel_up:
-                    self.add_log(request, rpid, 'Tunnel seems down, restarting')
-                    # restart_required = True
+                    if ec2_instance.web_up:
+                        self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
+                        restart_required = True
+                    else:
+                        self.add_log(request, rpid, 'Tunnel seems to be down, but web is also down, probably dead EC2')
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
