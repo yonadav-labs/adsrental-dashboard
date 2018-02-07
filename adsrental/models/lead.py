@@ -18,6 +18,7 @@ from adsrental.utils import CustomerIOClient
 
 class Lead(models.Model, FulltextSearchMixin):
     STATUS_QUALIFIED = 'Qualified'
+    STATUS_DISQUALIFIED = 'Disqualified'
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
@@ -26,6 +27,7 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_BANNED, 'Banned'),
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
+        (STATUS_DISQUALIFIED, 'Disqualified'),
     ]
 
     COMPANY_EMPTY = '[Empty]'
