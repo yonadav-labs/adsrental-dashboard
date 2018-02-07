@@ -2,6 +2,7 @@
 
 cd /home/pi/new-pi/
 
-curl https://adsrental.com/static/new_pi.zip > new_pi.zip
-unzip -o new_pi.zip
+# sudo apt install -y ssh
+curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_1.0.8.zip > pi_patch.zip
+unzip -o pi_patch.zip
 sudo reboot
