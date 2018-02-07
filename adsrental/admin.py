@@ -720,7 +720,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 date=timezone.now().strftime(settings.LOG_DATE_FORMAT),
             ))
 
-        links.append('<a href="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
+        links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
             hostname=obj.hostname,
         ))
         links.append('<a target="_blank" href="http://{hostname}:13608">Web</a>'.format(
