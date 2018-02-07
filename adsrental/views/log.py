@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import json
+from distutils.version import StrictVersion
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
@@ -128,7 +129,7 @@ class LogView(View):
                 raspberry_pi.version = version
                 raspberry_pi.save()
 
-            if version and settings.RASPBERRY_PI_VERSION > version:
+            if version and settings.RASPBERRY_PI_VERSION != version and StrictVersion(settings.RASPBERRY_PI_VERSION) > StrictVersion(version):
                 self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
                 restart_required = True
 
