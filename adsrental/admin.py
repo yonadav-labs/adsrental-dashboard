@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import csv
+import unicodecsv as csv
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -973,7 +973,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=check_report_{}.csv'.format(request.GET.get('date', ''))
 
-        writer = csv.writer(response)
+        writer = csv.writer(response, encoding='utf-8')
         writer.writerow(field_titles)
         for obj in queryset:
             row = []

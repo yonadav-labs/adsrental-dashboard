@@ -17,3 +17,5 @@ django-recaptcha2==1.0.3
 paramiko==2.4.0
 ipython==5.5.0
 django-bootstrap3==9.1.0
+unicodecsv==0.14.1
+django-admin-tools==0.8.1
