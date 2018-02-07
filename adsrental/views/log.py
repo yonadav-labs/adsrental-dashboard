@@ -113,8 +113,8 @@ class LogView(View):
 
                 if not tunnel_up:
                     if ec2_instance.web_up:
-                        self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
-                        restart_required = True
+                        self.add_log(request, rpid, 'Tunnel seems to be down, skipping')
+                        # restart_required = True
                     else:
                         self.add_log(request, rpid, 'Tunnel seems to be down, but web is also down, probably dead EC2')
 
