@@ -96,6 +96,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return ', '.join([
             self.street or '',
             self.city or '',
+            self.state or '',
             self.postal_code or '',
             self.country or '',
         ])

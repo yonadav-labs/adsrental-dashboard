@@ -781,6 +781,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
     list_display = (
         'sf_leadid',
+        # 'rpid',
         'first_name',
         'last_name',
         # 'utm_source',
@@ -907,9 +908,25 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         model = LeadHistoryMonth
 
     list_per_page = 5000
-    list_display = ('id', 'lead_link', 'date', 'days_online', 'days_offline', 'days_wrong_password', 'amount', )
+    list_display = (
+        'id',
+        'lead_link',
+        'rpid',
+        'lead_address',
+        'days_online',
+        'days_offline',
+        'days_wrong_password',
+        'amount',
+    )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (DateMonthListFilter, HistoryStatusListFilter, )
+    list_select_related = ('lead', 'lead__raspberry_pi')
+
+    def rpid(self, obj):
+        return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.rpid
+
+    def lead_address(self, obj):
+        return obj.lead and obj.lead.get_address()
 
     def get_queryset(self, request):
         queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
@@ -925,7 +942,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         lead = obj.lead
         return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
-            lead=lead.email,
+            lead=lead.name(),
             q=lead.leadid,
         )
 
