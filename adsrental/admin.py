@@ -450,12 +450,18 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
     def report_wrong_password(self, request, queryset):
-        queryset.update(wrong_password_date=timezone.now())
-        messages.info(request, 'Password is marked as wrong.')
+        for lead in queryset:
+            if lead.wrong_password_date is None:
+                lead.wrong_password_date = timezone.now()
+                lead.save()
+                messages.info(request, 'Lead {} password is marked as wrong.'.format(lead.email))
 
     def report_correct_password(self, request, queryset):
-        queryset.update(wrong_password_date=None)
-        messages.info(request, 'Password is marked as correct.')
+        for lead in queryset:
+            if lead.wrong_password_date is not None:
+                lead.wrong_password_date = None
+                lead.save()
+                messages.info(request, 'Lead {} password is marked as correct.'.format(lead.email))
 
     def touch(self, request, queryset):
         for lead in queryset:
