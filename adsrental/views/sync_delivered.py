@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import requests
 from django.views import View
 from django.http import JsonResponse

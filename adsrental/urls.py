@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.conf.urls import url
 from adsrental.views.log import LogView
 from adsrental.views.main import MainView

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import datetime
 from multiprocessing.pool import ThreadPool
 from itertools import chain, islice
