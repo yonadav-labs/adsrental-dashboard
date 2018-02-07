@@ -58,6 +58,7 @@ class Lead(models.Model, FulltextSearchMixin):
     raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', null=True, blank=True, default=None)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None)
     wrong_password = models.BooleanField(default=False)
+    wrong_password_date = models.DateTimeField(blank=True, null=True)
     bundler_paid = models.BooleanField(default=False)
     pi_delivered = models.BooleanField(default=False)
     billed = models.BooleanField(default=False)
@@ -188,7 +189,6 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.utm_source, lead.utm_source, ),
             (sf_lead.google_account, lead.google_account, ),
             (remote_raspberry_pi_rpid, local_raspberry_pi_rpid, ),
-            (sf_lead.wrong_password, lead.wrong_password, ),
             (sf_lead.bundler_paid, lead.bundler_paid, ),
             (sf_lead.facebook_account_status, lead.facebook_account_status, ),
             (sf_lead.google_account_status, lead.google_account_status, ),

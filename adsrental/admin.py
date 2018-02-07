@@ -173,13 +173,13 @@ class WrongPasswordListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'no':
-            return queryset.filter(wrong_password=False)
+            return queryset.filter(wrong_password_date__isnull=True)
         if self.value() == 'yes':
-            return queryset.filter(wrong_password=True)
+            return queryset.filter(wrong_password_date__isnull=False)
         if self.value() == 'yes_2days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
+            return queryset.filter(wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24))
         if self.value() == 'yes_5days':
-            return queryset.filter(wrong_password=True, raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
+            return queryset.filter(wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24))
 
 
 class CustomUserAdmin(UserAdmin):
@@ -223,7 +223,7 @@ class LeadAdmin(admin.ModelAdmin):
         'tunnel_last_tested',
         'online',
         'tunnel_online',
-        'wrong_password',
+        'wrong_password_date_field',
         'pi_delivered',
         'bundler_paid',
     )
@@ -249,6 +249,8 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'ban',
         'unban',
+        'report_wrong_password',
+        'report_correct_password',
         'prepare_for_reshipment',
         'touch',
     )
@@ -316,15 +318,21 @@ class LeadAdmin(admin.ModelAdmin):
 
     def facebook_account_column(self, obj):
         return '{} {}'.format(
-            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '',
             obj.facebook_account_status,
         )
 
     def google_account_column(self, obj):
         return '{} {}'.format(
-            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '<img src="/static/admin/img/icon-no.svg" alt="False">',
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '',
             obj.google_account_status,
         )
+
+    def wrong_password_date_field(self, obj):
+        if not obj.wrong_password_date:
+            return None
+
+        return '<span title="{}">{}</span>'.format(obj.wrong_password_date, naturaltime(obj.wrong_password_date))
 
     def raspberry_pi_link(self, obj):
         result = []
@@ -441,6 +449,14 @@ class LeadAdmin(admin.ModelAdmin):
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
+    def report_wrong_password(self, request, queryset):
+        queryset.update(wrong_password_date=timezone.now())
+        messages.info(request, 'Password is marked as wrong.')
+
+    def report_correct_password(self, request, queryset):
+        queryset.update(wrong_password_date=None)
+        messages.info(request, 'Password is marked as correct.')
+
     def touch(self, request, queryset):
         for lead in queryset:
             lead.touch()
@@ -459,8 +475,13 @@ class LeadAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
+    wrong_password_date_field.short_description = 'Wrong Password'
+    wrong_password_date_field.allow_tags = True
+    wrong_password_date_field.admin_order_field = 'wrong_password_date'
+
     tested_field.boolean = True
     tested_field.short_description = 'Tested'
+
     last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'

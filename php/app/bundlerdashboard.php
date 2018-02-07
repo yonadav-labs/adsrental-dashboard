@@ -61,7 +61,7 @@
 			$output[] = "<td title=\"" . $row["last_seen"]. "\">" . time_elapsed_string($row["last_seen"]) . "</td>";
 			$output[] = "<td title=\"" . $row["tunnel_last_tested"]. "\">" . time_elapsed_string($row["tunnel_last_tested"]) . "</td>";
 			$output[] = "<td>" . ($row["bundler_paid"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";
-			$output[] = "<td>" . ($row["wrong_password"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: red;\"></span>" : "No") . "</td>";
+			$output[] = "<td>" . ($row["wrong_password_date"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: red;\"></span>" : "No") . "</td>";
 			$output[] = "<td>" . ($row["pi_delivered"] ? "<span class=\"glyphicon glyphicon-ok\" style=\"color: lightgreen;\"></span>" : "<span class=\"glyphicon glyphicon-remove\" style=\"color: red;\"></span>") . "</td>";			
 			$output[] = "</tr>\n";
 	
@@ -163,7 +163,7 @@
 				"first_seen" => $row["first_seen"],
 				"last_seen" => $row["last_seen"],
 				"tunnel_last_tested" => $row["tunnel_last_tested"],
-				"wrong_password" => $row["wrong_password"],
+				"wrong_password_date" => $row["wrong_password_date"],
 				"bundler_paid" => $row["bundler_paid"],
 				"rpid" => $row["rpid"],
 			);

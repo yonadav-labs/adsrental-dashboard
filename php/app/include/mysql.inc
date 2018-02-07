@@ -72,7 +72,6 @@
 				utm_source,
 				google_account,
 				facebook_account,
-				wrong_password,
 				bundler_paid,
 				pi_delivered,
 				raspberry_pi_id,
@@ -91,7 +90,6 @@
 				'$lead[utm_source__c]',
 				'$googleAccount',
 				'$facebookAccount',
-				'$wrongPassword',
 				'$bundlerPaid',
 				'$piDelivered',
 				NULL,
@@ -99,7 +97,6 @@
 				'$now'
 			)
 			ON DUPLICATE KEY UPDATE
-				`wrong_password` = '$wrongPassword',
 				`bundler_paid` = '$bundlerPaid',
 				`pi_delivered` = '$piDelivered';
 EOD;
