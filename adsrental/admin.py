@@ -627,6 +627,23 @@ class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
             return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
 
 
+class LeadRaspberryPiVersionListFilter(SimpleListFilter):
+    title = 'RaspberryPi version'
+    parameter_name = 'version'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('latest', 'Only {}'.format(settings.RASPBERRY_PI_VERSION)),
+            ('old', 'Old versions'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'latest':
+            return queryset.filter(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
+        if self.value() == 'online':
+            return queryset.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
+
+
 class EC2InstanceAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
     list_display = (
@@ -648,6 +665,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'tunnel_up',
         'web_up',
         LeadRaspberryPiOnlineListFilter,
+        LeadRaspberryPiVersionListFilter,
     )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
