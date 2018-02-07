@@ -125,9 +125,10 @@ class Lead(models.Model, FulltextSearchMixin):
             self.google_account_status = Lead.STATUS_BANNED
         self.save()
 
-        sf_lead = SFLead.objects.get(email=self.email).first()
-        sf_lead.status = self.status
-        sf_lead.save()
+        sf_lead = SFLead.objects.first(email=self.email).first()
+        if sf_lead:
+            sf_lead.status = self.status
+            sf_lead.save()
 
         CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
         return True
@@ -143,9 +144,10 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.save()
 
-        sf_lead = SFLead.objects.get(email=self.email).first()
-        sf_lead.status = self.status
-        sf_lead.save()
+        sf_lead = SFLead.objects.first(email=self.email).first()
+        if sf_lead:
+            sf_lead.status = self.status
+            sf_lead.save()
 
         return True
 
