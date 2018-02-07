@@ -239,7 +239,6 @@ class LeadAdmin(admin.ModelAdmin):
         'create_shipstation_order',
         'start_ec2',
         'restart_ec2',
-        'troubleshoot_ec2',
         'restart_raspberry_pi',
         'ban',
         'unban',
@@ -415,12 +414,6 @@ class LeadAdmin(admin.ModelAdmin):
     def restart_ec2(self, request, queryset):
         for lead in queryset:
             lead.ec2instance.restart()
-
-    def troubleshoot_ec2(self, request, queryset):
-        for lead in queryset:
-            ec2_instance = lead.get_ec2_instance()
-            if ec2_instance:
-                ec2_instance.troubleshoot()
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
@@ -671,15 +664,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
     list_select_related = ('lead', 'lead__raspberry_pi', )
     actions = (
-        'troubleshoot',
-        'troubleshoot_fix',
-        'update_password',
         'update_ec2_tags',
         'get_currect_state',
         'check_missing',
         'restart',
         'start',
         'stop',
+        'restart_raspberry_pi',
     )
 
     def lead_link(self, obj):
@@ -722,18 +713,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         ))
         return ', '.join(links)
 
-    def troubleshoot(self, request, queryset):
-        for ec2_instance in queryset:
-            ec2_instance.troubleshoot()
-
-    def troubleshoot_fix(self, request, queryset):
-        for ec2_instance in queryset:
-            ec2_instance.troubleshoot_fix()
-
-    def update_password(self, request, queryset):
-        for ec2_instance in queryset:
-            ec2_instance.change_password()
-
     def update_ec2_tags(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.set_ec2_tags()
@@ -756,6 +735,12 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def stop(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.stop()
+
+    def restart_raspberry_pi(self, request, queryset):
+        for ec2_instance in queryset:
+            if ec2_instance.lead and ec2_instance.lead.raspberry_pi:
+                ec2_instance.lead.raspberry_pi.restart_required = True
+                ec2_instance.lead.raspberry_pi.save()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
