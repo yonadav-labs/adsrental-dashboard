@@ -240,6 +240,8 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.state = sf_lead.state
         lead.postal_code = sf_lead.postal_code
         lead.country = sf_lead.country
+        if not lead.created:
+            lead.created = timezone.now()
         lead.save()
         return lead
 
