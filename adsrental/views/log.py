@@ -74,9 +74,9 @@ class LogView(View):
             else:
                 self.add_log(request, rpid, 'Tunnel Tested')
 
-            if ec2_instance.ip_address != ip_address:
-                self.add_log(request, rpid, 'Updating EC2 IP address to {}'.format(ip_address))
-                ec2_instance.update_from_boto()
+            # if ec2_instance.ip_address != ip_address:
+            #     self.add_log(request, rpid, 'Updating EC2 IP address to {}'.format(ip_address))
+            #     ec2_instance.update_from_boto()
 
             return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
