@@ -195,6 +195,11 @@ class CustomUserAdmin(UserAdmin):
 
 
 class LeadAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     model = Lead
     list_display = (
         'id_field',
@@ -489,6 +494,11 @@ class LeadAdmin(admin.ModelAdmin):
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     model = RaspberryPi
     list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_tested_field', 'first_seen_field',
                     'last_seen_field', 'tunnel_last_tested_field', 'online', 'tunnel_online', )
@@ -638,6 +648,11 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     model = CustomerIOEvent
     list_display = (
         'id',
@@ -705,10 +720,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 date=timezone.now().strftime(settings.LOG_DATE_FORMAT),
             ))
 
-        links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
+        links.append('<a href="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
             hostname=obj.hostname,
         ))
-        links.append('<a target="_blank" href="http://{hostname}:13608">CURL</a>'.format(
+        links.append('<a target="_blank" href="http://{hostname}:13608">Web</a>'.format(
             hostname=obj.hostname,
         ))
         return ', '.join(links)
