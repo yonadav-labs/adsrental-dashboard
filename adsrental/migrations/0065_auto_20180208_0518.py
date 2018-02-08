@@ -13,7 +13,7 @@ def decode_fb_fields(apps, schema_editor):
         if '@' not in lead.fb_email:
             try:
                 lead.fb_email = base64.b64decode(lead.fb_email)
-                lead.fb_secret = base64.b64decode(lead.fb_secret)
+                lead.fb_secret = base64.b64decode(lead.fb_secret).encode('utf-8')
                 lead.save()
             except Exception as e:
                 print lead.email, e, lead.fb_email, lead.fb_secret
