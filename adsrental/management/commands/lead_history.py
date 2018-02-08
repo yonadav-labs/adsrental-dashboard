@@ -33,14 +33,14 @@ class Command(BaseCommand):
             return 'Done'
         if aggregate:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
-            d = datetime.datetime.strptime(date, '%Y-%m-%d').date() if date else datetime.date.today()
+            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             d = d.replace(day=1)
             for lead in leads:
                 LeadHistoryMonth.get_or_create(lead=lead, date=d).aggregate()
             return 'Done'
         if date:
             leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
-            d = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
             if force:
                 LeadHistory.objects.filter(date=d).delete()
             for lead in leads:

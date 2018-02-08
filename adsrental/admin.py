@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from adsrental.models.lead import Lead, ReportProxyLead
-from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory, LeadHistoryMonth
+from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory, LeadHistoryMonth, LeadChange
 from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import ShipStationClient
 
@@ -911,13 +911,13 @@ class DateMonthListFilter(SimpleListFilter):
         choices = []
         for i in range(3):
             d = month_start - relativedelta(months=i)
-            choices.append((d.strftime('%Y-%m-%d'), d.strftime('%b %Y')))
+            choices.append((d.strftime(settings.SYSTEM_DATE_FORMAT), d.strftime('%b %Y')))
 
         return choices
 
     def queryset(self, request, queryset):
         if self.value():
-            d = datetime.datetime.strptime(self.value(), '%Y-%m-%d').date()
+            d = datetime.datetime.strptime(self.value(), settings.SYSTEM_DATE_FORMAT).date()
             return queryset.filter(date=d)
 
 
@@ -999,9 +999,13 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def export_as_csv(self, request, queryset):
         field_names = [i[0] for i in self.csv_fields]
         field_titles = [i[1] for i in self.csv_fields]
+        date = (datetime.datetime.strptime(request.GET.get('date'), settings.SYSTEM_DATE_FORMAT) if request.GET.get('date') else timezone.now()).date()
 
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=check_report_{}.csv'.format(request.GET.get('date', ''))
+        response['Content-Disposition'] = 'attachment; filename=check_report_{month}_{year}.csv'.format(
+            month=date.strftime('%b').lower(),
+            year=date.strftime('%Y'),
+        )
 
         writer = csv.writer(response, encoding='utf-8')
         writer.writerow(field_titles)
@@ -1026,6 +1030,28 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     lead_link.allow_tags = True
 
 
+class LeadChangeAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'lead_link',
+        'field',
+        'value',
+        'old_value',
+        'created',
+    )
+
+    def lead_link(self, obj):
+        lead = obj.lead
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+            url=reverse('admin:adsrental_lead_changelist'),
+            lead=lead.name(),
+            q=lead.leadid,
+        )
+
+    lead_link.short_description = 'Lead'
+    lead_link.allow_tags = True
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
@@ -1035,3 +1061,4 @@ admin.site.register(ReportProxyLead, ReportLeadAdmin)
 admin.site.register(Bundler, BundlerAdmin)
 admin.site.register(LeadHistory, LeadHistoryAdmin)
 admin.site.register(LeadHistoryMonth, LeadHistoryMonthAdmin)
+admin.site.register(LeadChange, LeadChangeAdmin)

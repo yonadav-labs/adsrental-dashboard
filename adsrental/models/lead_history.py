@@ -7,6 +7,10 @@ from django.db import models
 
 
 class LeadHistory(models.Model):
+    class Meta:
+        verbose_name = 'Lead History'
+        verbose_name_plural = 'Lead Histories'
+
     lead = models.ForeignKey('adsrental.Lead')
     date = models.DateField(db_index=True)
     checks_offline = models.IntegerField(default=0)

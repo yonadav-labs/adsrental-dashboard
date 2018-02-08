@@ -9,6 +9,10 @@ from adsrental.models.mixins import FulltextSearchMixin
 
 
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
+    class Meta:
+        verbose_name = 'Lead History Month'
+        verbose_name_plural = 'Lead Histories Month'
+
     MAX_PAYMENT = 25.
 
     lead = models.ForeignKey('adsrental.Lead')

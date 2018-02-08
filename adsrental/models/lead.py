@@ -10,6 +10,7 @@ from django.conf import settings
 from django.apps import apps
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead_change import LeadChange
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 from salesforce_handler.models import Lead as SFLead
 from adsrental.models.mixins import FulltextSearchMixin
@@ -119,42 +120,44 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def ban(self):
-        if self.status == Lead.STATUS_BANNED:
+    def set_status(self, value):
+        if value not in dict(self.STATUS_CHOICES).keys():
+            raise ValueError('Unknown status: {}'.format(value))
+        if value == self.status:
             return False
-        self.old_status = self.status
-        self.status = Lead.STATUS_BANNED
-        if self.facebook_account:
-            self.facebook_account_status = Lead.STATUS_BANNED
-        if self.google_account:
-            self.google_account_status = Lead.STATUS_BANNED
-        self.save()
 
+        old_value = self.status
+
+        if value == self.STATUS_BANNED:
+            if self.facebook_account:
+                self.facebook_account_status = Lead.STATUS_BANNED
+            if self.google_account:
+                self.google_account_status = Lead.STATUS_BANNED
+        else:
+            if self.facebook_account:
+                self.facebook_account_status = Lead.STATUS_AVAILABLE
+            if self.google_account:
+                self.google_account_status = Lead.STATUS_AVAILABLE
+
+        if self.status != Lead.STATUS_BANNED:
+            self.old_status = self.status
+
+        self.status = value
+        self.save()
+        LeadChange(lead=self, field='status', value=value, old_value=old_value).save()
+        return True
+
+        # FIXME: remove
         sf_lead = SFLead.objects.filter(email=self.email).first()
         if sf_lead:
-            sf_lead.status = self.status
+            sf_lead.status = value
             sf_lead.save()
 
-        CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
-        return True
+    def ban(self):
+        return self.set_status(Lead.STATUS_BANNED)
 
     def unban(self):
-        if self.status != self.STATUS_BANNED:
-            return False
-        self.status = self.old_status or Lead.STATUS_QUALIFIED
-        if self.facebook_account:
-            self.facebook_account_status = Lead.STATUS_AVAILABLE
-        if self.google_account:
-            self.google_account_status = Lead.STATUS_AVAILABLE
-
-        self.save()
-
-        sf_lead = SFLead.objects.filter(email=self.email).first()
-        if sf_lead:
-            sf_lead.status = self.status
-            sf_lead.save()
-
-        return True
+        return self.set_status(self.old_status or Lead.STATUS_QUALIFIED)
 
     @staticmethod
     def upsert_from_sf(sf_lead, lead):
