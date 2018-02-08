@@ -57,7 +57,7 @@ class RaspberryPi(models.Model):
         now = timezone.now()
         if not self.first_tested:
             lead = self.get_lead()
-            if lead and lead.status == lead.STATUS_AVAILABLE:
+            if lead and lead.status == lead.STATUS_QUALIFIED:
                 lead.status = lead.STATUS_IN_PROGRESS
                 lead.save()
             self.first_tested = now
