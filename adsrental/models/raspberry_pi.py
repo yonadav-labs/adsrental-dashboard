@@ -11,6 +11,7 @@ from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class RaspberryPi(models.Model):
+class RaspberryPi(models.Model):
     online_hours_ttl = 6
     first_tested_hours_ttl = 1
     tunnel_online_hours_ttl = 1
@@ -56,6 +57,10 @@ class RaspberryPi(models.Model):
     def update_ping(self):
         now = timezone.now()
         if not self.first_tested:
+            lead = self.get_lead()
+            if lead and lead.status == lead.STATUS_AVAILABLE:
+                lead.status = lead.STATUS_IN_PROGRESS
+                lead.save()
             self.first_tested = now
             if self.lead:
                 self.lead.tested = True
