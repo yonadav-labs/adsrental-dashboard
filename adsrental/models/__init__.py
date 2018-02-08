@@ -7,3 +7,4 @@ from lead_history import LeadHistory  # noqa: F401
 from lead_history_month import LeadHistoryMonth  # noqa: F401
 from bundler import Bundler  # noqa: F401
 from lead_change import LeadChange  # noqa: F401
+from raspberry_pi_session import RaspberryPiSession  # noqa: F401

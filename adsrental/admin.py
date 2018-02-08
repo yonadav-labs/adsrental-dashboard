@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from adsrental.models.lead import Lead, ReportProxyLead
-from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory, LeadHistoryMonth, LeadChange
+from adsrental.models import User, RaspberryPi, CustomerIOEvent, EC2Instance, Bundler, LeadHistory, LeadHistoryMonth, LeadChange, RaspberryPiSession
 from salesforce_handler.models import Lead as SFLead
 from adsrental.utils import ShipStationClient
 
@@ -1039,6 +1039,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'old_value',
         'created',
     )
+    list_select_related = ('lead', )
 
     def lead_link(self, obj):
         lead = obj.lead
@@ -1052,6 +1053,34 @@ class LeadChangeAdmin(admin.ModelAdmin):
     lead_link.allow_tags = True
 
 
+class RaspberryPiSessionAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'raspberry_pi_link',
+        'start_date',
+        'end_date',
+        'duration',
+    )
+    list_select_related = ('raspberry_pi', )
+
+    def raspberry_pi_link(self, obj):
+        result = []
+        if obj.raspberry_pi:
+            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
+                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
+                url=reverse('admin:adsrental_raspberrypi_changelist'),
+                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
+                rpid=obj.raspberry_pi,
+            ))
+
+    def duration(self, obj):
+        end_date = obj.end_date or timezone.now()
+        return '{} hours'.format(round((end_date - obj.start_date).total_seconds() / 3600., 1))
+
+    raspberry_pi_link.short_description = 'Lead'
+    raspberry_pi_link.allow_tags = True
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Lead, LeadAdmin)
 admin.site.register(RaspberryPi, RaspberryPiAdmin)
@@ -1062,3 +1091,4 @@ admin.site.register(Bundler, BundlerAdmin)
 admin.site.register(LeadHistory, LeadHistoryAdmin)
 admin.site.register(LeadHistoryMonth, LeadHistoryMonthAdmin)
 admin.site.register(LeadChange, LeadChangeAdmin)
+admin.site.register(RaspberryPiSession, RaspberryPiSessionAdmin)

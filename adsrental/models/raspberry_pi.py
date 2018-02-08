@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 
+from adsrental.models.raspberry_pi_session import RaspberryPiSession
 from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
@@ -23,6 +24,7 @@ class RaspberryPi(models.Model):
     first_tested = models.DateTimeField(blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True, db_index=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
+    online_since_date = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
     restart_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, default=settings.IMAGE_RASPBERRY_PI_VERSION)
@@ -44,6 +46,13 @@ class RaspberryPi(models.Model):
 
         return lead.get_ec2_instance()
 
+    def report_offline(self):
+        self.last_offline_reported = timezone.now()
+        if self.online_since_date:
+            self.online_since_date = None
+            self.save()
+            RaspberryPiSession.end(self)
+
     def update_ping(self):
         now = timezone.now()
         if not self.first_tested:
@@ -55,6 +64,10 @@ class RaspberryPi(models.Model):
 
         if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
             return False
+
+        if self.online_since_date is None:
+            self.online_since_date = now
+            RaspberryPiSession.start(self)
 
         if not self.first_seen:
             self.first_seen = now
