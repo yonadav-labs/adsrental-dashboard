@@ -11,7 +11,6 @@ from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class RaspberryPi(models.Model):
-class RaspberryPi(models.Model):
     online_hours_ttl = 6
     first_tested_hours_ttl = 1
     tunnel_online_hours_ttl = 1
