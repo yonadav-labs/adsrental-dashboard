@@ -130,7 +130,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.google_account_status = Lead.STATUS_BANNED
         self.save()
 
-        sf_lead = SFLead.objects.first(email=self.email).first()
+        sf_lead = SFLead.objects.filter(email=self.email).first()
         if sf_lead:
             sf_lead.status = self.status
             sf_lead.save()
@@ -149,7 +149,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.save()
 
-        sf_lead = SFLead.objects.first(email=self.email).first()
+        sf_lead = SFLead.objects.filter(email=self.email).first()
         if sf_lead:
             sf_lead.status = self.status
             sf_lead.save()
