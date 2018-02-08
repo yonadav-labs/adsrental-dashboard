@@ -37,7 +37,7 @@ class SyncFromShipStationView(View):
 
             for row in response['shipments']:
                 order_number = row['orderNumber']
-                lead = Lead.objects.filter(account_name=order_number).first()
+                lead = Lead.objects.filter(shipstation_order_number=order_number).first()
                 if not lead:
                     orders_not_found.append(order_number)
                     continue

@@ -56,6 +56,7 @@ class Lead(models.Model, FulltextSearchMixin):
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True)
     google_account = models.BooleanField(default=False)
     facebook_account = models.BooleanField(default=False)
+    shipstation_order_number = models.CharField(max_length=100, null=True, blank=True)
     raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', null=True, blank=True, default=None)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None)
     wrong_password = models.BooleanField(default=False)

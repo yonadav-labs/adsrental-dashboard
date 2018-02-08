@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 import time
+import uuid
 
 import requests
 import boto3
@@ -72,8 +73,12 @@ class ShipStationClient(object):
         return self.client
 
     def add_lead_order(self, lead):
+        if not lead.shipstation_order_number:
+            random_str = str(uuid.uuid4()).replace('-', '')[:10]
+            lead.shipstation_order_number = '{}_{}' % (lead.raspberry_pi.rpid, random_str)
+
         order = ShipStationOrder(
-            order_key=lead.raspberry_pi.rpid, order_number=lead.account_name)
+            order_key=lead.shipstation_order_number, order_number=lead.shipstation_order_number)
         order.set_customer_details(
             username='{} {}'.format(lead.first_name, lead.last_name),
             email=lead.email,
@@ -129,7 +134,7 @@ class ShipStationClient(object):
     def get_lead_order_data(self, lead):
         data = requests.get(
             'https://ssapi.shipstation.com/orders',
-            params={'orderNumber': lead.account_name},
+            params={'orderNumber': lead.shipstation_order_number},
             auth=requests.auth.HTTPBasicAuth(
                 settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
         ).json().get('orders')
