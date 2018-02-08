@@ -1002,7 +1002,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         date = (datetime.datetime.strptime(request.GET.get('date'), settings.SYSTEM_DATE_FORMAT) if request.GET.get('date') else timezone.now()).date()
 
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=check_report_{month}_{year}.csv'.format(
+        response['Content-Disposition'] = 'attachment; filename=check_report__{month}_{year}.csv'.format(
             month=date.strftime('%b').lower(),
             year=date.strftime('%Y'),
         )
