@@ -842,6 +842,8 @@ class ReportLeadAdmin(admin.ModelAdmin):
         RaspberryPiOnlineListFilter,
         TouchCountListFilter,
         'is_sync_adsdb',
+        'bundler_paid',
+        'pi_delivered',
     )
     readonly_fields = ('created', 'updated', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
