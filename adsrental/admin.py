@@ -839,7 +839,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         StatusListFilter,
         'company',
         AccountTypeListFilter,
-        RaspberryPiOnlineListFilter,
+        OnlineListFilter,
         TouchCountListFilter,
         'is_sync_adsdb',
         'bundler_paid',
