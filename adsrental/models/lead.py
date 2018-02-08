@@ -69,6 +69,8 @@ class Lead(models.Model, FulltextSearchMixin):
     google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     fb_email = models.CharField(max_length=255, blank=True, null=True)
     fb_secret = models.CharField(max_length=255, blank=True, null=True)
+    google_email = models.CharField(max_length=255, blank=True, null=True)
+    google_password = models.CharField(max_length=255, blank=True, null=True)
     fb_friends = models.IntegerField(default=0)
     fb_profile_url = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
@@ -193,8 +195,8 @@ class Lead(models.Model, FulltextSearchMixin):
             (sf_lead.facebook_account_status, lead.facebook_account_status, ),
             (sf_lead.google_account_status, lead.google_account_status, ),
             (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
-            (sf_lead.fb_email, lead.fb_email, ),
-            (sf_lead.fb_secret, lead.fb_secret, ),
+            # (sf_lead.fb_email, lead.fb_email, ),
+            # (sf_lead.fb_secret, lead.fb_secret, ),
             (sf_lead.splashtop_id, lead.splashtop_id, ),
             (sf_lead.street, lead.street, ),
             (sf_lead.city, lead.city, ),
@@ -235,8 +237,8 @@ class Lead(models.Model, FulltextSearchMixin):
         lead.google_account_status = sf_lead.google_account_status
         if not lead.tested:
             lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
-        lead.fb_email = sf_lead.fb_email
-        lead.fb_secret = sf_lead.fb_secret
+        # lead.fb_email = sf_lead.fb_email
+        # lead.fb_secret = sf_lead.fb_secret
         lead.street = sf_lead.street
         lead.city = sf_lead.city
         lead.state = sf_lead.state
@@ -329,8 +331,8 @@ class Lead(models.Model, FulltextSearchMixin):
                 '00N46000009whHb': request and request.META.get('HTTP_USER_AGENT'),
                 '00N4600000B0zip': 1,
                 '00N4600000B1Sup': 'Available',
-                'Facebook_Email__c': self.fb_email,
-                'Facebook_Password__c': self.fb_secret,
+                'Facebook_Email__c': base64.b64encode(self.fb_email),
+                'Facebook_Password__c': base64.b64encode(self.fb_secret),
                 'Facebook_Friends__c': self.fb_friends,
                 'Account_Name__c': self.account_name,
                 'email': self.email,

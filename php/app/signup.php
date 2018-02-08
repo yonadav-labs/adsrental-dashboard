@@ -40,8 +40,8 @@
 		$data['00N4600000AuUxk'] = GenerateRandomHexString(32);
 
 		// B64 encode facebook data
-		$data['Facebook_Email__c'] = base64_encode($data['Facebook_Email__c']);
-		$data['Facebook_Password__c'] = base64_encode($data['Facebook_Password__c']);
+		// $data['Facebook_Email__c'] = base64_encode($data['Facebook_Email__c']);
+		// $data['Facebook_Password__c'] = base64_encode($data['Facebook_Password__c']);
 
 		//set debug
 		$data['debug'] = '1';
