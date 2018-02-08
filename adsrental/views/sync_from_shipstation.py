@@ -20,7 +20,7 @@ class SyncFromShipStationView(View):
         force = request.GET.get('force')
         request_params = {}
         date_start = timezone.now() - datetime.timedelta(days=days_ago)
-        request_params['shipDateStart'] = date_start.strftime('%Y-%m-%d')
+        request_params['shipDateStart'] = date_start.strftime(settings.SYSTEM_DATE_FORMAT)
 
         last_page = False
         page = 0

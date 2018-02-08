@@ -5,10 +5,8 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.utils.translation import ugettext_lazy as _
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.urls import reverse
 
 from admin_tools.dashboard import modules, Dashboard, AppIndexDashboard
 
@@ -52,13 +50,13 @@ class CustomIndexDashboard(Dashboard):
                 [_('Check Report for current month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urllib.urlencode(dict(
-                        date=datetime.date.today().replace(day=1).strftime('%Y-%m-%d'),
+                        date=datetime.date.today().replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
                     )),
                 )],
                 [_('Check Report for previous month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urllib.urlencode(dict(
-                        date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime('%Y-%m-%d'),
+                        date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
                     )),
                 )],
             ]

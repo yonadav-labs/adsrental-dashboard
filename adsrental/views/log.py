@@ -24,7 +24,7 @@ class LogView(View):
             os.makedirs(os.path.dirname(log_path))
         with open(log_path, 'a') as f:
             f.write('{ts}: {ip}: {message}\n'.format(
-                ts=now.strftime('%Y-%m-%d %H:%M:%S'),
+                ts=now.strftime(settings.SYSTEM_DATETIME_FORMAT),
                 ip=ip_address,
                 message=message,
             ))
