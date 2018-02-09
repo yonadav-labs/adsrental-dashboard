@@ -27,12 +27,12 @@ class SyncOfflineView(View):
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
                 offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
+            reported_offline_leads.append(lead.email)
             if test:
                 continue
 
             customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
             lead.raspberry_pi.report_offline()
-            reported_offline_leads.append(lead.email)
 
         return JsonResponse({
             'test': test,
