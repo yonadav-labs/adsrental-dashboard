@@ -15,6 +15,8 @@ class SyncToAdsdbView(View):
         saved_emails = []
         responses = []
         for lead in leads[:100]:
+            if not lead.fb_email:
+                continue
             bundler = lead.bundler or Bundler.get_by_utm_source(lead.utm_source)
             bundler_adsdb_id = bundler and bundler.adsdb_id
             data = dict(
