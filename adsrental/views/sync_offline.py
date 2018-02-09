@@ -31,7 +31,7 @@ class SyncOfflineView(View):
                 continue
 
             customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
-            # lead.raspberry_pi.report_offline()
+            lead.raspberry_pi.report_offline()
             reported_offline_leads.append(lead.email)
 
         return JsonResponse({
