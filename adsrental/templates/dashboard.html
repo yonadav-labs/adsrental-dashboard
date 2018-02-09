@@ -29,12 +29,12 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th><a href="{% relative_url request.GET.urlencode 'order' 'account_name' %}">Account</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
+                <th><a href="{% relative_url request.GET.urlencode 'order' 'utm_source' %}">UTM source</a></th>
+                <th>Facebook</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
                 <th>Address</th>
-                <th><a href="{% relative_url request.GET.urlencode 'order' 'raspberry_pi__rpid' %}">Raspberry Pi</a></th>
                 <th>Google</th>
                 <th>Facebook</th>
                 <th>Online</th>
@@ -51,8 +51,9 @@
             <tbody>
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ entry.account_name }}</td>
                     <td>{{entry.first_name}} {{entry.last_name}}</td>
+                    <td>{{ entry.utm_source }}</td>
+                    <td>{{ entry.fb_email }}</td>
                     <td>{{ entry.status }}</td>
                     <td>{{entry.phone}}</td>
                     <td>
@@ -60,17 +61,6 @@
                         {% if entry.usps_tracking_code %}
                             <br />    
                             USPS: {{entry.usps_tracking_code}}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if entry.raspberry_pi.rpid %}
-                            {{ entry.raspberry_pi.rpid }}
-                            (
-                                <a target="_blank" href="/log/{{ entry.raspberry_pi.rpid }}">Logs</a>,
-                                <a href="{% url 'rdp' rpid=entry.raspberry_pi.rpid %}">RDP</a>
-                            )
-                        {% else %}
-                            n/a
                         {% endif %}
                     </td>
                     <td>
@@ -85,8 +75,6 @@
                         {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
                         <br />
                         {% if entry.raspberry_pi.tunnel_online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Tunnel Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Tunnel Offline{% endif %}
-                        <br />
-                        <a href=\"http://{{entry.ec2_hostname}}:13608/start-tunnel\">Restart tunnel</a>
                     </td>
                     <td>{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
                     <td>{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
