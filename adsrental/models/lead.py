@@ -34,9 +34,11 @@ class Lead(models.Model, FulltextSearchMixin):
     COMPANY_EMPTY = '[Empty]'
     COMPANY_ACM = 'ACM'
     COMPANY_FBM = 'FBM'
+    COMPANY_ADB = 'ADB'
     COMPANY_CHOICES = (
         (COMPANY_ACM, COMPANY_ACM),
         (COMPANY_FBM, COMPANY_FBM),
+        (COMPANY_ADB, COMPANY_ADB),
         (COMPANY_EMPTY, COMPANY_EMPTY),
     )
 
