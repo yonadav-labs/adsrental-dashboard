@@ -50,7 +50,7 @@ class RaspberryPi(models.Model):
         self.last_offline_reported = timezone.now()
         if self.online_since_date:
             self.online_since_date = None
-        
+
         self.save()
         RaspberryPiSession.end(self)
 
