@@ -204,7 +204,7 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'latest':
             return queryset.filter(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
-        if self.value() == 'online':
+        if self.value() == 'old':
             return queryset.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
 
 
