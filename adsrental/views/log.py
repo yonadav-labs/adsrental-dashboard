@@ -104,19 +104,16 @@ class LogView(View):
             restart_required = False
 
             if troubleshoot and ec2_instance:
-                instance_id = request.GET.get('instance_id', '')
                 tunnel_up = request.GET.get('tunnel_up', '0') == '1'
-                ec2_instance.web_up = ec2_instance.instance_id == instance_id
-                ec2_instance.tunnel_up = tunnel_up
+                reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
+                ec2_instance.tunnel_up = tunnel_up and reverse_tunnel_up
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
-                if not tunnel_up:
-                    if ec2_instance.web_up:
-                        self.add_log(request, rpid, 'Tunnel seems to be down, skipping')
-                        # restart_required = True
-                    else:
-                        self.add_log(request, rpid, 'Tunnel seems to be down, but web is also down, probably dead EC2')
+                if tunnel_up:
+                    self.add_log(request, rpid, 'Tunnel seems to be down')
+                if reverse_tunnel_up:
+                    self.add_log(request, rpid, 'Reverse tunnel seems to be down')
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')

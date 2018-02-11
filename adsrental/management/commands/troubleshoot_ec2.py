@@ -25,8 +25,6 @@ def troubleshoot(args):
             ec2_instance.troubleshoot()
         except:
             print 'ERROR', lead.email
-        # if fix:
-        #     ec2_instance.troubleshoot_fix()
     connection.close()
     print lead.email, 'UP' if ec2_instance and ec2_instance.tunnel_up else 'DOWN', 'took', int(time.time() - t), 'seconds'
     return lead
@@ -42,8 +40,6 @@ class Command(BaseCommand):
         parser.add_argument('--older-minutes', type=int, default=0)
         parser.add_argument('--online-only', action='store_true')
         parser.add_argument('--tunnel-only', action='store_true')
-        parser.add_argument('--ssh-only', action='store_true')
-        parser.add_argument('--web-only', action='store_true')
         parser.add_argument('--skip', type=int, default=0)
 
     def handle(
@@ -54,8 +50,6 @@ class Command(BaseCommand):
         older_minutes,
         online_only,
         tunnel_only,
-        ssh_only,
-        web_only,
         skip,
         **kwargs
     ):
@@ -70,14 +64,6 @@ class Command(BaseCommand):
         if tunnel_only:
             leads = leads.filter(
                 ec2instance__tunnel_up=False,
-            )
-        if ssh_only:
-            leads = leads.filter(
-                ec2instance__ssh_up=False,
-            )
-        if web_only:
-            leads = leads.filter(
-                ec2instance__web_up=False,
             )
         if online_only:
             leads = leads.filter(
@@ -97,7 +83,3 @@ class Command(BaseCommand):
             counter += len(lead_queue)
             for lead in results:
                 pass
-                # if not ec2_instance:
-                #     print lead.email, 'no ec2'
-                #     continue
-                # print lead.email, ec2_instance.ssh_up, ec2_instance.web_up, ec2_instance.tunnel_up

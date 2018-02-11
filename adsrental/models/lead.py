@@ -425,8 +425,6 @@ class Lead(models.Model, FulltextSearchMixin):
             errors.append('Lead is active and has RPI and EC2 assigned, but RPi is not running. RPi should be restarted.')
 
         if ec2_instance and ec2_instance.is_running():
-            if not ec2_instance.web_up:
-                errors.append('EC2 web interface is not responding. Login to EC2 by RDP and check.')
             if not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online():
                 errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted.')
             if not ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online():

@@ -28,13 +28,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'status',
         'last_troubleshoot',
         'tunnel_up',
-        'web_up',
-        # 'ssh_up',
     )
     list_filter = (
         'status',
         'tunnel_up',
-        'web_up',
         LeadRaspberryPiOnlineListFilter,
         LeadRaspberryPiVersionListFilter,
     )

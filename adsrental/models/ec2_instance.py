@@ -5,7 +5,6 @@ from django.conf import settings
 from django.apps import apps
 from django.utils import timezone
 import paramiko
-import requests
 import time
 
 from adsrental.utils import BotoResource
@@ -43,7 +42,6 @@ class EC2Instance(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
     is_duplicate = models.BooleanField(default=False)
     tunnel_up = models.BooleanField(default=False)
-    web_up = models.BooleanField(default=False)
     ssh_up = models.BooleanField(default=False)
     password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD)
     last_synced = models.DateTimeField(default=timezone.now)
@@ -250,9 +248,7 @@ class EC2Instance(models.Model):
 
     def mark_as_missing(self):
         self.status = self.STATUS_MISSING
-        self.ssh_up = False
         self.tunnel_up = False
-        self.web_up = False
         self.save()
 
     def troubleshoot(self):
@@ -267,8 +263,6 @@ class EC2Instance(models.Model):
             return False
 
         self.troubleshoot_status()
-        self.troubleshoot_web()
-        self.troubleshoot_ssh()
         try:
             self.troubleshoot_proxy()
         except:
@@ -286,36 +280,6 @@ class EC2Instance(models.Model):
             if self.lead and self.lead.is_active():
                 self.start()
                 return
-
-    def troubleshoot_web(self):
-        response = None
-        try:
-            response = requests.get('http://{}:13608'.format(self.hostname), timeout=20)
-        except Exception:
-            self.web_up = False
-            return
-
-        if self.instance_id not in response.text:
-            self.web_up = False
-            return
-
-        self.web_up = True
-
-    def troubleshoot_ssh(self):
-        output = self.ssh_execute('del pi.conf')
-        if output is None:
-            self.ssh_up = False
-            self.tunnel_up = False
-            return
-
-        self.ssh_up = True
-        self.ssh_execute('scp -P 2046 pi@localhost:/boot/pi.conf pi.conf')
-        output = self.ssh_execute('type pi.conf')
-
-        if output and self.rpid in output:
-            self.tunnel_up = True
-        else:
-            self.tunnel_up = False
 
     def troubleshoot_proxy(self):
         cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
@@ -344,23 +308,6 @@ class EC2Instance(models.Model):
         if raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             self.ssh_execute(cmd_to_execute)
-            raspberry_pi.save()
-
-    def troubleshoot_fix(self):
-        if not self.lead or not self.lead.raspberry_pi:
-            return
-
-        raspberry_pi = self.lead.raspberry_pi
-
-        if raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION and self.tunnel_up:
-            self.troubleshoot_old_pi_version()
-            return
-
-        if self.ssh_up and not self.web_up:
-            self.ssh_execute('cd Desktop\\auto & start main.bat')
-
-        if not self.tunnel_up or not self.ssh_up:
-            raspberry_pi.restart_required = True
             raspberry_pi.save()
 
     def change_password(self):
