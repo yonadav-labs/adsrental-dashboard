@@ -7,7 +7,7 @@ from django.conf import settings
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
-from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter
+from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
@@ -32,6 +32,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_filter = (
         'status',
         'tunnel_up',
+        LeadStatusListFilter,
         LeadRaspberryPiOnlineListFilter,
         LeadRaspberryPiVersionListFilter,
     )

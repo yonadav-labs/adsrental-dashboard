@@ -12,6 +12,22 @@ from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 
 
+class LeadStatusListFilter(SimpleListFilter):
+    title = 'Lead Status'
+    parameter_name = 'lead_status'
+
+    def lookups(self, request, model_admin):
+        return Lead.STATUS_CHOICES + [
+            ('Active',  'Active'),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Active':
+            return queryset.filter(lead__status__in=Lead.STATUSES_ACTIVE)
+        if self.value():
+            return queryset.filter(lead__status=self.value())
+
+
 class StatusListFilter(SimpleListFilter):
     title = 'Status'
     parameter_name = 'status'
