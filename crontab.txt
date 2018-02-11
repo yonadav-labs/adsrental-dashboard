@@ -7,6 +7,6 @@
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/to_sf/?seconds_ago=3700 &>/dev/null
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/delivered/ &>/dev/null
 */10 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/offline/ &>/dev/null
-0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py sync_ec2 --all > /root/cron.log
-0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py lead_history --now > /root/cron.log
+0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py sync_ec2 --all >> /root/cron.log
+0 * * * * docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py lead_history --now >> /root/cron.log
 0 0 * * * mysqldump -h 0.0.0.0 -P 13306 adsrental | gzip > /mnt/volume-nyc3-01/mysqldumps/dump_`date +%Y_%m_%d`.sql.gz
