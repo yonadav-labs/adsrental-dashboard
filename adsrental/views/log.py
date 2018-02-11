@@ -112,9 +112,11 @@ class LogView(View):
                 ec2_instance.save()
 
                 if not tunnel_up:
-                    self.add_log(request, rpid, 'Tunnel seems to be down')
+                    self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
+                    restart_required = True
                 if not reverse_tunnel_up:
-                    self.add_log(request, rpid, 'Reverse tunnel seems to be down')
+                    self.add_log(request, rpid, 'Reverse tunnel seems to be down, restarting')
+                    restart_required = True
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
