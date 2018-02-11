@@ -115,10 +115,10 @@ class LogView(View):
                 if ec2_ready:
                     if not tunnel_up:
                         self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
-                        restart_required = True
+                        # restart_required = True
                     if not reverse_tunnel_up:
                         self.add_log(request, rpid, 'Reverse tunnel seems to be down, restarting')
-                        restart_required = True
+                        # restart_required = True
                 else:
                     self.add_log(request, rpid, 'EC2 instance is not initialized yet')
 
