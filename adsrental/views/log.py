@@ -110,9 +110,9 @@ class LogView(View):
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
-                if tunnel_up:
+                if not tunnel_up:
                     self.add_log(request, rpid, 'Tunnel seems to be down')
-                if reverse_tunnel_up:
+                if not reverse_tunnel_up:
                     self.add_log(request, rpid, 'Reverse tunnel seems to be down')
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
