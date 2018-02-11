@@ -47,6 +47,7 @@ class LogView(View):
         if 'h' in request.GET:
             ec2_instance = EC2Instance.objects.filter(lead__raspberry_pi__rpid=rpid).first()
             if ec2_instance:
+                ec2_instance.update_from_boto()
                 return HttpResponse(ec2_instance.hostname)
             else:
                 return HttpResponse('')
