@@ -105,14 +105,14 @@ class LogView(View):
             restart_required = False
 
             if troubleshoot and ec2_instance:
-                internal_hostname = request.GET.get('internal_hostname')
+                internal_hostname = request.GET.get('internal_hostname', 'NO_HOSTNAME')
                 tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
                 ec2_instance.tunnel_up = tunnel_up and reverse_tunnel_up
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
-                if internal_hostname:
+                if internal_hostname != 'NO_HOSTNAME':
                     if not tunnel_up:
                         self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
                         restart_required = True
