@@ -105,22 +105,18 @@ class LogView(View):
             restart_required = False
 
             if troubleshoot and ec2_instance:
-                ec2_ready = request.GET.get('ec2', '1') == '1'
                 tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
                 ec2_instance.tunnel_up = tunnel_up and reverse_tunnel_up
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
-                if ec2_ready:
-                    if not tunnel_up:
-                        self.add_log(request, rpid, 'Tunnel seems to be down, restarting')
-                        # restart_required = True
-                    if not reverse_tunnel_up:
-                        self.add_log(request, rpid, 'Reverse tunnel seems to be down, restarting')
-                        # restart_required = True
-                else:
-                    self.add_log(request, rpid, 'EC2 instance is not initialized yet')
+                if not tunnel_up:
+                    self.add_log(request, rpid, 'Tunnel seems to be down')
+                    # restart_required = True
+                if not reverse_tunnel_up:
+                    self.add_log(request, rpid, 'Reverse tunnel seems to be down')
+                    # restart_required = True
 
             if not version and ec2_instance and ec2_instance.tunnel_up:
                 self.add_log(request, rpid, 'Trying to force update old version')
