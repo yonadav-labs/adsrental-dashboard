@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
+import django.contrib.auth.views as auth_views
 from django.conf.urls import url
+
 from adsrental.views.log import LogView
 from adsrental.views.main import MainView
 from adsrental.views.thankyou import ThankyouView
@@ -18,7 +20,7 @@ from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sync_offline import SyncOfflineView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.start_reverse_tunnel import StartReverseTunnelView
-import django.contrib.auth.views as auth_views
+from adsrental.views.cron import SyncEC2View
 
 urlpatterns = [
     url(r'^$', SignupView.as_view(), name='home'),
@@ -47,4 +49,5 @@ urlpatterns = [
     url(r'^sf/to_shipstation/$', SFToShipstationView.as_view(), name='sf_to_shipstation'),
     url(r'^sf/launch_raspberry_pi_instance/$', SFLaunchRaspberryPiInstance.as_view(), name='sf_launch_raspberry_pi_instance'),
     url(r'^start_reverse_tunnel/(?P<rpid>.*)/$', StartReverseTunnelView.as_view(), name='start_reverse_tunnel'),
+    url(r'^cron/sync_ec2/$', SyncEC2View.as_view(), name='cron_sync_ec2'),
 ]
