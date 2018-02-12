@@ -16,7 +16,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
     model = ReportProxyLead
     list_display = (
-        'sf_leadid',
+        'leadid',
         # 'rpid',
         'first_name',
         'last_name',

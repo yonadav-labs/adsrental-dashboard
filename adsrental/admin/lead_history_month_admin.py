@@ -46,7 +46,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     actions = ('export_as_csv', )
 
     def leadid(self, obj):
-        return obj.lead and obj.lead.sf_leadid
+        return obj.lead and obj.lead.leadid
 
     def rpid(self, obj):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.rpid

@@ -85,10 +85,7 @@ class LeadAdmin(admin.ModelAdmin):
     raw_id_fields = ('raspberry_pi', )
 
     def id_field(self, obj):
-        if obj.sf_leadid:
-            return obj.sf_leadid
-
-        return ('LOCAL: {}'.format(obj.leadid))
+        return obj.leadid
 
     def name(self, obj):
         return u'{} {}'.format(

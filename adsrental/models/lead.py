@@ -89,7 +89,7 @@ class Lead(models.Model, FulltextSearchMixin):
     pi_sent = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.sf_leadid or '{} (local)'.format(self.leadid)
+        return self.leadid
 
     class Meta:
         db_table = 'lead'
