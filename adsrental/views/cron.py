@@ -1,10 +1,16 @@
 from __future__ import unicode_literals
 
+import os
+import datetime
+
 from django.views import View
 from django.http import JsonResponse
+from django.conf import settings
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
+from adsrental.models.lead_history import LeadHistory
+from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.utils import BotoResource
 
 
@@ -90,5 +96,49 @@ class SyncEC2View(View):
             return JsonResponse({
                 'launched_rpids': launched_rpids,
                 'started_rpids': started_rpids,
+                'result': True,
+            })
+
+
+class LeadHistoryView(View):
+    def get(self, request):
+        now = request.GET.get('now')
+        force = request.GET.get('force')
+        date = request.GET.get('date')
+        aggregate = request.GET.get('aggregate')
+
+        if now:
+            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            for lead in leads:
+                LeadHistory.upsert_for_lead(lead)
+            return JsonResponse({
+                'result': True,
+            })
+        if aggregate:
+            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
+            d = d.replace(day=1)
+            for lead in leads:
+                LeadHistoryMonth.get_or_create(lead=lead, date=d).aggregate()
+            return JsonResponse({
+                'result': True,
+            })
+        if date:
+            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
+            if force:
+                LeadHistory.objects.filter(date=d).delete()
+            for lead in leads:
+                if not force:
+                    lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
+                    if lead_history:
+                        continue
+
+                log_filename = '{}.log'.format(d.strftime('%Y%m%d'))
+                log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, lead.raspberry_pi.rpid, log_filename)
+                is_online = os.path.exists(log_path)
+                LeadHistory(lead=lead, date=d, checks_online=24 if is_online else 0, checks_offline=24 if not is_online else 0).save()
+                # print lead, is_online
+            return JsonResponse({
                 'result': True,
             })
