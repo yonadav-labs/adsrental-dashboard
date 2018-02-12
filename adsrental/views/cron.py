@@ -9,15 +9,17 @@ from adsrental.utils import BotoResource
 
 
 class SyncEC2View(View):
-    def get(self, request, rpid):
+    ec2_max_results = 300
+
+    def get(self, request):
         all = request.GET.get('all')
         pending = request.GET.get('pending')
         terminate_stopped = request.GET.get('terminate_stopped')
         missing = request.GET.get('missing')
         execute = request.GET.get('execute')
 
-        boto_resource = BotoResource().get_resource()
         if all:
+            boto_resource = BotoResource().get_resource()
             ec2_instances = EC2Instance.objects.all()
             ec2_instances_map = {}
             for ec2_instance in ec2_instances:
@@ -54,6 +56,7 @@ class SyncEC2View(View):
                 'result': True,
             })
         if pending:
+            boto_resource = BotoResource().get_resource()
             updated_rpids = []
             instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING])
             for instance in instances:
@@ -62,11 +65,10 @@ class SyncEC2View(View):
                     instance.update_from_boto(boto_instance)
                 updated_rpids.append((instance.rpid, instance.status))
 
-                return JsonResponse({
-                    'total': counter,
-                    'updated_rpids': updated_rpids,
-                    'result': True,
-                })
+            return JsonResponse({
+                'updated_rpids': updated_rpids,
+                'result': True,
+            })
         if missing:
             launched_rpids = []
             started_rpids = []
@@ -86,7 +88,6 @@ class SyncEC2View(View):
                     launched_rpids.append(lead.raspberry_id.rpid)
 
             return JsonResponse({
-                'total': counter,
                 'launched_rpids': launched_rpids,
                 'started_rpids': started_rpids,
                 'result': True,
