@@ -11,5 +11,5 @@ sudo apt install python-qt4
 
 source venv/bin/activate
 pip install flake8==3.4.1 autopep8==1.3.3 rdpy==1.3.2
-pip install -r requirements.txt
+pip install -U -r requirements.txt
 ln -s /usr/lib/python2.7/dist-packages/PyQt4/ venv/lib/python2.7/site-packages/
