@@ -9,4 +9,4 @@
 */10 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/offline/ &>/dev/null
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/sync_ec2/?all=true&execute=true >> /root/cron.log
 0 * * * * bash -c "docker-compose -f /root/dashboard/docker-compose.dev.yml run web python manage.py lead_history --now >> /root/cron.log"
-0 0 * * * bash -c "mysqldump -h 0.0.0.0 -P 13306 adsrental | gzip > /mnt/volume-nyc3-01/mysqldumps/dump_`date +%Y_%m_%d`.sql.gz"
+0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
