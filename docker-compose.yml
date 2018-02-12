@@ -37,7 +37,6 @@ services:
       WERKZEUG_DEBUG_PIN: 'off'
     volumes:
       - ./config/:/app/config/
-      - ./salesforce_handler/:/app/salesforce_handler/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - ./php/log/:/app/log/

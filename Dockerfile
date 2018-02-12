@@ -25,7 +25,6 @@ ADD ./manage.py /app/manage.py
 ADD ./cert /app/cert/
 ADD ./config/ /app/config/
 ADD ./scripts/ /app/scripts/
-ADD ./salesforce_handler/ /app/salesforce_handler/
 ADD ./adsrental/ /app/adsrental/
 
 EXPOSE 8007
