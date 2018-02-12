@@ -255,3 +255,29 @@ class HistoryStatusListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'hide_zeroes':
             return queryset.filter(days_online__gt=0)
+
+
+class LastTroubleshootListFilter(SimpleListFilter):
+    title = 'Lead Troubleshoot'
+    parameter_name = 'last_troubleshoot'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('20minutes', '20 minutesago'),
+            ('1hour', '1 hour ago'),
+            ('5hours', '5 hours ago'),
+            ('1day', '1 day ago'),
+            ('older', 'Older'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '20minutes':
+            return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(minutes=20))
+        if self.value() == '1hour':
+            return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(hours=1))
+        if self.value() == '5hours':
+            return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(hours=5))
+        if self.value() == '1day':
+            return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(hours=24))
+        if self.value() == 'older':
+            return queryset.filter(last_troubleshoot__lt=timezone.now() - datetime.timedelta(hours=24))

@@ -107,9 +107,11 @@ class LogView(View):
             restart_required = False
 
             if troubleshoot and ec2_instance:
-                tunnel_up = request.GET.get('tunnel_up', '0') == '1'
+                main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
-                ec2_instance.tunnel_up = tunnel_up and reverse_tunnel_up
+                tunnel_up = main_tunnel_up and reverse_tunnel_up
+                if tunnel_up:
+                    ec2_instance.tunnel_up_date = timezone.now()
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 

@@ -42,6 +42,7 @@ class EC2Instance(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
     is_duplicate = models.BooleanField(default=False)
     tunnel_up = models.BooleanField(default=False)
+    tunnel_up_date = models.DateTimeField(default=timezone.now)
     ssh_up = models.BooleanField(default=False)
     password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD)
     last_synced = models.DateTimeField(default=timezone.now)

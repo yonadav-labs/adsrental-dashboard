@@ -7,7 +7,7 @@ from django.conf import settings
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
-from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter
+from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
@@ -28,6 +28,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'status',
         'last_troubleshoot',
         'tunnel_up',
+        'tunnel_up_date',
     )
     list_filter = (
         'status',
@@ -35,6 +36,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         LeadStatusListFilter,
         LeadRaspberryPiOnlineListFilter,
         LeadRaspberryPiVersionListFilter,
+        LastTroubleshootListFilter,
     )
     readonly_fields = ('created', 'updated', )
     search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
