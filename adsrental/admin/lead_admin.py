@@ -215,8 +215,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
                 continue
 
-            lead.status = Lead.STATUS_QUALIFIED
-            lead.save()
+            lead.set_status(Lead.STATUS_QUALIFIED)
             if not lead.raspberry_pi:
                 lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
                 lead.save()
