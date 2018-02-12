@@ -66,8 +66,6 @@ class LeadAdmin(admin.ModelAdmin):
         'email',
     )
     actions = (
-        'update_from_salesforce',
-        'update_salesforce',
         'update_from_shipstation',
         'update_pi_delivered',
         'create_shipstation_order',
@@ -183,20 +181,6 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
 
         return '\n'.join(result)
-
-    def update_from_salesforce(self, request, queryset):
-        sf_lead_emails = []
-        leads_map = {}
-        for lead in queryset:
-            leads_map[lead.email] = lead
-            sf_lead_emails.append(lead.email)
-
-    def update_salesforce(self, request, queryset):
-        sf_lead_emails = []
-        leads_map = {}
-        for lead in queryset:
-            leads_map[lead.email] = lead
-            sf_lead_emails.append(lead.email)
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
