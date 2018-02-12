@@ -112,6 +112,7 @@ class LogView(View):
                 tunnel_up = main_tunnel_up and reverse_tunnel_up
                 if tunnel_up:
                     ec2_instance.tunnel_up_date = timezone.now()
+                ec2_instance.tunnel_up = tunnel_up
                 ec2_instance.last_troubleshoot = timezone.now()
                 ec2_instance.save()
 
