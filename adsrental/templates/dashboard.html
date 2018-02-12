@@ -30,6 +30,7 @@
             <tr>
                 <th>#</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
+                <th>Account</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'utm_source' %}">UTM</a></th>
                 <th>Facebook</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
@@ -52,6 +53,7 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{entry.first_name}} {{entry.last_name}}</td>
+                    <td>{{ entry.account_name }}</td>
                     <td>{{ entry.utm_source }}</td>
                     <td>{{ entry.fb_email }}</td>
                     <td>{{ entry.status }}</td>
