@@ -322,7 +322,7 @@ class LeadAdmin(admin.ModelAdmin):
     last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
-    create_shipstation_order.short_description = 'Mark Qualified, Assign RPi, create Shipstation order'
+    create_shipstation_order.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
     start_ec2.short_description = 'Start EC2 instance'
