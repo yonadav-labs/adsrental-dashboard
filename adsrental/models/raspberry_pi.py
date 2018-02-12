@@ -55,11 +55,8 @@ class RaspberryPi(models.Model):
 
     def update_ping(self):
         now = timezone.now()
+
         if not self.first_tested:
-            lead = self.get_lead()
-            if lead and lead.status == lead.STATUS_QUALIFIED:
-                lead.status = lead.STATUS_IN_PROGRESS
-                lead.save()
             self.first_tested = now
             if self.lead:
                 self.lead.tested = True
@@ -72,6 +69,10 @@ class RaspberryPi(models.Model):
         if self.online_since_date is None:
             self.online_since_date = now
             RaspberryPiSession.start(self)
+
+        lead = self.get_lead()
+        if lead and lead.status == lead.STATUS_QUALIFIED:
+            lead.set_status(lead.STATUS_IN_PROGRESS)
 
         if not self.first_seen:
             self.first_seen = now
