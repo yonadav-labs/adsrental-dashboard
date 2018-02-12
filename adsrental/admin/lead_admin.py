@@ -223,7 +223,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def start_ec2(self, request, queryset):
         for lead in queryset:
-            EC2Instance.launch_for_lead(self)
+            EC2Instance.launch_for_lead(lead)
 
     def restart_ec2(self, request, queryset):
         for lead in queryset:
