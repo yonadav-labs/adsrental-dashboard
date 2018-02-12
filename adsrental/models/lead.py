@@ -258,6 +258,9 @@ class Lead(models.Model, FulltextSearchMixin):
     def is_active(self):
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
 
+    def is_banned(self):
+        return self.status == Lead.STATUS_BANNED
+
     def find_ec2_instance_errors(self):
         errors = []
         ec2_instance = self.get_ec2_instance()

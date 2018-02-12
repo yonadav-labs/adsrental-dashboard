@@ -211,12 +211,12 @@ class LeadAdmin(admin.ModelAdmin):
 
     def create_shipstation_order(self, request, queryset):
         for lead in queryset:
-            if lead.status not in Lead.STATUSES_ACTIVE:
+            if lead.is_banned():
                 messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
                 continue
-            if lead.status == Lead.STATUS_AVAILABLE:
-                lead.status = Lead.STATUS_QUALIFIED
-                lead.save()
+
+            lead.status = Lead.STATUS_QUALIFIED
+            lead.save()
             if not lead.raspberry_pi:
                 lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
                 lead.save()
