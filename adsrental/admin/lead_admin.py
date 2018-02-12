@@ -12,7 +12,6 @@ from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter
 from adsrental.utils import ShipStationClient
-from salesforce_handler.models import Lead as SFLead
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -199,22 +198,12 @@ class LeadAdmin(admin.ModelAdmin):
             leads_map[lead.email] = lead
             sf_lead_emails.append(lead.email)
 
-        sf_leads = SFLead.objects.filter(
-            email__in=sf_lead_emails).simple_select_related('raspberry_pi')
-        for sf_lead in sf_leads:
-            Lead.upsert_from_sf(sf_lead, leads_map.get(sf_lead.email))
-
     def update_salesforce(self, request, queryset):
         sf_lead_emails = []
         leads_map = {}
         for lead in queryset:
             leads_map[lead.email] = lead
             sf_lead_emails.append(lead.email)
-
-        sf_leads = SFLead.objects.filter(
-            email__in=sf_lead_emails).simple_select_related('raspberry_pi')
-        for sf_lead in sf_leads:
-            Lead.upsert_to_sf(sf_lead, leads_map.get(sf_lead.email))
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:

@@ -6,8 +6,6 @@ from django.conf.urls import url
 from adsrental.views.log import LogView
 from adsrental.views.main import MainView
 from adsrental.views.thankyou import ThankyouView
-from adsrental.views.sync_from_sf import SyncFromSFView
-from adsrental.views.sync_to_sf import SyncToSFView
 from adsrental.views.sync_to_adsdb import SyncToAdsdbView
 from adsrental.views.sync_from_shipstation import SyncFromShipStationView
 from adsrental.views.sync_delivered import SyncDeliveredView
@@ -25,10 +23,8 @@ from adsrental.views.cron import SyncEC2View, LeadHistoryView
 urlpatterns = [
     url(r'^$', SignupView.as_view(), name='home'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
-    url(r'^sync/from_sf/$', SyncFromSFView.as_view(), name='sync_from_sf'),
     url(r'^sync/from_shipstation/$', SyncFromShipStationView.as_view(), name='sync_from_shipstation'),
     url(r'^sync/delivered/$', SyncDeliveredView.as_view(), name='sync_delivered'),
-    url(r'^sync/to_sf/$', SyncToSFView.as_view(), name='sync_to_sf'),
     url(r'^sync/to_adsdb/$', SyncToAdsdbView.as_view(), name='sync_to_adsdb'),
     url(r'^sync/offline/$', SyncOfflineView.as_view(), name='sync_offline'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),

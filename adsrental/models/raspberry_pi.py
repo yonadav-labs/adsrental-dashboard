@@ -7,7 +7,6 @@ from django.db import models
 from django.conf import settings
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
 
 
 class RaspberryPi(models.Model):
@@ -125,66 +124,6 @@ class RaspberryPi(models.Model):
             return a
 
         return b
-
-    @classmethod
-    def upsert_from_sf(cls, sf_raspberry_pi, raspberry_pi):
-        if raspberry_pi is None:
-            raspberry_pi = RaspberryPi(
-                rpid=sf_raspberry_pi.name,
-                ipaddress=sf_raspberry_pi.current_ip_address,
-            )
-            raspberry_pi.save()
-
-        first_seen = cls.get_max_datetime(raspberry_pi.first_seen, sf_raspberry_pi.first_seen)
-        last_seen = cls.get_max_datetime(raspberry_pi.last_seen, sf_raspberry_pi.last_seen)
-        tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)
-
-        for new_field, old_field in (
-            (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
-            (first_seen, raspberry_pi.first_seen, ),
-            (last_seen, raspberry_pi.last_seen, ),
-            (tunnel_last_tested, raspberry_pi.tunnel_last_tested, ),
-        ):
-            if new_field != old_field:
-                break
-        else:
-            return raspberry_pi
-
-        raspberry_pi.ipaddress = sf_raspberry_pi.current_ip_address
-        # raspberry_pi.ec2_hostname = sf_raspberry_pi.ec2
-        raspberry_pi.first_seen = first_seen
-        raspberry_pi.last_seen = last_seen
-        raspberry_pi.tunnel_last_tested = tunnel_last_tested
-
-        raspberry_pi.save()
-        return raspberry_pi
-
-    @classmethod
-    def upsert_to_sf(cls, sf_raspberry_pi, raspberry_pi):
-        if not sf_raspberry_pi:
-            sf_raspberry_pi = SFRaspberryPi()
-
-        first_seen = cls.get_max_datetime(raspberry_pi.first_seen, sf_raspberry_pi.first_seen)
-        last_seen = cls.get_max_datetime(raspberry_pi.last_seen, sf_raspberry_pi.last_seen)
-        tunnel_last_tested = cls.get_max_datetime(raspberry_pi.tunnel_last_tested, sf_raspberry_pi.tunnel_last_tested)
-
-        for new_field, old_field in (
-            (sf_raspberry_pi.current_ip_address, raspberry_pi.ipaddress, ),
-            (sf_raspberry_pi.first_seen, first_seen, ),
-            (sf_raspberry_pi.last_seen, last_seen, ),
-            (sf_raspberry_pi.tunnel_last_tested, tunnel_last_tested, ),
-        ):
-            if new_field != old_field:
-                break
-        else:
-            return raspberry_pi
-
-        sf_raspberry_pi.first_seen = first_seen
-        sf_raspberry_pi.last_seen = last_seen
-        sf_raspberry_pi.tunnel_last_tested = tunnel_last_tested
-        sf_raspberry_pi.current_ip_address = raspberry_pi.ipaddress
-        sf_raspberry_pi.last_modified_by_id = settings.SALESFORCE_API_USER_ID
-        sf_raspberry_pi.save()
 
     class Meta:
         db_table = 'raspberry_pi'

@@ -11,8 +11,6 @@ from django.apps import apps
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
-from salesforce_handler.models import RaspberryPi as SFRaspberryPi
-from salesforce_handler.models import Lead as SFLead
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.utils import CustomerIOClient
 
@@ -150,168 +148,17 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='status', value=value, old_value=old_value).save()
         return True
 
-        # FIXME: remove
-        sf_lead = SFLead.objects.filter(email=self.email).first()
-        if sf_lead:
-            sf_lead.status = value
-            sf_lead.save()
-
     def ban(self):
         return self.set_status(Lead.STATUS_BANNED)
 
     def unban(self):
         return self.set_status(self.old_status or Lead.STATUS_QUALIFIED)
 
-    @staticmethod
-    def upsert_from_sf(sf_lead, lead):
-        if lead is None:
-            lead = Lead(
-                leadid=sf_lead.id,
-                sf_leadid=sf_lead.id,
-            )
-
-        local_raspberry_pi = lead.raspberry_pi if lead else None
-        local_raspberry_pi_rpid = local_raspberry_pi.rpid if local_raspberry_pi else None
-        remote_raspberry_pi = sf_lead.raspberry_pi if sf_lead else None
-        remote_raspberry_pi_rpid = remote_raspberry_pi.name if remote_raspberry_pi else None
-
-        address = ', '.join([
-            sf_lead.street or '',
-            sf_lead.city or '',
-            sf_lead.state or '',
-            sf_lead.postal_code or '',
-            sf_lead.country or '',
-        ])
-
-        for new_field, old_field in (
-            (sf_lead.id, lead.sf_leadid, ),
-            (sf_lead.first_name, lead.first_name, ),
-            (sf_lead.last_name, lead.last_name, ),
-            (sf_lead.email, lead.email, ),
-            (sf_lead.phone, lead.phone, ),
-            # (address, lead.address, ),
-            (sf_lead.account_name, lead.account_name, ),
-            (sf_lead.status, lead.status, ),
-            # (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
-            # (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
-            (sf_lead.utm_source, lead.utm_source, ),
-            (sf_lead.google_account, lead.google_account, ),
-            (remote_raspberry_pi_rpid, local_raspberry_pi_rpid, ),
-            (sf_lead.bundler_paid, lead.bundler_paid, ),
-            (sf_lead.facebook_account_status, lead.facebook_account_status, ),
-            (sf_lead.google_account_status, lead.google_account_status, ),
-            (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
-            # (sf_lead.fb_email, lead.fb_email, ),
-            # (sf_lead.fb_secret, lead.fb_secret, ),
-            (sf_lead.splashtop_id, lead.splashtop_id, ),
-            (sf_lead.street, lead.street, ),
-            (sf_lead.city, lead.city, ),
-            (sf_lead.state, lead.state, ),
-            (sf_lead.postal_code, lead.postal_code, ),
-            (sf_lead.country, lead.country, ),
-        ):
-            if new_field != old_field:
-                break
-        else:
-            return lead
-
-        new_raspberry_pi = RaspberryPi.objects.filter(rpid=remote_raspberry_pi_rpid).first()
-        try:
-            if new_raspberry_pi and new_raspberry_pi.lead and new_raspberry_pi.lead.pk != lead.pk:
-                new_raspberry_pi = None
-        except Lead.DoesNotExist:
-            pass
-
-        lead.sf_leadid = sf_lead.id
-        lead.first_name = sf_lead.first_name
-        lead.last_name = sf_lead.last_name
-        lead.email = sf_lead.email
-        lead.phone = sf_lead.phone
-        lead.address = address
-        lead.account_name = sf_lead.account_name
-        lead.status = sf_lead.status
-        # lead.usps_tracking_code = sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None
-        # lead.pi_delivered = sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False
-        lead.utm_source = sf_lead.utm_source
-        lead.google_account = sf_lead.google_account
-        lead.facebook_account = sf_lead.facebook_account
-        lead.raspberry_pi = new_raspberry_pi
-        lead.wrong_password = sf_lead.wrong_password
-        lead.bundler_paid = sf_lead.bundler_paid
-        lead.splashtop_id = sf_lead.splashtop_id
-        lead.facebook_account_status = sf_lead.facebook_account_status
-        lead.google_account_status = sf_lead.google_account_status
-        if not lead.tested:
-            lead.tested = sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False
-        # lead.fb_email = sf_lead.fb_email
-        # lead.fb_secret = sf_lead.fb_secret
-        lead.street = sf_lead.street
-        lead.city = sf_lead.city
-        lead.state = sf_lead.state
-        lead.postal_code = sf_lead.postal_code
-        lead.country = sf_lead.country
-        if not lead.created:
-            lead.created = timezone.now()
-        lead.save()
-        return lead
-
     def name(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
     def str(self):
         return 'Lead {} ({})'.format(self.name(), self.email)
-
-    @staticmethod
-    def upsert_to_sf_thread(params):
-        try:
-            Lead.upsert_to_sf(*params)
-        except Exception as e:
-            return {'email': params[1].email, 'error': str(e), 'result': False}
-
-        return {'email': params[1].email, 'result': True}
-
-    @staticmethod
-    def upsert_to_sf(sf_lead, lead):
-        local_raspberry_pi = lead.raspberry_pi if lead else None
-        local_raspberry_pi_rpid = local_raspberry_pi.rpid if local_raspberry_pi else None
-        remote_raspberry_pi = sf_lead.raspberry_pi if sf_lead else None
-        remote_raspberry_pi_rpid = remote_raspberry_pi.name if remote_raspberry_pi else None
-
-        if sf_lead.raspberry_pi and lead.raspberry_pi:
-            lead.raspberry_pi.upsert_to_sf(sf_lead.raspberry_pi, lead.raspberry_pi)
-
-        for new_field, old_field in (
-            (sf_lead.raspberry_pi.usps_tracking_code if sf_lead.raspberry_pi else None, lead.usps_tracking_code, ),
-            (sf_lead.raspberry_pi.delivered if sf_lead.raspberry_pi else False, lead.pi_delivered, ),
-            (sf_lead.raspberry_pi.tested if sf_lead.raspberry_pi else False, lead.tested, ),
-            (sf_lead.splashtop_id, lead.splashtop_id, ),
-            (sf_lead.account_name, lead.account_name, ),
-            (sf_lead.first_name, lead.first_name, ),
-            (sf_lead.last_name, lead.last_name, ),
-            (local_raspberry_pi_rpid, remote_raspberry_pi_rpid, ),
-            # (sf_lead.status, lead.status, ),
-        ):
-            if new_field != old_field:
-                break
-        else:
-            return lead
-
-        sf_lead.raspberry_pi = SFRaspberryPi.objects.filter(name=local_raspberry_pi_rpid).first()
-        sf_lead.splashtop_id = lead.splashtop_id
-        # sf_lead.status = lead.status
-        sf_lead.last_modified_by_id = settings.SALESFORCE_API_USER_ID
-        sf_lead.account_name = lead.account_name
-        sf_lead.first_name = lead.first_name
-        sf_lead.last_name = lead.last_name
-        sf_lead.save()
-
-        if sf_lead.raspberry_pi:
-            sf_lead.raspberry_pi.usps_tracking_code = lead.usps_tracking_code
-            sf_lead.raspberry_pi.delivered = lead.pi_delivered
-            sf_lead.raspberry_pi.tested = lead.tested
-            sf_lead.raspberry_pi.save()
-
-        return lead
 
     def send_web_to_lead(self, request=None):
         response = requests.post(
