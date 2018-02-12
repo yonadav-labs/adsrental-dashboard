@@ -226,6 +226,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def create_shipstation_order(self, request, queryset):
         for lead in queryset:
+            if lead.status == Lead.STATUS_AVAILABLE:
+                lead.status = Lead.STATUS_QUALIFIED
+                lead.save()
             if not lead.raspberry_pi:
                 lead.raspberry_pi = RaspberryPi.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
                 lead.save()
@@ -319,7 +322,7 @@ class LeadAdmin(admin.ModelAdmin):
     last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
-    create_shipstation_order.short_description = 'Assign free RPi and create Shipstation order'
+    create_shipstation_order.short_description = 'Mark Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
     start_ec2.short_description = 'Start EC2 instance'
