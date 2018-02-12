@@ -211,6 +211,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def create_shipstation_order(self, request, queryset):
         for lead in queryset:
+            if lead.status not in Lead.STATUSES_ACTIVE:
+                messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
+                continue
             if lead.status == Lead.STATUS_AVAILABLE:
                 lead.status = Lead.STATUS_QUALIFIED
                 lead.save()
