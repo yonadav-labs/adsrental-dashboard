@@ -132,6 +132,8 @@ class ShipStationClient(object):
             raise ValueError('Shipstation Error', r.status_code, r.text)
 
     def get_lead_order_data(self, lead):
+        if not lead.shipstation_order_number:
+            return None
         data = requests.get(
             'https://ssapi.shipstation.com/orders',
             params={'orderNumber': lead.shipstation_order_number},

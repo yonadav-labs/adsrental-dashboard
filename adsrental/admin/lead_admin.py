@@ -233,7 +233,7 @@ class LeadAdmin(admin.ModelAdmin):
             shipstation_client = ShipStationClient()
             if shipstation_client.get_lead_order_data(lead):
                 messages.info(
-                    request, 'Lead {} order already exists: {}. If you want to ship another, clear field first'.format(lead.email, lead.shipstation_order_number))
+                    request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead.email, lead.shipstation_order_number))
                 continue
 
             order = shipstation_client.add_lead_order(lead)
