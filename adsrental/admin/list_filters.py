@@ -263,10 +263,10 @@ class LastTroubleshootListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('20minutes', '20 minutesago'),
-            ('1hour', '1 hour ago'),
-            ('5hours', '5 hours ago'),
-            ('1day', '1 day ago'),
+            ('20minutes', 'Less than 20 minutes ago'),
+            ('1hour', 'Less than 1 hour ago'),
+            ('5hours', 'Less than 5 hours ago'),
+            ('1day', 'Less than 1 day ago'),
             ('older', 'Older'),
         )
 
