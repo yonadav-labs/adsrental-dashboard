@@ -4,6 +4,7 @@ import datetime
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from django.conf import settings
 
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
@@ -31,7 +32,7 @@ class Command(BaseCommand):
         if google:
             ec2_instances = ec2_instances.filter(lead__google_account=True)
 
-        ec2_instances = ec2_instances.exclude(lead__raspberry_pi__version='1.0.20').order_by('-rpid')
+        ec2_instances = ec2_instances.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION).select_related('lead', 'lead__raspberry_pi').order_by('-rpid')
 
         print 'Total', ec2_instances.count()
 
@@ -47,4 +48,11 @@ class Command(BaseCommand):
 
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             ec2_instance.ssh_execute(cmd_to_execute)
-            print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Updated'
+            print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Attempted'
+
+        print('================')
+
+        for ec2_instance in ec2_instances:
+            new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid).select_related('lead', 'lead__raspberry_pi')
+            if new_ec2_instance.lead.raspberry_pi.version == settings.RASPBERRY_PI_VERSION:
+                print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Updated'
