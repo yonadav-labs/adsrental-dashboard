@@ -15,6 +15,8 @@ class EC2DataView(View):
         if not ec2_instance.lead:
             raise Http404
         if not ec2_instance.is_active():
+            if not ec2_instance.is_stopped():
+                ec2_instance.stop()
             raise Http404
 
         if not ec2_instance.is_running():
