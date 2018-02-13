@@ -19,6 +19,7 @@ class Command(BaseCommand):
         parser.add_argument('--facebook', action='store_true')
         parser.add_argument('--google', action='store_true')
         parser.add_argument('--force', action='store_true')
+        parser.add_argument('--test', action='store_true')
         parser.add_argument('--threads', type=int, default=10)
 
     def revive(self, ec2_instance):
@@ -42,6 +43,7 @@ class Command(BaseCommand):
         google,
         force,
         threads,
+        test,
         **kwargs
     ):
         logging.raiseExceptions = False
@@ -56,6 +58,11 @@ class Command(BaseCommand):
         ec2_instances = ec2_instances.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION).select_related('lead', 'lead__raspberry_pi').order_by('-rpid')
 
         print 'Total', ec2_instances.count()
+        if test:
+            for ec2_instance in ec2_instances:
+                info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
+                print info_str + '\t' + 'Test'
+            return
 
         pool = ThreadPool(processes=threads)
         results = pool.map(self.revive, ec2_instances)
@@ -63,9 +70,3 @@ class Command(BaseCommand):
         print('================')
         print(results)
         print('================')
-
-        for ec2_instance in ec2_instances:
-            new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid)
-            if new_ec2_instance.lead.raspberry_pi.version == settings.RASPBERRY_PI_VERSION:
-                info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
-                print(info_str + '\t' + 'Updated')
