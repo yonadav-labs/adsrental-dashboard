@@ -50,7 +50,7 @@ class Command(BaseCommand):
 
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             ec2_instance.ssh_execute(cmd_to_execute)
-            print(info_str + '\t' + 'SSH Attempted')
+            print(info_str + '\t' + 'Attempted update')
 
         print('================')
 
