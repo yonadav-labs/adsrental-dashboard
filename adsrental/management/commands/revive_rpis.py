@@ -14,12 +14,12 @@ from adsrental.models.ec2_instance import EC2Instance
 
 class Command(BaseCommand):
     help = 'Revive old EC2 EC2'
-    threads_count = 10
 
     def add_arguments(self, parser):
         parser.add_argument('--facebook', action='store_true')
         parser.add_argument('--google', action='store_true')
         parser.add_argument('--force', action='store_true')
+        parser.add_argument('--threads', type='int', default=10)
 
     def revive(self, ec2_instance):
         info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
@@ -41,6 +41,7 @@ class Command(BaseCommand):
         facebook,
         google,
         force,
+        threads,
         **kwargs
     ):
         logging.raiseExceptions = False
@@ -56,7 +57,7 @@ class Command(BaseCommand):
 
         print 'Total', ec2_instances.count()
 
-        pool = ThreadPool(processes=self.threads_count)
+        pool = ThreadPool(processes=threads)
         results = pool.map(self.revive, ec2_instances)
 
         print('================')
@@ -64,7 +65,7 @@ class Command(BaseCommand):
         print('================')
 
         for ec2_instance in ec2_instances:
-            new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid).select_related('lead', 'lead__raspberry_pi')
+            new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid)
             if new_ec2_instance.lead.raspberry_pi.version == settings.RASPBERRY_PI_VERSION:
                 info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
                 print(info_str + '\t' + 'Updated')
