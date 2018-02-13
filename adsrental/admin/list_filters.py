@@ -50,12 +50,15 @@ class TouchCountListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('10', 'More than 10 only'),
+            ('less10', 'Less than 10 only'),
+            ('more10', '10 or more'),
         )
 
     def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(touch_count__gte=int(self.value()))
+        if self.value() == 'less10':
+            return queryset.filter(touch_count__lt=10)
+        if self.value() == 'more10':
+            return queryset.filter(touch_count__gte=10)
 
 
 class RaspberryPiOnlineListFilter(SimpleListFilter):
