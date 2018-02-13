@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from multiprocessing.pool import ThreadPool
 import datetime
 import logging
 
@@ -13,11 +14,27 @@ from adsrental.models.ec2_instance import EC2Instance
 
 class Command(BaseCommand):
     help = 'Revive old EC2 EC2'
+    threads_count = 10
 
     def add_arguments(self, parser):
         parser.add_argument('--facebook', action='store_true')
         parser.add_argument('--google', action='store_true')
         parser.add_argument('--force', action='store_true')
+
+    def revive(self, ec2_instance):
+        info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
+        netstat_out = ec2_instance.ssh_execute('netstat -an')
+        if not netstat_out:
+            print(info_str + '\t' + 'SSH down')
+            return False
+        if '1:2046' not in netstat_out and not self.force:
+            print(info_str + '\t' + 'Tunnel down')
+            return False
+
+        cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+        ec2_instance.ssh_execute(cmd_to_execute)
+        print(info_str + '\t' + 'Attempted update')
+        return True
 
     def handle(
         self,
@@ -27,6 +44,7 @@ class Command(BaseCommand):
         **kwargs
     ):
         logging.raiseExceptions = False
+        self.force = force
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))
 
         if facebook:
@@ -38,20 +56,11 @@ class Command(BaseCommand):
 
         print 'Total', ec2_instances.count()
 
-        for ec2_instance in ec2_instances:
-            info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
-            netstat_out = ec2_instance.ssh_execute('netstat -an')
-            if not netstat_out:
-                print(info_str + '\t' + 'SSH down')
-                continue
-            if '1:2046' not in netstat_out and not force:
-                print(info_str + '\t' + 'Tunnel down')
-                continue
+        pool = ThreadPool(processes=self.threads_count)
+        results = pool.map(self.revive, ec2_instances)
 
-            cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
-            ec2_instance.ssh_execute(cmd_to_execute)
-            print(info_str + '\t' + 'Attempted update')
-
+        print('================')
+        print(results)
         print('================')
 
         for ec2_instance in ec2_instances:
