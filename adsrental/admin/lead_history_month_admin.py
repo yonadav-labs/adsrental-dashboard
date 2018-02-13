@@ -7,8 +7,10 @@ from django.contrib import admin
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponse
 
+from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListFilter
 
@@ -43,7 +45,17 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (DateMonthListFilter, HistoryStatusListFilter, )
     list_select_related = ('lead', 'lead__raspberry_pi')
-    actions = ('export_as_csv', )
+    actions = (
+        'export_as_csv',
+        'restart_raspberry_pi',
+        'start_ec2',
+        'ban',
+        'unban',
+        'report_wrong_password',
+        'report_correct_password',
+        'prepare_for_reshipment',
+        'touch',
+    )
 
     def leadid(self, obj):
         return obj.lead and obj.lead.leadid
@@ -101,6 +113,69 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 row.append(item)
             writer.writerow(row)
         return response
+
+    def start_ec2(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            EC2Instance.launch_for_lead(lead)
+
+    def restart_raspberry_pi(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            lead.raspberry_pi.restart_required = True
+            lead.raspberry_pi.save()
+        messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
+
+    def ban(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            if lead.ban(request.user):
+                if lead.get_ec2_instance():
+                    lead.get_ec2_instance().stop()
+                messages.info(request, 'Lead {} is banned.'.format(lead.email))
+
+    def unban(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            if lead.unban(request.user):
+                EC2Instance.launch_for_lead(lead)
+                messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
+    def report_wrong_password(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            if lead.wrong_password_date is None:
+                lead.wrong_password_date = timezone.now()
+                lead.save()
+                messages.info(request, 'Lead {} password is marked as wrong.'.format(lead.email))
+
+    def report_correct_password(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            if lead.wrong_password_date is not None:
+                lead.wrong_password_date = None
+                lead.save()
+                messages.info(request, 'Lead {} password is marked as correct.'.format(lead.email))
+
+    def touch(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            lead.touch()
+            messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
+
+    def prepare_for_reshipment(self, request, queryset):
+        for lead_history_month in queryset:
+            lead = lead_history_month.lead
+            raspberry_pi = lead.raspberry_pi
+            if raspberry_pi:
+                raspberry_pi.first_tested = None
+                raspberry_pi.last_seen = None
+                raspberry_pi.first_seen = None
+                raspberry_pi.tunnel_last_tested = None
+                raspberry_pi.save()
+                messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
+            else:
+                messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
