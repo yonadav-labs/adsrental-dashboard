@@ -37,22 +37,23 @@ class Command(BaseCommand):
         print 'Total', ec2_instances.count()
 
         for ec2_instance in ec2_instances:
-            print ec2_instance.rpid, ec2_instance.lead.raspberry_pi.version
+            info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
             netstat_out = ec2_instance.ssh_execute('netstat -an')
             if not netstat_out:
-                print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'SSH down'
+                print(info_str + '\t' + 'SSH down')
                 continue
             if '1:2046' not in netstat_out and not force:
-                print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Tunnel down'
+                print(info_str + '\t' + 'Tunnel down')
                 continue
 
             cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
             ec2_instance.ssh_execute(cmd_to_execute)
-            print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Attempted'
+            print(info_str + '\t' + 'SSH Attempted')
 
         print('================')
 
         for ec2_instance in ec2_instances:
             new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid).select_related('lead', 'lead__raspberry_pi')
             if new_ec2_instance.lead.raspberry_pi.version == settings.RASPBERRY_PI_VERSION:
-                print ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + 'Updated'
+                info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email '\t' + ec2_instance.lead.raspberry_pi.version
+                print(info_str + '\t' + 'Updated')
