@@ -29,7 +29,7 @@ class CustomIndexDashboard(Dashboard):
                     urllib.urlencode(dict(
                         account_type='facebook',
                         status='Active',
-                        company='FBM',
+                        company__exact='FBM',
                     )),
                 )],
                 [_('Master Report for Google Accounts'), '{}?{}'.format(
@@ -44,7 +44,7 @@ class CustomIndexDashboard(Dashboard):
                     urllib.urlencode(dict(
                         account_type='google',
                         status='Active',
-                        company='ACM',
+                        company__exact='ACM',
                     )),
                 )],
                 [_('Check Report for current month'), '{}?{}'.format(
