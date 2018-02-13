@@ -19,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument('--facebook', action='store_true')
         parser.add_argument('--google', action='store_true')
         parser.add_argument('--force', action='store_true')
-        parser.add_argument('--threads', type='int', default=10)
+        parser.add_argument('--threads', type=int, default=10)
 
     def revive(self, ec2_instance):
         info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
