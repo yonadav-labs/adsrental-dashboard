@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import logging
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -25,6 +26,7 @@ class Command(BaseCommand):
         force,
         **kwargs
     ):
+        logging.raiseExceptions = False
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))
 
         if facebook:
