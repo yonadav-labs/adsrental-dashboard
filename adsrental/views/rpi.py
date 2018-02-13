@@ -12,11 +12,12 @@ class EC2DataView(View):
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if not ec2_instance:
             raise Http404
+        if not ec2_instance.lead:
+            raise Http404
+        if not ec2_instance.is_active():
+            raise Http404
 
         if not ec2_instance.is_running():
-            if not ec2_instance.lead or not ec2_instance.lead.is_active():
-                raise Http404
-
             ec2_instance.start()
             if not ec2_instance.is_running():
                 raise Http404

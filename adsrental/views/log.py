@@ -46,13 +46,23 @@ class LogView(View):
 
         if 'h' in request.GET:
             ec2_instance = EC2Instance.objects.filter(lead__raspberry_pi__rpid=rpid).first()
-            if ec2_instance:
-                ec2_instance.update_from_boto()
-                ec2_instance.tunnel_up = False
-                ec2_instance.save()
-                return HttpResponse(ec2_instance.hostname)
-            else:
+            if not ec2_instance:
                 return HttpResponse('')
+            if not ec2_instance.lead:
+                return HttpResponse('')
+            if not ec2_instance.lead.is_active():
+                if not ec2_instance.is_stopped():
+                    ec2_instance.stop()
+                return HttpResponse('')
+
+            if not ec2_instance.is_running():
+                ec2_instance.start()
+                if not ec2_instance.is_running():
+                    return HttpResponse('')
+
+            ec2_instance.tunnel_up = False
+            ec2_instance.save()
+            return HttpResponse(ec2_instance.hostname)
 
         if 'o' in request.GET:
             ip_address = request.META.get('REMOTE_ADDR')
