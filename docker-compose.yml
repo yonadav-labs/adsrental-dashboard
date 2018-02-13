@@ -45,3 +45,9 @@ services:
       - db
     links:
       - db:db
+      - redis:redis
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"

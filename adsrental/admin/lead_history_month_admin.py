@@ -17,6 +17,7 @@ from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListF
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
     model = LeadHistoryMonth
+    admin_caching_enabled = True
     list_per_page = 5000
     list_display = (
         'id',

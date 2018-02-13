@@ -17,6 +17,8 @@ RUN apk --no-cache add \
 
 ADD ./requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
+RUN pip install django-admin-caching==0.1.5
+RUN pip install django-redis==4.8.0
 
 RUN apk --no-cache del gcc musl-dev
 
