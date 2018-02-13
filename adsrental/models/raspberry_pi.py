@@ -30,6 +30,23 @@ class RaspberryPi(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    @classmethod
+    def get_free_or_create(cls):
+        free_item = cls.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
+        if free_item:
+            return free_item
+
+        return cls.create()
+
+    @classmethod
+    def create(cls):
+        max_rpid = RaspberryPi.objects.filter(rpid__startswith='RP0').order_by('-rpid').first().rpid
+        max_rpid_number = int(''.join([i for i in max_rpid if i.isdigit()]))
+        next_rpid = 'RP%08d' % (max_rpid_number + 1)
+        item = cls(rpid=next_rpid)
+        item.save()
+        return item
+
     def get_lead(self):
         try:
             return self.lead
