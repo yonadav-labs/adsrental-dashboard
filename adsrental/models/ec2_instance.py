@@ -152,7 +152,7 @@ class EC2Instance(models.Model):
                 ssh = self.get_ssh()
             except:
                 return None
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=10)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input:
             for line in input:
                 ssh_stdin.write('{}\n'.format(line))
