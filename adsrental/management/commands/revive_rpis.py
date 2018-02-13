@@ -55,5 +55,5 @@ class Command(BaseCommand):
         for ec2_instance in ec2_instances:
             new_ec2_instance = EC2Instance.objects.get(rpid=ec2_instance.rpid).select_related('lead', 'lead__raspberry_pi')
             if new_ec2_instance.lead.raspberry_pi.version == settings.RASPBERRY_PI_VERSION:
-                info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email '\t' + ec2_instance.lead.raspberry_pi.version
+                info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
                 print(info_str + '\t' + 'Updated')
