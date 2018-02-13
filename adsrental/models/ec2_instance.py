@@ -102,6 +102,9 @@ class EC2Instance(models.Model):
     def is_running(self):
         return self.status == self.STATUS_RUNNING
 
+    def is_stopped(self):
+        return self.status == self.STATUS_STOPPED
+
     def update_from_boto(self, boto_instance=None):
         if not boto_instance:
             boto_instance = self.get_boto_instance()

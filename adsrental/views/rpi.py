@@ -13,6 +13,14 @@ class EC2DataView(View):
         if not ec2_instance:
             raise Http404
 
+        if not ec2_instance.is_running():
+            if not ec2_instance.lead or not ec2_instance.lead.is_active():
+                raise Http404
+
+            ec2_instance.start()
+            if not ec2_instance.is_running():
+                raise Http404
+
         return JsonResponse({
             'hostname': ec2_instance.hostname,
             'ip_address': ec2_instance.ip_address,
