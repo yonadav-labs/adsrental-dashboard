@@ -14,9 +14,14 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'field',
         'value',
         'old_value',
+        'edited_by',
         'created',
     )
     list_select_related = ('lead', )
+    list_filter = (
+        'value',
+        'old_value',
+    )
 
     def lead_link(self, obj):
         lead = obj.lead

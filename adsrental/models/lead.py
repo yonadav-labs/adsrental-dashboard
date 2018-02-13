@@ -121,7 +121,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def set_status(self, value):
+    def set_status(self, value, edited_by):
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
         if value == self.status:
@@ -145,14 +145,14 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.status = value
         self.save()
-        LeadChange(lead=self, field='status', value=value, old_value=old_value).save()
+        LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def ban(self):
-        return self.set_status(Lead.STATUS_BANNED)
+    def ban(self, edited_by):
+        return self.set_status(Lead.STATUS_BANNED, edited_by)
 
-    def unban(self):
-        return self.set_status(self.old_status or Lead.STATUS_QUALIFIED)
+    def unban(self, edited_by):
+        return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
 
     def name(self):
         return '{} {}'.format(self.first_name, self.last_name)

@@ -196,7 +196,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
                 continue
 
-            lead.set_status(Lead.STATUS_QUALIFIED)
+            lead.set_status(Lead.STATUS_QUALIFIED, request.user)
             if not lead.raspberry_pi:
                 lead.raspberry_pi = RaspberryPi.get_free_or_create()
                 lead.save()
@@ -237,14 +237,14 @@ class LeadAdmin(admin.ModelAdmin):
 
     def ban(self, request, queryset):
         for lead in queryset:
-            if lead.ban():
+            if lead.ban(request.user):
                 if lead.get_ec2_instance():
                     lead.get_ec2_instance().stop()
                 messages.info(request, 'Lead {} is banned.'.format(lead.email))
 
     def unban(self, request, queryset):
         for lead in queryset:
-            if lead.unban():
+            if lead.unban(request.user):
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
