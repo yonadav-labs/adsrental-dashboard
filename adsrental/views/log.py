@@ -151,7 +151,7 @@ class LogView(View):
                 self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
                 restart_required = True
 
-            if hostname and ec2_instance.hostname != hostname:
+            if hostname and ec2_instance.hostname and ec2_instance.hostname != hostname:
                 self.add_log(request, rpid, 'Hostname changed, restarting')
                 restart_required = True
 
