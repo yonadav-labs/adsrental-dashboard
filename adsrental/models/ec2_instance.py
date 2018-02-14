@@ -237,6 +237,8 @@ class EC2Instance(models.Model):
             return False
 
         self.status = self.STATUS_STOPPING
+        self.hostname = None
+        self.ip_address = None
         self.save()
         boto_instance.stop()
         if blocking:
