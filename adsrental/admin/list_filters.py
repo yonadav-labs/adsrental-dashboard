@@ -199,15 +199,18 @@ class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
+            ('online', 'Online'),
             ('online_5m', 'Online last 5 min'),
-            ('online', 'Online last hour'),
+            ('online_24h', 'Online last hour'),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'online_5m':
-            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=5))
         if self.value() == 'online':
             return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
+        if self.value() == 'online_5m':
+            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=5))
+        if self.value() == 'online_24h':
+            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=24))
 
 
 class LeadRaspberryPiVersionListFilter(SimpleListFilter):
