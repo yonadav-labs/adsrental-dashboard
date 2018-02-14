@@ -76,6 +76,7 @@ class ShipStationClient(object):
         if not lead.shipstation_order_number:
             random_str = str(uuid.uuid4()).replace('-', '')[:10]
             lead.shipstation_order_number = '{}__{}'.format(lead.raspberry_pi.rpid, random_str)
+            lead.save()
 
         order = ShipStationOrder(
             order_key=lead.shipstation_order_number, order_number=lead.shipstation_order_number)

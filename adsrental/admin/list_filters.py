@@ -201,7 +201,7 @@ class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
         return (
             ('online', 'Online'),
             ('online_5m', 'Online last 5 min'),
-            ('online_24h', 'Online last hour'),
+            ('online_24h', 'Online last 24 hours'),
         )
 
     def queryset(self, request, queryset):
