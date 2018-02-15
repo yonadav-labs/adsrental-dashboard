@@ -18,7 +18,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     model = RaspberryPi
     list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_tested_field', 'first_seen_field',
-                    'last_seen_field', 'tunnel_last_tested_field', 'online', 'tunnel_online', )
+                    'last_seen_field', 'online', )
     search_fields = ('leadid', 'rpid', )
     list_filter = (
         OnlineListFilter,
@@ -61,9 +61,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def online(self, obj):
         return obj.online()
 
-    def tunnel_online(self, obj):
-        return obj.tunnel_online()
-
     def first_tested_field(self, obj):
         if not obj.first_tested:
             return '<img src="/static/admin/img/icon-no.svg" title="Never" alt="False">'
@@ -85,13 +82,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
         return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
 
-    def tunnel_last_tested_field(self, obj):
-        if obj.tunnel_last_tested is None:
-            return None
-
-        tunnel_last_tested = obj.get_tunnel_last_tested()
-        return u'<span title="{}">{}</span>'.format(tunnel_last_tested, naturaltime(tunnel_last_tested))
-
     def restart_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.restart_required = True
@@ -103,7 +93,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     ec2_instance_link.short_description = 'EC2 Instance'
     ec2_instance_link.allow_tags = True
     online.boolean = True
-    tunnel_online.boolean = True
     first_tested_field.short_description = 'Tested'
     first_tested_field.allow_tags = True
     first_seen_field.short_description = 'First Seen'
@@ -112,6 +101,3 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     last_seen_field.short_description = 'Last Seen'
     last_seen_field.empty_value_display = 'Never'
     last_seen_field.allow_tags = True
-    tunnel_last_tested_field.short_description = 'Tunnel Last Tested'
-    tunnel_last_tested_field.empty_value_display = 'Never'
-    tunnel_last_tested_field.allow_tags = True

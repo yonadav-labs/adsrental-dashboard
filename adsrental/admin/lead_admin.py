@@ -38,7 +38,6 @@ class LeadAdmin(admin.ModelAdmin):
         'last_touch',
         'first_seen',
         'last_seen',
-        'tunnel_last_tested',
         'online',
         'tunnel_online',
         'wrong_password_date_field',
@@ -129,13 +128,6 @@ class LeadAdmin(admin.ModelAdmin):
         last_seen = obj.raspberry_pi.get_last_seen()
 
         return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
-
-    def tunnel_last_tested(self, obj):
-        if obj.raspberry_pi is None or obj.raspberry_pi.tunnel_last_tested is None:
-            return None
-
-        tunnel_last_tested = obj.raspberry_pi.get_tunnel_last_tested()
-        return u'<span title="{}">{}</span>'.format(tunnel_last_tested, naturaltime(tunnel_last_tested))
 
     def facebook_account_column(self, obj):
         return '{} {}'.format(
@@ -307,9 +299,6 @@ class LeadAdmin(admin.ModelAdmin):
     last_seen.empty_value_display = 'Never'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
     last_seen.allow_tags = True
-    tunnel_last_tested.empty_value_display = 'Never'
-    tunnel_last_tested.admin_order_field = 'raspberry_pi__tunnel_last_tested'
-    tunnel_last_tested.allow_tags = True
     facebook_account_column.short_description = 'Facebook Account'
     facebook_account_column.allow_tags = True
     google_account_column.admin_order_field = 'facebook_account'
