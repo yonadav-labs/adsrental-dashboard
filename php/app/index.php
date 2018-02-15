@@ -6,6 +6,6 @@
         return "?" . $_SERVER['QUERY_STRING'];
     }
 
-    header("Location: /app/signup/" . preserve_qs());
+    header("Location: /app/" . preserve_qs());
     die();
 ?>
