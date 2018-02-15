@@ -201,3 +201,9 @@ class ReportForm(forms.Form):
             return self.MONTH_CURRENT
 
         return value
+
+
+class LandingForm(forms.Form):
+    email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'placeholder': 'Email', 'class': 'email', }))
+    first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'name', }))
+    last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'name', }))

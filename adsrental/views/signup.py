@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import uuid
 import base64
+import json
 
 from django.views import View
 from django.http import HttpResponse
@@ -23,14 +24,23 @@ class SignupView(View):
         if not utm_source:
             return HttpResponse('')
 
+        landing_form_data = {}
+        landing_form_data_raw = request.session.get('landing_form_data')
+        if landing_form_data_raw:
+            landing_form_data = json.loads(landing_form_data_raw)
+            request.session['landing_form_data'] = None
+
+        form_initial_data = {
+            'utm_source': utm_source,
+        }
+        form_initial_data.update(landing_form_data)
+
         return render(request, 'signup.html', dict(
             user=request.user,
             utm_source=request.GET.get('utm_source'),
             isp='',
             remote_addr=request.META.get('REMOTE_ADDR'),
-            form=SignupForm(initial={
-                'utm_source': utm_source,
-            }),
+            form=SignupForm(initial=form_initial_data),
         ))
 
     def post(self, request):

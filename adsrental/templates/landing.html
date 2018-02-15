@@ -1,0 +1,224 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>FBCash</title>
+	<link rel="stylesheet" href="{% static 'css/landing/screen.css' %}">
+	<!-- <link rel="stylesheet" href="libs/bootstrap-3.3.7-dist/css/bootstrap.css"> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css">
+</head>
+<body>
+	<section id="wrapper">
+		<!--Header-->
+		<header>
+			<div class="top-header"></div>
+			<div class="container">
+				<div class="row">
+					<div class="col-md-5">
+						<div class="logo">
+							<a href="index.html"><img src="{% static 'images/landing/logo.png' %}" alt="logo"></a>
+						</div>
+					</div>
+					
+					<div class="col-md-7 nav-menu">
+						<button class="top-nav_btn">
+							<i class="icon-menu"></i>
+						</button>
+						<ul class="top-menu">
+							<li><a href="#wrapper">HOME</a></li>
+							<li><a href="#steps">HOW IT WORKS</a></li>
+							<li><a href="#form">SUBMIT FORM</a></li>
+							<li><a href="#faqs">FAQs</a></li>
+						</ul>
+					</div>
+						
+				</div>
+				<div class="earnings">
+					<h1><span>Earn Cash Now!</span></h1>
+					<h2>Just By Renting Out Your Facebook!</h2>
+					<div class="make-money">
+						Looking to make extra money this month?<br>
+						<span>You've come to the right place!</span>
+					</div>
+					<h3>Easy 15 Minute Setup <span>l</span> No Work on Your Part Required <span>l</span> Get Paid Instantly</h3>
+					<h4>Earn at least <span>$75</span> each month</h4>
+					<a href="#form"><button>Apply Now!</button></a>
+				</div>
+			</div>
+		</header>
+<!-- 		<section class="earnings"></section> -->
+<!--Steps-->
+		<section class="steps" id="steps">
+			<div class="all_steps">
+				<h1 class="text-center"><span>How Does It Work?</span></h1>
+				<h4 class="text-center">Easy Two Step Process</h4>
+				<div class="steps">
+					<div class="container_text">
+						<div class="row">
+							<div class="col-md-6 first_step">
+								<h2>Step 1</h2>
+							</div>
+							<div class="col-md-6 second_step">
+								<h2>Step 2</h2>
+							</div>
+						</div>	
+						
+					</div>
+					<div class="row">
+						<img src="{% static 'images/landing/top-border.png' %}" alt="top-border" class="col-md-5 hidden-xs hidden-sm first_border" width="255px" >
+						<div class="col-md-3-offset"></div>
+						<img src="{% static 'images/landing/top-border.png' %}" alt="top-border" class="col-md-5 second_border">
+					</div>
+
+					<!--Step_1-->	
+					<div class="row step_one" >
+						<div class="col-md-2 step_1">
+							<img src="{% static 'images/landing/clicking.png' %}" alt="clicking" >
+							<p >After clicking the apply now button you'll be redirected to register</p>
+						</div>
+						<div class="col-md-2 step_1">
+							<img src="{% static 'images/landing/server.png' %}" alt="server" width="">
+							<p class="facet">All of your information is encrypted on a dedicated server.</p>
+						</div>
+						<div class="col-md-2 step_1">
+							<img src="{% static 'images/landing/mail.png' %}" alt="mail" width="">
+							<p>Once your account has been registered we'll email you instructions on how to proceed as well as a Splashtop link for download.</p>
+						</div>
+					
+						<!--Step_2-->
+						<div class="col-md-2 step_2">
+							<img src="{% static 'images/landing/shipping.png' %}" alt="shipping" width="" style="margin-bottom: 32px;" >
+							<p class="facet">We’ll be shipping you a device for you to setup at your home.</p>
+						</div>
+						<div class="col-md-2 step_2" style="position: relative;left: 56px;">
+							<img src="{% static 'images/landing/plugged.png' %}" alt="plugged" width="">
+							<p >So long as your device is connected to your router and plugged in you’ll make money!</p>
+						</div>
+						<div class="col-md-2 step_2">
+							<img src="{% static 'images/landing/money.png' %}" alt="money" width="">
+							<p class="facets">At the end of each month we'll send you a check of up to $25 all you need to do is make sure your device stays plugged in and your password remains the same.</p>
+						</div>
+					</div>
+					<div class="row ">
+						<div class="col-md-12">
+							<div class="bottom">
+							<img src="{% static 'images/landing/bottom-border.png' %}" alt="bottom" >
+						</div>
+						</div>
+						
+					</div>
+				</div>
+				
+			</div>
+			<div class="info-warning">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-2 warning">
+							<img src="{% static 'images/landing/warning.png' %}" alt="warning">
+						</div>
+						<div class="col-md-10 ">
+							<p>Splashtop is a safe and secure software where users must accept a connection request before any connection is made. After you accept the request you will be able to watch in real time as one of our employees verifies your account's eligibility.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--Form-->
+		<section class="form" id="form" >
+			<h1 class="text-center"><span>Submit Form</span></h1>
+			<h2 class="text-center">After Sign up you will be redirected to our form to continue registration. <br> Please fill out the form when you are ready to be scheduled.</h2>
+			<div class="container">
+				<form action="" method="POST">
+					{% csrf_token %}
+					<div class="row">
+						<div class="col-md-6">
+							{{ form.first_name }}
+						</div>
+						<div class="col-md-6">
+							{{ form.last_name }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							{{ form.email }}
+						</div>
+					</div>
+					<button>Let's Get You That Money!</button>
+				</form>
+			</div>
+		</section>
+		<!--FAQ-->
+		<section class="faqs" id="faqs">
+			<h1 class="text-center">
+				<span>FAQs</span>
+			</h1>
+			<h2 class="text-center">
+				<span>All further questions can be answered by your Account Manager!</span>
+			</h2>
+			<div class="faq_info">
+				<div class="container">
+					<div class="row">
+						<div class="block">
+								<span>Will the ads show up on anyone's feed? </span>
+								<p>Absolutely not. The ads we create are the same sponsored ads you may or may not notice on the right hand side of your news feed. Facebook chooses who sees these ads with their advertisement algorithm based on people’s interests. </p>
+
+						</div>
+					</div>
+					<div class="row">
+						<div class="block">
+							<span>What are the risks involved?</span>
+							<p>There are no risks to the personal side of your account. We create a backend in order to separate your personal account. We create and use what is called an Ad Manager. To control their ad content, Facebook occasionally flag Ad Managers but this affects our ads only. If you want to run a  promotion in the future, you can simply create a new one. </p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="block">
+							<span>What kind of ads do you run?</span>
+							<p>The majority of our clients are small businesses in the heath, fitness, and lifestyle industries, but we also have clients that you may have heard of (this can be where the icons are)
+							Our ad campaigns represent their products or services.</p>
+						</div>
+					</div>
+				</div>
+				<h1 class="text-center">Ready to Get Started?</h1>
+				<button>Apply Now!</button>
+			</div>
+		</section>
+		<!--Footer-->
+		<footer>
+			<div class="container">
+				<div class="row">
+					<div class="col-md-5 logo">
+						<a href="index.html"><img src="{% static 'images/landing/logo.png' %}" alt="logo"></a>
+
+					</div>
+					<div class="col-md-7 nav-menu">
+						<ul>
+							<li><a href="#wrapper">HOME</a></li>
+							<li><a href="#steps">HOW IT WORKS</a></li>
+							<li><a href="#form">SUBMIT FORM</a></li>
+							<li><a href="#faqs">FAQs</a></li>
+						</ul>
+					</div>	
+				</div>
+			</div>
+		</footer>
+	</section>
+    <script type='text/javascript' src='https://code.jquery.com/jquery-1.12.4.min.js?ver=4.8.3'></script>
+    <script>
+        $(document).ready(function(){
+            var menuBtn = $('.top-nav_btn');
+            var menu = $('.top-menu');
+
+            menuBtn.on('click', function(event){
+                event.preventDefault();
+                menu.toggleClass('top-menu__active');
+            });
+        })
+    </script>	
+</body>
+</html>
