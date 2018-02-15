@@ -4,6 +4,6 @@
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/from_shipstation/?days_ago=1 &>/dev/null
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/delivered/ &>/dev/null
 */10 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/offline/ &>/dev/null
-0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/sync_ec2/?pending=true&execute=true >> /root/cron.log
+0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/sync_ec2/?pending=true\&execute=true >> /root/cron.log
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/lead_history/?now=true >> /root/cron.log
 0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
