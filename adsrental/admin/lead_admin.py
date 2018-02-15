@@ -24,7 +24,7 @@ class LeadAdmin(admin.ModelAdmin):
     list_display = (
         'id_field',
         'name',
-        'status',
+        'status_field',
         'email_field',
         'phone',
         'utm_source',
@@ -87,6 +87,13 @@ class LeadAdmin(admin.ModelAdmin):
         return u'{} {}'.format(
             obj.first_name,
             obj.last_name,
+        )
+
+    def status_field(self, obj):
+        return '<a target="_blank" href="{url}?q={q}" title="Show changes">{status}</a>'.format(
+            url=reverse('admin:adsrental_leadchange_changelist'),
+            q=obj.leadid,
+            status=obj.status,
         )
 
     def email_field(self, obj):
@@ -268,6 +275,10 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
+
+    status_field.allow_tags = True
+    status_field.short_description = 'Status'
+    status_field.admin_order_field = 'status'
 
     wrong_password_date_field.short_description = 'Wrong Password'
     wrong_password_date_field.allow_tags = True

@@ -22,6 +22,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'value',
         'old_value',
     )
+    search_fields = ('lead__leadid', )
 
     def lead_link(self, obj):
         lead = obj.lead
