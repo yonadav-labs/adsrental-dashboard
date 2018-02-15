@@ -66,7 +66,7 @@ class SignupView(View):
             return redirect('thankyou_email', b64_email=base64.b64encode(lead.email))
 
         lead_id = str(uuid.uuid4()).replace('-', '')
-        last_account_name = Lead.objects.all().order_by('-account_name').first().account_name
+        last_account_name = Lead.objects.filter(account_name__startswith='ACT').order_by('-account_name').first().account_name
         account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
 
         address = ', '.join([
