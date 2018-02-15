@@ -59,7 +59,7 @@
                     <td>{{ entry.status }}</td>
                     <td>{{entry.phone}}</td>
                     <td>
-                        {{ entry.address }}
+                        {{ entry.get_address }}
                         {% if entry.usps_tracking_code %}
                             <br />    
                             USPS: {{entry.usps_tracking_code}}

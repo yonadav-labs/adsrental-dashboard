@@ -43,14 +43,12 @@ class Lead(models.Model, FulltextSearchMixin):
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True)
-    sf_leadid = models.CharField(max_length=255, blank=True, null=True, unique=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None)
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
     account_name = models.CharField(max_length=255, blank=True, null=True, unique=True)
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True)
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True)
