@@ -65,7 +65,8 @@ class LeadAdmin(admin.ModelAdmin):
     actions = (
         'update_from_shipstation',
         'update_pi_delivered',
-        'create_shipstation_order',
+        'mark_as_qualified',
+        'mark_as_disqualified',
         'start_ec2',
         'restart_ec2',
         'restart_raspberry_pi',
@@ -173,7 +174,7 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             lead.update_pi_delivered()
 
-    def create_shipstation_order(self, request, queryset):
+    def mark_as_qualified(self, request, queryset):
         for lead in queryset:
             if lead.is_banned():
                 messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
@@ -203,6 +204,11 @@ class LeadAdmin(admin.ModelAdmin):
             order = shipstation_client.add_lead_order(lead)
             messages.success(
                 request, '{} order created: {}'.format(lead.str(), order.order_key))
+
+    def mark_as_disqualified(self, request, queryset):
+        for lead in queryset:
+            lead.set_status(Lead.STATUS_DISQUALIFIED)
+            messages.success(request, 'Lead {} is disqualified'.format(lead.email))
 
     def start_ec2(self, request, queryset):
         for lead in queryset:
@@ -273,7 +279,7 @@ class LeadAdmin(admin.ModelAdmin):
     last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
-    create_shipstation_order.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
+    mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
     start_ec2.short_description = 'Start EC2 instance'
