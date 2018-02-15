@@ -23,8 +23,6 @@ class LeadAdmin(admin.ModelAdmin):
     model = Lead
     list_display = (
         'id_field',
-        # 'usps_tracking_code',
-        'account_name',
         'name',
         'status',
         'email_field',
@@ -39,7 +37,6 @@ class LeadAdmin(admin.ModelAdmin):
         'first_seen',
         'last_seen',
         'online',
-        'tunnel_online',
         'wrong_password_date_field',
         'pi_delivered',
         'bundler_paid',
@@ -102,9 +99,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
-
-    def tunnel_online(self, obj):
-        return obj.raspberry_pi.tunnel_online() if obj.raspberry_pi else False
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
@@ -289,8 +283,6 @@ class LeadAdmin(admin.ModelAdmin):
     email_field.admin_order_field = 'email'
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
-    tunnel_online.boolean = True
-    tunnel_online.admin_order_field = 'raspberry_pi__tunnel_last_tested'
     raspberry_pi_link.short_description = 'Raspberry PI'
     raspberry_pi_link.allow_tags = True
     first_seen.empty_value_display = 'Never'
