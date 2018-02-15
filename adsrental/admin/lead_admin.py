@@ -10,7 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter
 from adsrental.utils import ShipStationClient
 
 
@@ -51,6 +51,7 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiTunnelOnlineListFilter,
         AccountTypeListFilter,
         WrongPasswordListFilter,
+        RaspberryPiFirstTestedListFilter,
         'utm_source',
         'bundler_paid',
         'pi_delivered',
@@ -108,9 +109,11 @@ class LeadAdmin(admin.ModelAdmin):
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
-            return True
+            return '<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(
+                naturaltime(obj.raspberry_pi.first_tested),
+            )
 
-        return False
+        return None
 
     def first_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
@@ -162,9 +165,6 @@ class LeadAdmin(admin.ModelAdmin):
                 rpid=obj.raspberry_pi,
             ))
 
-        for error in obj.find_raspberry_pi_errors():
-            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
-
         return '\n'.join(result)
 
     def ec2_instance_link(self, obj):
@@ -176,9 +176,6 @@ class LeadAdmin(admin.ModelAdmin):
                 ec2_instance=ec2_instance,
                 q=ec2_instance.instance_id,
             ))
-
-        for error in obj.find_ec2_instance_errors():
-            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
 
         return '\n'.join(result)
 
@@ -284,7 +281,7 @@ class LeadAdmin(admin.ModelAdmin):
     wrong_password_date_field.allow_tags = True
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
 
-    tested_field.boolean = True
+    tested_field.allow_tags = True
     tested_field.short_description = 'Tested'
 
     last_touch.allow_tags = True
