@@ -69,12 +69,6 @@ class SignupView(View):
         last_account_name = Lead.objects.filter(account_name__startswith='ACT').order_by('-account_name').first().account_name
         account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
 
-        address = ', '.join([
-            data['street'] or '',
-            data['city'] or '',
-            data['postal_code'] or '',
-            'United States',
-        ])
         lead = Lead(
             leadid=lead_id,
             account_name=account_name,
@@ -83,7 +77,6 @@ class SignupView(View):
             status=Lead.STATUS_AVAILABLE,
             email=data['email'],
             phone=data['phone'],
-            address=address,
             utm_source=data['utm_source'],
             bundler=Bundler.get_by_utm_source(data['utm_source']),
             facebook_account=True,
