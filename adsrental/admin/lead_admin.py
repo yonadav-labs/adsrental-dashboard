@@ -44,14 +44,14 @@ class LeadAdmin(admin.ModelAdmin):
     list_filter = (
         StatusListFilter,
         RaspberryPiOnlineListFilter,
-        RaspberryPiTunnelOnlineListFilter,
         AccountTypeListFilter,
         WrongPasswordListFilter,
         RaspberryPiFirstTestedListFilter,
+        'company',
         'utm_source',
+        'is_sync_adsdb',
         'bundler_paid',
         'pi_delivered',
-        'tested',
     )
     list_select_related = ('raspberry_pi', 'ec2instance', )
     search_fields = (

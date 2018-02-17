@@ -9,7 +9,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead import ReportProxyLead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter
 from adsrental.utils import ShipStationClient
 
 
@@ -26,7 +26,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         # 'rpid',
         'first_name',
         'last_name',
-        # 'utm_source',
+        'utm_source',
         'status',
         # 'street',
         # 'city',
@@ -50,10 +50,12 @@ class ReportLeadAdmin(admin.ModelAdmin):
     )
     list_filter = (
         StatusListFilter,
-        'company',
-        AccountTypeListFilter,
         RaspberryPiOnlineListFilter,
+        AccountTypeListFilter,
+        WrongPasswordListFilter,
         TouchCountListFilter,
+        'company',
+        'utm_source',
         'is_sync_adsdb',
         'bundler_paid',
         'pi_delivered',
