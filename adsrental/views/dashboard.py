@@ -45,7 +45,6 @@ class SetPasswordView(View):
         form = SetPasswordForm(request.POST)
         lead = Lead.objects.get(leadid=lead_id)
         if form.is_valid():
-            lead.fb_email = form.cleaned_data['fb_email']
             lead.fb_secret = form.cleaned_data['fb_password']
             lead.wrong_password = False
             lead.wrong_password_date = None

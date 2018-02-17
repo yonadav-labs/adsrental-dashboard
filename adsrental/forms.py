@@ -65,8 +65,8 @@ class DashboardForm(forms.Form):
 
 class SetPasswordForm(forms.Form):
     id = forms.CharField(label='ID', widget=forms.TextInput(attrs={'readonly': True}))
-    email = forms.EmailField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
-    fb_email = forms.EmailField(label='Facebook Email')
+    email = forms.CharField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
+    fb_email = forms.CharField(label='Facebook Email', widget=forms.TextInput(attrs={'readonly': True}))
     fb_password = forms.CharField(label='Facebook Password')
 
 

@@ -148,7 +148,11 @@ class LeadAdmin(admin.ModelAdmin):
         if not obj.wrong_password_date:
             return None
 
-        return '<span title="{}">{}</span>'.format(obj.wrong_password_date, naturaltime(obj.wrong_password_date))
+        return '<span title="{}">{}</span> <a href="{}" target="_blank">Fix</a>'.format(
+            obj.wrong_password_date,
+            naturaltime(obj.wrong_password_date),
+            reverse('dashboard_set_password', kwargs=dict(lead_id=obj.leadid)),
+        )
 
     def raspberry_pi_link(self, obj):
         result = []
