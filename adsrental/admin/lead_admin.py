@@ -10,7 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, RaspberryPiTunnelOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter
 from adsrental.utils import ShipStationClient
 
 
@@ -46,6 +46,7 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
         WrongPasswordListFilter,
+        TouchCountListFilter,
         RaspberryPiFirstTestedListFilter,
         'company',
         'utm_source',
