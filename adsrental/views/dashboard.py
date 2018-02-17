@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
 
 import datetime
+import urllib
 
 from django.views import View
+from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -40,16 +43,21 @@ class SetPasswordView(View):
 
     def post(self, request, lead_id):
         form = SetPasswordForm(request.POST)
+        lead = Lead.objects.get(leadid=lead_id)
         if form.is_valid():
-            lead = Lead.objects.get(leadid=lead_id)
             lead.fb_email = form.cleaned_data['fb_email']
             lead.fb_secret = form.cleaned_data['fb_password']
             lead.wrong_password = False
             lead.wrong_password_date = None
             lead.save()
-            return redirect('dashboard')
+            return HttpResponseRedirect('{}?{}'.format(
+                reverse('dashboard'),
+                urllib.urlencode(dict(
+                    search=lead.email,
+                )),
+            ))
 
-        return render(request, 'dashboaard_lead_password.html', dict(
+        return render(request, 'dashboard_lead_password.html', dict(
             form=form,
             lead=lead,
         ))
