@@ -63,6 +63,13 @@ class DashboardForm(forms.Form):
     account_type = forms.ChoiceField(label='Account Type', choices=ACCOUNT_TYPE_CHOICES, required=False)
 
 
+class SetPasswordForm(forms.Form):
+    id = forms.EmailField(label='ID', widget=forms.TextInput(attrs={'readonly': True}))
+    email = forms.EmailField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
+    fb_email = forms.EmailField(label='Facebook Email')
+    fb_password = forms.CharField(label='Facebook Password')
+
+
 class SignupForm(forms.Form):
     STATE_CHOICES = (
         ('Alabama', 'Alabama', ),

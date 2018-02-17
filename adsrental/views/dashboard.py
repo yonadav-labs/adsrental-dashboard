@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.forms import DashboardForm
+from adsrental.forms import DashboardForm, SetPasswordForm
 
 
 class CheckSentView(View):
@@ -22,6 +22,37 @@ class CheckSentView(View):
         lead.pi_sent = timezone.now()
         lead.save()
         return redirect('dashboard')
+
+
+class SetPasswordView(View):
+    def get(self, request, lead_id):
+        lead = Lead.objects.get(leadid=lead_id)
+        form = SetPasswordForm(initial=dict(
+            id=lead.leadid,
+            email=lead.email,
+            fb_email=lead.fb_email,
+            fb_password=lead.fb_secret,
+        ))
+        return render(request, 'dashboard_lead_password.html', dict(
+            form=form,
+            lead=lead,
+        ))
+
+    def post(self, request, lead_id):
+        form = SetPasswordForm(request.POST)
+        if form.is_valid():
+            lead = Lead.objects.get(leadid=lead_id)
+            lead.fb_email = form.cleaned_data['fb_email']
+            lead.fb_secret = form.cleaned_data['fb_password']
+            lead.wrong_password = False
+            lead.wrong_password_date = None
+            lead.save()
+            return redirect('dashboard')
+
+        return render(request, 'dashboaard_lead_password.html', dict(
+            form=form,
+            lead=lead,
+        ))
 
 
 class DashboardView(View):
