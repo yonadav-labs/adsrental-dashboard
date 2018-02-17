@@ -30,22 +30,31 @@ class CheckSentView(View):
 class SetPasswordView(View):
     def get(self, request, lead_id):
         lead = Lead.objects.get(leadid=lead_id)
+        is_facebook_account = lead.facebook_account
+        is_google_account = lead.google_account
         form = SetPasswordForm(initial=dict(
             id=lead.leadid,
-            email=lead.email,
-            fb_email=lead.fb_email,
-            fb_password=lead.fb_secret,
+            lead_email=lead.email,
+            email=lead.fb_email if is_facebook_account else lead.google_email,
+            new_password=lead.fb_secret if is_facebook_account else lead.google_password,
         ))
         return render(request, 'dashboard_lead_password.html', dict(
             form=form,
             lead=lead,
+            is_facebook_account=is_facebook_account,
+            is_google_account=is_google_account,
         ))
 
     def post(self, request, lead_id):
         form = SetPasswordForm(request.POST)
         lead = Lead.objects.get(leadid=lead_id)
+        is_facebook_account = lead.facebook_account
+        is_google_account = lead.google_account
         if form.is_valid():
-            lead.fb_secret = form.cleaned_data['fb_password']
+            if is_facebook_account:
+                lead.fb_secret = form.cleaned_data['new_password']
+            if is_google_account:
+                lead.google_password = form.cleaned_data['new_password']
             lead.wrong_password = False
             lead.wrong_password_date = None
             lead.save()
