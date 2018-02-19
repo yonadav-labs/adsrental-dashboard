@@ -168,6 +168,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     last_troubleshoot_field.allow_tags = True
     last_troubleshoot_field.short_description = 'Troubleshoot'
+    tunnel_up_date_field.admin_order_field = 'last_troubleshoot'
 
     tunnel_up_date_field.allow_tags = True
     tunnel_up_date_field.short_description = 'Tunnel up date'
+    tunnel_up_date_field.admin_order_field = 'tunnel_up_date'
