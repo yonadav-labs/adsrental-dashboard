@@ -34,7 +34,17 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
 
     def duration(self, obj):
         end_date = obj.end_date or timezone.now()
-        return '{} hours'.format(round((end_date - obj.start_date).total_seconds() / 3600., 1))
+        delta = end_date - obj.start_date
+        if delta.seconds < 5:
+            return 'now'
+        days = delta.days
+        delta_seconds = delta.seconds % (60 * 60 * 24)
+        return '{days}{hh}:{mm}:{ss}'.format(
+            days='{} days and '.format(days) if days else '',
+            hh='%02d' % (delta_seconds // 60 // 60),
+            mm='%02d' % (delta_seconds // 60 % 60),
+            ss='%02d' % (delta_seconds % 60),
+        )
 
     raspberry_pi_link.short_description = 'Raspberry Pi'
     raspberry_pi_link.allow_tags = True
