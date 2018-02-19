@@ -267,7 +267,7 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
         if self.value() == 'latest':
             return queryset.filter(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'old':
-            return queryset.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
+            return queryset.filter(version__isnull=False).exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'null':
             return queryset.filter(lead__raspberry_pi__version__isnull=True)
 
@@ -329,3 +329,23 @@ class LastTroubleshootListFilter(SimpleListFilter):
             return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(hours=24))
         if self.value() == 'older':
             return queryset.filter(last_troubleshoot__lt=timezone.now() - datetime.timedelta(hours=24))
+
+
+class VersionListFilter(SimpleListFilter):
+    title = 'Version'
+    parameter_name = 'version'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('latest', 'Only {}'.format(settings.RASPBERRY_PI_VERSION)),
+            ('old', 'Old versions'),
+            ('null', 'Not set'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'latest':
+            return queryset.filter(version=settings.RASPBERRY_PI_VERSION)
+        if self.value() == 'old':
+            return queryset.filter(version__isnull=False).exclude(version=settings.RASPBERRY_PI_VERSION)
+        if self.value() == 'null':
+            return queryset.filter(version__isnull=True)

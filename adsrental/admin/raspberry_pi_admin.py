@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.admin.list_filters import OnlineListFilter, TunnelOnlineListFilter
+from adsrental.admin.list_filters import OnlineListFilter, TunnelOnlineListFilter, VersionListFilter
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
@@ -17,12 +17,21 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         }
 
     model = RaspberryPi
-    list_display = ('rpid', 'lead_link', 'ec2_instance_link', 'first_tested_field', 'first_seen_field',
-                    'last_seen_field', 'online', )
+    list_display = (
+        'rpid',
+        'lead_link',
+        'ec2_instance_link',
+        'version',
+        'first_tested_field',
+        'first_seen_field',
+        'last_seen_field',
+        'online',
+    )
     search_fields = ('leadid', 'rpid', )
     list_filter = (
         OnlineListFilter,
         TunnelOnlineListFilter,
+        VersionListFilter,
     )
     list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
