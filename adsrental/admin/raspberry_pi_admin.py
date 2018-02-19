@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.admin.list_filters import OnlineListFilter, TunnelOnlineListFilter, VersionListFilter
+from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
@@ -30,7 +30,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     search_fields = ('leadid', 'rpid', )
     list_filter = (
         OnlineListFilter,
-        TunnelOnlineListFilter,
         VersionListFilter,
     )
     list_select_related = ('lead', 'lead__ec2instance', )
@@ -61,9 +60,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
                 ec2_instance=ec2_instance,
                 q=ec2_instance.instance_id,
             ))
-
-        for error in obj.lead.find_ec2_instance_errors():
-            result.append('<img src="/static/admin/img/icon-no.svg" title="{}" alt="False">'.format(error))
 
         return '\n'.join(result)
 

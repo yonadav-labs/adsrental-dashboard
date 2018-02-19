@@ -140,6 +140,11 @@ class EC2Instance(models.Model):
         return self
 
     def __str__(self):
+        if self.tunnel_up:
+            return self.instance_id
+        if self.is_running():
+            return '{} (down)'.format(self.instance_id)
+
         return '{} ({})'.format(self.instance_id, self.status)
 
     def get_ssh(self):

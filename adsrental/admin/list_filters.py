@@ -143,29 +143,6 @@ class OnlineListFilter(SimpleListFilter):
             return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
 
 
-class RaspberryPiTunnelOnlineListFilter(SimpleListFilter):
-    title = 'Tunnel online state'
-    parameter_name = 'tunnel_online'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('online', 'Online only'),
-            ('offline', 'Offline only'),
-            ('offline_2days', 'Offline for last 2 days'),
-            ('offline_5days', 'Offline for last 5 days'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'online':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
-        if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
-        if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 2 * 24))
-        if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 5 * 24))
-
-
 class AccountTypeListFilter(SimpleListFilter):
     title = 'Account type'
     parameter_name = 'account_type'
