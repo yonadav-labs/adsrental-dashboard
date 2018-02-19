@@ -238,6 +238,7 @@ class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
             ('online', 'Online'),
             ('online_5m', 'Online last 5 min'),
             ('online_24h', 'Online last 24 hours'),
+            ('offline', 'Offline'),
         )
 
     def queryset(self, request, queryset):
@@ -247,6 +248,8 @@ class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
             return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=5))
         if self.value() == 'online_24h':
             return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=24))
+        if self.value() == 'offline':
+            return queryset.filter(lead__raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
 
 
 class LeadRaspberryPiVersionListFilter(SimpleListFilter):
@@ -257,6 +260,7 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
         return (
             ('latest', 'Only {}'.format(settings.RASPBERRY_PI_VERSION)),
             ('old', 'Old versions'),
+            ('null', 'Not set'),
         )
 
     def queryset(self, request, queryset):
@@ -264,6 +268,8 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
             return queryset.filter(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'old':
             return queryset.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
+        if self.value() == 'null':
+            return queryset.filter(lead__raspberry_pi__version__isnull=True)
 
 
 class DateMonthListFilter(SimpleListFilter):
