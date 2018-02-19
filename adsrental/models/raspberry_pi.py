@@ -130,7 +130,7 @@ class RaspberryPi(models.Model):
         last_log = sorted(log_files)[-1]
         last_log_path = os.path.join(log_dir, last_log)
         lines = open(last_log_path).readlines()[-tail:]
-        return '\n'.join(lines)
+        return '\n'.join([i.rstrip('\n') for i in lines])
 
     def get_last_seen(self):
         if self.last_seen is None:
