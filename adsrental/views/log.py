@@ -112,6 +112,10 @@ class LogView(View):
             raspberry_pi.update_ping()
             raspberry_pi.save()
 
+            if lead.is_active() and ec2_instance and not ec2_instance.is_running():
+                self.add_log(request, rpid, 'EC2 is now {}, trying to start'.format(ec2_instance.status))
+                ec2_instance.start()
+
             self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
             restart_required = False
