@@ -64,7 +64,7 @@ class CustomIndexDashboard(Dashboard):
                     urllib.urlencode(dict(
                         lead_status='Active',
                         online='online',
-                        tunnel_up__exact='0',
+                        tunnel_up='no',
                         version='latest',
                     )),
                 )],

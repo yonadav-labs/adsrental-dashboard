@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
 
+import datetime
+import time
+
 from django.db import models
 from django.conf import settings
 from django.apps import apps
 from django.utils import timezone
 import paramiko
-import time
 
 from adsrental.utils import BotoResource
 
@@ -14,6 +16,8 @@ class EC2Instance(models.Model):
     class Meta:
         verbose_name = 'EC2 Instance'
         verbose_name_plural = 'EC2 Instances'
+
+    TUNNEL_UP_TTL_SECONDS = 20 * 60
 
     STATUS_RUNNING = 'running'
     STATUS_STOPPED = 'stopped'
@@ -105,6 +109,12 @@ class EC2Instance(models.Model):
     def is_stopped(self):
         return self.status == self.STATUS_STOPPED
 
+    def is_tunnel_up(self):
+        if not self.tunnel_up_date:
+            return False
+        now = timezone.now()
+        return self.tunnel_up_date > now - datetime.timedelta(seconds=self.TUNNEL_UP_TTL_SECONDS)
+
     def update_from_boto(self, boto_instance=None):
         if not boto_instance:
             boto_instance = self.get_boto_instance()
@@ -140,7 +150,7 @@ class EC2Instance(models.Model):
         return self
 
     def __str__(self):
-        if self.tunnel_up:
+        if self.is_tunnel_up():
             return self.instance_id
         if self.is_running():
             return '{} (down)'.format(self.instance_id)

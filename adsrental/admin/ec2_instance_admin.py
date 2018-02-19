@@ -8,7 +8,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
-from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter
+from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
@@ -29,12 +29,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'last_troubleshoot_field',
         'tunnel_up_date_field',
         'links',
-        'tunnel_up',
         'raspberry_pi_online',
     )
     list_filter = (
         'status',
-        'tunnel_up',
+        TunnelUpListFilter,
         LeadStatusListFilter,
         LeadRaspberryPiOnlineListFilter,
         LeadRaspberryPiVersionListFilter,
@@ -94,7 +93,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             return None
 
         d = obj.tunnel_up_date
-        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
+        is_tunnel_up = obj.is_tunnel_up()
+        return u'<span title="{}">{}</span>'.format(
+            d,
+            'Yes' if is_tunnel_up else naturaltime(d),
+        )
 
     def links(self, obj):
         links = []
@@ -168,8 +171,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     last_troubleshoot_field.allow_tags = True
     last_troubleshoot_field.short_description = 'Troubleshoot'
-    tunnel_up_date_field.admin_order_field = 'last_troubleshoot'
+    last_troubleshoot_field.admin_order_field = 'last_troubleshoot'
 
     tunnel_up_date_field.allow_tags = True
-    tunnel_up_date_field.short_description = 'Tunnel up date'
+    tunnel_up_date_field.short_description = 'Tunnel up'
     tunnel_up_date_field.admin_order_field = 'tunnel_up_date'

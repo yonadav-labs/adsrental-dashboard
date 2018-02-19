@@ -10,6 +10,7 @@ from django.contrib.admin import SimpleListFilter
 
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.ec2_instance import EC2Instance
 
 
 class LeadStatusListFilter(SimpleListFilter):
@@ -326,3 +327,27 @@ class VersionListFilter(SimpleListFilter):
             return queryset.filter(version__isnull=False).exclude(version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'null':
             return queryset.filter(version__isnull=True)
+
+
+class TunnelUpListFilter(SimpleListFilter):
+    title = 'Tunnel Up'
+    parameter_name = 'tunnel_up'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+            ('no_1hour', 'No for 1 hour'),
+            ('no_1day', 'No for 1 day'),
+        )
+
+    def queryset(self, request, queryset):
+        now = timezone.now()
+        if self.value() == 'yes':
+            return queryset.filter(tunnel_up_date__gt=now - datetime.timedelta(seconds=EC2Instance.TUNNEL_UP_TTL_SECONDS))
+        if self.value() == 'no':
+            return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=EC2Instance.TUNNEL_UP_TTL_SECONDS))
+        if self.value() == 'no_1hour':
+            return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60))
+        if self.value() == 'no_1day':
+            return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60 * 24))

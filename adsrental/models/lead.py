@@ -259,50 +259,6 @@ class Lead(models.Model, FulltextSearchMixin):
     def is_banned(self):
         return self.status == Lead.STATUS_BANNED
 
-    def find_ec2_instance_errors(self):
-        errors = []
-        ec2_instance = self.get_ec2_instance()
-
-        if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
-            errors.append('Lead is not active but instance is running')
-        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
-            errors.append('Lead is active and has RPI assigned, but no EC2 instance')
-        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and ec2_instance and not ec2_instance.is_running():
-            errors.append('Lead is active and has RPI assigned, but  EC is not running')
-        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not self.raspberry_pi.online():
-            errors.append('Lead is active and has RPI and EC2 assigned, but RPi is not running. RPi should be restarted.')
-
-        if ec2_instance and ec2_instance.is_running():
-            if not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online():
-                errors.append('EC2 SSH tunnel to RPi is down, but RPi seems to be online. RPi should be restarted.')
-            if not ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online():
-                errors.append('EC2 SSH tunnel to RPi is down, and RPi seems to be offline. Check RPI internet connection and restart it.')
-
-            if ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
-                errors.append('RPi still runs old version {}. Autoupdating it over tunnel.'.format(self.raspberry_pi.version))
-            if not ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.version == settings.OLD_RASPBERRY_PI_VERSION:
-                errors.append('RPi still runs old version {}. Tunnel is down, ask {} to reset RPi manually.'.format(self.raspberry_pi.version, self.name()))
-            if ec2_instance.tunnel_up and self.raspberry_pi and self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                errors.append('RPi still runs version {} and is online. RPi updater will update it soon.'.format(self.raspberry_pi.version))
-            if ec2_instance.tunnel_up and self.raspberry_pi and not self.raspberry_pi.online() and self.raspberry_pi.version != settings.RASPBERRY_PI_VERSION:
-                errors.append('RPi still runs version {} but is offline. RPi updater will update it soon.'.format(self.raspberry_pi.version))
-
-        return errors
-
-    def find_raspberry_pi_errors(self):
-        errors = []
-        if self.status == Lead.STATUS_QUALIFIED and not self.raspberry_pi:
-            errors.append('Lead is qualified but RaspberryPi is not assigned')
-        # if self.is_active() and self.raspberry_pi and not self.raspberry_pi.online():
-        #     errors.append('Lead is active but RaspberryPi is offline')
-        if self.status == Lead.STATUS_QUALIFIED and self.raspberry_pi and not self.raspberry_pi.first_tested:
-            errors.append('Lead is qualified but RaspberryPi is not tested')
-
-        return errors
-
-    def find_errors(self):
-        return self.find_ec2_instance_errors() + self.find_raspberry_pi_errors()
-
 
 class ReportProxyLead(Lead):
     class Meta:

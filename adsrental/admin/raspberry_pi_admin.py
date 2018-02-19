@@ -78,7 +78,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         if not ec2_instance:
             return None
 
-        return ec2_instance.tunnel_up
+        return ec2_instance.is_tunnel_up()
 
     def first_tested_field(self, obj):
         if not obj.first_tested:
