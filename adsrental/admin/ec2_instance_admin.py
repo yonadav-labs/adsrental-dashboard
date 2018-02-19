@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
@@ -25,10 +26,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'raspberry_pi_version',
         'status',
-        'last_troubleshoot',
+        'last_troubleshoot_field',
+        'links',
         'tunnel_up',
         'raspberry_pi_online',
-        'linkss',
     )
     list_filter = (
         'status',
@@ -78,6 +79,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def raspberry_pi_version(self, obj):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.version
+
+    def last_troubleshoot_field(self, obj):
+        if obj.last_troubleshoot is None:
+            return None
+
+        last_troubleshoot = obj.last_troubleshoot
+        return u'<span title="{}">{}</span>'.format(last_troubleshoot, naturaltime(last_troubleshoot))
 
     def links(self, obj):
         links = []
@@ -148,3 +156,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     raspberry_pi_online.boolean = True
     raspberry_pi_online.short_description = 'RPi Online'
+
+    last_troubleshoot_field.allow_tags = True
+    last_troubleshoot_field.short_description = 'Troubleshoot'

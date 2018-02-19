@@ -27,6 +27,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'first_seen_field',
         'last_seen_field',
         'online',
+        'tunnel_online',
     )
     search_fields = ('leadid', 'rpid', )
     list_filter = (
@@ -69,6 +70,13 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def online(self, obj):
         return obj.online()
 
+    def tunnel_online(self, obj):
+        ec2_instance = obj.get_ec2_instance()
+        if not ec2_instance:
+            return None
+
+        return ec2_instance.tunnel_up
+
     def first_tested_field(self, obj):
         if not obj.first_tested:
             return '<img src="/static/admin/img/icon-no.svg" title="Never" alt="False">'
@@ -98,14 +106,21 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
+
     ec2_instance_link.short_description = 'EC2 Instance'
     ec2_instance_link.allow_tags = True
+
     online.boolean = True
+
+    tunnel_online.boolean = True
+
     first_tested_field.short_description = 'Tested'
     first_tested_field.allow_tags = True
+
     first_seen_field.short_description = 'First Seen'
     first_seen_field.empty_value_display = 'Never'
     first_seen_field.allow_tags = True
+
     last_seen_field.short_description = 'Last Seen'
     last_seen_field.empty_value_display = 'Never'
     last_seen_field.allow_tags = True
