@@ -17,6 +17,8 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
         'duration',
     )
     list_select_related = ('raspberry_pi', )
+    search_fields = ('raspberry_pi__rpid', )
+    raw_id_fields = ('raspberry_pi', )
 
     def raspberry_pi_link(self, obj):
         result = []
@@ -28,9 +30,11 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
                 rpid=obj.raspberry_pi,
             ))
 
+        return '\n'.join(result)
+
     def duration(self, obj):
         end_date = obj.end_date or timezone.now()
         return '{} hours'.format(round((end_date - obj.start_date).total_seconds() / 3600., 1))
 
-    raspberry_pi_link.short_description = 'Lead'
+    raspberry_pi_link.short_description = 'Raspberry Pi'
     raspberry_pi_link.allow_tags = True

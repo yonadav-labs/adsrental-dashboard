@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.utils import timezone
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
@@ -26,6 +28,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'first_tested_field',
         'first_seen_field',
         'last_seen_field',
+        'links',
         'online',
         'tunnel_online',
     )
@@ -104,6 +107,22 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.save()
         messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
+    def links(self, obj):
+        links = []
+        links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
+        ))
+        links.append('<a target="_blank" href="/log/{rpid}/{date}.log">Today log</a>'.format(
+            rpid=obj.rpid,
+            date=timezone.now().strftime(settings.LOG_DATE_FORMAT),
+        ))
+        links.append('<a target="_blank" href="{url}?q={rpid}">Sessions</a>'.format(
+            url=reverse('admin:adsrental_raspberrypisession_changelist'),
+            rpid=obj.rpid,
+        ))
+
+        return ', '.join(links)
+
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
 
@@ -124,3 +143,5 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     last_seen_field.short_description = 'Last Seen'
     last_seen_field.empty_value_display = 'Never'
     last_seen_field.allow_tags = True
+
+    links.allow_tags = True

@@ -51,6 +51,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'stop',
         'restart_raspberry_pi',
     )
+    raw_id_fields = ('lead', )
 
     def lead_link(self, obj):
         if obj.lead is None:
