@@ -22,13 +22,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'hostname',
         'lead_link',
         'lead_status',
-        'links',
         'raspberry_pi_link',
         'raspberry_pi_version',
         'status',
         'last_troubleshoot',
         'tunnel_up',
         'raspberry_pi_online',
+        'linkss',
     )
     list_filter = (
         'status',
