@@ -27,6 +27,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'raspberry_pi_version',
         'status',
         'last_troubleshoot_field',
+        'tunnel_up_date_field',
         'links',
         'tunnel_up',
         'raspberry_pi_online',
@@ -85,8 +86,15 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         if obj.last_troubleshoot is None:
             return None
 
-        last_troubleshoot = obj.last_troubleshoot
-        return u'<span title="{}">{}</span>'.format(last_troubleshoot, naturaltime(last_troubleshoot))
+        d = obj.last_troubleshoot
+        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
+
+    def tunnel_up_date_field(self, obj):
+        if obj.tunnel_up_date is None:
+            return None
+
+        d = obj.tunnel_up_date
+        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
 
     def links(self, obj):
         links = []
@@ -160,3 +168,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     last_troubleshoot_field.allow_tags = True
     last_troubleshoot_field.short_description = 'Troubleshoot'
+
+    tunnel_up_date_field.allow_tags = True
+    tunnel_up_date_field.short_description = 'Tunnel up date'
