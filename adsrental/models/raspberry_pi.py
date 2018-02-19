@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import datetime
 
 from django.utils import timezone
@@ -116,6 +117,20 @@ class RaspberryPi(models.Model):
             return None
 
         return self.first_seen
+
+    def get_last_log(self, tail=1):
+        log_dir = os.path.join(settings.RASPBERRY_PI_LOG_PATH, self.rpid)
+        if not os.path.exists(log_dir):
+            return ''
+
+        log_files = os.listdir(log_dir)
+        if not log_files:
+            return ''
+
+        last_log = sorted(log_files)[-1]
+        last_log_path = os.path.join(log_dir, last_log)
+        lines = open(last_log_path).readlines()[-tail:]
+        return '\n'.join(lines)
 
     def get_last_seen(self):
         if self.last_seen is None:
