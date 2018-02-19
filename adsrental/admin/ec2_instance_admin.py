@@ -19,17 +19,16 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     model = EC2Instance
     list_display = (
         'id',
-        'instance_id',
         'hostname',
-        'version',
         'lead_link',
         'lead_status',
         'links',
         'raspberry_pi_link',
+        'raspberry_pi_version',
         'status',
         'last_troubleshoot',
         'tunnel_up',
-        'tunnel_up_date',
+        'raspberry_pi_online',
     )
     list_filter = (
         'status',
@@ -67,13 +66,18 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
-        return '<a target="_blank" href="{url}?q={q}">{rpid} {version} {status}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}">{rpid} {status}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
-            version='v. {}'.format(obj.lead.raspberry_pi.version) if obj.lead.raspberry_pi.version else '(new)',
             status='(online)' if obj.lead.raspberry_pi.online() else '',
             q=obj.lead.raspberry_pi.rpid,
         )
+
+    def raspberry_pi_online(self, obj):
+        return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.online()
+
+    def raspberry_pi_version(self, obj):
+        return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.version
 
     def links(self, obj):
         links = []
@@ -134,6 +138,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
+
     raspberry_pi_link.short_description = 'RaspberryPi'
     raspberry_pi_link.allow_tags = True
+
     links.allow_tags = True
+
+    raspberry_pi_version.short_description = 'Version'
+
+    raspberry_pi_online.boolean = True
+    raspberry_pi_online.short_description = 'RPi Online'
