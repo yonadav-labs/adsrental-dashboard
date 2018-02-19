@@ -20,6 +20,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     list_display = (
         'rpid',
         'lead_link',
+        'lead_status',
         'ec2_instance_link',
         'version',
         'first_tested_field',
@@ -42,12 +43,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         lead = obj.get_lead()
         if lead is None:
             return obj.leadid
-        return '<a target="_blank" href="{url}?q={q}">{lead} {status}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.email,
-            status='(active)' if lead.is_active() else '',
             q=lead.leadid,
         )
+
+    def lead_status(self, obj):
+        return obj.lead and obj.lead.status
 
     def ec2_instance_link(self, obj):
         ec2_instance = obj.get_ec2_instance()

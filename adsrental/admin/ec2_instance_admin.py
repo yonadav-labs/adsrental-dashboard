@@ -23,6 +23,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'hostname',
         'version',
         'lead_link',
+        'lead_status',
         'links',
         'raspberry_pi_link',
         'status',
@@ -54,12 +55,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def lead_link(self, obj):
         if obj.lead is None:
             return obj.email
-        return '<a target="_blank" href="{url}?q={q}">{lead} {status}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=obj.lead.email,
-            status='(active)' if obj.lead.is_active() else '',
             q=obj.lead.email,
         )
+
+    def lead_status(self, obj):
+        return obj.lead and obj.lead.status
 
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
