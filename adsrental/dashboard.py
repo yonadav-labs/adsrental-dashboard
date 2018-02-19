@@ -59,6 +59,15 @@ class CustomIndexDashboard(Dashboard):
                         date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
                     )),
                 )],
+                [_('DEBUG: Tunnel down'), '{}?{}'.format(
+                    reverse('admin:adsrental_ec2instance_changelist'),
+                    urllib.urlencode(dict(
+                        lead_status='Active',
+                        online='online',
+                        tunnel_up__exact='0',
+                        version='latest',
+                    )),
+                )],
             ]
         ))
 
