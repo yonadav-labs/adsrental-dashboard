@@ -17,8 +17,8 @@ python manage.py collectstatic --noinput > /dev/nul
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
-gunicorn -D config.wsgi_debug:application -b 0.0.0.0:80
-gunicorn config.wsgi_debug:application \
+gunicorn -D config.wsgi:application -b 0.0.0.0:80
+gunicorn config.wsgi:application \
   --bind 0.0.0.0:443 \
   --certfile=/app/cert/adsrental_com.crt \
   --keyfile=/app/cert/csr.key \
