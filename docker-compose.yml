@@ -20,7 +20,7 @@ services:
       HTTPS: 'on'
       wsgi.url_scheme: 'https'
     volumes:
-      - ./php/cert/:/app/cert/
+      - ./cert/:/app/cert/
       - ./config/:/app/config/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
