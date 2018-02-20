@@ -42,15 +42,13 @@ class ShowLogView(View):
 
 
 class LogView(View):
-    LOG_PATH = '{root}{rpid}/{date}.log'
-
     def add_log(self, request, rpid, message):
         ip_address = request.META.get('REMOTE_ADDR')
         now = timezone.now()
-        log_path = LogView.LOG_PATH.format(
-            root=settings.RASPBERRY_PI_LOG_PATH,
-            rpid=rpid,
-            date=now.strftime('%Y%m%d'),
+        log_path = os.path.join(
+            settings.RASPBERRY_PI_LOG_PATH,
+            rpid,
+            '{}.log'.format(now.strftime('%Y%m%d')),
         )
         if not os.path.exists(os.path.dirname(log_path)):
             os.makedirs(os.path.dirname(log_path))
