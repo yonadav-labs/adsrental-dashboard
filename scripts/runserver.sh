@@ -16,8 +16,8 @@ python manage.py collectstatic --noinput > /dev/nul
 # python manage.py migrate
 # python manage.py loaddata adsrental/fixtures/fixtures.json
 
-gunicorn -D config.wsgi:application -b 0.0.0.0:80 --reload
-gunicorn config.wsgi:application \
+gunicorn -D config.wsgi_debug:application -b 0.0.0.0:80 --reload
+gunicorn config.wsgi_debug:application \
   --bind 0.0.0.0:443 \
   --certfile=/app/cert/adsrental_com.crt \
   --keyfile=/app/cert/csr.key \
