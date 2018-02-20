@@ -11,36 +11,24 @@ services:
       - ./dbdata1:/var/lib/mysql
     ports:
       - "23306:3306"
-  php:
-    build: php
-    volumes:
-      - ./php/cert/:/var/www/html/cert/
-      - ./php/app/:/var/www/html/app/
-      - ./php/log/:/var/www/html/log/
-      - ./media/:/var/www/media/
-      - ./php/uploads/:/var/www/html/uploads/
-      - ./php/apache_logs/:/var/log/apache2/
-    ports:
-      - "8080:80"
-      - "7443:443"
-    depends_on:
-      - db
-      - web
-    links:
-      - db:db
-      - web:web
   web:
     build: .
     command: /app/scripts/runserver.sh
     environment:
       ENV: local
       WERKZEUG_DEBUG_PIN: 'off'
+      HTTPS: 'on'
+      wsgi.url_scheme: 'https'
     volumes:
+      - ./php/cert/:/app/cert/
       - ./config/:/app/config/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - ./php/log/:/app/log/
       - ./media/:/app/media/
+    ports:
+      - "8080:80"
+      - "7443:443"
     depends_on:
       - db
     links:
