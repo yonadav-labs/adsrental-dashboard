@@ -22,9 +22,9 @@ services:
       wsgi.url_scheme: 'https'
     volumes:
       - ./cert/:/app/cert/
-      # - ./config/:/app/config/
-      # - ./adsrental/:/app/adsrental/
-      # - ./scripts/:/app/scripts/
+      - ./config/:/app/config/
+      - ./adsrental/:/app/adsrental/
+      - ./scripts/:/app/scripts/
       - /mnt/volume-nyc3-01/log/:/app/log/
       - /mnt/volume-nyc3-01/media/:/app/media/
     depends_on:
