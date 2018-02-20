@@ -4,7 +4,7 @@ services:
   db:
     restart: on-failure
     image: mysql
-    command: 'mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=300'
+    command: 'mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=2000'
     environment:
       MYSQL_DATABASE: adsrental
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
