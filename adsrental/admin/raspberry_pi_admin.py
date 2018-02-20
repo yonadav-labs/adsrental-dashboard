@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.utils import timezone
+from django.utils import timezone, timesince
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
@@ -30,6 +30,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'last_seen_field',
         'links',
         'online',
+        'uptime',
         'tunnel_online',
     )
     search_fields = ('leadid', 'rpid', )
@@ -72,6 +73,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def online(self, obj):
         return obj.online()
+
+    def uptime(self, obj):
+        if not obj.online():
+            return None
+
+        return timesince.timesince(obj.online_since_date)
 
     def tunnel_online(self, obj):
         ec2_instance = obj.get_ec2_instance()
@@ -135,13 +142,18 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     first_tested_field.short_description = 'Tested'
     first_tested_field.allow_tags = True
+    first_tested_field.admin_order_field = 'first_tested'
 
     first_seen_field.short_description = 'First Seen'
     first_seen_field.empty_value_display = 'Never'
     first_seen_field.allow_tags = True
+    first_seen_field.admin_order_field = 'first_seen'
 
     last_seen_field.short_description = 'Last Seen'
     last_seen_field.empty_value_display = 'Never'
     last_seen_field.allow_tags = True
+    last_seen_field.admin_order_field = 'last_seen'
 
     links.allow_tags = True
+
+    uptime.admin_order_field = 'online_since_date'
