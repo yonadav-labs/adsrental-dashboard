@@ -24,6 +24,7 @@ class ShowLogDirView(View):
         if not os.path.exists(path):
             raise Http404
         filenames = os.listdir(path)
+        filenames.sort(reverse=True)
         return render(request, 'log_dir.html', dict(
             user=request.user,
             rpid=rpid,
