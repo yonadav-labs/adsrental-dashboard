@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title_extra %}| Page not found{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Page not found</h1>
+        <a href="{% url 'home' %}">
+            <button class="btn btn-lg btn-primary">Back to main page</button>
+        </a>
+    </div>
+{% endblock %}

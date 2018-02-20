@@ -4,7 +4,7 @@
 {% block html %}
   <head>
     {% block head %}
-    <title>{% block title %}Adsrental{% endblock title %}</title>
+    <title>{% block title %}Adsrental{% block title_extra %}{% endblock title_extra %}{% endblock title %}</title>
 
     {% block metas %}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
