@@ -22,7 +22,7 @@ class SyncOfflineView(View):
             raspberry_pi__last_offline_reported__lt=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
             pi_delivered=True,
             raspberry_pi__first_seen__isnull=False,
-            status=Lead.STATUS_QUALIFIED,
+            status__in=Lead.STATUSES_ACTIVE,
         ).select_related('raspberry_pi'):
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
