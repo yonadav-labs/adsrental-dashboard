@@ -22,6 +22,7 @@ gunicorn config.wsgi:application \
   --bind 0.0.0.0:443 \
   --certfile=/app/cert/adsrental_com.crt \
   --keyfile=/app/cert/csr.key \
+  --ca-certs=/app/cert/adsrental_com.ca-bundle \
   --worker-class gevent \
   --workers 8 \
   --timeout 3000 \

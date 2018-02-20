@@ -36,7 +36,13 @@ services:
     command: /app/scripts/server.sh
     environment:
       ENV: dev
+      HTTPS: 'on'
+      wsgi.url_scheme: 'https'
     volumes:
+      - ./php/cert/:/app/cert/
+      # - ./config/:/app/config/
+      # - ./adsrental/:/app/adsrental/
+      # - ./scripts/:/app/scripts/
       - /mnt/volume-nyc3-01/log/:/app/log/
       - /mnt/volume-nyc3-01/media/:/app/media/
     depends_on:
