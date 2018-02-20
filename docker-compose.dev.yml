@@ -32,6 +32,9 @@ services:
     links:
       - db:db
       - redis:redis
+    ports:
+      - "80:80"
+      - "443:443"
   redis:
     restart: always
     image: redis:latest
