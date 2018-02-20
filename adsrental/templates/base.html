@@ -1,18 +1,21 @@
 {% block doc %}
+{% load static %}
+
 <!DOCTYPE html>
 <html{% block html_attribs %}{% endblock html_attribs %}>
 {% block html %}
   <head>
     {% block head %}
-    <title>{% block title %}Adsrental{% block title_extra %}{% endblock title_extra %}{% endblock title %}</title>
+      <title>{% block title %}Adsrental{% block title_extra %}{% endblock title_extra %}{% endblock title %}</title>
+      <link rel="shortcut icon" href="{% static 'images/landing/logo.png' %}">
 
-    {% block metas %}
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% endblock metas %}
+      {% block metas %}
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      {% endblock metas %}
 
-    {% block styles %}
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    {% endblock styles %}
+      {% block styles %}
+          <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+      {% endblock styles %}
     {% endblock head %}
   </head>
   <body{% block body_attribs %}{% endblock body_attribs %}>
