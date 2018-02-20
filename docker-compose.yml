@@ -24,7 +24,8 @@ services:
       - ./config/:/app/config/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
-      - ./php/log/:/app/log/
+      - ./log/:/app/log/
+      - ./app_log/:/app/app_log/
       - ./media/:/app/media/
     ports:
       - "8080:80"

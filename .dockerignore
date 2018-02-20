@@ -6,3 +6,5 @@ venv
 **/*.pyc
 __pycache__
 php
+log
+app_log

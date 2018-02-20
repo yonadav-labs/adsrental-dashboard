@@ -17,8 +17,10 @@ dbdata1
 # **/migrations/*
 # !**/migrations/__init__.py
 dropins
-php/log/*
-!php/log/placeholder.txt
+log/*
+!log/placeholder.txt
+app_log/*
+!app_log/placeholder.txt
 php/apache_logs/*
 !php/apache_logs/placeholder.txt
 php/uploads/photo_ids/*

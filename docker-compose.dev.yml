@@ -26,6 +26,7 @@ services:
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - /mnt/volume-nyc3-01/log/:/app/log/
+      - /mnt/volume-nyc3-01/app_log/:/app/app_log/
       - /mnt/volume-nyc3-01/media/:/app/media/
     depends_on:
       - db
