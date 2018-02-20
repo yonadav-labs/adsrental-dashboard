@@ -17,13 +17,17 @@ python manage.py collectstatic --noinput
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
-exec gunicorn config.wsgi:application \
-    --worker-class gevent \
-    --bind 0.0.0.0:8007 \
-    --workers 8 \
-    --timeout 3000 \
-    --graceful-timeout 3000 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=-
+gunicorn -D config.wsgi:application -b 0.0.0.0:80 --reload
+gunicorn config.wsgi:application \
+  --bind 0.0.0.0:443 \
+  --certfile=/app/cert/adsrental_com.crt \
+  --keyfile=/app/cert/csr.key \
+  --worker-class gevent \
+  --workers 8 \
+  --timeout 3000 \
+  --graceful-timeout 3000 \
+  --worker-connections 10000 \
+  --max-requests 10000 \
+  --error-logfile=- \
+  --reload
 
