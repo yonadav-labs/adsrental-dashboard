@@ -8,7 +8,7 @@ cd $ROOT_PATH
 #create database if it is not there yet
 python -c 'import pymysql; pymysql.connect(user="root", host="db").cursor().execute("create database if not exists adsrental CHARACTER SET utf8;")'
 
-python manage.py collectstatic --noinput > /dev/nul
+python manage.py collectstatic --noinput > /dev/null
 
 #install DB and fixtures
 # python manage.py migrate adsrental
