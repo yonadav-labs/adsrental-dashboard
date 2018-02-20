@@ -12,24 +12,6 @@ services:
       - ./dbdata1:/var/lib/mysql
     ports:
       - "13306:3306"
-  php:
-    restart: on-failure
-    build: php
-    volumes:
-      - ./php/cert/:/var/www/html/cert/
-      - ./php/app/:/var/www/html/app/
-      - /mnt/volume-nyc3-01/log/:/var/www/html/log/
-      - /mnt/volume-nyc3-01/media/:/var/www/media/
-      - ./php/apache_logs/:/var/log/apache2/
-      - ./php/uploads/:/var/www/html/uploads/
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - db
-    links:
-      - db:db
-      - web:web
   web:
     restart: on-failure
     build: .
