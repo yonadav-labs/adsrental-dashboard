@@ -119,9 +119,9 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         links.append('<a target="_blank" href="{url}">RDP</a>'.format(
             url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
         ))
-        links.append('<a target="_blank" href="/log/{rpid}/{date}.log">Today log</a>'.format(
-            rpid=obj.rpid,
-            date=timezone.now().strftime(settings.LOG_DATE_FORMAT),
+        today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
+        links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
+            log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
         ))
         links.append('<a target="_blank" href="{url}?q={rpid}">Sessions</a>'.format(
             url=reverse('admin:adsrental_raspberrypisession_changelist'),

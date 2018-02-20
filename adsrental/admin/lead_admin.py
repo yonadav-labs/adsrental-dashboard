@@ -157,10 +157,11 @@ class LeadAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         result = []
         if obj.raspberry_pi:
-            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
-                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi}),
+            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="{log_url}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
+                log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid}),
+                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
-                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
+                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 rpid=obj.raspberry_pi,
             ))
 

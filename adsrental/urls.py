@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import django.contrib.auth.views as auth_views
 from django.conf.urls import url
 
-from adsrental.views.log import LogView
+from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.sync_to_adsdb import SyncToAdsdbView
@@ -39,7 +39,9 @@ urlpatterns = [
     url(r'^log.php', LogView.as_view(), name='old_log'),
     url(r'^rlog.php', LogView.as_view(), name='old_rlog'),
     url(r'^log/$', LogView.as_view(), name='log'),
-    url(r'^log/rlog.php$', LogView.as_view(), name='log'),
+    url(r'^log/$', LogView.as_view(), name='log'),
+    url(r'^log/(?P<rpid>RP\d+)/$', ShowLogDirView.as_view(), name='show_log_dir'),
+    url(r'^log/(?P<rpid>RP\d+)/(?P<filename>\d+\.log)$', ShowLogView.as_view(), name='show_log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),

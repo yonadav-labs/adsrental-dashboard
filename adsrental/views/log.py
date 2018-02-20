@@ -8,18 +8,49 @@ from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.shortcuts import Http404
 
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
 
 
+class ShowLogDirView(View):
+    @method_decorator(login_required)
+    def get(self, request, rpid):
+        path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid)
+        if not os.path.exists(path):
+            raise Http404
+        filenames = os.listdir(path)
+        return render(request, 'log_dir.html', dict(
+            user=request.user,
+            rpid=rpid,
+            filenames=filenames,
+        ))
+
+
+class ShowLogView(View):
+    @method_decorator(login_required)
+    def get(self, request, rpid, filename):
+        log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid, filename)
+        if not os.path.exists(log_path):
+            raise Http404
+        return HttpResponse(open(log_path).read(), content_type='text/plain')
+
+
 class LogView(View):
-    LOG_PATH = '/app/log/{rpid}/{date}.log'
+    LOG_PATH = '{root}{rpid}/{date}.log'
 
     def add_log(self, request, rpid, message):
         ip_address = request.META.get('REMOTE_ADDR')
         now = timezone.now()
-        log_path = LogView.LOG_PATH.format(rpid=rpid, date=now.strftime('%Y%m%d'))
+        log_path = LogView.LOG_PATH.format(
+            root=settings.RASPBERRY_PI_LOG_PATH,
+            rpid=rpid,
+            date=now.strftime('%Y%m%d'),
+        )
         if not os.path.exists(os.path.dirname(log_path)):
             os.makedirs(os.path.dirname(log_path))
         with open(log_path, 'a') as f:

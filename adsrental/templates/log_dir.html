@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title_extra %}| Internal server error{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Logs for {{ rpid }}</h1>
+        <ul>
+            {% for filename in filenames %}
+                <li><a href="{% url 'show_log' rpid=rpid filename=filename %}">{{filename}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
