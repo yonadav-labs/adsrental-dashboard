@@ -33,7 +33,7 @@ class Command(BaseCommand):
             print(info_str + '\t' + 'Tunnel down')
             return False
 
-        cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
+        cmd_to_execute = '''ssh pi@localhost -p 2046 "curl http://adsrental.com/static/update_pi_old.sh | bash"'''
         ec2_instance.ssh_execute(cmd_to_execute)
         print(info_str + '\t' + 'Attempted update')
         return True
