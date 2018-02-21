@@ -27,8 +27,8 @@ gunicorn config.wsgi:application \
   --workers 13 \
   --timeout 300 \
   --graceful-timeout 300 \
-  --worker-connections 10000 \
-  --max-requests 10000 \
+  --worker-connections 100000 \
+  --max-requests 100000 \
   --error-logfile=/app/app_log/error.log \
   --access-logfile=/app/app_log/access.log \
   --reload
