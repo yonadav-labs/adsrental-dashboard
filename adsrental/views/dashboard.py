@@ -112,26 +112,6 @@ class DashboardView(View):
                         raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
                     )
 
-            if form.cleaned_data['tunnel_state']:
-                value = form.cleaned_data['tunnel_state']
-                entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)
-                if value == 'online':
-                    entries = entries.filter(
-                        raspberry_pi__tunnel_last_tested__gte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl),
-                    )
-                if value == 'offline':
-                    entries = entries.filter(
-                        raspberry_pi__tunnel_last_tested__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl),
-                    )
-                if value == 'offline_2days':
-                    entries = entries.filter(
-                        raspberry_pi__tunnel_last_tested__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 2 * 24),
-                    )
-                if value == 'offline_5days':
-                    entries = entries.filter(
-                        raspberry_pi__tunnel_last_tested__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 5 * 24),
-                    )
-
             if form.cleaned_data['wrong_password']:
                 value = form.cleaned_data['wrong_password']
                 entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)
@@ -141,13 +121,18 @@ class DashboardView(View):
                 if value == 'yes':
                     entries = entries.filter(
                         wrong_password_date__isnull=False)
-                if value == 'yes_2days':
+                if value == 'yes_0_2days':
                     entries = entries.filter(
-                        wrong_password_date__lt=timezone.now() - datetime.timedelta(hours=5 * 24),
+                        wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                    )
+                if value == 'yes_3_5days':
+                    entries = entries.filter(
+                        wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                        wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
                     )
                 if value == 'yes_5days':
                     entries = entries.filter(
-                        wrong_password_date__lt=timezone.now() - datetime.timedelta(hours=5 * 24),
+                        wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
                     )
 
             if form.cleaned_data['lead_status']:

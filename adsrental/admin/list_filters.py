@@ -192,8 +192,9 @@ class WrongPasswordListFilter(SimpleListFilter):
         return (
             ('no', 'No'),
             ('yes', 'Yes'),
-            ('yes_2days', 'Yes for 2 days'),
-            ('yes_5days', 'Yes for 5 days'),
+            ('yes_0_2days', 'Wrong for 0-2 days'),
+            ('yes_3_5days', 'Wrong for 3-5 days'),
+            ('yes_5days', 'Wrong for more than 5 days'),
         )
 
     def queryset(self, request, queryset):
@@ -201,10 +202,19 @@ class WrongPasswordListFilter(SimpleListFilter):
             return queryset.filter(wrong_password_date__isnull=True)
         if self.value() == 'yes':
             return queryset.filter(wrong_password_date__isnull=False)
-        if self.value() == 'yes_2days':
-            return queryset.filter(wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24))
+        if self.value() == 'yes_0_2days':
+            return queryset.filter(
+                wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+            )
+        if self.value() == 'yes_3_5days':
+            return queryset.filter(
+                wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
         if self.value() == 'yes_5days':
-            return queryset.filter(wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24))
+            return queryset.filter(
+                wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
 
 
 class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
