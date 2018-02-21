@@ -5,12 +5,35 @@ import json
 from django.views import View
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.conf import settings
+from django.http import HttpResponseRedirect
 
 from adsrental.forms import LandingForm
 
 
 class LandingView(View):
+    def redirect_https(self, request):
+        protocol = u'https'
+        host = u'{protocol}://{domain}'.format(
+            protocol=protocol,
+            domain=request.get_host().split(':')[0],
+        )
+
+        if settings.SSL_PORT:
+            host = u'{host}:{port}'.format(
+                host=host,
+                port=settings.SSL_PORT,
+            )
+
+        url = u'{host}{path}'.format(
+            host=host,
+            path=request.get_full_path()
+        )
+        return HttpResponseRedirect(url)
+
     def get(self, request):
+        if not request.is_secure():
+            return self.redirect_https(request)
         if 'utm_source' in request.GET:
             utm_source = request.GET.get('utm_source')
             request.session['utm_source'] = utm_source
