@@ -97,9 +97,10 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def status_field(self, obj):
-        return '<a target="_blank" href="{url}?q={q}" title="Show changes">{status}</a>'.format(
+        return '<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
+            title='Banned for {}'.format(obj.ban_reason) if obj.ban_reason else 'Show changes',
             status=obj.status,
         )
 
