@@ -22,9 +22,11 @@ gunicorn -D config.wsgi:application \
     --worker-class eventlet \
     --workers 4 \
     --timeout 300 \
+    --graceful-timeout 300 \
     --worker-connections 10000 \
     --max-requests 10000 \
-    --graceful-timeout 300 \
+    --error-logfile=/app/app_log/error_http.log \
+    --access-logfile=/app/app_log/access_http.log \
     --reload
 gunicorn config.wsgi:application \
     --bind 0.0.0.0:443 \
