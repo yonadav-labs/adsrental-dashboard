@@ -25,8 +25,8 @@ gunicorn config.wsgi:application \
   --ca-certs=/app/cert/adsrental_com.ca-bundle \
   --worker-class gevent \
   --workers 13 \
-  --timeout 3000 \
-  --graceful-timeout 3000 \
+  --timeout 300 \
+  --graceful-timeout 300 \
   --worker-connections 10000 \
   --max-requests 10000 \
   --error-logfile=/app/app_log/error.log \
