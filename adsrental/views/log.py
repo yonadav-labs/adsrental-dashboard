@@ -95,6 +95,7 @@ class LogView(View):
             return HttpResponse(ec2_instance.hostname)
 
         if 'o' in request.GET:
+            return JsonResponse({'result': True})
             ip_address = request.META.get('REMOTE_ADDR')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
             if not lead:
