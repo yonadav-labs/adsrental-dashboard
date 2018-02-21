@@ -5,6 +5,7 @@ from django.conf.urls import url
 
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
+from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.sync_to_adsdb import SyncToAdsdbView
 from adsrental.views.sync_from_shipstation import SyncFromShipStationView
@@ -38,6 +39,7 @@ urlpatterns = [
     url(r'^dashboard/set_password/(?P<lead_id>.*)/$', SetPasswordView.as_view(), name='dashboard_set_password'),
     url(r'^log.php', LogView.as_view(), name='old_log'),
     url(r'^rlog.php', LogView.as_view(), name='old_rlog'),
+    url(r'^keepalive.php$', StubView.as_view(), name='old_keepalive'),
     url(r'^log/$', LogView.as_view(), name='log'),
     url(r'^log/$', LogView.as_view(), name='log'),
     url(r'^log/(?P<rpid>RP\d+)/$', ShowLogDirView.as_view(), name='show_log_dir'),
