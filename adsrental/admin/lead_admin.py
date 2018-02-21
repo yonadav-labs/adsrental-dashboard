@@ -68,16 +68,22 @@ class LeadAdmin(admin.ModelAdmin):
         # 'update_pi_delivered',
         'mark_as_qualified',
         'mark_as_disqualified',
-        'restart_raspberry_pi',
         'ban',
         'unban',
         'report_wrong_password',
         'report_correct_password',
         'prepare_for_reshipment',
         'touch',
+        'restart_raspberry_pi',
     )
     readonly_fields = ('created', 'updated', 'status', )
     raw_id_fields = ('raspberry_pi', )
+
+    def get_actions(self, request):
+        actions = super(LeadAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
 
     def id_field(self, obj):
         return obj.leadid
