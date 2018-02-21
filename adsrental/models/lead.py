@@ -157,9 +157,12 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def ban(self, edited_by, reason=None):
         self.ban_reason = reason
+        self.save()
         return self.set_status(Lead.STATUS_BANNED, edited_by)
 
     def unban(self, edited_by):
+        self.ban_reason = None
+        self.save()
         return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
 
     def name(self):
