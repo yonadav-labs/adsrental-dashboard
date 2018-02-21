@@ -17,28 +17,18 @@ python manage.py collectstatic --noinput > /dev/null
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
-gunicorn -D config.wsgi_debug:application \
-    --bind 0.0.0.0:80 \
-    --worker-class gevent \
-    --workers 2 \
-    --timeout 300 \
-    --graceful-timeout 300 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=/app/app_log/error_http.log \
-    --access-logfile=/app/app_log/access_http.log \
-    --reload
+gunicorn -D config.wsgi:application -b 0.0.0.0:80 --reload
 gunicorn config.wsgi:application \
-    --bind 0.0.0.0:443 \
-    --certfile=/app/cert/adsrental_com.crt \
-    --keyfile=/app/cert/csr.key \
-    --ca-certs=/app/cert/adsrental_com.ca-bundle \
-    --worker-class gevent \
-    --workers 13 \
-    --timeout 300 \
-    --graceful-timeout 300 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=/app/app_log/error.log \
-    --access-logfile=/app/app_log/access.log \
-    --reload
+  --bind 0.0.0.0:443 \
+  --certfile=/app/cert/adsrental_com.crt \
+  --keyfile=/app/cert/csr.key \
+  --ca-certs=/app/cert/adsrental_com.ca-bundle \
+  --worker-class gevent \
+  --workers 13 \
+  --timeout 300 \
+  --graceful-timeout 300 \
+  --worker-connections 10000 \
+  --max-requests 10000 \
+  --error-logfile=/app/app_log/error.log \
+  --access-logfile=/app/app_log/access.log \
+  --reload
