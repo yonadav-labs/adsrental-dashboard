@@ -1,5 +1,6 @@
 {% load recaptcha2 %}
 {% load bootstrap3 %}
+{% load static %}
 
 <!DOCTYPE html>
     <!-- saved from url=(0027)http://rentyouraccount.org/ -->
@@ -17,7 +18,7 @@
         <meta content="1432b3173f72a2:152e1c642f46dc" name="leadpages-meta-id">
         <meta content="//movement.leadpages.co" name="leadpages-url">
         <meta name="leadpages-served-by" content="html">
-        <link rel="stylesheet" href="/signup.css" media="all">
+        <link rel="stylesheet" href="{% static 'css/signup.css' %}" media="all">
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAPQbYIQgJUBpQ-e2sMwPTXlpGR3WUy3h0">
         </script>
         {% recaptcha_init %}
