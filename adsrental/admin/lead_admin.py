@@ -64,8 +64,8 @@ class LeadAdmin(admin.ModelAdmin):
         'email',
     )
     actions = (
-        'update_from_shipstation',
-        'update_pi_delivered',
+        # 'update_from_shipstation',
+        # 'update_pi_delivered',
         'mark_as_qualified',
         'mark_as_disqualified',
         'restart_raspberry_pi',
