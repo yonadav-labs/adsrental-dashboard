@@ -20,6 +20,11 @@ echo Starting Gunicorn.
 gunicorn -D config.wsgi:application \
     --bind 0.0.0.0:80 \
     --worker-class eventlet \
+    --workers 4 \
+    --timeout 300 \
+    --worker-connections 10000 \
+    --max-requests 10000 \
+    --graceful-timeout 300 \
     --reload
 gunicorn config.wsgi:application \
     --bind 0.0.0.0:443 \
@@ -27,11 +32,11 @@ gunicorn config.wsgi:application \
     --keyfile=/app/cert/csr.key \
     --ca-certs=/app/cert/adsrental_com.ca-bundle \
     --worker-class eventlet \
-    --workers 13 \
+    --workers 4 \
     --timeout 300 \
     --graceful-timeout 300 \
-    --worker-connections 100000 \
-    --max-requests 100000 \
+    --worker-connections 10000 \
+    --max-requests 10000 \
     --error-logfile=/app/app_log/error.log \
     --access-logfile=/app/app_log/access.log \
     --reload
