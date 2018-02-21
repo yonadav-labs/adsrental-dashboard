@@ -32,9 +32,11 @@ class Lead(models.Model, FulltextSearchMixin):
     BAN_REASON_CHOICES = (
         ('Google - Policy', 'Google - Policy', ),
         ('Google - Billing', 'Google - Billing', ),
+        ('Google - Unresponsive User', 'Google - Unresponsive User', ),
         ('Facebook - Policy', 'Facebook - Policy', ),
         ('Facebook - Suspicious', 'Facebook - Suspicious', ),
         ('Facebook - Lockout', 'Facebook - Lockout', ),
+        ('Facebook - Unresponsive User', 'Facebook - Unresponsive User', ),
     )
 
     COMPANY_EMPTY = '[Empty]'
