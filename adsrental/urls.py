@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^log.php', LogView.as_view(), name='old_log'),
     url(r'^rlog.php', LogView.as_view(), name='old_rlog'),
     url(r'^keepalive.php$', StubView.as_view(), name='old_keepalive'),
-    url(r'^log/$', LogView.as_view(), name='log', kwargs={'SSL': False}),
+    url(r'^log/$', LogView.as_view(), name='log'),
     url(r'^log/(?P<rpid>RP\d+)/$', ShowLogDirView.as_view(), name='show_log_dir'),
     url(r'^log/(?P<rpid>RP\d+)/(?P<filename>\d+\.log)$', ShowLogView.as_view(), name='show_log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
