@@ -19,30 +19,23 @@ python manage.py collectstatic --noinput > /dev/null
 
 while true; do
     echo "Re-starting Gunicorn runserver"
-    gunicorn -D config.wsgi_debug:application \
-        --bind 0.0.0.0:80 \
-        --worker-class gevent \
-        --workers 1 \
-        --timeout 300 \
-        --graceful-timeout 300 \
-        --worker-connections 10000 \
-        --max-requests 10000 \
-        --error-logfile=/app/app_log/error_http.log \
-        --access-logfile=/app/app_log/access_http.log \
-        --reload
-    gunicorn config.wsgi_debug:application \
+    gunicorn -D config.wsgi:application \
+      --bind 0.0.0.0:80 \
+      --worker-class eventlet \
+      --reload
+    gunicorn config.wsgi:application \
         --bind 0.0.0.0:443 \
         --certfile=/app/cert/adsrental_com.crt \
         --keyfile=/app/cert/csr.key \
         --ca-certs=/app/cert/adsrental_com.ca-bundle \
-        --worker-class gevent \
-        --workers 1 \
+        --worker-class eventlet \
+        --workers 13 \
         --timeout 300 \
         --graceful-timeout 300 \
-        --worker-connections 10000 \
-        --max-requests 10000 \
+        --worker-connections 100000 \
+        --max-requests 100000 \
         --error-logfile=/app/app_log/error.log \
         --access-logfile=/app/app_log/access.log \
-      --reload
+        --reload
     sleep 5
 done
