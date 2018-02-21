@@ -29,7 +29,6 @@ gunicorn -D config.wsgi_debug:application \
     --access-logfile=/app/app_log/access_http.log \
     --reload
 gunicorn config.wsgi:application \
-    --bind 0.0.0.0:80 \
     --bind 0.0.0.0:443 \
     --certfile=/app/cert/adsrental_com.crt \
     --keyfile=/app/cert/csr.key \
