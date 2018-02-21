@@ -17,12 +17,20 @@ class SSLRedirectMiddleware:
             return self._redirect(request, response_is_secure)
 
     def _response_is_secure(self, request, view_func, view_args, view_kwargs):
-        if SSL_KW in view_kwargs:
-            value = view_kwargs[SSL_KW]
-            del view_kwargs[SSL_KW]
-            return value
+        if not SSL_ON:
+            return False
 
-        return True
+        if SSL_ALWAYS:
+            return True
+
+        if SSL_KW in view_kwargs:
+            return view_kwargs[SSL_KW]
+
+        for path in HTTPS_PATHS:
+            if request.path.startswith(u'/{}'.format(path)):
+                return True
+
+        return False
 
     def _request_is_secure(self, request):
         if request.is_secure():
