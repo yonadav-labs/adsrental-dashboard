@@ -50,8 +50,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'export_as_csv',
         'restart_raspberry_pi',
         'start_ec2',
-        'ban',
-        'unban',
         'report_wrong_password',
         'report_correct_password',
         'prepare_for_reshipment',
@@ -126,21 +124,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
-
-    def ban(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
-            if lead.ban(request.user):
-                if lead.get_ec2_instance():
-                    lead.get_ec2_instance().stop()
-                messages.info(request, 'Lead {} is banned.'.format(lead.email))
-
-    def unban(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
-            if lead.unban(request.user):
-                EC2Instance.launch_for_lead(lead)
-                messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
     def report_wrong_password(self, request, queryset):
         for lead_history_month in queryset:
