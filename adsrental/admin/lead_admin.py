@@ -68,8 +68,6 @@ class LeadAdmin(admin.ModelAdmin):
         'update_pi_delivered',
         'mark_as_qualified',
         'mark_as_disqualified',
-        'start_ec2',
-        'restart_ec2',
         'restart_raspberry_pi',
         'ban',
         'unban',
@@ -78,7 +76,7 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_reshipment',
         'touch',
     )
-    readonly_fields = ('created', 'updated', )
+    readonly_fields = ('created', 'updated', 'status', )
     raw_id_fields = ('raspberry_pi', )
 
     def id_field(self, obj):
@@ -223,14 +221,6 @@ class LeadAdmin(admin.ModelAdmin):
             lead.set_status(Lead.STATUS_DISQUALIFIED)
             messages.success(request, 'Lead {} is disqualified'.format(lead.email))
 
-    def start_ec2(self, request, queryset):
-        for lead in queryset:
-            EC2Instance.launch_for_lead(lead)
-
-    def restart_ec2(self, request, queryset):
-        for lead in queryset:
-            lead.ec2instance.restart()
-
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             lead.raspberry_pi.restart_required = True
@@ -299,8 +289,6 @@ class LeadAdmin(admin.ModelAdmin):
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
     ec2_instance_link.allow_tags = True
-    start_ec2.short_description = 'Start EC2 instance'
-    restart_ec2.short_description = 'Restart EC2 instance'
     email_field.allow_tags = True
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'

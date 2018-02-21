@@ -46,7 +46,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'update_ec2_tags',
         'get_currect_state',
         'check_missing',
-        'restart',
         'start',
         'stop',
         'restart_raspberry_pi',
@@ -128,10 +127,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
         for ec2_instance in queryset:
             ec2_instance.update_from_boto()
-
-    def restart(self, request, queryset):
-        for ec2_instance in queryset:
-            ec2_instance.restart()
 
     def start(self, request, queryset):
         for ec2_instance in queryset:
