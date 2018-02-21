@@ -3,10 +3,12 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.utils import timezone
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
+from adsrental.forms import AdminLeadBanForm
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
@@ -234,11 +236,26 @@ class LeadAdmin(admin.ModelAdmin):
         messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     def ban(self, request, queryset):
-        for lead in queryset:
-            if lead.ban(request.user):
-                if lead.get_ec2_instance():
-                    lead.get_ec2_instance().stop()
-                messages.info(request, 'Lead {} is banned.'.format(lead.email))
+        if 'do_action' in request.POST:
+            form = AdminLeadBanForm(request.POST)
+            if form.is_valid():
+                reason = form.cleaned_data['reason']
+                for lead in queryset:
+                    lead.ban(request.user, reason)
+                    if lead.get_ec2_instance():
+                        lead.get_ec2_instance().stop()
+                    messages.info(request, 'Lead {} is banned.'.format(lead.email))
+                return
+        else:
+            form = AdminLeadBanForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'ban',
+            'title': 'Choose reason to ban following leads',
+            'button': 'Ban',
+            'objects': queryset,
+            'form': form,
+        })
 
     def unban(self, request, queryset):
         for lead in queryset:

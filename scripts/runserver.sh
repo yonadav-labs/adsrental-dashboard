@@ -21,20 +21,20 @@ while true; do
     echo "Re-starting Gunicorn runserver"
     gunicorn -D config.wsgi:application \
       --bind 0.0.0.0:80 \
-      --worker-class eventlet \
+      --worker-class=eventlet \
       --reload
     gunicorn config.wsgi:application \
         --bind 0.0.0.0:443 \
         --certfile=/app/cert/adsrental_com.crt \
         --keyfile=/app/cert/csr.key \
         --ca-certs=/app/cert/adsrental_com.ca-bundle \
-        --worker-class eventlet \
-        --workers 13 \
+        --worker-class=eventlet \
+        --workers 4 \
         --timeout 300 \
         --graceful-timeout 300 \
         --worker-connections 100000 \
         --max-requests 100000 \
-        --error-logfile=/app/app_log/error.log \
+        --error-logfile=- \
         --access-logfile=/app/app_log/access.log \
         --reload
     sleep 5

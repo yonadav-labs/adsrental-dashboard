@@ -221,6 +221,8 @@ class EC2Instance(models.Model):
         return True
 
     def start(self, blocking=False):
+        if not settings.MANAGE_EC2:
+            return
         boto_instance = self.get_boto_instance()
         self.update_from_boto(boto_instance)
         if self.status != self.STATUS_STOPPED:
@@ -241,11 +243,15 @@ class EC2Instance(models.Model):
         return True
 
     def restart(self):
+        if not settings.MANAGE_EC2:
+            return
         self.stop(blocking=True)
         self.start(blocking=True)
         return True
 
     def stop(self, blocking=False):
+        if not settings.MANAGE_EC2:
+            return
         boto_instance = self.get_boto_instance()
         self.update_from_boto(boto_instance)
         if self.status != self.STATUS_RUNNING:

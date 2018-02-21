@@ -29,6 +29,14 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_DISQUALIFIED, 'Disqualified'),
     ]
 
+    BAN_REASON_CHOICES = (
+        ('Google - Policy', 'Google - Policy', ),
+        ('Google - Billing', 'Google - Billing', ),
+        ('Facebook - Policy', 'Facebook - Policy', ),
+        ('Facebook - Suspicious', 'Facebook - Suspicious', ),
+        ('Facebook - Lockout', 'Facebook - Lockout', ),
+    )
+
     COMPANY_EMPTY = '[Empty]'
     COMPANY_ACM = 'ACM'
     COMPANY_FBM = 'FBM'
@@ -46,6 +54,7 @@ class Lead(models.Model, FulltextSearchMixin):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
+    ban_reason = models.CharField(max_length=40, choices=BAN_REASON_CHOICES, null=True, blank=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None)
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
@@ -146,7 +155,8 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def ban(self, edited_by):
+    def ban(self, edited_by, reason=None):
+        self.ban_reason = reason
         return self.set_status(Lead.STATUS_BANNED, edited_by)
 
     def unban(self, edited_by):
