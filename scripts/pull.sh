@@ -9,7 +9,7 @@ if [ "$1" = "restart" ]; then
     docker-compose -f docker-compose.dev.yml run web python manage.py migrate adsrental
     docker-compose -f docker-compose.dev.yml up --remove-orphans -d
 else
-    docker exec -ti dashboard_web_1 python manage.py collectstatic --noinput > /dev/null
+    docker exec -ti dashboard_web_1 python manage.py collectstatic --noinput
 fi
 
 #docker-compose -f docker-compose.dev.yml run web python manage.py migrate
