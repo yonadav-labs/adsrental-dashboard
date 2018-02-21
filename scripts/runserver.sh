@@ -18,21 +18,31 @@ python manage.py collectstatic --noinput > /dev/null
 
 
 while true; do
-  echo "Re-starting Gunicorn runserver"
-  gunicorn -D config.wsgi_debug:application -b 0.0.0.0:80 --reload
-  gunicorn config.wsgi_debug:application \
-    --bind 0.0.0.0:443 \
-    --certfile=/app/cert/adsrental_com.crt \
-    --keyfile=/app/cert/csr.key \
-    --ca-certs=/app/cert/adsrental_com.ca-bundle \
-    --worker-class gevent \
-    --workers 1 \
-    --timeout 3000 \
-    --graceful-timeout 3000 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=- \
-    --access-logfile=/app/app_log/access.log \
-    --reload
-  sleep 5
+    echo "Re-starting Gunicorn runserver"
+    gunicorn -D config.wsgi_debug:application \
+        --bind 0.0.0.0:80 \
+        --worker-class gevent \
+        --workers 1 \
+        --timeout 300 \
+        --graceful-timeout 300 \
+        --worker-connections 10000 \
+        --max-requests 10000 \
+        --error-logfile=/app/app_log/error_http.log \
+        --access-logfile=/app/app_log/access_http.log \
+        --reload
+    gunicorn config.wsgi_debug:application \
+        --bind 0.0.0.0:443 \
+        --certfile=/app/cert/adsrental_com.crt \
+        --keyfile=/app/cert/csr.key \
+        --ca-certs=/app/cert/adsrental_com.ca-bundle \
+        --worker-class gevent \
+        --workers 1 \
+        --timeout 300 \
+        --graceful-timeout 300 \
+        --worker-connections 10000 \
+        --max-requests 10000 \
+        --error-logfile=/app/app_log/error.log \
+        --access-logfile=/app/app_log/access.log \
+      --reload
+    sleep 5
 done
