@@ -20,7 +20,7 @@ echo Starting Gunicorn.
 gunicorn -D config.wsgi_debug:application \
     --bind 0.0.0.0:80 \
     --worker-class gevent \
-    --workers 10 \
+    --workers 2 \
     --timeout 300 \
     --graceful-timeout 300 \
     --worker-connections 10000 \
@@ -35,7 +35,7 @@ gunicorn config.wsgi:application \
     --keyfile=/app/cert/csr.key \
     --ca-certs=/app/cert/adsrental_com.ca-bundle \
     --worker-class gevent \
-    --workers 10 \
+    --workers 13 \
     --timeout 300 \
     --graceful-timeout 300 \
     --worker-connections 100000 \
