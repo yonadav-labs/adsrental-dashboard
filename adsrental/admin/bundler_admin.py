@@ -17,7 +17,18 @@ class BundlerAdmin(admin.ModelAdmin):
     def assign_leads_for_this_bundler(self, request, queryset):
         for bundler in queryset:
             leads = Lead.objects.filter(utm_source=bundler.utm_source)
-            leads.update(bundler=bundler)
-            messages.success(request, 'Bundler {} is assigned to {} leads.'.format(
-                bundler, leads.count(),
-            ))
+            if leads:
+                leads.update(bundler=bundler)
+                messages.success(request, 'Bundler {} is assigned to {} leads.'.format(
+                    bundler, leads.count(),
+                ))
+            else:
+                messages.success(request, 'Bundler {} has no leads.'.format(
+                    bundler, leads.count(),
+                ))
+            leads = Lead.objects.filter(bundler=bundler).exclude(utm_source=bundler.utm_source)
+            if leads:
+                leads.update(bundler=None)
+                messages.success(request, 'Bundler {} is unassigned from {} leads.'.format(
+                    bundler, leads.count(),
+                ))
