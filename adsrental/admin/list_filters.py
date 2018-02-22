@@ -62,29 +62,6 @@ class TouchCountListFilter(SimpleListFilter):
             return queryset.filter(touch_count__gte=10)
 
 
-class RaspberryPiOnlineListFilter(SimpleListFilter):
-    title = 'RaspberryPi online state'
-    parameter_name = 'online'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('online', 'Online only'),
-            ('offline', 'Offline only'),
-            ('offline_2days', 'Offline for last 2 days'),
-            ('offline_5days', 'Offline for last 5 days'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'online':
-            return queryset.filter(raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
-        if self.value() == 'offline':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
-        if self.value() == 'offline_2days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
-        if self.value() == 'offline_5days':
-            return queryset.filter(raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
-
-
 class RaspberryPiFirstTestedListFilter(SimpleListFilter):
     title = 'Shipped Date'
     parameter_name = 'shipped_date'
@@ -124,24 +101,57 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
 class OnlineListFilter(SimpleListFilter):
     title = 'RaspberryPi online state'
     parameter_name = 'online'
+    filter_field = 'last_seen'
 
     def lookups(self, request, model_admin):
         return (
             ('online', 'Online only'),
+            ('online_5minutes', 'Online for last 5 minutes'),
             ('offline', 'Offline only'),
-            ('offline_2days', 'Offline for last 2 days'),
-            ('offline_5days', 'Offline for last 5 days'),
+            ('offline_0_2days', 'Offline for 0-2 days'),
+            ('offline_3_5days', 'Offline for 3-5 days'),
+            ('offline_5days', 'Offline for more than 5 days'),
         )
 
     def queryset(self, request, queryset):
+        filter_field__gte = '{}__gte'.format(self.filter_field)
+        filter_field__lte = '{}__lte'.format(self.filter_field)
         if self.value() == 'online':
-            return queryset.filter(last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
+            return queryset.filter(**{
+                filter_field__gte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+            })
+        if self.value() == 'online_5minutes':
+            return queryset.filter(**{
+                filter_field__gte: timezone.now() - datetime.timedelta(minutes=5),
+            })
         if self.value() == 'offline':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
-        if self.value() == 'offline_2days':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24))
+            return queryset.filter(**{
+                filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+            })
+        if self.value() == 'offline_0_2days':
+            now = timezone.now()
+            return queryset.filter(**{
+                filter_field__lte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+                filter_field__gte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24),
+            })
+        if self.value() == 'offline_3_5days':
+            now = timezone.now()
+            return queryset.filter(**{
+                filter_field__lte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24),
+                filter_field__gte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+            })
         if self.value() == 'offline_5days':
-            return queryset.filter(last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24))
+            return queryset.filter(**{
+                filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+            })
+
+
+class RaspberryPiOnlineListFilter(OnlineListFilter):
+    filter_field = 'raspberry_pi__last_seen'
+
+
+class LeadRaspberryPiOnlineListFilter(OnlineListFilter):
+    filter_field = 'lead__raspberry_pi__last_seen'
 
 
 class AccountTypeListFilter(SimpleListFilter):
@@ -159,29 +169,6 @@ class AccountTypeListFilter(SimpleListFilter):
             return queryset.filter(facebook_account=True)
         if self.value() == 'google':
             return queryset.filter(google_account=True)
-
-
-class TunnelOnlineListFilter(SimpleListFilter):
-    title = 'Tunnel online state'
-    parameter_name = 'tunnel_online'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('online', 'Online only'),
-            ('offline', 'Offline only'),
-            ('offline_2days', 'Offline for last 2 days'),
-            ('offline_5days', 'Offline for last 5 days'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'online':
-            return queryset.filter(tunnel_last_tested__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
-        if self.value() == 'offline':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl))
-        if self.value() == 'offline_2days':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 2 * 24))
-        if self.value() == 'offline_5days':
-            return queryset.filter(tunnel_last_tested__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.tunnel_online_hours_ttl + 5 * 24))
 
 
 class WrongPasswordListFilter(SimpleListFilter):
@@ -215,29 +202,6 @@ class WrongPasswordListFilter(SimpleListFilter):
             return queryset.filter(
                 wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
             )
-
-
-class LeadRaspberryPiOnlineListFilter(SimpleListFilter):
-    title = 'RaspberryPi online state'
-    parameter_name = 'online'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('online', 'Online'),
-            ('online_5m', 'Online last 5 min'),
-            ('online_24h', 'Online last 24 hours'),
-            ('offline', 'Offline'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'online':
-            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
-        if self.value() == 'online_5m':
-            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(minutes=5))
-        if self.value() == 'online_24h':
-            return queryset.filter(lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=24))
-        if self.value() == 'offline':
-            return queryset.filter(lead__raspberry_pi__last_seen__lte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl))
 
 
 class LeadRaspberryPiVersionListFilter(SimpleListFilter):
