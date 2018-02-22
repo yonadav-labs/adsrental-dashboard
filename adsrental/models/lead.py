@@ -180,15 +180,11 @@ class Lead(models.Model, FulltextSearchMixin):
         self.save()
         return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
 
-    def disqualify(self, edited_by, reason):
+    def disqualify(self, edited_by):
         self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
-        self.disqualify_reason = reason
-        self.save()
 
     def qualify(self, edited_by):
         self.set_status(Lead.STATUS_QUALIFIED, edited_by)
-        self.disqualify_reason = None
-        self.save()
 
     def assign_raspberry_pi(self):
         if not self.raspberry_pi:

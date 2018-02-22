@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
-from adsrental.forms import AdminLeadBanForm, AdminLeadDisqualifyForm
+from adsrental.forms import AdminLeadBanForm
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter
@@ -98,8 +98,6 @@ class LeadAdmin(admin.ModelAdmin):
         title = 'Show changes'
         if obj.ban_reason:
             title = 'Banned for {}'.format(obj.ban_reason)
-        if obj.disqualify_reason:
-            title = 'Disqualified for {}'.format(obj.disqualify_reason)
         return '<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
@@ -217,28 +215,13 @@ class LeadAdmin(admin.ModelAdmin):
                     request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead.email, lead.shipstation_order_number))
 
     def mark_as_disqualified(self, request, queryset):
-        if 'do_action' in request.POST:
-            form = AdminLeadDisqualifyForm(request.POST)
-            if form.is_valid():
-                reason = form.cleaned_data['reason']
-                for lead in queryset:
-                    if lead.is_banned():
-                        messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
-                        continue
+        for lead in queryset:
+            if lead.is_banned():
+                messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
+                continue
 
-                    lead.disqualify(request.user, reason)
-                    messages.info(request, 'Lead {} is disqualified.'.format(lead.email))
-                return
-        else:
-            form = AdminLeadDisqualifyForm()
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'mark_as_disqualified',
-            'title': 'Choose reason to disqualify following leads',
-            'button': 'Mark as disqualified',
-            'objects': queryset,
-            'form': form,
-        })
+            lead.disqualify(request.user)
+            messages.info(request, 'Lead {} is disqualified.'.format(lead.email))
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
