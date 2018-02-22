@@ -37,6 +37,9 @@ class Lead(models.Model, FulltextSearchMixin):
         ('Facebook - Suspicious', 'Facebook - Suspicious', ),
         ('Facebook - Lockout', 'Facebook - Lockout', ),
         ('Facebook - Unresponsive User', 'Facebook - Unresponsive User', ),
+        ('Duplicate', 'Duplicate', ),
+        ('Bad ad account', 'Bad ad account', ),
+        ('Other', 'Other', ),
     )
 
     COMPANY_EMPTY = '[Empty]'
