@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.contrib.admin import SimpleListFilter
 
 from adsrental.models.lead import Lead
+from adsrental.models.bundler import Bundler
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 
@@ -325,3 +326,20 @@ class TunnelUpListFilter(SimpleListFilter):
             return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60))
         if self.value() == 'no_1day':
             return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60 * 24))
+
+
+class BundlerListFilter(SimpleListFilter):
+    title = 'Bundler'
+    parameter_name = 'bundler'
+
+    def lookups(self, request, model_admin):
+        choices = [(i[0], '%s (%s)' % i[1:]) for i in Bundler.objects.all().values_list('id', 'name', 'utm_source')]
+        return choices + [
+            ('null', 'Not assigned'),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'null':
+            return queryset.filter(bundler__isnull=True)
+        if self.value():
+            return queryset.filter(bundler_id=int(self.value()))

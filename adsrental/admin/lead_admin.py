@@ -11,7 +11,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.forms import AdminLeadBanForm
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -49,7 +49,7 @@ class LeadAdmin(admin.ModelAdmin):
         TouchCountListFilter,
         RaspberryPiFirstTestedListFilter,
         'company',
-        'bundler',
+        BundlerListFilter,
         'is_sync_adsdb',
         'bundler_paid',
         'pi_delivered',
