@@ -51,7 +51,7 @@ class LeadAdmin(admin.ModelAdmin):
         TouchCountListFilter,
         RaspberryPiFirstTestedListFilter,
         'company',
-        # 'utm_source',
+        'bundler',
         'is_sync_adsdb',
         'bundler_paid',
         'pi_delivered',
