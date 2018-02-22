@@ -8,12 +8,10 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
-from adsrental.forms import AdminLeadBanForm
+from adsrental.forms import AdminLeadBanForm, AdminLeadDisqualifyForm
 from adsrental.models.lead import Lead
-from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter
-from adsrental.utils import ShipStationClient
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -97,10 +95,15 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def status_field(self, obj):
+        title = 'Show changes'
+        if obj.ban_reason:
+            title = 'Banned for {}'.format(obj.ban_reason)
+        if obj.disqualify_reason:
+            title = 'Disqualified for {}'.format(obj.disqualify_reason)
         return '<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
-            title='Banned for {}'.format(obj.ban_reason) if obj.ban_reason else 'Show changes',
+            title=title,
             status=obj.status,
         )
 
@@ -200,35 +203,42 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
                 continue
 
-            lead.set_status(Lead.STATUS_QUALIFIED, request.user)
-            if not lead.raspberry_pi:
-                lead.raspberry_pi = RaspberryPi.get_free_or_create()
-                lead.save()
-                lead.raspberry_pi.leadid = lead.leadid
-                lead.raspberry_pi.first_seen = None
-                lead.raspberry_pi.last_seen = None
-                lead.raspberry_pi.first_tested = None
-                lead.raspberry_pi.tunnel_last_tested = None
-                lead.raspberry_pi.save()
+            lead.qualify(request.user)
+            if lead.assign_raspberry_pi():
                 messages.success(
                     request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
 
             EC2Instance.launch_for_lead(lead)
-
-            shipstation_client = ShipStationClient()
-            if shipstation_client.get_lead_order_data(lead):
+            if lead.add_shipstation_order():
+                messages.success(
+                    request, '{} order created: {}'.format(lead.email, lead.shipstation_order_number))
+            else:
                 messages.info(
                     request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead.email, lead.shipstation_order_number))
-                continue
-
-            order = shipstation_client.add_lead_order(lead)
-            messages.success(
-                request, '{} order created: {}'.format(lead.str(), order.order_key))
 
     def mark_as_disqualified(self, request, queryset):
-        for lead in queryset:
-            lead.set_status(Lead.STATUS_DISQUALIFIED)
-            messages.success(request, 'Lead {} is disqualified'.format(lead.email))
+        if 'do_action' in request.POST:
+            form = AdminLeadDisqualifyForm(request.POST)
+            if form.is_valid():
+                reason = form.cleaned_data['reason']
+                for lead in queryset:
+                    if lead.is_banned():
+                        messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
+                        continue
+
+                    lead.disqualify(request.user, reason)
+                    messages.info(request, 'Lead {} is disqualified.'.format(lead.email))
+                return
+        else:
+            form = AdminLeadDisqualifyForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'mark_as_disqualified',
+            'title': 'Choose reason to disqualify following leads',
+            'button': 'Mark as disqualified',
+            'objects': queryset,
+            'form': form,
+        })
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:

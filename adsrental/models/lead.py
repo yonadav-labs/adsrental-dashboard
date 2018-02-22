@@ -12,7 +12,7 @@ from django.apps import apps
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
-from adsrental.utils import CustomerIOClient
+from adsrental.utils import CustomerIOClient, ShipStationClient
 
 
 class Lead(models.Model, FulltextSearchMixin):
@@ -42,6 +42,15 @@ class Lead(models.Model, FulltextSearchMixin):
         ('Other', 'Other', ),
     )
 
+    DISQUALIFY_REASON_CHOICES = (
+        ('Doesn\'t meet friend requirements', 'Doesn\'t meet friend requirements', ),
+        ('Doesn\'t meet age requirements', 'Doesn\'t meet age requirements', ),
+        ('Fake FB', 'Fake FB', ),
+        ('Fake Google', 'Fake Google', ),
+        ('Non US account', 'Non US account', ),
+        ('Other', 'Other', ),
+    )
+
     COMPANY_EMPTY = '[Empty]'
     COMPANY_ACM = 'ACM'
     COMPANY_FBM = 'FBM'
@@ -60,6 +69,7 @@ class Lead(models.Model, FulltextSearchMixin):
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available')
     ban_reason = models.CharField(max_length=40, choices=BAN_REASON_CHOICES, null=True, blank=True)
+    disqualify_reason = models.CharField(max_length=40, choices=DISQUALIFY_REASON_CHOICES, null=True, blank=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None)
     email = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
@@ -169,6 +179,40 @@ class Lead(models.Model, FulltextSearchMixin):
         self.ban_reason = None
         self.save()
         return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
+
+    def disqualify(self, edited_by, reason):
+        self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
+        self.disqualify_reason = reason
+        self.save()
+
+    def qualify(self, edited_by):
+        self.set_status(Lead.STATUS_QUALIFIED, edited_by)
+        self.disqualify_reason = None
+        self.save()
+
+    def assign_raspberry_pi(self):
+        if not self.raspberry_pi:
+            self.raspberry_pi = RaspberryPi.get_free_or_create()
+            self.save()
+            self.raspberry_pi.leadid = self.leadid
+            self.raspberry_pi.first_seen = None
+            self.raspberry_pi.last_seen = None
+            self.raspberry_pi.first_tested = None
+            self.raspberry_pi.tunnel_last_tested = None
+            self.raspberry_pi.save()
+            return True
+
+        return False
+
+    def add_shipstation_order(self):
+        if not settings.MANAGE_EC2:
+            return False
+
+        shipstation_client = ShipStationClient()
+        if shipstation_client.get_lead_order_data(self):
+            return False
+        shipstation_client.add_lead_order(self)
+        return True
 
     def name(self):
         return '{} {}'.format(self.first_name, self.last_name)

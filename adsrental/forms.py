@@ -211,3 +211,7 @@ class LandingForm(forms.Form):
 
 class AdminLeadBanForm(forms.Form):
     reason = forms.ChoiceField(choices=Lead.BAN_REASON_CHOICES)
+
+
+class AdminLeadDisqualifyForm(forms.Form):
+    reason = forms.ChoiceField(choices=Lead.DISQUALIFY_REASON_CHOICES)

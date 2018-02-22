@@ -57,6 +57,9 @@ class EC2Instance(models.Model):
 
     @classmethod
     def launch_for_lead(cls, lead):
+        if not settings.MANAGE_EC2:
+            return False
+
         if not lead.raspberry_pi:
             return None
         instance = cls.objects.filter(lead=lead).first()
