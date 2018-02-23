@@ -192,7 +192,7 @@ class LogView(View):
             if hostname is not None and ec2_instance.is_running() and ec2_instance.hostname != hostname:
                 self.add_log(request, rpid, 'Hostname changed, restarting')
                 new_config_required = True
-                restart_required = True
+                # restart_required = True
 
             if raspberry_pi.restart_required:
                 self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
