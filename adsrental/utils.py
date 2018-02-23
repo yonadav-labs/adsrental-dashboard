@@ -86,7 +86,7 @@ class ShipStationClient(object):
         )
 
         shipping_address = ShipStationAddress(
-            name='{} {}'.format(lead.first_name, lead.last_name),
+            name=lead.safe_name(),
             # company=sf_lead.company,
             street1=lead.street,
             city=lead.city,
