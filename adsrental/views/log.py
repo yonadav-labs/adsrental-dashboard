@@ -150,6 +150,8 @@ class LogView(View):
             self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
             restart_required = False
+            new_config_required = False
+            update_required = False
 
             if troubleshoot and ec2_instance:
                 main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
@@ -183,11 +185,13 @@ class LogView(View):
                 raspberry_pi.save()
 
             if version and settings.RASPBERRY_PI_VERSION != version and StrictVersion(settings.RASPBERRY_PI_VERSION) > StrictVersion(version):
-                self.add_log(request, rpid, 'RaspberryPi image updated, restarting')
+                self.add_log(request, rpid, 'RaspberryPi image updated, updating...')
+                update_required = True
                 restart_required = True
 
-            if hostname and hostname != 'NO_EC2_INSTANCE' and ec2_instance.hostname and ec2_instance.hostname != hostname:
+            if hostname and ec2_instance.hostname and ec2_instance.hostname != hostname:
                 self.add_log(request, rpid, 'Hostname changed, restarting')
+                new_config_required = True
                 restart_required = True
 
             if raspberry_pi.restart_required:
@@ -196,12 +200,18 @@ class LogView(View):
                 raspberry_pi.restart_required = False
                 raspberry_pi.save()
 
-            return self.json_response(request, rpid, {
+            response_data = {
                 'result': True,
-                'ip_address': ip_address,
                 'source': 'ping',
-                'restart': restart_required,
-            })
+            }
+            if restart_required:
+                response_data['restart'] = restart_required
+            if new_config_required:
+                response_data['new_config'] = new_config_required
+            if update_required:
+                response_data['update'] = update_required
+
+            return self.json_response(request, rpid, response_data)
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})
 
