@@ -11,4 +11,4 @@ unzip -o pi_patch.zip
 
 # ./install.sh
 cat /home/pi/new-pi/crontab.txt | crontab
-sudo reboot
+# sudo reboot
