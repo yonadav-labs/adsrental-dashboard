@@ -27,7 +27,7 @@ class LeadAdmin(admin.ModelAdmin):
         'status_field',
         'email_field',
         'phone',
-        'utm_source',
+        'bundler_field',
         'google_account_column',
         'facebook_account_column',
         'raspberry_pi_link',
@@ -54,7 +54,7 @@ class LeadAdmin(admin.ModelAdmin):
         'bundler_paid',
         'pi_delivered',
     )
-    list_select_related = ('raspberry_pi', 'ec2instance', )
+    list_select_related = ('raspberry_pi', 'ec2instance', 'bundler', )
     search_fields = (
         'leadid',
         'account_name',
@@ -104,6 +104,12 @@ class LeadAdmin(admin.ModelAdmin):
             title=title,
             status=obj.status,
         )
+
+    def bundler_field(self, obj):
+        if obj.bundler:
+            return obj.bundler
+
+        return obj.utm_source
 
     def email_field(self, obj):
         return obj.email
@@ -325,3 +331,6 @@ class LeadAdmin(admin.ModelAdmin):
     google_account_column.short_description = 'Google Account'
     google_account_column.allow_tags = True
     google_account_column.admin_order_field = 'google_account'
+
+    bundler_field.short_description = 'Bundler'
+    bundler_field.admin_order_field = 'utm_source'

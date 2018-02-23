@@ -39,7 +39,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'email',
         # 'phone',
         'raspberry_pi_link',
-        'utm_source',
+        'bundler_field',
         'bundler_paid',
         'billed',
         'touch_count',
@@ -63,7 +63,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created', 'updated', )
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
-    list_select_related = ('raspberry_pi', )
+    list_select_related = ('raspberry_pi', 'bundler', )
     actions = (
         'mark_as_qualified',
         'mark_as_disqualified',
@@ -86,6 +86,12 @@ class ReportLeadAdmin(admin.ModelAdmin):
         if obj.google_account:
             return 'Google'
         return 'n/a'
+
+    def bundler_field(self, obj):
+        if obj.bundler:
+            return obj.bundler
+
+        return obj.utm_source
 
     def first_seen(self, obj):
         return obj.raspberry_pi and obj.raspberry_pi.first_seen
@@ -215,3 +221,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     raspberry_pi_link.short_description = 'RPID'
 
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
+
+    bundler_field.short_description = 'Bundler'
+    bundler_field.admin_order_field = 'utm_source'

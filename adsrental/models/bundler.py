@@ -20,4 +20,5 @@ class Bundler(models.Model):
         return cls.objects.filter(utm_source=utm_source).first()
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.utm_source)
+        return self.name
+        # return '{} ({})'.format(self.name, self.utm_source)
