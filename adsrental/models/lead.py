@@ -213,6 +213,9 @@ class Lead(models.Model, FulltextSearchMixin):
     def name(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
+    def safe_name(self):
+        return self.name().encode('ascii', errors='replace')
+
     def str(self):
         return 'Lead {} ({})'.format(self.name(), self.email)
 

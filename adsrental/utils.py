@@ -81,7 +81,7 @@ class ShipStationClient(object):
         order = ShipStationOrder(
             order_key=lead.shipstation_order_number, order_number=lead.shipstation_order_number)
         order.set_customer_details(
-            username='{} {}'.format(lead.first_name, lead.last_name),
+            username=lead.safe_name(),
             email=lead.email,
         )
 
