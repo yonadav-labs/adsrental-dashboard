@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 from django.contrib.admin import SimpleListFilter
 
 from adsrental.models.lead import Lead
@@ -112,11 +113,13 @@ class OnlineListFilter(SimpleListFilter):
             ('offline_0_2days', 'Offline for 0-2 days'),
             ('offline_3_5days', 'Offline for 3-5 days'),
             ('offline_5days', 'Offline for more than 5 days'),
+            ('never', 'Never'),
         )
 
     def queryset(self, request, queryset):
         filter_field__gte = '{}__gte'.format(self.filter_field)
         filter_field__lte = '{}__lte'.format(self.filter_field)
+        filter_field__isnull = '{}__isnull'.format(self.filter_field)
         if self.value() == 'online':
             return queryset.filter(**{
                 filter_field__gte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
@@ -126,9 +129,11 @@ class OnlineListFilter(SimpleListFilter):
                 filter_field__gte: timezone.now() - datetime.timedelta(minutes=5),
             })
         if self.value() == 'offline':
-            return queryset.filter(**{
+            return queryset.filter(Q(**{
                 filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
-            })
+            }) | Q(**{
+                filter_field__isnull: True,
+            }))
         if self.value() == 'offline_0_2days':
             now = timezone.now()
             return queryset.filter(**{
@@ -144,6 +149,10 @@ class OnlineListFilter(SimpleListFilter):
         if self.value() == 'offline_5days':
             return queryset.filter(**{
                 filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+            })
+        if self.value() == 'never':
+            return queryset.filter(**{
+                filter_field__isnull: True,
             })
 
 
