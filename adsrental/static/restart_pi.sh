@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sudo reboot
+# sudo reboot
