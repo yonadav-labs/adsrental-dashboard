@@ -89,10 +89,12 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.leadid
 
     def name(self, obj):
-        return u'{} {}'.format(
-            obj.first_name,
-            obj.last_name,
-        )
+        if obj.note:
+            return '<span class="has_note" title="{}">{}</span>'.format(
+                obj.note,
+                obj.name(),
+            )
+        return obj.name()
 
     def status_field(self, obj):
         title = 'Show changes'
@@ -334,3 +336,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     bundler_field.short_description = 'Bundler'
     bundler_field.admin_order_field = 'utm_source'
+
+    name.allow_tags = True
+    name.admin_order_field = 'first_name'
