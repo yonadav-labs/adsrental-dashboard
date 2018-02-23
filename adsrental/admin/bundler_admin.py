@@ -40,3 +40,5 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def leads_count(self, inst):
         return inst.leads_count
+
+    leads_count.short_description = 'Leads'
