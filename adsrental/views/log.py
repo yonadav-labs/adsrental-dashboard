@@ -75,7 +75,7 @@ class LogView(View):
             return JsonResponse({'result': True, 'source': 'client'})
 
         if 'h' in request.GET:
-            ec2_instance = EC2Instance.objects.filter(lead__raspberry_pi__rpid=rpid).first()
+            ec2_instance = EC2Instance.objects.filter(lead__raspberry_pi__rpid=rpid).select_related('lead').first()
             if not ec2_instance:
                 return HttpResponse('')
             if not ec2_instance.lead:
@@ -125,11 +125,12 @@ class LogView(View):
             return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
         if 'p' in request.GET:
+            raise ValueError('asd')
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
             troubleshoot = request.GET.get('troubleshoot')
-            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
             if not lead:
                 return self.json_response(request, rpid, {
                     'result': False,
@@ -169,15 +170,6 @@ class LogView(View):
                 if not reverse_tunnel_up:
                     self.add_log(request, rpid, 'Reverse tunnel seems to be down')
                     # restart_required = True
-
-            if not version and ec2_instance and ec2_instance.tunnel_up:
-                self.add_log(request, rpid, 'Trying to force update old version')
-                cmd_to_execute = '''ssh pi@localhost -p 2046 "curl https://adsrental.com/static/update_pi.sh | bash"'''
-                try:
-                    ssh = ec2_instance.get_ssh()
-                    ssh.exec_command(cmd_to_execute)
-                except:
-                    self.add_log(request, rpid, 'Update failed, tunnel is down')
 
             if version and raspberry_pi.version != version:
                 self.add_log(request, rpid, 'RaspberryPI updated to {}'.format(version))
