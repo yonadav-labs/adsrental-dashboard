@@ -19,11 +19,13 @@ python manage.py collectstatic --noinput > /dev/null
 
 while true; do
     echo "Re-starting Gunicorn runserver"
-    gunicorn -D config.wsgi:application \
+    gunicorn -D config.wsgi_debug:application \
       --bind 0.0.0.0:80 \
       --worker-class=eventlet \
+      --error-logfile=/app/app_log/error_http.log \
+      --access-logfile=/app/app_log/access_http.log \
       --reload
-    gunicorn config.wsgi:application \
+    gunicorn config.wsgi_debug:application \
         --bind 0.0.0.0:443 \
         --certfile=/app/cert/adsrental_com.crt \
         --keyfile=/app/cert/csr.key \
@@ -35,7 +37,7 @@ while true; do
         --worker-connections 100000 \
         --max-requests 100000 \
         --error-logfile=- \
-        --access-logfile=/app/app_log/access.log \
+        --access-logfile=- \
         --reload
     sleep 5
 done
