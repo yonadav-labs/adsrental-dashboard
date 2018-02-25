@@ -131,8 +131,7 @@ class EC2Instance(models.Model):
         rpid = self.get_tag(boto_instance, 'Name')
         lead_email = self.get_tag(boto_instance, 'Email')
         is_duplicate = self.get_tag(boto_instance, 'Duplicate') == 'true'
-        instance_state = boto_instance.state['Name']
-        self.status = instance_state
+        self.status = boto_instance.state['Name']
         is_active = self.is_active()
 
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if is_active else None
@@ -141,8 +140,9 @@ class EC2Instance(models.Model):
         self.rpid = rpid
         self.lead = lead
         self.is_duplicate = is_duplicate
-        self.hostname = boto_instance.public_dns_name
-        self.ip_address = boto_instance.public_ip_address
+        if self.is_running():
+            self.hostname = boto_instance.public_dns_name
+            self.ip_address = boto_instance.public_ip_address
         self.last_synced = timezone.now()
 
         self.save()
