@@ -21,10 +21,11 @@ from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.start_reverse_tunnel import StartReverseTunnelView
 from adsrental.views.cron import SyncEC2View, LeadHistoryView
 from adsrental.views.rpi import EC2DataView
-from adsrental.views.landing import LandingView
+from adsrental.views.landing import LandingView, TermsView
 
 urlpatterns = [
     url(r'^$', LandingView.as_view(), name='home'),
+    url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
     url(r'^sync/from_shipstation/$', SyncFromShipStationView.as_view(), name='sync_from_shipstation'),
     url(r'^sync/delivered/$', SyncDeliveredView.as_view(), name='sync_delivered'),

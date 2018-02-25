@@ -7,7 +7,7 @@
 {% block html %}
   <head>
     {% block head %}
-      <title>{% block title %}Adsrental{% block title_extra %}{% endblock title_extra %}{% endblock title %}</title>
+      <title>{% block title %}RentYourSocialMedia{% block title_extra %}{% endblock title_extra %}{% endblock title %}</title>
       <link rel="shortcut icon" href="{% static 'images/landing/logo.png' %}">
 
       {% block metas %}
@@ -26,9 +26,9 @@
             <div class="container">
               <div class="navbar-header">
                 {% if user.is_authenticated %}
-                    <a class="navbar-brand" href="{% url "home" %}">Logged in to Adsrental as {{user.email}}</a>
+                    <a class="navbar-brand" href="{% url "home" %}">Logged in to RentYourSocialMedia as {{user.email}}</a>
                 {% else %}
-                <a class="navbar-brand" href="{% url "login" %}">Not logged in to Adsrental</a>
+                <a class="navbar-brand" href="{% url "home" %}">RentYourSocialMedia</a>
                 {% endif %}
             </div>
               <div id="navbar" class="navbar-collapse collapse">

@@ -11,6 +11,11 @@ from django.http import HttpResponseRedirect
 from adsrental.forms import LandingForm
 
 
+class TermsView(View):
+    def get(self, request):
+        return render(request, 'terms.html')
+
+
 class LandingView(View):
     def redirect_https(self, request):
         protocol = u'https'
