@@ -233,9 +233,13 @@ class LeadAdmin(admin.ModelAdmin):
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
+            if not lead.raspberry_pi:
+                messages.warning(request, 'Lead {} does not haave RaspberryPi assigned, skipping'.format(lead.email))
+                continue
+
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
-        messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
+            messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     def ban(self, request, queryset):
         if 'do_action' in request.POST:

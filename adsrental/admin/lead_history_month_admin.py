@@ -119,11 +119,14 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             EC2Instance.launch_for_lead(lead)
 
     def restart_raspberry_pi(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
+        for lead in queryset:
+            if not lead.raspberry_pi:
+                messages.warning(request, 'Lead {} does not haave RaspberryPi assigned, skipping'.format(lead.email))
+                continue
+
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
-        messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
+            messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     def report_wrong_password(self, request, queryset):
         for lead_history_month in queryset:
