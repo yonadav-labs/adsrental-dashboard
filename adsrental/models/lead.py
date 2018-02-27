@@ -175,6 +175,12 @@ class Lead(models.Model, FulltextSearchMixin):
         old_value = self.pi_delivered
         self.shipstation_order_number = None
         self.pi_delivered = False
+        extra_note = 'Prepared for reshipment by {} on {}'.format(
+            edited_by,
+            timezone.now().strftime('%Y-%m-%d'),
+        )
+        self.note = '{}\n{}'.format(self.note or '', extra_note)
+        self.save()
         raspberry_pi = self.raspberry_pi
         if raspberry_pi:
             raspberry_pi.first_tested = None
