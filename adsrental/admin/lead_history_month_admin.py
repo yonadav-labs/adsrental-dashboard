@@ -153,13 +153,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def prepare_for_reshipment(self, request, queryset):
         for lead_history_month in queryset:
             lead = lead_history_month.lead
-            raspberry_pi = lead.raspberry_pi
-            if raspberry_pi:
-                raspberry_pi.first_tested = None
-                raspberry_pi.last_seen = None
-                raspberry_pi.first_seen = None
-                raspberry_pi.tunnel_last_tested = None
-                raspberry_pi.save()
+            if lead.raspberry_pi:
+                lead.prepare_for_reshipment(request.user)
                 messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))

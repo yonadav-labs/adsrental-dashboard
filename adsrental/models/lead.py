@@ -171,6 +171,20 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
+    def prepare_for_reshipment(self, edited_by):
+        old_value = self.pi_delivered
+        self.shipstation_order_number = None
+        self.pi_delivered = False
+        raspberry_pi = self.raspberry_pi
+        if raspberry_pi:
+            raspberry_pi.first_tested = None
+            raspberry_pi.last_seen = None
+            raspberry_pi.first_seen = None
+            raspberry_pi.tunnel_last_tested = None
+            raspberry_pi.save()
+        LeadChange(lead=self, field='pi_delivered', value=False, old_value=old_value, edited_by=edited_by).save()
+        return True
+
     def ban(self, edited_by, reason=None):
         self.ban_reason = reason
         self.save()
