@@ -32,8 +32,10 @@ if [ "$HAS_ANTIDETECT" == "" ]; then
     fi
     ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Expand-Archive -force c:\\Antidetect.zip -DestinationPath c:\\"
     ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Copy-Item -Path 'C:\\Antidetect\\Browser.exe' -Destination C:\\Users\\Public\\Desktop\\"
+    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Copy-Item -Path 'C:\\Antidetect\\variables.conf' -Destination C:\\Users\\Public\\Desktop\\"
     ${HOME}/new-pi/client_log.sh "Antidetect is installed"
 else
+    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Copy-Item -Path 'C:\\Antidetect\\variables.conf' -Destination C:\\Users\\Public\\Desktop\\"
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
 
