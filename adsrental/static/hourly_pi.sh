@@ -15,6 +15,8 @@ if [ "$HAS_FF" == "" ]; then
     HAS_FF="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Public\\Desktop\\Firefox.lnk' | grep Firefox.lnk`"
     if [ "$HAS_FF" == "" ]; then
         ${HOME}/new-pi/client_log.sh "Firefox is still missing..."
+    else
+        ${HOME}/new-pi/client_log.sh "Antidetect is installed"
     fi
 else
     ${HOME}/new-pi/client_log.sh "Firefox is already installed"
@@ -28,6 +30,9 @@ if [ "$HAS_ANTIDETECT" == "" ]; then
         ${HOME}/new-pi/client_log.sh "Antidetect is not downloaded..."
         ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell iwr -outf C:\\Antidetect.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect.zip"
     fi
+    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Expand-Archive -force c:\\Antidetect.zip -DestinationPath c:\\"
+    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Copy-Item -Path 'C:\\Antidetect\\Browser.exe' -Destination C:\\Users\\Public\\Desktop\\"
+    ${HOME}/new-pi/client_log.sh "Antidetect is installed"
 else
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
