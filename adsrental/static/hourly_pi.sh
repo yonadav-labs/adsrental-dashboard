@@ -36,3 +36,5 @@ if [ "$HAS_ANTIDETECT" == "" ]; then
 else
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
+
+${HOME}/new-pi/client_log.sh "Info `ls -l ${HOME}/new-pi/keepalive_cron.sh`"
