@@ -2,7 +2,7 @@
 
 EC2_INSTANCE="`head -n 1 ${HOME}/hostname.conf`"
 echo $EC2_INSTANCE
-HAS_INST=`ssh Administrator@${EC2_INSTANCE} -p 40594 "dir C:\\firefox_inst.exe" | grep firefox_inst`
+HAS_INST="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\firefox_inst.exe' | grep firefox_inst`"
 echo $HAS_INST
 
 if [ "$HAS_INST" == "" ]; then
