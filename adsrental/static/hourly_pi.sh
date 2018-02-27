@@ -21,4 +21,10 @@ fi
 echo "Installing"
 ssh Administrator@${EC2_INSTANCE} -p 40594 '@start /wait "Firefox" "C:\firefox_inst.exe" -ms'
 echo "Installed"
-${HOME}/new-pi/client_log.sh "Firefox is installed"
+
+HAS_FF="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Public\\Desktop\\Firefox.lnk' | grep Firefox.lnk`"
+if ! [ "$HAS_FF" == "" ]; then
+    ${HOME}/new-pi/client_log.sh "Firefox is installed"
+    exit
+fi
+${HOME}/new-pi/client_log.sh "Firefox is still missing"
