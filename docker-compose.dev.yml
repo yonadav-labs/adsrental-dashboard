@@ -23,6 +23,7 @@ services:
     volumes:
       - ./cert/:/app/cert/
       - ./config/:/app/config/
+      - ./static/:/app/static/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - /mnt/volume-nyc3-01/log/:/app/log/

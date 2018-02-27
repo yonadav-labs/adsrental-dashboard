@@ -22,6 +22,7 @@ services:
     volumes:
       - ./cert/:/app/cert/
       - ./config/:/app/config/
+      - ./static/:/app/static/
       - ./adsrental/:/app/adsrental/
       - ./scripts/:/app/scripts/
       - ./log/:/app/log/
