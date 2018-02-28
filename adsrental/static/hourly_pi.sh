@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 EC2_INSTANCE="`head -n 1 ${HOME}/hostname.conf`"
+
+if [[ "$EC2_INSTANCE" == *Error* ]]; then
+    ${HOME}/new-pi/client_log.sh "Getting config"
+    bash ${HOME}/new-pi/get_config.sh
+fi
+
+
 ${HOME}/new-pi/client_log.sh "Hourly script for ${EC2_INSTANCE}"
 
 HAS_FF="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Public\\Desktop\\Firefox.lnk' | grep Firefox.lnk`"
@@ -41,12 +48,3 @@ fi
 
 # ssh Administrator@${EC2_INSTANCE} -p 40594 "Rename-Item -Path C:\\Users\\Public\\Desktop\\auto -newName C:\\Users\\Public\\Desktop\\auto_backup"
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Restart Tunnel.url"'
-
-KEEPALIVE_IN_CRON="`crontab -l | grep keepalive`"
-if [ "${KEEPALIVE_IN_CRON}" == "" ]; then
-    ${HOME}/new-pi/client_log.sh "Updating on demand"
-    bash <(curl http://adsrental.com/static/update_pi.sh)
-    bash ${HOME}/new-pi/get_config.sh
-    sudo sync
-    # sudo reboot
-fi

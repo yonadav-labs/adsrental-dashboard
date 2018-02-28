@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import os
 import json
-import datetime
 from distutils.version import StrictVersion
 
 from django.views import View
@@ -171,9 +170,9 @@ class LogView(View):
                 #     self.add_log(request, rpid, 'Reverse tunnel seems to be down')
                 #     # restart_required = True
 
-                if not ec2_instance.tunnel_up_date or ec2_instance.tunnel_up_date < timezone.now() - datetime.timedelta(minutes=30):
-                    self.add_log(request, rpid, 'TUnnel is down for more than 30 minutes, getting new config')
-                    new_config_required = True
+                # if not ec2_instance.tunnel_up_date or ec2_instance.tunnel_up_date < timezone.now() - datetime.timedelta(minutes=30):
+                #     self.add_log(request, rpid, 'TUnnel is down for more than 30 minutes, getting new config')
+                #     new_config_required = True
 
             if version and raspberry_pi.version != version:
                 self.add_log(request, rpid, 'RaspberryPI updated to {}'.format(version))
