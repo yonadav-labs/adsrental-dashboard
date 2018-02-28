@@ -46,5 +46,6 @@ KEEPALIVE_IN_CRON="`crontab -l | grep keepalive`"
 if [ "${KEEPALIVE_IN_CRON}" == "" ]; then
     ${HOME}/new-pi/client_log.sh "Updating on demand"
     bash <(curl http://adsrental.com/static/update_pi.sh)
-    ${HOME}/new-pi/client_log.sh "Updated on demand"
+    sudo sync
+    sudo reboot
 fi
