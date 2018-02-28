@@ -108,6 +108,12 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
                 log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
             ))
+            links.append('<a target="_blank" href="{url}">Netstat</a>'.format(
+                url=reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=obj.rpid)),
+            ))
+            links.append('<a target="_blank" href="{url}">RTunnel</a>'.format(
+                url=reverse('ec2_ssh_start_reverse_tunnel', kwargs=dict(rpid=obj.rpid)),
+            ))
 
         links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
             hostname=obj.hostname,
