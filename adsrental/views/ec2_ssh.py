@@ -24,4 +24,4 @@ class GetNetstatView(View):
             output = ec2_instance.ssh_execute('netstat -an')
         except:
             pass
-        return HttpResponse(output)
+        return HttpResponse(output, content_type='text/plain')
