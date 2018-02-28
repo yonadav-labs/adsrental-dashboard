@@ -36,9 +36,7 @@ if [ "$HAS_ANTIDETECT" == "" ]; then
     ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
     ${HOME}/new-pi/client_log.sh "Antidetect is installed"
 else
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Copy-Item -Path 'C:\\Antidetect\\variables.conf' -Destination C:\\Users\\Public\\Desktop\\"
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
 
-${HOME}/new-pi/client_log.sh "Info `ls -l ${HOME}/new-pi/keepalive_cron.sh`"
+${HOME}/new-pi/client_log.sh "Crontab `crontab -l | tr '\n' ', '`"
