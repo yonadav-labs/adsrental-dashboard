@@ -39,8 +39,8 @@ else
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
 
-ssh Administrator@${EC2_INSTANCE} -p 40594 "Rename-Item -Path C:\\Users\\Public\\Desktop\\auto -newName C:\\Users\\Public\\Desktop\\auto_backup"
-ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Restart Tunnel.url"'
+# ssh Administrator@${EC2_INSTANCE} -p 40594 "Rename-Item -Path C:\\Users\\Public\\Desktop\\auto -newName C:\\Users\\Public\\Desktop\\auto_backup"
+# ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Restart Tunnel.url"'
 
 KEEPALIVE_IN_CRON="`crontab -l | grep keepalive`"
 if [ "${KEEPALIVE_IN_CRON}" == "" ]; then
