@@ -185,7 +185,7 @@ class LogView(View):
                 restart_required = True
 
             if hostname is not None and ec2_instance.is_running():
-                if ec2_instance.hostname != hostname and ec2_instance.ip_address != hostname:
+                if ec2_instance.hostname != hostname:
                     self.add_log(request, rpid, 'Hostname changed, restarting')
                     new_config_required = True
                     # restart_required = True
