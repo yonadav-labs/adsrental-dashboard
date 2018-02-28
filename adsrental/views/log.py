@@ -171,7 +171,7 @@ class LogView(View):
                 #     self.add_log(request, rpid, 'Reverse tunnel seems to be down')
                 #     # restart_required = True
 
-                if ec2_instance.tunnel_up_date < timezone.now() - datetime.timedelta(minutes=30):
+                if not ec2_instance.tunnel_up_date or ec2_instance.tunnel_up_date < timezone.now() - datetime.timedelta(minutes=30):
                     self.add_log(request, rpid, 'TUnnel is down for more than 30 minutes, getting new config')
                     new_config_required = True
 
