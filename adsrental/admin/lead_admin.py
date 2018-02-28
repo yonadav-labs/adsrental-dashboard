@@ -75,6 +75,7 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_reshipment',
         'touch',
         'restart_raspberry_pi',
+        'sync_to_adsdb',
     )
     readonly_fields = ('created', 'updated', 'status', )
     raw_id_fields = ('raspberry_pi', )
@@ -268,6 +269,13 @@ class LeadAdmin(admin.ModelAdmin):
             if lead.unban(request.user):
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
+    def sync_to_adsdb(self, request, queryset):
+        for lead in queryset:
+            if lead.sync_to_adsdb():
+                messages.info(request, 'Lead {} is synced.'.format(lead.email))
+            else:
+                messages.warning(request, 'Lead {} does not meet conditions to sync.'.format(lead.email))
 
     def report_wrong_password(self, request, queryset):
         for lead in queryset:

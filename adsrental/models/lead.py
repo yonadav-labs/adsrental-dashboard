@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django.apps import apps
+from django.utils import dateformat
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
@@ -117,9 +118,45 @@ class Lead(models.Model, FulltextSearchMixin):
     class Meta:
         db_table = 'lead'
 
+    def sync_to_adsdb(self):
+        if self.status != Lead.STATUS_IN_PROGRESS:
+            return False
+        if self.facebook_account and self.touch_count < 10:
+            return False
+        url = 'https://staging.adsdb.io/api/v1/accounts/create-s'
+        if self.is_sync_adsdb:
+            url = 'https://staging.adsdb.io/api/v1/accounts/update-s'
+        bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
+        data = dict(
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            fb_username=self.fb_email or self.google_email,
+            fb_password=self.fb_secret or self.google_password,
+            last_seen=dateformat.format(self.raspberry_pi.last_seen, 'j E Y H:i') if self.raspberry_pi and self.raspberry_pi.last_seen else None,
+            phone=self.phone,
+            ec2_hostname=self.raspberry_pi.ec2_hostname if self.raspberry_pi else None,
+            utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
+            rp_id=self.raspberry_pi.rpid if self.raspberry_pi else None,
+        )
+        # import json
+        # raise ValueError(json.dumps(data))
+        response = requests.post(
+            url,
+            json=[data],
+            auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+        )
+        if response.status_code != 200:
+            raise ValueError(response.status_code, response.content)
+
+        self.is_sync_adsdb = True
+        self.save()
+        return True
+
     def touch(self):
         self.last_touch_date = timezone.now()
         self.touch_count += 1
+        self.sync_to_adsdb()
         self.save()
 
     def get_address(self):
