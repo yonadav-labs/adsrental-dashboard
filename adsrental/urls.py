@@ -18,7 +18,7 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sync_offline import SyncOfflineView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
-from adsrental.views.start_reverse_tunnel import StartReverseTunnelView
+from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
 from adsrental.views.cron import SyncEC2View, LeadHistoryView
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
@@ -52,6 +52,8 @@ urlpatterns = [
     url(r'^sf/to_shipstation/$', SFToShipstationView.as_view(), name='sf_to_shipstation'),
     url(r'^sf/launch_raspberry_pi_instance/$', SFLaunchRaspberryPiInstance.as_view(), name='sf_launch_raspberry_pi_instance'),
     url(r'^start_reverse_tunnel/(?P<rpid>.*)/$', StartReverseTunnelView.as_view(), name='start_reverse_tunnel'),
+    url(r'^ec2_ssh/start_reverse_tunnel/(?P<rpid>.*)/$', StartReverseTunnelView.as_view(), name='ec2_ssh_start_reverse_tunnel'),
+    url(r'^ec2_ssh/get_netstat/(?P<rpid>.*)/$', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
     url(r'^cron/sync_ec2/$', SyncEC2View.as_view(), name='cron_sync_ec2'),
     url(r'^cron/lead_history/$', LeadHistoryView.as_view(), name='cron_lead_history'),
     url(r'^rpi/ec2_data/(?P<rpid>.*)/$', EC2DataView.as_view(), name='rpi_ec2_data'),
