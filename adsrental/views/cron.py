@@ -108,14 +108,14 @@ class LeadHistoryView(View):
         aggregate = request.GET.get('aggregate')
 
         if now:
-            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             for lead in leads:
                 LeadHistory.upsert_for_lead(lead)
             return JsonResponse({
                 'result': True,
             })
         if aggregate:
-            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             d = d.replace(day=1)
             for lead in leads:
@@ -124,7 +124,7 @@ class LeadHistoryView(View):
                 'result': True,
             })
         if date:
-            leads = Lead.objects.filter(status=Lead.STATUS_QUALIFIED, raspberry_pi__isnull=False).select_related('raspberry_pi')
+            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
             if force:
                 LeadHistory.objects.filter(date=d).delete()
