@@ -182,7 +182,8 @@ class LogView(View):
             if version and settings.RASPBERRY_PI_VERSION != version and StrictVersion(settings.RASPBERRY_PI_VERSION) > StrictVersion(version):
                 self.add_log(request, rpid, 'RaspberryPi image updated, updating...')
                 update_required = True
-                restart_required = True
+                if version and StrictVersion(version) < StrictVersion('1.1.2'):
+                    restart_required = True
 
             if hostname is not None and ec2_instance.is_running():
                 if ec2_instance.hostname != hostname and ec2_instance.ip_address != hostname:
