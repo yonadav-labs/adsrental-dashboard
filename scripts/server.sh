@@ -16,29 +16,4 @@ python manage.py collectstatic --noinput > /dev/null
 # python manage.py loaddata adsrental/fixtures/fixtures.json
 
 # Start Gunicorn processes
-echo Starting Gunicorn.
-gunicorn -D config.wsgi:application \
-    --bind 0.0.0.0:80 \
-    --worker-class eventlet \
-    --workers 4 \
-    --timeout 300 \
-    --graceful-timeout 300 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=/app/app_log/error_http.log \
-    --access-logfile=/app/app_log/access_http.log \
-    --reload
-gunicorn config.wsgi:application \
-    --bind 0.0.0.0:443 \
-    --certfile=/app/cert/adsrental_com.crt \
-    --keyfile=/app/cert/csr.key \
-    --ca-certs=/app/cert/adsrental_com.ca-bundle \
-    --worker-class eventlet \
-    --workers 4 \
-    --timeout 300 \
-    --graceful-timeout 300 \
-    --worker-connections 10000 \
-    --max-requests 10000 \
-    --error-logfile=/app/app_log/error.log \
-    --access-logfile=/app/app_log/access.log \
-    --reload
+/entrypoint.sh

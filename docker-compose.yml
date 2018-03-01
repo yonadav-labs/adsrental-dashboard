@@ -14,11 +14,13 @@ services:
   web:
     build: .
     command: /app/scripts/runserver.sh
+    privileged: true
     environment:
       ENV: local
       WERKZEUG_DEBUG_PIN: 'off'
       HTTPS: 'on'
       wsgi.url_scheme: 'https'
+      UWSGI_INI: /app/config/nginx/uwsgi_debug.ini
     volumes:
       - ./cert/:/app/cert/
       - ./config/:/app/config/
