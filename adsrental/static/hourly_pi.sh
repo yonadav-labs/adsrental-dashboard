@@ -2,7 +2,7 @@
 
 EC2_INSTANCE="`head -n 1 ${HOME}/hostname.conf`"
 
-if [[ "$EC2_INSTANCE" == *Error* ]]; then
+if [[ "$EC2_INSTANCE" == *html* ]]; then
     ${HOME}/new-pi/client_log.sh "Getting config"
     bash ${HOME}/new-pi/get_config.sh
 fi
