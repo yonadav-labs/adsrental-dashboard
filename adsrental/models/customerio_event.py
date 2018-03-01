@@ -22,4 +22,5 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
     lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None)
     name = models.CharField(max_length=255, choices=NAME_CHOICES)
     kwargs = models.TextField(blank=True, null=True)
+    sent = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)

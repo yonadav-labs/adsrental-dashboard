@@ -105,6 +105,7 @@ class Lead(models.Model, FulltextSearchMixin):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     company = models.CharField(max_length=20, default=COMPANY_EMPTY, choices=COMPANY_CHOICES)
     is_sync_adsdb = models.BooleanField(default=False)
+    customerio_enabled = models.BooleanField(default=True)
     photo_id = models.FileField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
     splashtop_id = models.CharField(max_length=255, blank=True, null=True)

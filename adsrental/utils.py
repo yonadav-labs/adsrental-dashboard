@@ -52,12 +52,18 @@ class CustomerIOClient(object):
             )
 
     def send_lead_event(self, lead, event, **kwargs):
+        send = True
+        if not self.client:
+            send = False
+        if not lead.customerio_enabled:
+            send = False
         CustomerIOEvent(
             lead=lead,
             name=event,
+            sent=send,
             kwargs=json.dumps(kwargs),
         ).save()
-        if self.client:
+        if send:
             self.client.track(customer_id=lead.leadid, name=event, **kwargs)
 
     def is_enabled(self):
