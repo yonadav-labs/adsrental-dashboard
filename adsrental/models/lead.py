@@ -96,7 +96,7 @@ class Lead(models.Model, FulltextSearchMixin):
     fb_secret = models.CharField(max_length=255, blank=True, null=True)
     google_email = models.CharField(max_length=255, blank=True, null=True)
     google_password = models.CharField(max_length=255, blank=True, null=True)
-    fb_friends = models.IntegerField(default=0)
+    fb_friends = models.BigIntegerField(default=0)
     fb_profile_url = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
