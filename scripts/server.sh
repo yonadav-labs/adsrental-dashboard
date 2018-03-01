@@ -15,5 +15,5 @@ python manage.py collectstatic --noinput > /dev/null
 # python manage.py migrate
 # python manage.py loaddata adsrental/fixtures/fixtures.json
 
-# Start Gunicorn processes
-/entrypoint.sh
+sysctl -w net.core.somaxconn=65535
+/usr/bin/supervisord
