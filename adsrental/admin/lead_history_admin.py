@@ -9,7 +9,7 @@ from adsrental.admin.list_filters import DateMonthListFilter
 
 class LeadHistoryAdmin(admin.ModelAdmin):
     model = LeadHistory
-    list_display = ('id', 'lead_link', 'email', 'rpid', 'date', 'active', 'checks_offline', 'checks_online', 'checks_wrong_password', )
+    list_display = ('id', 'lead_link', 'email', 'rpid', 'date', 'active', 'online', 'wrong_password', )
     raw_id_fields = ('lead', )
     list_select_related = ('lead', 'lead__raspberry_pi')
     search_fields = ('lead__email', )
@@ -34,8 +34,18 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     def active(self, obj):
         return obj.is_active()
 
+    def online(self, obj):
+        return obj.is_online()
+
+    def wrong_password(self, obj):
+        return obj.is_wrong_password()
+
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
     lead_link.allow_tags = True
 
     active.boolean = True
+
+    online.boolean = True
+
+    wrong_password.boolean = True
