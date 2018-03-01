@@ -247,10 +247,19 @@ class DateMonthListFilter(SimpleListFilter):
 
         return choices
 
+    def get_month_end(self, date):
+        if date.month == 12:
+            return date.replace(day=31)
+        return date.replace(month=date.month+1, day=1) - datetime.timedelta(days=1)
+
     def queryset(self, request, queryset):
         if self.value():
-            d = datetime.datetime.strptime(self.value(), settings.SYSTEM_DATE_FORMAT).date()
-            return queryset.filter(date=d)
+            month_start = datetime.datetime.strptime(self.value(), settings.SYSTEM_DATE_FORMAT).date()
+            month_end = self.get_month_end(month_start)
+            return queryset.filter(
+                date__gte=month_start,
+                date__lte=month_end,
+            )
 
 
 class HistoryStatusListFilter(SimpleListFilter):

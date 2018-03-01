@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import urllib
 import unicodecsv as csv
 
 from django.contrib import admin
@@ -28,6 +29,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_offline',
         'days_wrong_password',
         'amount',
+        'links',
     )
     csv_fields = (
         ('leadid', 'Lead'),
@@ -82,6 +84,18 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             lead=lead.name(),
             q=lead.leadid,
         )
+
+    def links(self, obj):
+        result = []
+        result.append('<a target="_blank" href="{url}?{query}">Timestamps</a>'.format(
+            url=reverse('admin:adsrental_leadhistory_changelist'),
+            query=urllib.urlencode(dict(
+                date=obj.date.strftime(settings.SYSTEM_DATE_FORMAT),
+                q=obj.lead.email,
+                o='-5',
+            )),
+        ))
+        return ', '.join(result)
 
     def export_as_csv(self, request, queryset):
         field_names = [i[0] for i in self.csv_fields]
@@ -161,3 +175,5 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
+
+    links.allow_tags = True
