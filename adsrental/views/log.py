@@ -130,7 +130,7 @@ class LogView(View):
             version = request.GET.get('version')
             troubleshoot = request.GET.get('troubleshoot')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
-            if not lead:
+            if not lead or not lead.is_active():
                 return self.json_response(request, rpid, {
                     'result': False,
                     'reason': 'Lead not found',
