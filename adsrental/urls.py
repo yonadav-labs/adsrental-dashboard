@@ -22,6 +22,7 @@ from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
 from adsrental.views.cron import SyncEC2View, LeadHistoryView
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
+from adsrental.views.adsdb import ADSDBUpdateLead
 
 urlpatterns = [
     url(r'^$', LandingView.as_view(), name='home'),
@@ -57,4 +58,5 @@ urlpatterns = [
     url(r'^cron/sync_ec2/$', SyncEC2View.as_view(), name='cron_sync_ec2'),
     url(r'^cron/lead_history/$', LeadHistoryView.as_view(), name='cron_lead_history'),
     url(r'^rpi/ec2_data/(?P<rpid>.*)/$', EC2DataView.as_view(), name='rpi_ec2_data'),
+    url(r'^adsdb/update_lead/$', ADSDBUpdateLead.as_view(), name='adsdb_update_lead'),
 ]
