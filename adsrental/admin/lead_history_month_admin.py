@@ -84,8 +84,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         return queryset
 
     def amount(self, obj):
-        if not obj.lead or obj.lead.is_banned():
-            return '${}'.format(round(0, 2))
         return '${}'.format(round(obj.get_amount(), 2))
 
     def lead_link(self, obj):

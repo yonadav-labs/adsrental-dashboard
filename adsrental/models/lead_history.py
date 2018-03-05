@@ -20,6 +20,10 @@ class LeadHistory(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def check_lead(self):
+        if not self.lead.is_active():
+            self.checks_offline += 1
+            return
+
         if self.lead.raspberry_pi.online():
             self.checks_online += 1
         else:
