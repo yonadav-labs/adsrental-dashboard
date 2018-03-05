@@ -18,7 +18,7 @@ class StartReverseTunnelView(View):
 
 class GetNetstatView(View):
     def get(self, request, rpid):
-        ec2_instance = EC2Instance.objects.get(rpid=rpid)
+        ec2_instance = EC2Instance.objects.get(rpid=rpid.strip())
         output = ''
         try:
             output = ec2_instance.ssh_execute('netstat -an')
