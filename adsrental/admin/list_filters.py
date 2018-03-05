@@ -108,7 +108,6 @@ class OnlineListFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('online', 'Online only'),
-            ('online_5minutes', 'Online for last 5 minutes'),
             ('offline', 'Offline only'),
             ('offline_0_2days', 'Offline for 0-2 days'),
             ('offline_3_5days', 'Offline for 3-5 days'),
@@ -123,10 +122,6 @@ class OnlineListFilter(SimpleListFilter):
         if self.value() == 'online':
             return queryset.filter(**{
                 filter_field__gte: timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
-            })
-        if self.value() == 'online_5minutes':
-            return queryset.filter(**{
-                filter_field__gte: timezone.now() - datetime.timedelta(minutes=5),
             })
         if self.value() == 'offline':
             return queryset.filter(Q(**{
