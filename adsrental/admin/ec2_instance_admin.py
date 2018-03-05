@@ -26,6 +26,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'raspberry_pi_version',
         'status',
+        'last_seen',
         'last_troubleshoot_field',
         'tunnel_up_date_field',
         'links',
@@ -79,6 +80,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def raspberry_pi_version(self, obj):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.version
+
+    def last_seen(self, obj):
+        if obj.lead is None or obj.lead.raspberry_pi is None or obj.lead.raspberry_pi.last_seen is None:
+            return None
+
+        d = obj.lead.raspberry_pi.last_seen
+        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
 
     def last_troubleshoot_field(self, obj):
         if obj.last_troubleshoot is None:
@@ -177,3 +185,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     tunnel_up_date_field.allow_tags = True
     tunnel_up_date_field.short_description = 'Tunnel up'
     tunnel_up_date_field.admin_order_field = 'tunnel_up_date'
+
+    last_seen.allow_tags = True
+    last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
