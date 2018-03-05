@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from dateutil.relativedelta import relativedelta
+import calendar
 
 from django.db import models
 
@@ -35,10 +36,10 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         for lead_history in lead_histories:
             if lead_history.checks_online and lead_history.checks_online > lead_history.checks_offline:
                 self.days_online += 1
+                if lead_history.checks_wrong_password:
+                    self.days_wrong_password += 1
             else:
                 self.days_offline += 1
-            if lead_history.checks_wrong_password:
-                self.days_wrong_password += 1
 
         self.save()
 
@@ -54,6 +55,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     def get_amount(self):
         if not self.days_online:
             return 0
+
+        days_in_month = calendar.monthrange(self.date.year, self.date.month)[1]
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
-        days_total = self.days_online + self.days_offline
-        return self.MAX_PAYMENT * days_online_valid / days_total
+        return self.MAX_PAYMENT * days_online_valid / days_in_month
