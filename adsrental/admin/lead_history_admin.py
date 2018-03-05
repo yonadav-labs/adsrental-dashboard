@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 
 from adsrental.models.lead_history import LeadHistory
-from adsrental.admin.list_filters import DateMonthListFilter
+from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter
 
 
 class LeadHistoryAdmin(admin.ModelAdmin):
@@ -15,7 +15,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     search_fields = ('lead__email', )
     list_filter = ('date', )
 
-    list_filter = (DateMonthListFilter, )
+    list_filter = (DateMonthListFilter, LeadStatusListFilter, )
 
     def lead_link(self, obj):
         lead = obj.lead

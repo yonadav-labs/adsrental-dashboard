@@ -13,7 +13,7 @@ from django.http import HttpResponse
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
-from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListFilter
+from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListFilter, LeadStatusListFilter
 
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
@@ -23,6 +23,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'lead_link',
+        # 'leadid',
+        'lead_status',
         'rpid',
         'lead_address',
         'days_online',
@@ -46,7 +48,11 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         ('amount', 'Amount'),
     )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
-    list_filter = (DateMonthListFilter, HistoryStatusListFilter, )
+    list_filter = (
+        DateMonthListFilter,
+        HistoryStatusListFilter,
+        LeadStatusListFilter,
+    )
     list_select_related = ('lead', 'lead__raspberry_pi')
     actions = (
         'export_as_csv',
@@ -60,6 +66,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def leadid(self, obj):
         return obj.lead and obj.lead.leadid
+
+    def lead_status(self, obj):
+        return obj.lead and obj.lead.status
 
     def rpid(self, obj):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.rpid
@@ -75,6 +84,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         return queryset
 
     def amount(self, obj):
+        if not obj.lead or obj.lead.is_banned():
+            return '${}'.format(round(0, 2))
         return '${}'.format(round(obj.get_amount(), 2))
 
     def lead_link(self, obj):
