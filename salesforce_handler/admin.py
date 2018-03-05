@@ -10,7 +10,7 @@ class LeadAdmin(admin.ModelAdmin):
     # list_select_related = (
     #     'raspberry_pi',
     # )
-    list_display = ('id', 'name', 'account_name', 'email_field', 'phone', 'full_address', 'tracking_number', 'online', 'tunnel_online', 'google_account', 'facebook_account', 'utm_source', 'bundler_paid', 'wrong_password', 'last_seen', )
+    list_display = ('id', 'name', 'account_name', 'email_field', 'phone', 'full_address', 'tracking_number', 'online', 'google_account', 'facebook_account', 'utm_source', 'bundler_paid', 'wrong_password', 'last_seen', )
     search_fields = ['name', 'email', 'account_name', ]
 
     def email_field(self, obj):
@@ -36,9 +36,6 @@ class LeadAdmin(admin.ModelAdmin):
     def online(self, obj):
         return obj.raspberry_pi.online if obj.raspberry_pi else False
 
-    def tunnel_online(self, obj):
-        return obj.raspberry_pi.tunnel_online if obj.raspberry_pi else False
-
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
             return None
@@ -52,12 +49,11 @@ class LeadAdmin(admin.ModelAdmin):
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
     online.boolean = True
-    tunnel_online.boolean = True
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
     model = RaspberryPi
-    list_display = ('name', 'version', 'online', 'tunnel_online', 'links', 'is_deleted', 'last_seen', )
+    list_display = ('name', 'version', 'online', 'links', 'is_deleted', 'last_seen', )
     search_fields = ['name', ]
     list_filter = ['online', ]
 

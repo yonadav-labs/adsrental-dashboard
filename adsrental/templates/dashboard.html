@@ -41,7 +41,6 @@
                 <th>Online</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__first_seen' %}">First Seen</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__last_seen' %}">Last Seen</a></th>
-                <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__tunnel_last_tested' %}">Tunnel Last Tested</a></th>
                 <th>Bundler Paid</th>
                 <th>Wrong Password</th>
                 <th>Pi delivered</th>
@@ -75,14 +74,9 @@
                     </td>
                     <td>
                         {% if entry.raspberry_pi.online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Offline{% endif %}
-                        <br />
-                        {% if entry.raspberry_pi.tunnel_online %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span> Tunnel Online{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span> Tunnel Offline{% endif %}
                     </td>
                     <td>{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
                     <td>{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
-                    <td>
-                        {{entry.raspberry_pi.get_tunnel_last_tested|naturaltime|default:"Never"}}
-                    </td>
                     <td>
                         {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
                     </td>

@@ -14,7 +14,6 @@ class RaspberryPi(models.Model):
     online_hours_ttl = 6
     online_minutes_ttl = 5
     first_tested_hours_ttl = 1
-    tunnel_online_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
     rpid = models.CharField(primary_key=True, max_length=255, unique=True)
@@ -108,12 +107,6 @@ class RaspberryPi(models.Model):
 
         return (timezone.now() - self.get_last_seen()).total_seconds() < self.online_minutes_ttl * 60
 
-    def tunnel_online(self):
-        if self.tunnel_last_tested is None:
-            return False
-
-        return (timezone.now() - self.get_tunnel_last_tested()).total_seconds() < self.tunnel_online_hours_ttl * 60 * 60
-
     def get_first_seen(self):
         if self.first_seen is None:
             return None
@@ -139,12 +132,6 @@ class RaspberryPi(models.Model):
             return None
 
         return self.last_seen
-
-    def get_tunnel_last_tested(self):
-        if self.tunnel_last_tested is None:
-            return None
-
-        return self.tunnel_last_tested
 
     def __str__(self):
         return self.rpid
