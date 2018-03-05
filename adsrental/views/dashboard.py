@@ -97,19 +97,19 @@ class DashboardView(View):
                 entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)
                 if value == 'online':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__gte=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+                        raspberry_pi__last_seen__gte=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
                     )
                 if value == 'offline':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
                     )
                 if value == 'offline_2days':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24),
+                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
                     )
                 if value == 'offline_5days':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
                     )
 
             if form.cleaned_data['wrong_password']:

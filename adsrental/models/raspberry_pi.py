@@ -12,6 +12,7 @@ from adsrental.models.raspberry_pi_session import RaspberryPiSession
 
 class RaspberryPi(models.Model):
     online_hours_ttl = 6
+    online_minutes_ttl = 5
     first_tested_hours_ttl = 1
     tunnel_online_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
@@ -105,7 +106,7 @@ class RaspberryPi(models.Model):
         if self.last_seen is None:
             return False
 
-        return (timezone.now() - self.get_last_seen()).total_seconds() < self.online_hours_ttl * 60 * 60
+        return (timezone.now() - self.get_last_seen()).total_seconds() < self.online_minutes_ttl * 60
 
     def tunnel_online(self):
         if self.tunnel_last_tested is None:

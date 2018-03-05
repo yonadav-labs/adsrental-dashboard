@@ -122,7 +122,7 @@ class OnlineListFilter(SimpleListFilter):
         filter_field__isnull = '{}__isnull'.format(self.filter_field)
         if self.value() == 'online':
             return queryset.filter(**{
-                filter_field__gte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+                filter_field__gte: timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
             })
         if self.value() == 'online_5minutes':
             return queryset.filter(**{
@@ -130,25 +130,25 @@ class OnlineListFilter(SimpleListFilter):
             })
         if self.value() == 'offline':
             return queryset.filter(Q(**{
-                filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
+                filter_field__lte: timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
             }) | Q(**{
                 filter_field__isnull: True,
             }))
         if self.value() == 'offline_0_2days':
             now = timezone.now()
             return queryset.filter(**{
-                filter_field__lte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl),
-                filter_field__gte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24),
+                filter_field__lte: now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                filter_field__gte: now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
             })
         if self.value() == 'offline_3_5days':
             now = timezone.now()
             return queryset.filter(**{
-                filter_field__lte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 2 * 24),
-                filter_field__gte: now - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+                filter_field__lte: now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
+                filter_field__gte: now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
             })
         if self.value() == 'offline_5days':
             return queryset.filter(**{
-                filter_field__lte: timezone.now() - datetime.timedelta(hours=RaspberryPi.online_hours_ttl + 5 * 24),
+                filter_field__lte: timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
             })
         if self.value() == 'never':
             return queryset.filter(**{

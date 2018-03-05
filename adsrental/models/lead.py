@@ -179,7 +179,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
     @classmethod
     def get_online_filter(cls):
-        return cls.get_timedelta_filter('raspberry_pi__last_seen__gt', hours=-RaspberryPi.online_hours_ttl)
+        return cls.get_timedelta_filter('raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
     def get_pi_sent_this_month(self):
         if not self.pi_sent:
