@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.views import View
-from django.http import JsonResponse, QueryDict
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.shortcuts import Http404
 from basicauth.decorators import basic_auth_required
@@ -13,6 +13,9 @@ from adsrental.models.lead_change import LeadChange
 class ADSDBUpdateLead(View):
     @method_decorator(basic_auth_required)
     def get(self, request):
+        if not request.user.is_superuser:
+            raise Http404
+
         data = request.GET
         lead = Lead.obejcts.filter(email=data.get('email'))
         if not lead:
@@ -23,8 +26,11 @@ class ADSDBUpdateLead(View):
         return JsonResponse(dict(result=True))
 
     @method_decorator(basic_auth_required)
-    def put(self, request):
-        data = QueryDict(request.data)
+    def post(self, request):
+        if not request.user.is_superuser:
+            raise Http404
+
+        data = request.POST
         lead = Lead.obejcts.filter(email=data.get('email'))
         if not lead:
             raise Http404
@@ -45,7 +51,7 @@ class ADSDBUpdateLead(View):
     def update_lead(self, lead, data, user):
         if 'first_name' in data:
             self.update_field(lead, 'first_name', data.get('first_name'), user)
-        if 'first_name' in data:
+        if 'last_name' in data:
             self.update_field(lead, 'last_name', data.get('last_name'), user)
         if 'fb_username' in data:
             self.update_field(lead, 'fb_email', data.get('fb_username'), user)
