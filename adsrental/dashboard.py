@@ -63,7 +63,7 @@ class CustomIndexDashboard(Dashboard):
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urllib.urlencode(dict(
                         lead_status='Active',
-                        online='online',
+                        online='online_5minutes',
                         tunnel_up='no',
                         version='latest',
                     )),

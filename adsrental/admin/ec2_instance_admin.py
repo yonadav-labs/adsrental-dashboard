@@ -115,7 +115,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 url=reverse('ec2_ssh_start_reverse_tunnel', kwargs=dict(rpid=obj.rpid)),
             ))
 
-        links.append('<a href="#" title="ssh -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
+        links.append('<a href="#" title="ssh -o StrictHostKeyChecking=no -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
             hostname=obj.hostname,
         ))
         links.append('<a target="_blank" href="http://{hostname}:13608">Web</a>'.format(
