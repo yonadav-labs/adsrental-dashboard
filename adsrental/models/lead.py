@@ -128,12 +128,20 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.is_sync_adsdb:
             url = 'https://staging.adsdb.io/api/v1/accounts/update-s'
         bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
+        api_id = 0
+        if self.facebook_account:
+            api_id = 146
+        if self.google_account:
+            api_id = 147
         data = dict(
             first_name=self.first_name,
             last_name=self.last_name,
             email=self.email,
-            fb_username=self.fb_email or self.google_email,
-            fb_password=self.fb_secret or self.google_password,
+            fb_username=self.fb_email,
+            fb_password=self.fb_secret,
+            google_username=self.google_email,
+            google_password=self.google_password,
+            api_id=api_id,
             last_seen=dateformat.format(self.raspberry_pi.last_seen, 'j E Y H:i') if self.raspberry_pi and self.raspberry_pi.last_seen else None,
             phone=self.phone,
             ec2_hostname=self.raspberry_pi.ec2_hostname if self.raspberry_pi else None,
