@@ -60,7 +60,7 @@ class LogView(View):
             ))
 
     def get(self, request):
-        rpid = request.GET.get('rpid')
+        rpid = request.GET.get('rpid', '').strip()
         if not rpid:
             return JsonResponse({'result': False, 'reason': 'RPID not found'})
 
