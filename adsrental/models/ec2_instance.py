@@ -257,7 +257,7 @@ class EC2Instance(models.Model):
             return
         boto_instance = self.get_boto_instance()
         self.update_from_boto(boto_instance)
-        if self.status != self.STATUS_RUNNING:
+        if self.status not in (self.STATUS_RUNNING, self.STATUS_PENDING):
             return False
 
         self.status = self.STATUS_STOPPING
