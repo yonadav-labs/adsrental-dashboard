@@ -16,6 +16,24 @@ class RaspberryPi(models.Model):
     :model:`adsrental.EC2Instance`, but it always can be obtained from related Lead.
 
     It is created automatically when you use *Mark as Qualified, Assign RPi, create Shipstation order* action in Lead admin.
+
+    **How to test RaspberryPi device*
+
+    It does not matter if it is inital testing or reshipment, actions are the same:
+
+    1. Use *Prepare for testing* action for this lead. On this form you can specify extra RPIDs to prepare for testing. Paste any data to textarea
+       and values like *RP<numbers>* will be prepared for testing as well. Make sure lead status is Qualified.
+    2. Download latest firmware if you do not have it: `https://s3-us-west-2.amazonaws.com/mvp-store/pi_1.0.26.zip`
+    3. Flash Firmware to SD card using Etcher `https://etcher.io/`
+    4. Download `pi.conf` file for this device by clicking *Config file* link in admin for this lead
+    5. Copy `pi.conf` to SD card root folder.If you are using MacOS/Linux you will see two partitions, use *boot* one.
+    6. Safe eject SD card to prevent dataloss.
+    7. Insert SD card to RaspberryPi device. If everything is okay, in 10 seconds RaspbeerPi green LED on device should start blinking.
+    8. Device can reboot up to 2 times (partition table fix and update to latest patch), so give it at least 3 minutes.
+    9. Check `Tested` mark in admin.
+    10. Device is ready to be shipped to the end user
+
+    If anything goes wrong, report to @Vlad in Slack.
     """
 
     online_hours_ttl = 6
