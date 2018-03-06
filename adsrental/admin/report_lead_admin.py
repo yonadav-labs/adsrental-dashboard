@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
-from adsrental.forms import AdminLeadBanForm
+from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter
@@ -202,12 +202,35 @@ class ReportLeadAdmin(admin.ModelAdmin):
             messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
 
     def prepare_for_reshipment(self, request, queryset):
-        for lead in queryset:
-            if lead.raspberry_pi:
-                lead.prepare_for_reshipment(request.user)
-                messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
-            else:
-                messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
+        if 'do_action' in request.POST:
+            form = AdminPrepareForReshipmentForm(request.POST)
+            if form.is_valid():
+                rpids = form.cleaned_data['rpids']
+                queryset = ReportProxyLead.objects.filter(raspberry_pi__rpid__in=rpids)
+                for lead in queryset:
+                    if lead.is_banned():
+                        lead.unban(request.user)
+                        messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
+                    if lead.first_tested:
+                        lead.prepare_for_reshipment(request.user)
+                        messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
+
+                    messages.success(request, 'RPID {} is ready to be tested.'.format(lead.raspberry_pi.rpid))
+                return
+        else:
+            rpids = [i.raspberry_pi.rpid for i in queryset if i.raspberry_pi]
+            form = AdminPrepareForReshipmentForm(initial=dict(
+                rpids='\n'.join(rpids),
+            ))
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'prepare_for_reshipment',
+            'title': 'Prepare for reshipment following leads',
+            'button': 'Prepare for reshipment',
+            'objects': queryset,
+            'form': form,
+        })
 
     last_touch.allow_tags = True
     raspberry_pi_link.allow_tags = True

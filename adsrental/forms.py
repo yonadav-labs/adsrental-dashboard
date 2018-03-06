@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
+import re
 
 from django import forms
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
@@ -211,3 +212,11 @@ class LandingForm(forms.Form):
 
 class AdminLeadBanForm(forms.Form):
     reason = forms.ChoiceField(choices=Lead.BAN_REASON_CHOICES)
+
+
+class AdminPrepareForReshipmentForm(forms.Form):
+    rpids = forms.CharField(widget=forms.Textarea())
+
+    def clean_rpids(self):
+        value = self.cleaned_data['rpids']
+        return re.findall('RP\d+', value)
