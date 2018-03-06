@@ -31,6 +31,8 @@ class CustomIndexDashboard(Dashboard):
             deletable=False,
             collapsible=False,
             children=[
+                [_('Admin Documentation'), '/app/admin/doc/', ],
+                [_('FAQ: Lead documentation'), '/app/admin/doc/models/adsrental.lead/', ],
                 [_('Master Report for Facebook Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
                     urllib.urlencode(dict(
@@ -102,6 +104,17 @@ class CustomIndexDashboard(Dashboard):
                         version='latest',
                     )),
                 )],
+            ]
+        ))
+        self.children.append(modules.LinkList(
+            _('Documentation'),
+            # layout='inline',
+            draggable=False,
+            deletable=False,
+            collapsible=False,
+            children=[
+                [_('Admin Documentation'), '/app/admin/doc/', ],
+                [_('FAQ: Lead documentation'), '/app/admin/doc/models/adsrental.lead/', ],
             ]
         ))
 
