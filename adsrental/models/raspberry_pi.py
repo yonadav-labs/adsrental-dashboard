@@ -11,6 +11,13 @@ from adsrental.models.raspberry_pi_session import RaspberryPiSession
 
 
 class RaspberryPi(models.Model):
+    """
+    Stores a single RaspberryPi device entry, related to :model:`adsrental.Lead`. It does not have direct connection to
+    :model:`adsrental.EC2Instance`, but it always can be obtained from related Lead.
+
+    It is created automatically when you use *Mark as Qualified, Assign RPi, create Shipstation order* action in Lead admin.
+    """
+
     online_hours_ttl = 6
     online_minutes_ttl = 5
     first_tested_hours_ttl = 1

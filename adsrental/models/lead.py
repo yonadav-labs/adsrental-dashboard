@@ -22,7 +22,7 @@ class Lead(models.Model, FulltextSearchMixin):
     Stores a single lead entry, related to :model:`adsrental.RaspberryPi` and
     :model:`adsrental.EC2Instance`.
 
-    It is created with status *Available*
+    It is created with status *Available*.
 
     **How to make lead qualified**
 

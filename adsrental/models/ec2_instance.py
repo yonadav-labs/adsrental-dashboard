@@ -13,6 +13,46 @@ from adsrental.utils import BotoResource
 
 
 class EC2Instance(models.Model):
+    """
+    Stores a single EC2 Instance entry, related to :model:`adsrental.Lead`. It does not have direct connection to
+    :model:`adsrental.RaspberryPi`, but it always can be obtained from related Lead.
+
+    It is created automatically when you use *Mark as Qualified, Assign RPi, create Shipstation order* action in Lead admin.
+
+    **How to use EC2 RDP**
+
+    You can connect to EC2 Instance using RDP. EC2 has Antidetect browser, that you can launch from desktop *Browser.exe*
+
+    To connect to RDP:
+
+    1. click on *RDP* link in *Links* column. In downloads you see file *RP<numbers>.rdp*.
+    2. Open this file by double-click with your favorite RDP manager.
+    3. Use *Browser.exe* for Antidetect or *Firefox* for browsing
+    3. You should be able to connect. If you cannot - read the following troubleshooting guide.
+
+    **I cannot connect to RDP**
+
+    Looks like EC2 is stopped, not responding, or you are using old *RP<number>.rdp* file
+
+    1. Download new *RP<number>.rdp* file by clicking *RDP* link
+    2. If you still cannot connect check if EC2 status is running. If it is not - report to me. Probably lead is banned.
+    3. If statu is Running, but you still cannot connect - use *Stop* admin action for this EC2. It will start on next ping for RaspberryPi.
+
+    **I get Proxy Error while trying to connect to internet**
+
+    There could be several reasons, but short explanation is - reverse tunnel is down.
+
+    What to do:
+
+    1. Check if RPi online is green. If it is not - device is turned off, so proxy does not work. Ask user to check his device and if green LED is blinking.
+    2. Check Tunnel up column. If it is *Yes* then just wait. RaspberryPi device tries to revive tunnel every 10 minutes and it works in 95% of cases.
+    3. If you waited longer than 10 minutes and tunnel is still down, choose *Stop* action for this EC2. Tunnel should be up once EC2 restarts. Takes 1-10 minutes.
+
+    **I see black window when I connect to EC2**
+
+    Close it. Newest RaspberryPi devices do not use this ruby webservice anymore.
+    """
+
     class Meta:
         verbose_name = 'EC2 Instance'
         verbose_name_plural = 'EC2 Instances'
