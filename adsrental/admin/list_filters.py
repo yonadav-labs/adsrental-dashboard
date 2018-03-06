@@ -65,8 +65,8 @@ class TouchCountListFilter(SimpleListFilter):
 
 
 class RaspberryPiFirstTestedListFilter(SimpleListFilter):
-    title = 'Shipped Date'
-    parameter_name = 'shipped_date'
+    title = 'Delivered Date'
+    parameter_name = 'delivered_date'
 
     def lookups(self, request, model_admin):
         return (
@@ -74,7 +74,7 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
             ('previous_week',  'Previous week'),
             ('this_month',  'This month'),
             ('previous_month',  'Previous month'),
-            ('not_shipped',  'Not yet'),
+            ('not',  'Not yet'),
         )
 
     def queryset(self, request, queryset):
@@ -96,7 +96,7 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
             end_date = now.replace(day=1, hour=0, minute=0, second=0)
             start_date = (end_date - datetime.timedelta(hours=1)).replace(day=1, hour=0, minute=0, second=0)
             return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
-        if self.value() == 'not_shipped':
+        if self.value() == 'not':
             return queryset.filter(raspberry_pi__first_tested__isnull=True)
 
 
@@ -160,8 +160,8 @@ class LeadRaspberryPiOnlineListFilter(OnlineListFilter):
 
 
 class ShipDateListFilter(SimpleListFilter):
-    title = 'Ship date'
-    parameter_name = 'ship_date'
+    title = 'Shipped date'
+    parameter_name = 'shipped_date'
 
     def lookups(self, request, model_admin):
         now = timezone.now()
