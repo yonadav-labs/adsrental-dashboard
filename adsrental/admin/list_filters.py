@@ -159,6 +159,70 @@ class LeadRaspberryPiOnlineListFilter(OnlineListFilter):
     filter_field = 'lead__raspberry_pi__last_seen'
 
 
+class ShipDateListFilter(SimpleListFilter):
+    title = 'Ship date'
+    parameter_name = 'ship_date'
+
+    def lookups(self, request, model_admin):
+        now = timezone.now()
+        current_week_start = now - datetime.timedelta(days=now.weekday())
+        prev_week_end = current_week_start - datetime.timedelta(days=1)
+        prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+        current_month_start = now - datetime.timedelta(days=now.day - 1)
+        prev_month_end = current_month_start - datetime.timedelta(days=1)
+        prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
+        return (
+            ('current_week', 'Current week ({} - {})'.format(
+                current_week_start.strftime(settings.HUMAN_DATE_FORMAT),
+                now.strftime(settings.HUMAN_DATE_FORMAT),
+            )),
+            ('previus_week', 'Previous week ({} - {})'.format(
+                prev_week_start.strftime(settings.HUMAN_DATE_FORMAT),
+                prev_week_end.strftime(settings.HUMAN_DATE_FORMAT),
+            )),
+            ('current_month', 'Current month ({} - {})'.format(
+                current_month_start.strftime(settings.HUMAN_DATE_FORMAT),
+                now.strftime(settings.HUMAN_DATE_FORMAT),
+            )),
+            ('previus_month', 'Previous month ({} - {})'.format(
+                prev_month_start.strftime(settings.HUMAN_DATE_FORMAT),
+                prev_month_end.strftime(settings.HUMAN_DATE_FORMAT),
+            )),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'current_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            return queryset.filter(
+                ship_date__gte=current_week_start.date(),
+            )
+        if self.value() == 'previous_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            prev_week_end = current_week_start - datetime.timedelta(days=1)
+            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+            return queryset.filter(
+                ship_date__gte=prev_week_start.date(),
+                ship_date__lte=prev_week_end.date(),
+            )
+        if self.value() == 'current_month':
+            now = timezone.now()
+            current_month_start = now - datetime.timedelta(days=now.day - 1)
+            return queryset.filter(
+                ship_date__gte=current_month_start.date(),
+            )
+        if self.value() == 'previous_week':
+            now = timezone.now()
+            current_month_start = now - datetime.timedelta(days=now.day - 1)
+            prev_month_end = current_month_start - datetime.timedelta(days=1)
+            prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
+            return queryset.filter(
+                ship_date__gte=prev_month_start.date(),
+                ship_date__lte=prev_month_end.date(),
+            )
+
+
 class AccountTypeListFilter(SimpleListFilter):
     title = 'Account type'
     parameter_name = 'account_type'

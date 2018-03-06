@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import base64
+import datetime
 
 import requests
 from xml.etree import ElementTree
@@ -89,6 +90,7 @@ class Lead(models.Model, FulltextSearchMixin):
     billed = models.BooleanField(default=False)
     tested = models.BooleanField(default=False)
     last_touch_date = models.DateTimeField(blank=True, null=True)
+    ship_date = models.DateField(blank=True, null=True)
     touch_count = models.IntegerField(default=0)
     facebook_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
@@ -327,6 +329,11 @@ class Lead(models.Model, FulltextSearchMixin):
                 auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
             ).json().get('shipments')
             data = data[0] if data else {}
+
+        if data and data.get('shipDate'):
+            self.ship_date = datetime.datetime.strptime(data.get('shipDate'), '%Y-%m-%d').date()
+            self.save()
+
         if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_SHIPPED, tracking_code=self.usps_tracking_code)
