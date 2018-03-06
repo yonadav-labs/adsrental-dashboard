@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^', include('adsrental.urls')),
     url(r'^app/admin/', admin.site.urls),
     url(r'^app/', include('adsrental.urls')),
-    url(r'^app/admin/doc/', include('django.contrib.admindocs.urls')) 
+    url(r'^app/admin/doc/', include('django.contrib.admindocs.urls')),
 ]
 
 handler404 = Error404View.as_view()  # noqa: F811
