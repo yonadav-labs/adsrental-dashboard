@@ -325,7 +325,7 @@ class Lead(models.Model, FulltextSearchMixin):
             data = requests.get(
                 'https://ssapi.shipstation.com/shipments',
                 # params={'shipDateStart': '2017-12-30'},
-                params={'orderNumber': self.account_name},
+                params={'orderNumber': self.shipstation_order_number},
                 auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
             ).json().get('shipments')
             data = data[0] if data else {}
