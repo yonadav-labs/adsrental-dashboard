@@ -73,7 +73,7 @@ class LeadAdmin(admin.ModelAdmin):
         'unban',
         'report_wrong_password',
         'report_correct_password',
-        'prepare_for_reshipment',
+        'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
         'sync_to_adsdb',
@@ -265,7 +265,7 @@ class LeadAdmin(admin.ModelAdmin):
             'form': form,
         })
 
-    def prepare_for_reshipment(self, request, queryset):
+    def prepare_for_testing(self, request, queryset):
         if 'do_action' in request.POST:
             form = AdminPrepareForReshipmentForm(request.POST)
             if form.is_valid():
@@ -289,7 +289,7 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'prepare_for_reshipment',
+            'action_name': 'prepare_for_testing',
             'title': 'Prepare for reshipment following leads',
             'button': 'Prepare for reshipment',
             'objects': queryset,

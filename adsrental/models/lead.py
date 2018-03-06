@@ -18,6 +18,71 @@ from adsrental.utils import CustomerIOClient, ShipStationClient
 
 
 class Lead(models.Model, FulltextSearchMixin):
+    """
+    Stores a single lead entry, related to :model:`adsrental.RaspberryPi` and
+    :model:`adsrental.EC2Instance`.
+
+    It is created with status *Available*
+
+    **How to make lead qualified**
+
+    To change status to qualified, use *Mark as Qualified, Assign RPi, create Shipstation order* admin action.
+    This sets status to Qualified, assigns :model:`adsrental.EC2Instance` and :model:`adsrental.EC2Instance` if they are not assigned yet.
+    Action does nothing to banned leads.
+
+    **How to ban lead**
+
+    Banned lead does not get payments for beign online and logs from his device are no longer processed.
+
+    To ban lead use *Ban* admin action.
+    This action also stops corresponding :model:`adsrental.EC2Instance`.
+
+    **How to unban lead**
+
+    If you unban a lead, it will receive payments fo being online, get RPi firmware updates and process pings for his :model:`adsrental.EC2Instance`.
+
+    To unban lead use *Unban* admin action.
+    This action also starts corresponding :model:`adsrental.EC2Instance`.
+
+    **How to check lead status changes**
+
+    Click on lead status. You can see all changes done by backend and admin users for this lead.
+
+    **How to prepare lead for testing**
+
+    Preparation unbans lead if it was banned and resets `first_seen`, `first_tested` and `last_seen` fields, so `Tested` check becomes
+    red until backend gets first ping for lead's device.
+
+    To prepare lead for testing use *Prepare for testing* admin action.
+
+    **How to use EC2 RDP for this lead**
+
+    You can connect to corresponding :model:`adsrental.EC2Instance` using RDP. EC2 has Antidetect browser, that you can launch from desktop `Browser.exe`
+
+    To connect to RDP:
+
+    1. click on `RDP` link in *Raspberry Pi* column. In downloads you see file *RP<numbers>.rdp*.
+    2. Open this file by double-click with your favorite RDP manager.
+
+    **How to test RaspberryPi device for lead**
+
+    It does not matter if it is inital testing or reshipment, actions are the same:
+
+    1. Use *Prepare for testing* action for this lead. On this form you can specify extra RPIDs to prepare for testing. Paste any data to textarea
+       and values like `RP<numbers>` will be prepared for testing as well. Make sure lead status is Qualified.
+    2. Download latest firmware if you do not have it ([pi_1.0.26.zip](`https://s3-us-west-2.amazonaws.com/mvp-store/pi_1.0.26.zip`))
+    3. Flash Firmware to SD card using [Etcher](https://etcher.io/)
+    4. Download `pi.conf` file for this device by clicking *Config file* link in admin for this lead
+    5. Copy `pi.conf` to SD card root folder.If you are using MacOS/Linux you will see two partitions, use `boot` one.
+    6. Safe eject SD card to prevent dataloss.
+    7. Insert SD card to RaspberryPi device. If everything is okay, in 10 seconds RaspbeerPigreen LED on device should start blinking.
+    8. Device can reboot up to 2 times (partition table fix and update to latest patch), so give it at least 3 minutes.
+    9. Check `Tested` mark in admin.
+    10. Device is ready to be shipped to the end user
+
+    If anything goes wrong, report to @Vlad in Slack.
+    """
+
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
     STATUS_AVAILABLE = 'Available'
