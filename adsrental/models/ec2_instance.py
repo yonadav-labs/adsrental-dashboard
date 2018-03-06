@@ -28,7 +28,7 @@ class EC2Instance(models.Model):
     1. click on *RDP* link in *Links* column. In downloads you see file *RP<numbers>.rdp*.
     2. Open this file by double-click with your favorite RDP manager.
     3. Use *Browser.exe* for Antidetect or *Firefox* for browsing
-    3. You should be able to connect. If you cannot - read the following troubleshooting guide.
+    4. You should be able to connect. If you cannot - read the following troubleshooting guide.
 
     **I cannot connect to RDP**
 

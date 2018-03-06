@@ -31,8 +31,6 @@ class CustomIndexDashboard(Dashboard):
             deletable=False,
             collapsible=False,
             children=[
-                [_('Admin Documentation'), '/app/admin/doc/', ],
-                [_('FAQ: Lead documentation'), '/app/admin/doc/models/adsrental.lead/', ],
                 [_('Master Report for Facebook Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
                     urllib.urlencode(dict(
@@ -115,6 +113,8 @@ class CustomIndexDashboard(Dashboard):
             children=[
                 [_('Admin Documentation'), '/app/admin/doc/', ],
                 [_('FAQ: Lead documentation'), '/app/admin/doc/models/adsrental.lead/', ],
+                [_('FAQ: RaspberryPi documentation'), '/app/admin/doc/models/adsrental.raspberrypi/', ],
+                [_('FAQ: EC2 Instance documentation'), '/app/admin/doc/models/adsrental.ec2instance/', ],
             ]
         ))
 

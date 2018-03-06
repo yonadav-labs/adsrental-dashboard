@@ -17,7 +17,7 @@ class RaspberryPi(models.Model):
 
     It is created automatically when you use *Mark as Qualified, Assign RPi, create Shipstation order* action in Lead admin.
 
-    **How to test RaspberryPi device*
+    **How to test RaspberryPi device**
 
     It does not matter if it is inital testing or reshipment, actions are the same:
 
