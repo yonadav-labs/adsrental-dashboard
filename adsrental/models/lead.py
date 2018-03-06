@@ -50,18 +50,18 @@ class Lead(models.Model, FulltextSearchMixin):
 
     **How to prepare lead for testing**
 
-    Preparation unbans lead if it was banned and resets `first_seen`, `first_tested` and `last_seen` fields, so `Tested` check becomes
+    Preparation unbans lead if it was banned and resets *first_seen*, *first_tested* and *last_seen* fields, so `Tested` check becomes
     red until backend gets first ping for lead's device.
 
     To prepare lead for testing use *Prepare for testing* admin action.
 
     **How to use EC2 RDP for this lead**
 
-    You can connect to corresponding :model:`adsrental.EC2Instance` using RDP. EC2 has Antidetect browser, that you can launch from desktop `Browser.exe`
+    You can connect to corresponding :model:`adsrental.EC2Instance` using RDP. EC2 has Antidetect browser, that you can launch from desktop *Browser.exe*
 
     To connect to RDP:
 
-    1. click on `RDP` link in *Raspberry Pi* column. In downloads you see file *RP<numbers>.rdp*.
+    1. click on *RDP* link in *Raspberry Pi* column. In downloads you see file *RP<numbers>.rdp*.
     2. Open this file by double-click with your favorite RDP manager.
 
     **How to test RaspberryPi device for lead**
@@ -69,13 +69,13 @@ class Lead(models.Model, FulltextSearchMixin):
     It does not matter if it is inital testing or reshipment, actions are the same:
 
     1. Use *Prepare for testing* action for this lead. On this form you can specify extra RPIDs to prepare for testing. Paste any data to textarea
-       and values like `RP<numbers>` will be prepared for testing as well. Make sure lead status is Qualified.
-    2. Download latest firmware if you do not have it ([pi_1.0.26.zip](`https://s3-us-west-2.amazonaws.com/mvp-store/pi_1.0.26.zip`))
-    3. Flash Firmware to SD card using [Etcher](https://etcher.io/)
+       and values like *RP<numbers>* will be prepared for testing as well. Make sure lead status is Qualified.
+    2. Download latest firmware if you do not have it: `https://s3-us-west-2.amazonaws.com/mvp-store/pi_1.0.26.zip`
+    3. Flash Firmware to SD card using Etcher `https://etcher.io/`
     4. Download `pi.conf` file for this device by clicking *Config file* link in admin for this lead
-    5. Copy `pi.conf` to SD card root folder.If you are using MacOS/Linux you will see two partitions, use `boot` one.
+    5. Copy `pi.conf` to SD card root folder.If you are using MacOS/Linux you will see two partitions, use *boot* one.
     6. Safe eject SD card to prevent dataloss.
-    7. Insert SD card to RaspberryPi device. If everything is okay, in 10 seconds RaspbeerPigreen LED on device should start blinking.
+    7. Insert SD card to RaspberryPi device. If everything is okay, in 10 seconds RaspbeerPi green LED on device should start blinking.
     8. Device can reboot up to 2 times (partition table fix and update to latest patch), so give it at least 3 minutes.
     9. Check `Tested` mark in admin.
     10. Device is ready to be shipped to the end user
