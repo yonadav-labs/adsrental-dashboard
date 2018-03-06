@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 from admin_tools.dashboard import modules, Dashboard, AppIndexDashboard
 
@@ -17,6 +18,12 @@ class CustomIndexDashboard(Dashboard):
     """
     def init_with_context(self, context):
         # append a link list module for "quick links"
+        now = timezone.now()
+        current_week_start = now - datetime.timedelta(days=now.weekday())
+        prev_week_end = current_week_start - datetime.timedelta(days=1)
+        prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+        current_month_start = now - datetime.timedelta(days=now.day - 1)
+
         self.children.append(modules.LinkList(
             _('Reports'),
             # layout='inline',
@@ -57,6 +64,33 @@ class CustomIndexDashboard(Dashboard):
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urllib.urlencode(dict(
                         date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
+                    )),
+                )],
+                [_('Devices shipped this week ({} - {})'.format(
+                    current_week_start.strftime(settings.HUMAN_DATE_FORMAT),
+                    now.strftime(settings.HUMAN_DATE_FORMAT),
+                )), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urllib.urlencode(dict(
+                        shipped_date='current_week',
+                    )),
+                )],
+                [_('Devices shipped previous week ({} - {})'.format(
+                    prev_week_start.strftime(settings.HUMAN_DATE_FORMAT),
+                    prev_week_end.strftime(settings.HUMAN_DATE_FORMAT),
+                )), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urllib.urlencode(dict(
+                        shipped_date='previous_week',
+                    )),
+                )],
+                [_('Devices shipped this month ({} - {})'.format(
+                    current_month_start.strftime(settings.HUMAN_DATE_FORMAT),
+                    now.strftime(settings.HUMAN_DATE_FORMAT),
+                )), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urllib.urlencode(dict(
+                        shipped_date='current_month',
                     )),
                 )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(

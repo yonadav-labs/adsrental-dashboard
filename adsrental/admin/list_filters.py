@@ -164,30 +164,11 @@ class ShipDateListFilter(SimpleListFilter):
     parameter_name = 'shipped_date'
 
     def lookups(self, request, model_admin):
-        now = timezone.now()
-        current_week_start = now - datetime.timedelta(days=now.weekday())
-        prev_week_end = current_week_start - datetime.timedelta(days=1)
-        prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
-        current_month_start = now - datetime.timedelta(days=now.day - 1)
-        prev_month_end = current_month_start - datetime.timedelta(days=1)
-        prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
         return (
-            ('current_week', 'Current week ({} - {})'.format(
-                current_week_start.strftime(settings.HUMAN_DATE_FORMAT),
-                now.strftime(settings.HUMAN_DATE_FORMAT),
-            )),
-            ('previus_week', 'Previous week ({} - {})'.format(
-                prev_week_start.strftime(settings.HUMAN_DATE_FORMAT),
-                prev_week_end.strftime(settings.HUMAN_DATE_FORMAT),
-            )),
-            ('current_month', 'Current month ({} - {})'.format(
-                current_month_start.strftime(settings.HUMAN_DATE_FORMAT),
-                now.strftime(settings.HUMAN_DATE_FORMAT),
-            )),
-            ('previus_month', 'Previous month ({} - {})'.format(
-                prev_month_start.strftime(settings.HUMAN_DATE_FORMAT),
-                prev_month_end.strftime(settings.HUMAN_DATE_FORMAT),
-            )),
+            ('current_week', 'Current week', ),
+            ('previus_week', 'Previous week', ),
+            ('current_month', 'Current month', ),
+            ('previus_month', 'Previous month', ),
         )
 
     def queryset(self, request, queryset):
