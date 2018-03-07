@@ -36,6 +36,7 @@ class LeadAdmin(admin.ModelAdmin):
         'last_touch',
         'first_seen',
         'last_seen',
+        'usps_tracking_code',
         'online',
         'wrong_password_date_field',
         'pi_delivered',
