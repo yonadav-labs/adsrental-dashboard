@@ -310,8 +310,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def sync_to_adsdb(self, request, queryset):
         for lead in queryset:
-            if lead.sync_to_adsdb():
-                messages.info(request, 'Lead {} is synced.'.format(lead.email))
+            result = lead.sync_to_adsdb()
+            if result:
+                messages.info(request, 'Lead {} is synced: {}'.format(lead.email, result))
             else:
                 messages.warning(request, 'Lead {} does not meet conditions to sync.'.format(lead.email))
 
