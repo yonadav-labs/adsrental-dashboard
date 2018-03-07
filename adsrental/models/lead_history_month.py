@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from dateutil.relativedelta import relativedelta
 import calendar
+import datetime
 
+from django.utils import timezone
 from django.db import models
 
 from adsrental.models.lead_history import LeadHistory
@@ -15,6 +17,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         verbose_name_plural = 'Lead Histories Month'
 
     MAX_PAYMENT = 25.
+    NEW_MAX_PAYMENT = 15.
+    NEW_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
 
     lead = models.ForeignKey('adsrental.Lead')
     date = models.DateField(db_index=True)
@@ -52,10 +56,19 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         return cls(lead=lead, date=date_month)
 
+    def get_max_payment(self):
+        if not self.lead.raspberry_pi or not self.lead.raspberry_pi.first_seen:
+            return 0.
+        if self.lead.raspberry_pi.first_seen > self.NEW_MAX_PAYMENT_DATE:
+            return self.NEW_MAX_PAYMENT
+
+        return self.MAX_PAYMENT
+
     def get_amount(self):
         if not self.days_online:
             return 0
 
         days_in_month = calendar.monthrange(self.date.year, self.date.month)[1]
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
-        return self.MAX_PAYMENT * days_online_valid / days_in_month
+        max_payment = self.get_max_payment()
+        return max_payment * days_online_valid / days_in_month

@@ -77,26 +77,29 @@ class EC2Instance(models.Model):
     )
     STATUSES_ACTIVE = [STATUS_RUNNING, STATUS_STOPPED, STATUS_PENDING, STATUS_STOPPING]
 
-    instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    email = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    lead = models.OneToOneField('adsrental.Lead', blank=True, null=True)
-    hostname = models.CharField(max_length=255, blank=True, null=True)
-    ip_address = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING)
-    is_duplicate = models.BooleanField(default=False)
-    tunnel_up = models.BooleanField(default=False)
-    tunnel_up_date = models.DateTimeField(default=timezone.now)
-    ssh_up = models.BooleanField(default=False)
-    password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD)
-    last_synced = models.DateTimeField(default=timezone.now)
-    last_troubleshoot = models.DateTimeField(default=timezone.now)
-    version = models.CharField(max_length=255, default='2.4.6')
+    instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
+    rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='RPID that was inserted to EC2 metadata')
+    email = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Lead email')
+    lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead')
+    hostname = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 hostname. Updates everytime EC2 restarts. RPi use it to create tunnels.')
+    ip_address = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 IP. Updates everytime EC2 restarts.')
+    status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING, help_text='Status of EC2, same as in AWS UI')
+    is_duplicate = models.BooleanField(default=False, help_text='Obsolete field')
+    tunnel_up = models.BooleanField(default=False, help_text='Obsolete field')
+    tunnel_up_date = models.DateTimeField(default=timezone.now, help_text='Last time both tunnel and reverse tunnels were online. Chcecked every 10 minutes.')
+    ssh_up = models.BooleanField(default=False, help_text='Obsolete field')
+    password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD, help_text='Password for RDP session')
+    last_synced = models.DateTimeField(default=timezone.now, help_text='Last time when instance state was synced back from AWS')
+    last_troubleshoot = models.DateTimeField(default=timezone.now, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
+    version = models.CharField(max_length=255, default='2.4.6', help_text='AWS EC2 Firmware version')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     @classmethod
     def launch_for_lead(cls, lead):
+        '''
+        Launch EC2, set tags if it does not exist. If it exists - make sure it is Running.
+        '''
         if not settings.MANAGE_EC2:
             return False
 
@@ -130,6 +133,11 @@ class EC2Instance(models.Model):
         return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
     def get_boto_instance(self, boto_resource=None):
+        '''
+        Get dict with data from AWS about current instance.
+
+        *boto_instance* - if provided, use provided data instead of getting it from AWS.
+        '''
         if not boto_resource:
             boto_resource = BotoResource().get_resource('ec2')
         instances = boto_resource.instances.filter(
@@ -144,21 +152,38 @@ class EC2Instance(models.Model):
             return instance
 
     def is_active(self):
+        '''
+        Check if instance status is not *Stopped* or *Terminated*
+        '''
         return self.status in self.STATUSES_ACTIVE
 
     def is_running(self):
+        '''
+        Check if instance status is *Running*
+        '''
         return self.status == self.STATUS_RUNNING
 
     def is_stopped(self):
+        '''
+        Check if instance status is *Stopped*
+        '''
         return self.status == self.STATUS_STOPPED
 
     def is_tunnel_up(self):
+        '''
+        Check if tunnels were reported as UP in last 20 minutes.
+        '''
         if not self.tunnel_up_date:
             return False
         now = timezone.now()
         return self.tunnel_up_date > now - datetime.timedelta(seconds=self.TUNNEL_UP_TTL_SECONDS)
 
     def update_from_boto(self, boto_instance=None):
+        '''
+        Update tags and state from AWS.
+
+        *boto_instance* - if provided, use provided data instead of getting it from AWS.
+        '''
         if not boto_instance:
             boto_instance = self.get_boto_instance()
         if not boto_instance:
@@ -201,6 +226,9 @@ class EC2Instance(models.Model):
         return '{} ({})'.format(self.instance_id, self.status)
 
     def get_ssh(self):
+        '''
+        Create SSH connection to EC2
+        '''
         private_key = paramiko.RSAKey.from_private_key_file(settings.FARMBOT_KEY)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -208,6 +236,9 @@ class EC2Instance(models.Model):
         return ssh
 
     def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
+        '''
+        Safe execute SSH command on EC2 and get output.
+        '''
         if not ssh:
             try:
                 ssh = self.get_ssh()
@@ -231,6 +262,9 @@ class EC2Instance(models.Model):
 
     @staticmethod
     def get_tag(boto_instance, key):
+        '''
+        Get AWS EC2 instance tag value.
+        '''
         if not boto_instance.tags:
             return None
 
@@ -242,6 +276,9 @@ class EC2Instance(models.Model):
 
     @classmethod
     def upsert_from_boto(cls, boto_instance, instance=None):
+        '''
+        Create or update instance from AWS using *instance_id* as a key.
+        '''
         if not instance:
             instance = cls.objects.filter(instance_id=boto_instance.id).first()
         if not instance:
@@ -252,6 +289,9 @@ class EC2Instance(models.Model):
         return instance.update_from_boto(boto_instance)
 
     def terminate(self):
+        '''
+        Terminate instance. Terminated instance can stay up for 24 hours in AWS.
+        '''
         boto_instance = self.get_boto_instance()
         if not boto_instance:
             self.mark_as_missing()
@@ -264,6 +304,11 @@ class EC2Instance(models.Model):
         return True
 
     def start(self, blocking=False):
+        '''
+        Start stopped EC2 instance.
+
+        *blocking* - waits until instance enters *Running* state.
+        '''
         if not settings.MANAGE_EC2:
             return
         boto_instance = self.get_boto_instance()
@@ -286,6 +331,7 @@ class EC2Instance(models.Model):
         return True
 
     def restart(self):
+        'Restart instance. DO not use, as it can take up to 10 minutes.'
         if not settings.MANAGE_EC2:
             return
         self.stop(blocking=True)
@@ -293,6 +339,11 @@ class EC2Instance(models.Model):
         return True
 
     def stop(self, blocking=False):
+        '''
+        Stop running or pending EC2 instance.
+
+        *blocking* - waits until instance enters *Stopped* state.
+        '''
         if not settings.MANAGE_EC2:
             return
         boto_instance = self.get_boto_instance()
@@ -317,11 +368,13 @@ class EC2Instance(models.Model):
         return True
 
     def mark_as_missing(self):
+        'Mark instance that not present in AWS.'
         self.status = self.STATUS_MISSING
         self.tunnel_up = False
         self.save()
 
     def troubleshoot(self):
+        'Run all troubleshoot at once.'
         self.last_troubleshoot = timezone.now()
         boto_instance = self.get_boto_instance()
         if not boto_instance:
@@ -342,6 +395,7 @@ class EC2Instance(models.Model):
         return True
 
     def troubleshoot_status(self):
+        'Check and fix if instance is running for active lead and stopped for banned lead'
         if self.status == self.STATUS_RUNNING:
             if not self.lead.is_active():
                 # self.stop()
@@ -352,6 +406,7 @@ class EC2Instance(models.Model):
                 return
 
     def troubleshoot_proxy(self):
+        'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'
         cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
         output = self.ssh_execute(cmd_to_execute)
         if '0x1' in output:
@@ -367,6 +422,7 @@ class EC2Instance(models.Model):
         ssh.close()
 
     def troubleshoot_old_pi_version(self):
+        'Force update old version that do no support firmware update.'
         if not self.lead or not self.lead.raspberry_pi:
             return
 
@@ -381,6 +437,7 @@ class EC2Instance(models.Model):
             raspberry_pi.save()
 
     def change_password(self):
+        'Obsolete method. Was used to update all old non-human-friendly passwords.'
         if self.password == settings.EC2_ADMIN_PASSWORD:
             return
         try:
@@ -392,6 +449,7 @@ class EC2Instance(models.Model):
         self.save()
 
     def set_ec2_tags(self):
+        'Update RPID and email in EC2 metadata on AWS.'
         tags = []
         if self.is_duplicate:
             tags.append({'Key': 'Duplicate', 'Value': 'true'})

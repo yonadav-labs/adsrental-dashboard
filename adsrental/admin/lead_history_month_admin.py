@@ -30,6 +30,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_online',
         'days_offline',
         'days_wrong_password',
+        'max_payment',
         'amount',
         'links',
     )
@@ -82,6 +83,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             queryset = queryset.filter(date=datetime.date.today().replace(day=1))
 
         return queryset
+
+    def max_payment(self, obj):
+        return '${}'.format(round(obj.get_max_payment(), 2))
 
     def amount(self, obj):
         return '${}'.format(round(obj.get_amount(), 2))
