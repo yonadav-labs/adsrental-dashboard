@@ -16,7 +16,7 @@ class PiConfigView(View):
             raise Http404
 
         if not lead.is_ready_for_testing():
-            messages.error(request, 'RPID {} is not ready for testing yet. Select it and use "Prepare for testing" action.'.format(rpid))
+            messages.error(request, 'RPID {} is not ready for testing yet. Select it and use "Prepare for testing" action then download config file again.'.format(rpid))
             return HttpResponseRedirect(back)
 
         content = rpid
