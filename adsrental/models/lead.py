@@ -156,6 +156,7 @@ class Lead(models.Model, FulltextSearchMixin):
     tested = models.BooleanField(default=False)
     last_touch_date = models.DateTimeField(blank=True, null=True)
     ship_date = models.DateField(blank=True, null=True)
+    qualified_date = models.DateTimeField(blank=True, null=True)
     touch_count = models.IntegerField(default=0)
     facebook_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
     google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
@@ -317,7 +318,10 @@ class Lead(models.Model, FulltextSearchMixin):
         self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
 
     def qualify(self, edited_by):
-        self.set_status(Lead.STATUS_QUALIFIED, edited_by)
+        result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
+        if result:
+            self.qualified_date = timezone.now()
+            self.save()
 
     def assign_raspberry_pi(self):
         if not self.raspberry_pi:
