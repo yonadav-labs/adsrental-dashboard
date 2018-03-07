@@ -72,7 +72,7 @@ class Lead(models.Model, FulltextSearchMixin):
        and values like *RP<numbers>* will be prepared for testing as well. Make sure lead status is Qualified.
     2. Download latest firmware if you do not have it: `https://s3-us-west-2.amazonaws.com/mvp-store/pi_1.0.26.zip`
     3. Flash Firmware to SD card using Etcher `https://etcher.io/`
-    4. Download `pi.conf` file for this device by clicking *Config file* link in admin for this lead
+    4. Download `pi.conf` file for this device by clicking *pi.conf* link in admin for this lead
     5. Copy `pi.conf` to SD card root folder.If you are using MacOS/Linux you will see two partitions, use *boot* one.
     6. Safe eject SD card to prevent dataloss.
     7. Insert SD card to RaspberryPi device. If everything is okay, in 10 seconds RaspbeerPi green LED on device should start blinking.

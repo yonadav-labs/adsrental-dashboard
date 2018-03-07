@@ -3,6 +3,10 @@
     font-size: 11px;
 }
 
+#changelist table tbody th {
+    white-space: nowrap;
+}
+
 #changelist table tbody td {
     padding: 8px 3px;
     font-size: 11px;

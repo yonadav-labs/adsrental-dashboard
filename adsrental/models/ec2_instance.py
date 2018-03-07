@@ -218,6 +218,7 @@ class EC2Instance(models.Model):
         return self
 
     def __str__(self):
+        return self.instance_id
         if self.is_tunnel_up():
             return self.instance_id
         if self.is_running():

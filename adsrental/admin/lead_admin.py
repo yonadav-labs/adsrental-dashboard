@@ -22,7 +22,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     model = Lead
     list_display = (
-        'id_field',
+        # 'id_field',
         'name',
         'status_field',
         'email_field',
@@ -30,12 +30,13 @@ class LeadAdmin(admin.ModelAdmin):
         'bundler_field',
         'google_account_column',
         'facebook_account_column',
-        'raspberry_pi_link',
-        'ec2_instance_link',
+        'links',
         'tested_field',
         'last_touch',
         'first_seen',
         'last_seen',
+        'ec2_instance_link',
+        'raspberry_pi_link',
         'usps_tracking_code',
         'online',
         'wrong_password_date_field',
@@ -175,17 +176,20 @@ class LeadAdmin(admin.ModelAdmin):
         )
 
     def raspberry_pi_link(self, obj):
+        if obj.raspberry_pi:
+            return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+                url=reverse('admin:adsrental_raspberrypi_changelist'),
+                rpid=obj.raspberry_pi,
+            )
+
+    def links(self, obj):
         result = []
         if obj.raspberry_pi:
-            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="{log_url}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
-                log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid}),
-                rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi.rpid}),
-                url=reverse('admin:adsrental_raspberrypi_changelist'),
-                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi.rpid}),
-                rpid=obj.raspberry_pi,
-            ))
+            result.append('<a target="_blank" href="{log_url}">Logs</a>'.format(log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid})))
+            result.append('<a href="{rdp_url}">RDP</a>'.format(rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi.rpid})))
+            result.append('<a href="{config_url}">pi.conf</a>'.format(config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi.rpid})))
 
-        return '\n'.join(result)
+        return ', '.join(result)
 
     def ec2_instance_link(self, obj):
         result = []
@@ -372,3 +376,5 @@ class LeadAdmin(admin.ModelAdmin):
 
     name.allow_tags = True
     name.admin_order_field = 'first_name'
+
+    links.allow_tags = True
