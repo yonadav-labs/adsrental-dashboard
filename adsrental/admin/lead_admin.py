@@ -187,7 +187,9 @@ class LeadAdmin(admin.ModelAdmin):
         if obj.raspberry_pi:
             result.append('<a target="_blank" href="{log_url}">Logs</a>'.format(log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid})))
             result.append('<a href="{rdp_url}">RDP</a>'.format(rdp_url=reverse('rdp', kwargs={'rpid': obj.raspberry_pi.rpid})))
-            result.append('<a href="{config_url}">pi.conf</a>'.format(config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi.rpid})))
+            result.append('<a href="{config_url}">pi.conf</a>'.format(config_url=reverse('farming_pi_config', kwargs={
+                'rpid': obj.raspberry_pi.rpid,
+            })))
 
         return ', '.join(result)
 

@@ -287,6 +287,14 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
+    def is_ready_for_testing(self):
+        if self.raspberry_pi.first_tested:
+            return False
+        if self.raspberry_pi.first_seen:
+            return False
+
+        return True
+
     def prepare_for_reshipment(self, edited_by):
         old_value = self.pi_delivered
         self.shipstation_order_number = None
