@@ -188,6 +188,8 @@ class Lead(models.Model, FulltextSearchMixin):
         db_table = 'lead'
 
     def sync_to_adsdb(self):
+        if self.company != self.COMPANY_FBM:
+            return False
         if self.status != Lead.STATUS_IN_PROGRESS:
             return False
         if self.facebook_account and self.touch_count < 10:
