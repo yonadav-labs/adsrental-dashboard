@@ -10,7 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
 class ReportLeadAdmin(admin.ModelAdmin):
@@ -56,6 +56,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         TouchCountListFilter,
         'company',
         ShipDateListFilter,
+        QualifiedDateListFilter,
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
         'is_sync_adsdb',

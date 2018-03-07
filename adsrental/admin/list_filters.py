@@ -204,6 +204,51 @@ class ShipDateListFilter(SimpleListFilter):
             )
 
 
+class QualifiedDateListFilter(SimpleListFilter):
+    title = 'Qualified date'
+    parameter_name = 'qualified_date'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('current_week', 'Current week', ),
+            ('previus_week', 'Previous week', ),
+            ('current_month', 'Current month', ),
+            ('previus_month', 'Previous month', ),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'current_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            return queryset.filter(
+                qualified_date__gte=current_week_start,
+            )
+        if self.value() == 'previous_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            prev_week_end = current_week_start - datetime.timedelta(days=1)
+            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+            return queryset.filter(
+                qualified_date__gte=prev_week_start,
+                qualified_date__lte=prev_week_end,
+            )
+        if self.value() == 'current_month':
+            now = timezone.now()
+            current_month_start = now - datetime.timedelta(days=now.day - 1)
+            return queryset.filter(
+                qualified_date__gte=current_month_start,
+            )
+        if self.value() == 'previous_week':
+            now = timezone.now()
+            current_month_start = now - datetime.timedelta(days=now.day - 1)
+            prev_month_end = current_month_start - datetime.timedelta(days=1)
+            prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
+            return queryset.filter(
+                qualified_date__gte=prev_month_start,
+                qualified_date__lte=prev_month_end,
+            )
+
+
 class AccountTypeListFilter(SimpleListFilter):
     title = 'Account type'
     parameter_name = 'account_type'
