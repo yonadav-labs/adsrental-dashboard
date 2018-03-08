@@ -196,15 +196,16 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.facebook_account and self.touch_count < 10:
             return False
         bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
+        ec2_instance = self.get_ec2_instance()
         data = dict(
             first_name=self.first_name,
-            last_name=self.last_name + 'com',
+            last_name=self.last_name,
             email=self.email,
             fb_username=self.fb_email,
             fb_password=self.fb_secret,
             last_seen=dateformat.format(self.raspberry_pi.last_seen, 'j E Y H:i') if self.raspberry_pi and self.raspberry_pi.last_seen else None,
             phone=self.phone,
-            ec2_hostname=self.raspberry_pi.ec2_hostname if self.raspberry_pi else None,
+            ec2_hostname=ec2_instance.hostname if ec2_instance else None,
             utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
             rp_id=self.raspberry_pi.rpid if self.raspberry_pi else None,
         )
@@ -219,6 +220,12 @@ class Lead(models.Model, FulltextSearchMixin):
             data['username'] = self.google_email
             data['google_username'] = self.google_email
             data['google_password'] = self.google_password
+
+        # import json
+        # raise ValueError(json.dumps({
+        #             'account_id': int(self.adsdb_account_id),
+        #             'data': data,
+        #         }))
 
         if self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/update-s'
