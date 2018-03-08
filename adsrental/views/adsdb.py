@@ -26,6 +26,9 @@ class ADSDBUpdateLead(View):
     * google_username - string (optional)
     * google_password - string (optional)
     * phone - string (optional)
+    * status - number (optional)
+
+    If status = 4, lead will be banned
     '''
     @method_decorator(basic_auth_required)
     def get(self, request):
