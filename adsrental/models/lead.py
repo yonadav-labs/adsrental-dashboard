@@ -208,10 +208,6 @@ class Lead(models.Model, FulltextSearchMixin):
             utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
             rp_id=self.raspberry_pi.rpid if self.raspberry_pi else None,
         )
-        url = 'https://www.adsdb.io/api/v1/accounts/create-s'
-        if self.adsdb_account_id:
-            url = 'https://www.adsdb.io/api/v1/accounts/update-s'
-            data['account_id'] = int(self.adsdb_account_id)
 
         if self.facebook_account:
             data['api_id'] = 146
@@ -224,11 +220,24 @@ class Lead(models.Model, FulltextSearchMixin):
             data['google_username'] = self.google_email
             data['google_password'] = self.google_password
 
-        response = requests.post(
-            url,
-            json=[data],
-            auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
-        )
+        if self.adsdb_account_id:
+            url = 'https://www.adsdb.io/api/v1/accounts/update-s'
+            response = requests.post(
+                url,
+                json={
+                    'account_id': int(self.adsdb_account_id),
+                    'data': data,
+                },
+                auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+            )
+        else:
+            url = 'https://www.adsdb.io/api/v1/accounts/create-s'
+            response = requests.post(
+                url,
+                json=[data],
+                auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+            )
+
         result = response.content
         data = response.json()
         if 'id' in data:
