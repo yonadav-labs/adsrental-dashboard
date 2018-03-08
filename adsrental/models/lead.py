@@ -195,9 +195,6 @@ class Lead(models.Model, FulltextSearchMixin):
             return False
         if self.facebook_account and self.touch_count < 10:
             return False
-        url = 'https://staging.adsdb.io/api/v1/accounts/create-s'
-        if self.is_sync_adsdb and False:
-            url = 'https://staging.adsdb.io/api/v1/accounts/update-s'
         bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
         data = dict(
             first_name=self.first_name,
@@ -211,23 +208,34 @@ class Lead(models.Model, FulltextSearchMixin):
             utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
             rp_id=self.raspberry_pi.rpid if self.raspberry_pi else None,
         )
+        url = 'https://www.adsdb.io/api/v1/accounts/create-s'
+        if self.adsdb_account_id:
+            url = 'https://www.adsdb.io/api/v1/accounts/update-s'
+            data['account_id'] = int(self.adsdb_account_id)
+
         if self.facebook_account:
             data['api_id'] = 146
+            data['username'] = self.fb_email
             data['fb_username'] = self.fb_email
             data['fb_password'] = self.fb_secret
         if self.google_account:
             data['api_id'] = 147
+            data['username'] = self.google_email
             data['google_username'] = self.google_email
             data['google_password'] = self.google_password
-        # import json
-        # raise ValueError(json.dumps(data))
+
+        import json
+        raise ValueError(json.dumps([data]))
+
         response = requests.post(
             url,
             json=[data],
             auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
         )
         result = response.content
-
+        data = response.json()
+        if 'id' in data:
+            self.adsdb_account_id = data['id']
         self.is_sync_adsdb = True
         self.save()
         return result

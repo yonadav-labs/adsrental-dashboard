@@ -15,6 +15,10 @@ class PiConfigView(View):
         if not lead:
             raise Http404
 
+        if lead.is_banned():
+            messages.error(request, 'RPID {} banned. Cross-check and use "Unban" if you want to get config for it.'.format(rpid))
+            return HttpResponseRedirect(back)
+
         if not lead.is_ready_for_testing():
             messages.error(request, 'RPID {} is not ready for testing yet. Select it and use "Prepare for testing" action then download config file again.'.format(rpid))
             return HttpResponseRedirect(back)
