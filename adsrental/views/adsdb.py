@@ -11,6 +11,22 @@ from adsrental.models.lead_change import LeadChange
 
 
 class ADSDBUpdateLead(View):
+    '''
+    Update lead info from adsdb. Requires basic auth.
+
+    POST https://adsrental.com/adsdb/update_lead/
+
+    Parameters:
+
+    * email - string (required)
+    * first_name - string (optional)
+    * last_name - string (optional)
+    * fb_username - string (optional)
+    * fb_password - string (optional)
+    * google_username - string (optional)
+    * google_password - string (optional)
+    * phone - string (optional)
+    '''
     @method_decorator(basic_auth_required)
     def get(self, request):
         if not request.user.is_superuser:
