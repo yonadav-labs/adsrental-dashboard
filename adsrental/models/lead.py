@@ -198,7 +198,7 @@ class Lead(models.Model, FulltextSearchMixin):
         bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
         data = dict(
             first_name=self.first_name,
-            last_name=self.last_name,
+            last_name=self.last_name + 'com',
             email=self.email,
             fb_username=self.fb_email,
             fb_password=self.fb_secret,
@@ -223,9 +223,6 @@ class Lead(models.Model, FulltextSearchMixin):
             data['username'] = self.google_email
             data['google_username'] = self.google_email
             data['google_password'] = self.google_password
-
-        import json
-        raise ValueError(json.dumps([data]))
 
         response = requests.post(
             url,
