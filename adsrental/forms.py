@@ -143,7 +143,7 @@ class SignupForm(forms.Form):
         digits = ''.join([i for i in value if i.isdigit()])
         if len(digits) != 10:
             raise forms.ValidationError("Phone number should have 10 digits excluding +1 code")
-        return '({}) {}-{}'.format(value[0:3], value[3:6], value[6:])
+        return '({}) {}-{}'.format(digits[0:3], digits[3:6], digits[6:])
 
     def clean_first_name(self):
         value = self.cleaned_data['first_name'].capitalize()
