@@ -27,7 +27,6 @@ class SyncToAdsdbView(View):
                 fb_password=lead.fb_secret,
                 last_seen=dateformat.format(lead.raspberry_pi.last_seen, 'j E Y H:i') if lead.raspberry_pi and lead.raspberry_pi.last_seen else None,
                 phone=lead.phone,
-                ec2_hostname=lead.raspberry_pi.ec2_hostname if lead.raspberry_pi else None,
                 utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
                 rp_id=lead.raspberry_pi.rpid if lead.raspberry_pi else None,
             )
