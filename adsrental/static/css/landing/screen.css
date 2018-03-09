@@ -250,19 +250,6 @@ header .logo {
   font-size: 20px;
   padding-top: 15px;
 }
-/* line 136, ../sass/screen.scss */
-.earnings h3:before {
-  content: "";
-  display: block;
-  background: url("/static/images/landing/icon.png") no-repeat;
-  width: 20px;
-  height: 20px;
-  float: left;
-  margin: 10px 0px 0 0;
-  position: relative;
-  left: 208px;
-  bottom: 3px;
-}
 /* line 149, ../sass/screen.scss */
 .earnings h4 {
   font-family: 'Roboto', sans-serif;
