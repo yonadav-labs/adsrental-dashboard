@@ -15,6 +15,7 @@ class Bundler(models.Model):
     phone = models.CharField(max_length=255, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     bank_info = models.TextField(null=True, blank=True)
+    is_active = models.BooleanField(default=True, help_text='If inactive, landing/sugnup page will not be shown for this utm_source.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

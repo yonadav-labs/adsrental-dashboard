@@ -10,14 +10,47 @@ from adsrental.models.lead import Lead
 
 class BundlerAdmin(admin.ModelAdmin):
     model = Bundler
-    list_display = ('id', 'name', 'utm_source', 'adsdb_id', 'email', 'phone', 'leads_count', )
+    list_display = (
+        'id',
+        'name',
+        'utm_source',
+        'adsdb_id',
+        'email',
+        'phone',
+        'is_active',
+        'leads_count',
+    )
     actions = (
         'assign_leads_for_this_bundler',
+        'pause',
+        'activate',
     )
 
     def get_queryset(self, request):
         qs = super(BundlerAdmin, self).get_queryset(request)
         return qs.annotate(leads_count=Count('lead'))
+
+    def pause(self, request, queryset):
+        'Inactivate bundler and prevent leads registration for his utm_source'
+        for bundler in queryset:
+            if bundler.is_active:
+                bundler.is_active = False
+                bundler.save()
+                messages.success(request, 'Bundler {} is now inactive. Leads will not be registered for UTM source {}.'.format(
+                    bundler,
+                    bundler.utm_source,
+                ))
+
+    def activate(self, request, queryset):
+        'Activate bundler and allow leads registration for his utm_source'
+        for bundler in queryset:
+            if not bundler.is_active:
+                bundler.is_active = True
+                bundler.save()
+                messages.success(request, 'Bundler {} is now inactive. Leads can now not be registered for UTM source {}.'.format(
+                    bundler,
+                    bundler.utm_source,
+                ))
 
     def assign_leads_for_this_bundler(self, request, queryset):
         for bundler in queryset:
