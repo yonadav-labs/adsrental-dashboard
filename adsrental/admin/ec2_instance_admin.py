@@ -91,14 +91,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def last_troubleshoot_field(self, obj):
         if obj.last_troubleshoot is None:
-            return None
+            return 'Never'
 
         d = obj.last_troubleshoot
         return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
 
     def tunnel_up_date_field(self, obj):
         if obj.tunnel_up_date is None:
-            return None
+            return 'Never'
 
         d = obj.tunnel_up_date
         is_tunnel_up = obj.is_tunnel_up()
