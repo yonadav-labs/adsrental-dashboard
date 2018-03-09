@@ -91,7 +91,7 @@ class EC2Instance(models.Model):
     password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD, help_text='Password for RDP session')
     last_synced = models.DateTimeField(default=timezone.now, help_text='Last time when instance state was synced back from AWS')
     last_troubleshoot = models.DateTimeField(default=timezone.now, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
-    version = models.CharField(max_length=255, default='2.4.6', help_text='AWS EC2 Firmware version')
+    version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
