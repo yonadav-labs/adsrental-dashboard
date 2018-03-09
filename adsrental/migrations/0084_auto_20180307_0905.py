@@ -77,7 +77,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ec2instance',
             name='status',
-            field=models.CharField(choices=[('running', 'Running'), ('stopped', 'Stopped'), ('terminated', 'Terminated'), ('pending', 'Pending'), ('stopping', 'Stopping'), ('missing', 'Missing'), ('shutting-down', 'Shutting down')], db_index=True, default='missing', help_text='Status of EC2, same as in AWS UI', max_length=255),
+            field=models.CharField(
+                choices=[('running', 'Running'), ('stopped', 'Stopped'), ('terminated', 'Terminated'), ('pending', 'Pending'), ('stopping', 'Stopping'), ('missing', 'Missing'), ('shutting-down', 'Shutting down')],
+                db_index=True,
+                default='missing', help_text='Status of EC2, same as in AWS UI', max_length=255),
         ),
         migrations.AlterField(
             model_name='ec2instance',
