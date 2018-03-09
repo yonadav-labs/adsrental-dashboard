@@ -4,9 +4,12 @@ from django.db import models
 
 
 class Bundler(models.Model):
+    '''
+    Stores a single bundler entry, used to get bundler info for lead by *utm_source*
+    '''
     name = models.CharField(max_length=255, unique=True, db_index=True)
     utm_source = models.CharField(max_length=50, db_index=True, null=True, blank=True)
-    adsdb_id = models.IntegerField(null=True, blank=True)
+    adsdb_id = models.IntegerField(null=True, blank=True, help_text='ID from adsdb database')
     email = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)

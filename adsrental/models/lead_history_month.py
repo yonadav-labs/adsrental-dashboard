@@ -12,6 +12,10 @@ from adsrental.models.mixins import FulltextSearchMixin
 
 
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
+    '''
+    Aggregated monthly stats for :model:`adsrental.Lead`.
+    Used to calculate payments to leads.
+    '''
     class Meta:
         verbose_name = 'Lead History Month'
         verbose_name_plural = 'Lead Histories Month'
@@ -20,11 +24,11 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     NEW_MAX_PAYMENT = 15.
     NEW_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
 
-    lead = models.ForeignKey('adsrental.Lead')
+    lead = models.ForeignKey('adsrental.Lead', help_text='Linked lead.')
     date = models.DateField(db_index=True)
-    days_offline = models.IntegerField(default=0)
-    days_online = models.IntegerField(default=0)
-    days_wrong_password = models.IntegerField(default=0)
+    days_offline = models.IntegerField(default=0, help_text='Days when device had been online less than 12 hours.')
+    days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 12 hours.')
+    days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least once.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

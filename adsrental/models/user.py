@@ -6,6 +6,9 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    '''
+    Stores a single user models.
+    '''
     class Meta:
         app_label = 'adsrental'
 
@@ -17,7 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    utm_source = models.CharField(max_length=255, default='', blank=True)
+    utm_source = models.CharField(max_length=255, default='', blank=True, help_text='If not NULL, leads in dashboard will be filtered by this utm_source. SHould be changed to bundler.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     objects = BaseUserManager()

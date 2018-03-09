@@ -6,6 +6,9 @@ from adsrental.models.mixins import FulltextSearchMixin
 
 
 class CustomerIOEvent(models.Model, FulltextSearchMixin):
+    '''
+    Stores a single event for CustomerIO entry. Related to :model:`adsrental.Lead`.
+    '''
     NAME_SHIPPED = 'shipped'
     NAME_DELIVERED = 'delivered'
     NAME_OFFLINE = 'offline'
@@ -19,8 +22,8 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
         (NAME_BANNED, 'Banned'),
     ]
 
-    lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None)
-    name = models.CharField(max_length=255, choices=NAME_CHOICES)
-    kwargs = models.TextField(blank=True, null=True)
-    sent = models.BooleanField(default=True)
+    lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None, help_text='Linked lead.')
+    name = models.CharField(max_length=255, choices=NAME_CHOICES, help_text='Event name. Used in customer.io filters.')
+    kwargs = models.TextField(blank=True, null=True, help_text='Extra data sent to event, like hours_offline')
+    sent = models.BooleanField(default=True, help_text='Is published to customer.io or not.')
     created = models.DateTimeField(auto_now_add=True)

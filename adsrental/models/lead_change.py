@@ -4,6 +4,9 @@ from django.db import models
 
 
 class LeadChange(models.Model):
+    '''
+    Stores a single change for :model:`adsrental.Lead`, like status.
+    '''
     lead = models.ForeignKey('adsrental.Lead')
     field = models.CharField(max_length=255)
     value = models.CharField(max_length=255)

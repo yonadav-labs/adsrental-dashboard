@@ -7,6 +7,10 @@ from django.db import models
 
 
 class LeadHistory(models.Model):
+    '''
+    Aggregated daily stats for :model:`adsrental.Lead`.
+    Used to calculate payments to leads.
+    '''
     class Meta:
         verbose_name = 'Lead History'
         verbose_name_plural = 'Lead Histories'

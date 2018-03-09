@@ -5,6 +5,10 @@ from django.utils import timezone
 
 
 class RaspberryPiSession(models.Model):
+    '''
+    Created every time :model:`adsrental.RaspberryPi` comes online. CLosed when it comes offline.
+    Will be potentially used in stats calculation and test sessions.
+    '''
     raspberry_pi = models.ForeignKey('adsrental.RaspberryPi')
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
