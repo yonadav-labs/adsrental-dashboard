@@ -9,6 +9,7 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from adsrental.forms import LandingForm
+from adsrental.models.bundler import Bundler
 
 
 class TermsView(View):
@@ -45,6 +46,10 @@ class LandingView(View):
 
         utm_source = request.session.get('utm_source')
         if not utm_source:
+            return HttpResponse('')
+
+        bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
+        if not bundler:
             return HttpResponse('')
 
         return render(request, 'landing.html', dict(

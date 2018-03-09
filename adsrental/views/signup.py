@@ -24,6 +24,10 @@ class SignupView(View):
         if not utm_source:
             return HttpResponse('')
 
+        bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
+        if not bundler:
+            return HttpResponse('')
+
         landing_form_data = {}
         landing_form_data_raw = request.session.get('landing_form_data')
         if landing_form_data_raw:
