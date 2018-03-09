@@ -28,7 +28,7 @@ def troubleshoot(args):
         except:
             print 'ERROR', lead.email
     connection.close()
-    print lead.email, 'UP' if ec2_instance and ec2_instance.tunnel_up else 'DOWN', 'took', int(time.time() - t), 'seconds'
+    print lead.email, 'UP' if ec2_instance and ec2_instance.is_tunnel_up() else 'DOWN', 'took', int(time.time() - t), 'seconds'
     return lead
 
 
