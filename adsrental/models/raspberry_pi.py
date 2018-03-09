@@ -45,6 +45,7 @@ class RaspberryPi(models.Model):
     leadid = models.CharField(max_length=255, blank=True, null=True)
     first_seen = models.DateTimeField(blank=True, null=True)
     first_tested = models.DateTimeField(blank=True, null=True)
+    ip_address = models.CharField(max_length=20, blank=True, null=True)
     last_seen = models.DateTimeField(blank=True, null=True, db_index=True)
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
     online_since_date = models.DateTimeField(blank=True, null=True)

@@ -141,6 +141,8 @@ class LogView(View):
             raspberry_pi = lead.raspberry_pi
             ec2_instance = lead.get_ec2_instance()
             raspberry_pi.update_ping()
+            if ip_address != raspberry_pi.ip_address:
+                raspberry_pi.ip_address = ip_address
             raspberry_pi.save()
 
             if lead.is_active() and ec2_instance and not ec2_instance.is_running():
