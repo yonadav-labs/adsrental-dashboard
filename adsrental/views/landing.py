@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import json
 
 from django.views import View
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.shortcuts import Http404
 
 from adsrental.forms import LandingForm
 from adsrental.models.bundler import Bundler
@@ -46,11 +46,11 @@ class LandingView(View):
 
         utm_source = request.session.get('utm_source')
         if not utm_source:
-            return HttpResponse('')
+            raise Http404
 
         bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
         if not bundler:
-            return HttpResponse('')
+            raise Http404
 
         return render(request, 'landing.html', dict(
             user=request.user,

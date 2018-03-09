@@ -5,8 +5,8 @@ import base64
 import json
 
 from django.views import View
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.shortcuts import Http404
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
@@ -22,11 +22,11 @@ class SignupView(View):
 
         utm_source = request.session.get('utm_source')
         if not utm_source:
-            return HttpResponse('')
+            raise Http404
 
         bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
         if not bundler:
-            return HttpResponse('')
+            raise Http404
 
         landing_form_data = {}
         landing_form_data_raw = request.session.get('landing_form_data')
