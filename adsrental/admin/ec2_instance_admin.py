@@ -24,6 +24,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'lead_link',
         'lead_status',
         'raspberry_pi_link',
+        'version',
         'raspberry_pi_version',
         'status',
         'last_seen',
@@ -173,7 +174,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     links.allow_tags = True
 
-    raspberry_pi_version.short_description = 'Version'
+    raspberry_pi_version.short_description = 'RPi Version'
 
     raspberry_pi_online.boolean = True
     raspberry_pi_online.short_description = 'RPi Online'
