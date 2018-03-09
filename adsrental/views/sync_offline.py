@@ -12,6 +12,14 @@ from adsrental.utils import CustomerIOClient
 
 
 class SyncOfflineView(View):
+    '''
+    Check :model:`adsrental.RaspberryPi` state and close sessions if device is offline. Send *offline* Cutomer.io event.
+    Run by cron every 10 minutes.
+
+    Parameters:
+
+    * test - if 'true' does not close sessions and generate events, just provides output.
+    '''
     def get(self, request):
         reported_offline_leads = []
         now = timezone.now()

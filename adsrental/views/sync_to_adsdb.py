@@ -10,6 +10,9 @@ from adsrental.models import Lead, Bundler
 
 
 class SyncToAdsdbView(View):
+    '''
+    Send changes to Adsdb. Obsolete.
+    '''
     def get(self, request):
         leads = Lead.objects.filter(status=Lead.STATUS_IN_PROGRESS, is_sync_adsdb=False, fb_email__isnull=False).select_related('raspberry_pi')
         saved_emails = []

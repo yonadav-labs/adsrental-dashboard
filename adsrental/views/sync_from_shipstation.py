@@ -12,6 +12,15 @@ from adsrental.models import Lead
 
 
 class SyncFromShipStationView(View):
+    '''
+    Get shipments from shipstation API and populate *usps_tracking_code* in :model:`adsrental.Lead` identified by *shipstation_order_number*.
+    Runs hourly by cron.
+
+    Parameters:
+
+    * days_ago - Get orders that were created X days ago. If not provided, gets orders 1 day ago.
+    * force - if 'true' removes tracking codes that are not present in SS.
+    '''
     def get(self, request):
         order_numbers = []
         orders_new = []

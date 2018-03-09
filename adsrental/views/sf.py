@@ -10,6 +10,7 @@ from adsrental.models.ec2_instance import EC2Instance
 
 
 class SFToShipstationView(View):
+    'Obsolete'
     def get(self, request):
         email = request.GET.get('email')
         lead = Lead.objects.filter(email=email).first()
@@ -40,6 +41,7 @@ class SFToShipstationView(View):
 
 
 class SFLaunchRaspberryPiInstance(View):
+    'Obsolete'
     def get(self, request):
         rpid = request.GET.get('rpid')
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()

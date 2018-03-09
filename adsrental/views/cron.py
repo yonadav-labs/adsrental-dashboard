@@ -15,6 +15,17 @@ from adsrental.utils import BotoResource
 
 
 class SyncEC2View(View):
+    '''
+    Sync EC2 instances states from AWS to local DB.
+
+    Parameters:
+
+    * all - if 'true' syncs all EC2s
+    * pending - if 'true' syncs only EC2s that have stopping or pending status in local DB
+    * terminate_stopped - if 'true' terminates all instances that are currently stopped. Be careful.
+    * missing - if 'true' creates instances for active leads if they are missing
+    * execute - if 'true' performs all actions in AWS, otherwise it is test run
+    '''
     ec2_max_results = 300
 
     def get(self, request):
@@ -101,6 +112,16 @@ class SyncEC2View(View):
 
 
 class LeadHistoryView(View):
+    '''
+    Calculate :model:`adsrental.Lead` stats and store them in :model:`adsrental.LeadHistory` and :model:`adsrental.LeadHistoryMonth`
+
+    Parameters:
+
+    * now - if 'true' creates or updates :model:`adsrental.LeadHistory` objects with current lead stats. Runs on cron hourly.
+    * force - forde replace :model:`adsrental.LeadHistory` on run even if they are calculated
+    * date - 'YYYY-MM-DD', if provided calculates :model:`adsrental.LeadHistory` from logs. Does not check worng password and potentially incaccurate.
+    * aggregate - if 'true' calculates :model:`adsrental.LeadHistoryMonth`. You can also provide *date*
+    '''
     def get(self, request):
         now = request.GET.get('now')
         force = request.GET.get('force')

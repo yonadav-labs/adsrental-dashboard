@@ -8,6 +8,14 @@ from adsrental.models import Lead
 
 
 class SyncDeliveredView(View):
+    '''
+    Get data from *https://secure.shippingapis.com/ShippingAPI.dll* and update *pi_delivered* field in :model:`adsrental.Lead.`
+    Run by cron hourly.
+
+    Parameters:
+
+    * all - if 'true' runs through all leads. this can take a while.
+    '''
     def get(self, request):
         leads = []
         delivered = []
