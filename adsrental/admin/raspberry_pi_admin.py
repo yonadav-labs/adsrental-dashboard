@@ -25,6 +25,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'lead_status',
         'ec2_instance_link',
         'version',
+        'ip_address',
         'first_tested_field',
         'first_seen_field',
         'last_seen_field',
