@@ -50,7 +50,7 @@ class ADSDBUpdateLead(View):
         return JsonResponse(dict(result=True))
 
     @method_decorator(basicauth_required)
-    def put(self, request):
+    def post(self, request):
         if not request.user.is_staff:
             raise ValueError(request.META)
             raise Http404
