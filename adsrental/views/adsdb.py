@@ -1,15 +1,20 @@
 from __future__ import unicode_literals
 
+import json
+
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.shortcuts import Http404
-from basicauth.decorators import basic_auth_required
+from adsrental.decorators import basicauth_required
+from django.views.decorators.csrf import csrf_exempt
+
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_change import LeadChange
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ADSDBUpdateLead(View):
     '''
     Update lead info from adsdb. Requires basic auth.
@@ -30,13 +35,13 @@ class ADSDBUpdateLead(View):
 
     If status = 4, lead will be banned
     '''
-    @method_decorator(basic_auth_required)
+    @method_decorator(basicauth_required)
     def get(self, request):
-        if not request.user.is_superuser:
+        if not request.user.is_staff:
             raise Http404
 
         data = request.GET
-        lead = Lead.obejcts.filter(email=data.get('email'))
+        lead = Lead.objects.filter(email=data.get('email')).first()
         if not lead:
             raise Http404
 
@@ -44,13 +49,18 @@ class ADSDBUpdateLead(View):
 
         return JsonResponse(dict(result=True))
 
-    @method_decorator(basic_auth_required)
-    def post(self, request):
-        if not request.user.is_superuser:
+    @method_decorator(basicauth_required)
+    def put(self, request):
+        if not request.user.is_staff:
+            raise ValueError(request.META)
             raise Http404
 
-        data = request.POST
-        lead = Lead.obejcts.filter(email=data.get('email'))
+        try:
+            data = json.loads(request.body)
+        except:
+            return HttpResponseBadRequest('No JSON could be decoded')
+
+        lead = Lead.objects.filter(email=data.get('email')).first()
         if not lead:
             raise Http404
 
