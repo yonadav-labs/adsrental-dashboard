@@ -75,7 +75,7 @@ class ADSDBUpdateLead(View):
 
         setattr(lead, field_name, value)
         lead.save()
-        LeadChange(lead=lead, old_value=old_value, new_value=value, edited_by=edited_by).save()
+        LeadChange(lead=lead, old_value=old_value, value=value, edited_by=edited_by).save()
 
     def update_lead(self, lead, data, user):
         if 'first_name' in data:
