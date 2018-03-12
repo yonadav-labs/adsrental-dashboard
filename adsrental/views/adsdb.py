@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import json
+import uuid
 
 from django.views import View
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -12,14 +13,36 @@ from django.views.decorators.csrf import csrf_exempt
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_change import LeadChange
+from adsrental.models.bundler import Bundler
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ADSDBUpdateLead(View):
+class ADSDBLeadView(View):
     '''
-    Update lead info from adsdb. Requires basic auth.
+    **Update lead info from adsdb. Requires basic auth.**
 
-    POST https://adsrental.com/adsdb/update_lead/
+    POST https://adsrental.com/adsdb/lead/
+
+    Parameters:
+
+    * email - string (required)
+    * first_name - string (required)
+    * last_name - string (required)
+    * fb_profile_url - string (optional)
+    * fb_username - string (optional)
+    * fb_password - string (optional)
+    * google_username - string (optional)
+    * google_password - string (optional)
+    * phone - string (required)
+    * bundler_id - number (required)
+    * street - number (required)
+    * city - number (required)
+    * state - number (required)
+    * postal_code - number (required)
+
+    **Update lead info from adsdb. Requires basic auth.**
+
+    PUT https://adsrental.com/adsdb/lead/
 
     Parameters:
 
@@ -27,30 +50,18 @@ class ADSDBUpdateLead(View):
     * first_name - string (optional)
     * last_name - string (optional)
     * fb_username - string (optional)
+    * fb_username - string (optional)
     * fb_password - string (optional)
     * google_username - string (optional)
     * google_password - string (optional)
     * phone - string (optional)
     * status - number (optional)
 
-    If status = 4, lead will be banned
+    If status = 3, lead will be banned
     '''
-    @method_decorator(basicauth_required)
-    def get(self, request):
-        if not request.user.is_staff:
-            raise Http404
-
-        data = request.GET
-        lead = Lead.objects.filter(email=data.get('email')).first()
-        if not lead:
-            raise Http404
-
-        self.update_lead(lead, data, request.user)
-
-        return JsonResponse(dict(result=True))
 
     @method_decorator(basicauth_required)
-    def post(self, request):
+    def put(self, request):
         if not request.user.is_staff:
             raise ValueError(request.META)
             raise Http404
@@ -92,3 +103,61 @@ class ADSDBUpdateLead(View):
             self.update_field(lead, 'google_password', data.get('google_password'), user)
         if 'phone' in data:
             self.update_field(lead, 'phone', data.get('phone'), user)
+        if 'status' in data:
+            if data.get('status') == '3':
+                lead.ban(user)
+
+    def post(self, request):
+        if not request.user.is_staff:
+            raise ValueError(request.META)
+            raise Http404
+
+        try:
+            data = json.loads(request.body)
+        except:
+            return HttpResponseBadRequest('No JSON could be decoded')
+
+        lead_id = str(uuid.uuid4()).replace('-', '')
+        last_account_name = Lead.objects.filter(account_name__startswith='ACT').order_by('-account_name').first().account_name
+        account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
+
+        bundler = Bundler.get_by_adsdb_id(data.get('bundler_id'))
+        if not bundler:
+            return HttpResponseBadRequest('Bundler ID not found')
+
+        is_facebook_account = False
+        if data.get('fb_username'):
+            is_facebook_account = True
+
+        is_google_account = False
+        if data.get('google_username'):
+            is_google_account = True
+
+        lead = Lead(
+            leadid=lead_id,
+            account_name=account_name,
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            status=Lead.STATUS_AVAILABLE,
+            email=data['email'],
+            phone=data['phone'],
+            bundler=bundler,
+            utm_source=bundler.utm_source,
+            facebook_account=True,
+            facebook_account_status=Lead.STATUS_AVAILABLE if is_facebook_account else None,
+            fb_email=data.get('fb_username'),
+            fb_secret=data.get('fb_password'),
+            fb_friends=data.get('fb_friends'),
+            fb_profile_url=data.get('fb_profile_url'),
+            google_account=is_google_account,
+            google_account_status=Lead.STATUS_AVAILABLE if is_facebook_account else None,
+            google_email=data.get('google_username'),
+            google_password=data.get('google_password'),
+            street=data['street'],
+            city=data['city'],
+            state=data['state'],
+            postal_code=data['postal_code'],
+            country='United States',
+        )
+        lead.save()
+        return JsonResponse(dict(result=True, leadid=lead_id))
