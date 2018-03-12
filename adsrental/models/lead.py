@@ -227,6 +227,8 @@ class Lead(models.Model, FulltextSearchMixin):
         #             'data': data,
         #         }))
 
+        auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
+
         if self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/update-s'
             response = requests.post(
@@ -235,14 +237,14 @@ class Lead(models.Model, FulltextSearchMixin):
                     'account_id': int(self.adsdb_account_id),
                     'data': data,
                 },
-                auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+                auth=auth,
             )
         else:
             url = 'https://www.adsdb.io/api/v1/accounts/create-s'
             response = requests.post(
                 url,
                 json=[data],
-                auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+                auth=auth,
             )
 
         result = response.content

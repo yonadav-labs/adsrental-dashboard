@@ -20,4 +20,3 @@ unicodecsv==0.14.1
 django-admin-tools==0.8.1
 django-admin-caching==0.1.5
 django-redis==4.8.0
-django-basicauth==0.4.2

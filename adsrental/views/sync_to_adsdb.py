@@ -38,7 +38,7 @@ class SyncToAdsdbView(View):
             response = requests.post(
                 'https://staging.adsdb.io/api/v1/accounts/create-s',
                 json=[data],
-                auth=requests.auth.HTTPBasicAuth('timothy@adsinc.io', 'timgoat900'),
+                auth=requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD),
             )
             if response.status_code != 200:
                 raise ValueError(response.status_code, response.content)
