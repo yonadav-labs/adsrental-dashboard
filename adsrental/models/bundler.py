@@ -23,6 +23,10 @@ class Bundler(models.Model):
     def get_by_utm_source(cls, utm_source):
         return cls.objects.filter(utm_source=utm_source).first()
 
+    @classmethod
+    def get_by_adsdb_id(cls, adsdb_id):
+        return cls.objects.filter(adsdb_id=adsdb_id).first()
+
     def __str__(self):
         return self.name
         # return '{} ({})'.format(self.name, self.utm_source)
