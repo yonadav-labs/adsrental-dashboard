@@ -146,11 +146,11 @@ class SignupForm(forms.Form):
         return '({}) {}-{}'.format(digits[0:3], digits[3:6], digits[6:])
 
     def clean_first_name(self):
-        value = self.cleaned_data['first_name'].capitalize()
+        value = self.cleaned_data['first_name'].title()
         return value
 
     def clean_last_name(self):
-        value = self.cleaned_data['last_name'].capitalize()
+        value = self.cleaned_data['last_name'].title()
         return value
 
     def clean_email(self):
