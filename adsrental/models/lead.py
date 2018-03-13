@@ -201,8 +201,6 @@ class Lead(models.Model, FulltextSearchMixin):
             first_name=self.first_name,
             last_name=self.last_name,
             email=self.email,
-            fb_username=self.fb_email,
-            fb_password=self.fb_secret,
             last_seen=dateformat.format(self.raspberry_pi.last_seen, 'j E Y H:i') if self.raspberry_pi and self.raspberry_pi.last_seen else None,
             phone=self.phone,
             ec2_hostname=ec2_instance.hostname if ec2_instance else None,
@@ -228,6 +226,7 @@ class Lead(models.Model, FulltextSearchMixin):
         #         }))
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
+        raise ValueError([data])
 
         if self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/update-s'
