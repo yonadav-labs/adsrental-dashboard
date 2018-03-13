@@ -87,6 +87,13 @@ class ADSDBLeadView(View):
         lead.save()
         LeadChange(lead=lead, old_value=old_value, value=value, edited_by=edited_by).save()
 
+    def clean_phone(self, value):
+        if value.startswith('+1'):
+            value = value[2:]
+
+        digits = ''.join([i for i in value if i.isdigit()])
+        return '({}) {}-{}'.format(digits[0:3], digits[3:6], digits[6:])
+
     def update_lead(self, lead, data, user):
         if 'first_name' in data:
             self.update_field(lead, 'first_name', data.get('first_name'), user)
@@ -101,7 +108,8 @@ class ADSDBLeadView(View):
         if 'google_password' in data:
             self.update_field(lead, 'google_password', data.get('google_password'), user)
         if 'phone' in data:
-            self.update_field(lead, 'phone', data.get('phone'), user)
+            phone = self.clean_phone(data.get('phone'))
+            self.update_field(lead, 'phone', phone, user)
         if 'status' in data:
             if data.get('status') == '3':
                 lead.ban(user)
