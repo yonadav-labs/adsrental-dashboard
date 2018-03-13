@@ -26,7 +26,7 @@ class LeadAdmin(admin.ModelAdmin):
         'name',
         'status_field',
         'email_field',
-        'phone',
+        'phone_field',
         'bundler_field',
         'google_account_column',
         'facebook_account_column',
@@ -120,6 +120,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def email_field(self, obj):
         return obj.email
+
+    def phone_field(self, obj):
+        return obj.get_phone_formatted()
 
     def last_touch(self, obj):
         return '<span title="Touched {} times">{}</span>'.format(
@@ -381,3 +384,6 @@ class LeadAdmin(admin.ModelAdmin):
     name.admin_order_field = 'first_name'
 
     links.allow_tags = True
+
+    phone_field.short_description = 'Phone'
+    phone_field.admin_order_field = 'phone'

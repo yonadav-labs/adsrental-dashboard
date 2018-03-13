@@ -92,7 +92,7 @@ class ADSDBLeadView(View):
             value = value[2:]
 
         digits = ''.join([i for i in value if i.isdigit()])
-        return '({}) {}-{}'.format(digits[0:3], digits[3:6], digits[6:])
+        return digits
 
     def update_lead(self, lead, data, user):
         if 'first_name' in data:

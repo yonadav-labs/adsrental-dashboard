@@ -226,7 +226,6 @@ class Lead(models.Model, FulltextSearchMixin):
         #         }))
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
-        raise ValueError([data])
 
         if self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/update-s'
@@ -268,6 +267,15 @@ class Lead(models.Model, FulltextSearchMixin):
             self.postal_code or '',
             self.country or '',
         ])
+
+    def get_phone_formatted(self):
+        if not self.phone:
+            return None
+
+        if self.phone.startswith('('):
+            return self.phone
+
+        return '({}) {}-{}'.format(self.phone[0:3], self.phone[3:6], self.phone[6:])
 
     @classmethod
     def get_online_filter(cls):
