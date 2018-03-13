@@ -63,7 +63,6 @@ class ADSDBLeadView(View):
     @method_decorator(basicauth_required)
     def put(self, request):
         if not request.user.is_staff:
-            raise ValueError(request.META)
             raise Http404
 
         try:
@@ -109,7 +108,6 @@ class ADSDBLeadView(View):
 
     def post(self, request):
         if not request.user.is_staff:
-            raise ValueError(request.META)
             raise Http404
 
         try:
