@@ -1,4 +1,4 @@
-@reboot /root/pull.sh
+@reboot /root/pull.sh restart
 
 #*/10 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/to_adsdb/ &>/dev/null
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/sync/from_shipstation/?days_ago=1 &>/dev/null
