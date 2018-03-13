@@ -23,7 +23,7 @@ if [ "$HAS_FF" == "" ]; then
     if [ "$HAS_FF" == "" ]; then
         ${HOME}/new-pi/client_log.sh "Firefox is still missing..."
     else
-        ${HOME}/new-pi/client_log.sh "Antidetect is installed"
+        ${HOME}/new-pi/client_log.sh "Firefox is installed"
     fi
 else
     ${HOME}/new-pi/client_log.sh "Firefox is already installed"
