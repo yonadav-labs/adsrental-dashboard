@@ -22,7 +22,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
     MAX_PAYMENT = 25.
     NEW_MAX_PAYMENT = 15.
-    NEW_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
+    NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
+    NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
     lead = models.ForeignKey('adsrental.Lead', help_text='Linked lead.')
     date = models.DateField(db_index=True)
@@ -63,7 +64,9 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     def get_max_payment(self):
         if not self.lead.raspberry_pi or not self.lead.raspberry_pi.first_seen:
             return 0.
-        if self.lead.google_account and self.lead.raspberry_pi.first_seen > self.NEW_MAX_PAYMENT_DATE:
+        if self.lead.google_account and self.lead.raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+            return self.NEW_MAX_PAYMENT
+        if self.lead.facebook_account and self.lead.raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
             return self.NEW_MAX_PAYMENT
 
         return self.MAX_PAYMENT
