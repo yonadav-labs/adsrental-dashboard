@@ -70,7 +70,7 @@ class ADSDBLeadView(View):
         except:
             return HttpResponseBadRequest('No JSON could be decoded')
 
-        lead = Lead.objects.filter(email=data.get('email')).first()
+        lead = Lead.objects.filter(email=data.get('email')).order_by('-created').first()
         if not lead:
             raise Http404
 
