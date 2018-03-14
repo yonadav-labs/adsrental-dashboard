@@ -49,10 +49,10 @@ class ADSDBLeadView(View):
             data = json.loads(request.body)
         except:
             return HttpResponseBadRequest('No JSON could be decoded')
-        
+
         lead = None
         if data.get('account_id'):
-            lead = Lead.objects.filter(adsdb_account_id=data.get('account_id')).order_by('-created').first()
+            lead = Lead.objects.filter(adsdb_account_id=str(data.get('account_id'))).order_by('-created').first()
         if lead is None and data.get('email'):
             lead = Lead.objects.filter(email=data.get('email')).order_by('-created').first()
 
