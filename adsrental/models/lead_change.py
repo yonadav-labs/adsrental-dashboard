@@ -10,7 +10,7 @@ class LeadChange(models.Model):
     lead = models.ForeignKey('adsrental.Lead')
     field = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
-    old_value = models.CharField(max_length=255)
+    old_value = models.CharField(max_length=255, null=True, blank=True)
     # data = models.TextField(null=True, blank=True)
     edited_by = models.ForeignKey('adsrental.User', null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
