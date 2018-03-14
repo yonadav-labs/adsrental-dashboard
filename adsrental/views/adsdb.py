@@ -113,6 +113,8 @@ class ADSDBLeadView(View):
         if 'status' in data:
             if data.get('status') == '3':
                 lead.ban(user)
+            else:
+                lead.unban(user)
 
     def post(self, request):
         if not request.user.is_staff:
