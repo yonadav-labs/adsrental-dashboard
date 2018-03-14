@@ -21,32 +21,12 @@ class ADSDBLeadView(View):
     '''
     **Update lead info from adsdb. Requires basic auth.**
 
-    POST https://adsrental.com/adsdb/lead/
-
-    Parameters:
-
-    * email - string (required)
-    * first_name - string (required)
-    * last_name - string (required)
-    * fb_profile_url - string (optional)
-    * fb_username - string (optional)
-    * fb_password - string (optional)
-    * google_username - string (optional)
-    * google_password - string (optional)
-    * phone - string (required)
-    * bundler_id - number (required)
-    * street - number (required)
-    * city - number (required)
-    * state - number (required)
-    * postal_code - number (required)
-
-    **Update lead info from adsdb. Requires basic auth.**
-
     PUT https://adsrental.com/adsdb/lead/
 
     Parameters:
 
-    * email - string (required)
+    * email - string (optional, but required if no account_id provided)
+    * account_id - string (optional, but required if no email provided)
     * first_name - string (optional)
     * last_name - string (optional)
     * fb_username - string (optional)
@@ -69,8 +49,13 @@ class ADSDBLeadView(View):
             data = json.loads(request.body)
         except:
             return HttpResponseBadRequest('No JSON could be decoded')
+        
+        lead = None
+        if data.get('account_id'):
+            lead = Lead.objects.filter(adsdb_account_id=data.get('account_id')).order_by('-created').first()
+        if lead is None and data.get('email'):
+            lead = Lead.objects.filter(email=data.get('email')).order_by('-created').first()
 
-        lead = Lead.objects.filter(email=data.get('email')).order_by('-created').first()
         if not lead:
             raise Http404
 
