@@ -439,7 +439,7 @@ class Lead(models.Model, FulltextSearchMixin):
             ).json().get('shipments')
             data = data[0] if data else {}
 
-        if data and data.get('shipDate'):
+        if data and data.get('shipDate') and not self.ship_date:
             self.ship_date = datetime.datetime.strptime(data.get('shipDate'), '%Y-%m-%d').date()
             self.save()
 
