@@ -7,6 +7,7 @@ from django.db import models
 from django.conf import settings
 from django.apps import apps
 from django.utils import timezone
+from django_bulk_update.manager import BulkUpdateManager
 import paramiko
 
 from adsrental.utils import BotoResource
@@ -92,6 +93,8 @@ class EC2Instance(models.Model):
     version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    objects = BulkUpdateManager()
 
     @classmethod
     def launch_for_lead(cls, lead):
