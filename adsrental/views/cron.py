@@ -169,6 +169,15 @@ class LeadHistoryView(View):
 
 
 class UpdatePingView(View):
+    '''
+    Update :model:`adsrental.RaspberryPi` and :model:`adsrental.EC2Instance` pings in databse from cache.
+
+    Runs every 2 minutes by cron.
+
+    Parameters:
+
+    * rpid - if provided, process only one lead, used for debug purposes
+    '''
     def get(self, request):
         ping_keys = cache.get('ping_keys', [])
         rpid = request.GET.get('rpid')
