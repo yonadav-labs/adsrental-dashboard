@@ -145,6 +145,10 @@ class LogView(View):
                 raspberry_pi.ip_address = ip_address
             raspberry_pi.save()
 
+            if not ec2_instance:
+                EC2Instance.launch_for_lead(lead)
+                return self.json_response(request, rpid, {'result': True, 'source': 'ping', 'message': 'Launch missing EC2'})
+
             if lead.is_active() and ec2_instance and not ec2_instance.is_running():
                 self.add_log(request, rpid, 'EC2 is now {}, trying to start'.format(ec2_instance.status))
                 ec2_instance.start()
