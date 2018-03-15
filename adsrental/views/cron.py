@@ -132,6 +132,7 @@ class LeadHistoryView(View):
         date = request.GET.get('date')
         rpid = request.GET.get('rpid')
         aggregate = request.GET.get('aggregate')
+        results = []
 
         if now:
             leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
@@ -171,7 +172,10 @@ class LeadHistoryView(View):
                 is_online = os.path.exists(log_path)
                 LeadHistory(lead=lead, date=d, checks_online=24 if is_online else 0, checks_offline=24 if not is_online else 0).save()
                 # print lead, is_online
+                results.append([lead.email, is_online])
+
             return JsonResponse({
+                'results': results,
                 'result': True,
             })
 
