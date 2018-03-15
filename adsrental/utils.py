@@ -20,6 +20,7 @@ class CustomerIOClient(object):
     EVENT_OFFLINE = 'offline'
     EVENT_APPROVED = 'lead_approved'
     EVENT_BANNED = 'banned'
+    EVENT_AVAILABLE_BANNED = 'available_banned'
 
     def __init__(self):
         self.client = None
