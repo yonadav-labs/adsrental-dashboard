@@ -114,6 +114,8 @@ class LogView(View):
             ping_keys.append(ping_key)
             cache.set('ping_keys', ping_keys)
 
+        if 'lead_status' not in ping_data:
+            raise ValueError(ping_data)
         if self.fix_ec2_state(request, rpid, lead_status=ping_data['lead_status'], ec2_instance_status=ping_data['ec2_instance_status']):
             cache.delete(ping_key)
 
