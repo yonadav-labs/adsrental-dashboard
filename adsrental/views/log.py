@@ -81,6 +81,7 @@ class LogView(View):
             'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
             'ec2_ip_address': ec2_instance and ec2_instance.ip_address,
             'ip_address': ip_address,
+            'last_ping': None,
         }
         return ping_data
 

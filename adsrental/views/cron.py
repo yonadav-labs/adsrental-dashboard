@@ -189,9 +189,10 @@ class UpdatePingView(View):
             ip_address = ping_data['ip_address']
             version = ping_data['raspberry_pi_version']
             restart_required = ping_data['restart_required']
-            last_ping = ping_data['last_ping']
+            last_ping = ping_data.get('last_ping')
 
-            raspberry_pi.update_ping(last_ping)
+            if last_ping:
+                raspberry_pi.update_ping(last_ping)
             if raspberry_pi.ip_address != ip_address:
                 raspberry_pi.ip_address = ip_address
             if raspberry_pi.version != version:
@@ -200,7 +201,7 @@ class UpdatePingView(View):
                 raspberry_pi.restart_required = False
             raspberry_pi.version = version
 
-            if ping_data.get('last_troubleshoot') == last_ping:
+            if last_ping and ping_data.get('last_troubleshoot') == last_ping:
                 ec2_instance = raspberry_pi.get_ec2_instance()
                 ec2_instance.last_troubleshoot = last_ping
                 if ping_data.get('tunnel_up'):
