@@ -8,4 +8,4 @@
 0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/lead_history/?now=true >> /root/cron.log
 0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
 0 * * * * bash /root/dashboard/scripts/revive_rpis.sh
-* * * * * /usr/bin/curl https://adsrental.com/app/cron/update_ping/ >> /root/cron.log
+*/2 * * * * /usr/bin/curl https://adsrental.com/app/cron/update_ping/ >> /root/cron.log
