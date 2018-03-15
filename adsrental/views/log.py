@@ -75,6 +75,7 @@ class LogView(View):
             'rpid': rpid,
             'lead_status': lead and lead.status,
             'raspberry_pi_version': version,
+            'wrong_password': lead and lead.wrong_password,
             'restart_required': raspberry_pi and raspberry_pi.restart_required,
             'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
             'ec2_instance_status': ec2_instance and ec2_instance.status,
