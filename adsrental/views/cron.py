@@ -208,9 +208,9 @@ class UpdatePingView(View):
             if restart_required:
                 raspberry_pi.restart_required = False
             raspberry_pi.version = version
-            ec2_instance = ec2_instances_map[rpid]
+            ec2_instance = ec2_instances_map.get(rpid)
 
-            if last_troubleshoot:
+            if ec2_instance and last_troubleshoot:
                 if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
                     ec2_instance.last_troubleshoot = last_ping
                     if ping_data.get('tunnel_up'):
