@@ -43,7 +43,6 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             date__lt=self.date + relativedelta(months=1),
         )
         for lead_history in lead_histories:
-            raise ValueError([i.date for i in lead_histories])
             if lead_history.checks_online and lead_history.checks_online > lead_history.checks_offline:
                 self.days_online += 1
                 if lead_history.checks_wrong_password:
