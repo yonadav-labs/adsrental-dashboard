@@ -95,36 +95,6 @@ class LogView(View):
             ec2_instance.save()
             return HttpResponse(ec2_instance.hostname)
 
-        if 'o' in request.GET:
-            return JsonResponse({'result': True})
-            ip_address = request.META.get('REMOTE_ADDR')
-            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
-            if not lead:
-                return self.json_response(request, rpid, {
-                    'result': False,
-                    'reason': 'Lead not found',
-                    'rpid': rpid,
-                    'source': 'tunnel',
-                })
-
-            raspberry_pi = lead.raspberry_pi
-            ec2_instance = lead.get_ec2_instance()
-
-            raspberry_pi.update_ping()
-            if not raspberry_pi.first_seen:
-                self.add_log(request, rpid, 'Tested')
-
-            if raspberry_pi.first_seen:
-                self.add_log(request, rpid, 'Tunnel Online')
-            else:
-                self.add_log(request, rpid, 'Tunnel Tested')
-
-            # if ec2_instance.ip_address != ip_address:
-            #     self.add_log(request, rpid, 'Updating EC2 IP address to {}'.format(ip_address))
-            #     ec2_instance.update_from_boto()
-
-            return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
-
         if 'p' in request.GET:
             troubleshoot = request.GET.get('troubleshoot')
             ip_address = request.META.get('REMOTE_ADDR')
