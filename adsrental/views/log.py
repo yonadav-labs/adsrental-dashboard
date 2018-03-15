@@ -158,7 +158,7 @@ class LogView(View):
             return JsonResponse({'result': True, 'source': 'client'})
 
         if 'h' in request.GET:
-            ping_data = self.get_ping_data(request, update_ping=False)
+            ping_data = self.get_ping_data(request, update_ping=False, refresh=True)
             return HttpResponse(ping_data.get('ec2_hostname') or '')
 
         if 'p' in request.GET:
