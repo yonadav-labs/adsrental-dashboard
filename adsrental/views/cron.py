@@ -218,7 +218,7 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up = True
 
         bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])
-        bulk_update(ec2_instances, update_fields=['tunnel_up', 'last_troubleshoot', 'tunnel_up_date'])
+        bulk_update(ec2_instances, update_fields=['last_troubleshoot', 'tunnel_up_date'])
         return JsonResponse({
             'ping_keys': ping_keys,
             'result': True,
