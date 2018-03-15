@@ -94,7 +94,7 @@ class LogView(View):
         ping_data = None
         if not refresh:
             ping_data = cache.get(ping_key)
-        if not ping_data:
+        if not ping_data or 'lead_status' not in ping_data:
             ping_data = self.get_actual_ping_data(request)
         else:
             if ping_data.get('restart_required'):
