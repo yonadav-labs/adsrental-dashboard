@@ -125,11 +125,13 @@ class LogView(View):
             return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
         if 'p' in request.GET:
-            return self.json_response(request, rpid, {'result': True, 'source': 'ping'})
+            troubleshoot = request.GET.get('troubleshoot')
+            if not troubleshoot:
+                return self.json_response(request, rpid, {'result': True, 'source': 'ping'})
+
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
-            troubleshoot = request.GET.get('troubleshoot')
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
             if not lead or not lead.is_active():
                 return self.json_response(request, rpid, {
@@ -156,7 +158,7 @@ class LogView(View):
             new_config_required = False
             update_required = False
 
-            if troubleshoot and ec2_instance:
+            if ec2_instance:
                 main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
                 tunnel_up = main_tunnel_up and reverse_tunnel_up
