@@ -8,6 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.admin import SimpleListFilter
+from django.utils.translation import ugettext_lazy as _
 
 from adsrental.models.lead import Lead
 from adsrental.models.bundler import Bundler
@@ -434,15 +435,58 @@ class TunnelUpListFilter(SimpleListFilter):
 class BundlerListFilter(SimpleListFilter):
     title = 'Bundler'
     parameter_name = 'bundler'
+    template = 'admin/checkbox_filter.html'
+
+    def choices(self, changelist):
+        current_value = self.value()
+        values = current_value
+        yield {
+            'selected': self.value() is None,
+            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'display': _('All'),
+        }
+        for lookup, title in self.lookup_choices:
+            lookup_value = []
+            if lookup not in values:
+                lookup_value.extend(current_value)
+                lookup_value.append(lookup)
+            else:
+                for v in current_value:
+                    if v != lookup:
+                        lookup_value.append(v)
+
+            lookup_value = ','.join([str(i) for i in lookup_value if i])
+            if lookup_value:
+                yield {
+                    'selected': lookup in current_value,
+                    'query_string': changelist.get_query_string({self.parameter_name: lookup_value}, []),
+                    'display': title,
+                }
+            else:
+                yield {
+                    'selected': lookup in current_value,
+                    'query_string': changelist.get_query_string({}, [self.parameter_name]),
+                    'display': title,
+                }
+        yield {
+            'selected': 0 in self.value(),
+            'query_string': changelist.get_query_string({self.parameter_name: '0'}, []),
+            'display': _('Not assigned'),
+        }
+
+    def value(self):
+        result = self.used_parameters.get(self.parameter_name)
+        if not result:
+            return []
+
+        return [int(i) for i in result.split(',') if i.isdigit()]
 
     def lookups(self, request, model_admin):
         choices = [(i[0], '%s (%s)' % i[1:]) for i in Bundler.objects.all().values_list('id', 'name', 'utm_source')]
-        return choices + [
-            ('null', 'Not assigned'),
-        ]
+        return choices
 
     def queryset(self, request, queryset):
-        if self.value() == 'null':
+        if self.value() == [0]:
             return queryset.filter(bundler__isnull=True)
         if self.value():
-            return queryset.filter(bundler_id=int(self.value()))
+            return queryset.filter(bundler_id__in=self.value())
