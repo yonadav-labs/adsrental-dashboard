@@ -350,7 +350,8 @@ class Lead(models.Model, FulltextSearchMixin):
     def ban(self, edited_by, reason=None):
         self.ban_reason = reason
         self.save()
-        CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
+        if self.status != Lead.STATUS_AVAILABLE:
+            CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
         return self.set_status(Lead.STATUS_BANNED, edited_by)
 
     def unban(self, edited_by):
