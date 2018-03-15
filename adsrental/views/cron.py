@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 import os
 import datetime
 
+from django.core.cache import cache
 from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
+from django_bulk_update.helper import bulk_update
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
+from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.utils import BotoResource
@@ -163,3 +166,33 @@ class LeadHistoryView(View):
             return JsonResponse({
                 'result': True,
             })
+
+
+class UpdatePingView(View):
+    def get(self, request):
+        ping_keys = cache.get('ping_keys', [])
+
+        rpids_ping_map = {}
+        for ping_key in ping_keys:
+            ping_data = cache.get(ping_key)
+            if not ping_data:
+                continue
+            rpid = ping_data['rpid']
+            rpids_ping_map[rpid] = ping_data
+
+        raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys())
+        for raspberry_pi in raspberry_pis:
+            ping_data = rpids_ping_map.get(raspberry_pi.rpid)
+            rpid = ping_data['rpid']
+            ip_address = ping_data['ip_address']
+            last_ping = ping_data['last_ping']
+
+            raspberry_pi.update_ping(last_ping)
+            if raspberry_pi.ip_address != ip_address:
+                raspberry_pi.ip_address = ip_address
+
+        bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen'])
+        return JsonResponse({
+            'ping_keys': ping_keys,
+            'result': True,
+        })

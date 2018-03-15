@@ -6,6 +6,7 @@ import datetime
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
+from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
 
@@ -55,6 +56,8 @@ class RaspberryPi(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    objects = BulkUpdateManager()
+
     @classmethod
     def get_free_or_create(cls):
         free_item = cls.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
@@ -80,6 +83,9 @@ class RaspberryPi(models.Model):
 
         return None
 
+    def get_ping_key(self):
+        return 'ping_{}'.format(self.rpid)
+
     def get_ec2_instance(self):
         lead = self.get_lead()
         if not lead:
@@ -95,21 +101,22 @@ class RaspberryPi(models.Model):
         self.save()
         RaspberryPiSession.end(self)
 
-    def update_ping(self):
-        now = timezone.now()
+    def update_ping(self, d=None):
+        if d is None:
+            d = timezone.now()
 
         if not self.first_tested:
-            self.first_tested = now
+            self.first_tested = d
             if self.lead:
                 self.lead.tested = True
                 self.lead.save()
             return True
 
-        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
+        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > d:
             return False
 
         if self.online_since_date is None:
-            self.online_since_date = now
+            self.online_since_date = d
             RaspberryPiSession.start(self)
 
         lead = self.get_lead()
@@ -118,11 +125,11 @@ class RaspberryPi(models.Model):
             lead.sync_to_adsdb()
 
         if not self.first_seen:
-            self.first_seen = now
-            self.last_seen = now
+            self.first_seen = d
+            self.last_seen = d
             return True
 
-        self.last_seen = now
+        self.last_seen = d
         return True
 
     def online(self):

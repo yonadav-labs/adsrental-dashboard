@@ -4,6 +4,7 @@ import os
 import json
 from distutils.version import StrictVersion
 
+from django.core.cache import cache
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
@@ -140,10 +141,20 @@ class LogView(View):
 
             raspberry_pi = lead.raspberry_pi
             ec2_instance = lead.get_ec2_instance()
-            raspberry_pi.update_ping()
-            if ip_address != raspberry_pi.ip_address:
-                raspberry_pi.ip_address = ip_address
-            raspberry_pi.save()
+            # raspberry_pi.update_ping()
+            # if ip_address != raspberry_pi.ip_address:
+            #     raspberry_pi.ip_address = ip_address
+            # raspberry_pi.save()
+            ping_key = raspberry_pi.get_ping_key()
+            ping_keys = cache.get('ping_keys', [])
+            cache.set('ping_{}'.format(rpid), {
+                'rpid': rpid,
+                'last_ping': timezone.now(),
+                'ip_address': ip_address,
+            }, 300)
+            if ping_key not in ping_keys:
+                ping_keys.append(ping_key)
+                cache.set('ping_keys', ping_keys)
 
             if not ec2_instance:
                 EC2Instance.launch_for_lead(lead)
