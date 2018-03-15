@@ -177,6 +177,8 @@ class UpdatePingView(View):
             ping_data = cache.get(ping_key)
             if not ping_data:
                 continue
+            if ping_data.get('v') != settings.CACHE_VERSION:
+                continue
             rpid = ping_data['rpid']
             rpids_ping_map[rpid] = ping_data
 

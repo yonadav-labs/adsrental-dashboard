@@ -71,6 +71,7 @@ class LogView(View):
         raspberry_pi = lead and lead.raspberry_pi
         ec2_instance = lead and lead.get_ec2_instance()
         ping_data = {
+            'v': settings.CACHE_VERSION,
             'rpid': rpid,
             'lead_status': lead and lead.status,
             'raspberry_pi_version': version,
@@ -94,7 +95,7 @@ class LogView(View):
         ping_data = None
         if not refresh:
             ping_data = cache.get(ping_key)
-        if not ping_data or 'lead_status' not in ping_data:
+        if not ping_data or ping_data.get('v') != settings.CACHE_VERSION:
             ping_data = self.get_actual_ping_data(request)
         else:
             if ping_data.get('restart_required'):
