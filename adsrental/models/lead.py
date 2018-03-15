@@ -501,6 +501,10 @@ class Lead(models.Model, FulltextSearchMixin):
     def is_active(self):
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
 
+    @classmethod
+    def is_status_active(cls, status):
+        return status in cls.STATUSES_ACTIVE
+
     def is_banned(self):
         return self.status == Lead.STATUS_BANNED
 

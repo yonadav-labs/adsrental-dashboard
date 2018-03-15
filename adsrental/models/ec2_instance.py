@@ -149,6 +149,13 @@ class EC2Instance(models.Model):
         for instance in instances:
             return instance
 
+    @classmethod
+    def is_status_active(cls, status):
+        '''
+        Check if status is not *Stopped* or *Terminated*
+        '''
+        return status in cls.STATUSES_ACTIVE
+
     def is_active(self):
         '''
         Check if instance status is not *Stopped* or *Terminated*
@@ -160,6 +167,13 @@ class EC2Instance(models.Model):
         Check if instance status is *Running*
         '''
         return self.status == self.STATUS_RUNNING
+
+    @classmethod
+    def is_status_running(cls, status):
+        '''
+        Check if status is *Running*
+        '''
+        return status == cls.STATUS_RUNNING
 
     def is_stopped(self):
         '''

@@ -185,13 +185,28 @@ class UpdatePingView(View):
             ping_data = rpids_ping_map.get(raspberry_pi.rpid)
             rpid = ping_data['rpid']
             ip_address = ping_data['ip_address']
+            version = ping_data['raspberry_pi_version']
+            restart_required = ping_data['restart_required']
             last_ping = ping_data['last_ping']
 
             raspberry_pi.update_ping(last_ping)
             if raspberry_pi.ip_address != ip_address:
                 raspberry_pi.ip_address = ip_address
+            if raspberry_pi.version != version:
+                raspberry_pi.version = version
+            if restart_required:
+                raspberry_pi.restart_required = False
+            raspberry_pi.version = version
 
-        bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen'])
+            if ping_data.get('last_troubleshoot') == last_ping:
+                ec2_instance = raspberry_pi.get_ec2_instance()
+                ec2_instance.last_troubleshoot = last_ping
+                if ping_data.get('tunnel_up'):
+                    ec2_instance.tunnel_up_date = last_ping
+                    ec2_instance.tunnel_up = True
+                ec2_instance.save()
+
+        bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])
         return JsonResponse({
             'ping_keys': ping_keys,
             'result': True,
