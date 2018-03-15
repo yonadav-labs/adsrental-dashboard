@@ -126,9 +126,6 @@ class LogView(View):
 
         if 'p' in request.GET:
             troubleshoot = request.GET.get('troubleshoot')
-            if not troubleshoot:
-                return self.json_response(request, rpid, {'result': True, 'source': 'ping'})
-
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
@@ -158,7 +155,7 @@ class LogView(View):
             new_config_required = False
             update_required = False
 
-            if ec2_instance:
+            if troubleshoot and ec2_instance:
                 main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
                 tunnel_up = main_tunnel_up and reverse_tunnel_up
