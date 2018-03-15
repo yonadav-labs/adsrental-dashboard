@@ -298,6 +298,9 @@ class Lead(models.Model, FulltextSearchMixin):
 
         old_value = self.status
 
+        if value == self.STATUS_QUALIFIED and old_value == self.STATUS_IN_PROGRESS:
+            return False
+
         if value == self.STATUS_BANNED:
             if self.facebook_account:
                 self.facebook_account_status = Lead.STATUS_BANNED
