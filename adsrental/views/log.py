@@ -159,7 +159,7 @@ class LogView(View):
             new_config_required = False
             update_required = False
 
-            if troubleshoot and ec2_instance:
+            if troubleshoot:
                 main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
                 reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
                 tunnel_up = main_tunnel_up and reverse_tunnel_up
@@ -180,7 +180,7 @@ class LogView(View):
                 if version and StrictVersion(version) < StrictVersion('1.1.2'):
                     restart_required = True
 
-            if hostname is not None and ec2_instance and ec2_instance.is_running():
+            if hostname is not None and ec2_instance.is_running():
                 if ec2_instance.hostname != hostname and ec2_instance.ip_address != hostname:
                     self.add_log(request, rpid, 'Hostname changed, restarting')
                     new_config_required = True
