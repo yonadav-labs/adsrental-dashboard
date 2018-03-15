@@ -120,6 +120,7 @@ class LeadHistoryView(View):
 
     Parameters:
 
+    * rpid - if provided, process only one lead, used for debug purposes
     * now - if 'true' creates or updates :model:`adsrental.LeadHistory` objects with current lead stats. Runs on cron hourly.
     * force - forde replace :model:`adsrental.LeadHistory` on run even if they are calculated
     * date - 'YYYY-MM-DD', if provided calculates :model:`adsrental.LeadHistory` from logs. Does not check worng password and potentially incaccurate.
