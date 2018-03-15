@@ -125,7 +125,7 @@ class LogView(View):
             return self.json_response(request, rpid, {'result': True, 'ip_address': ip_address, 'source': 'tunnel'})
 
         if 'p' in request.GET:
-            return JsonResponse({'result': True, 'source': 'ping'})
+            return self.json_response(request, rpid, {'result': True, 'source': 'ping'})
             ip_address = request.META.get('REMOTE_ADDR')
             hostname = request.GET.get('hostname')
             version = request.GET.get('version')
