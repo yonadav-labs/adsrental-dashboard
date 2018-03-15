@@ -171,6 +171,9 @@ class LeadHistoryView(View):
 class UpdatePingView(View):
     def get(self, request):
         ping_keys = cache.get('ping_keys', [])
+        rpid = request.GET.get('rpid')
+        if rpid:
+            ping_keys = [RaspberryPi.get_ping_key(rpid)]
 
         rpids_ping_map = {}
         for ping_key in ping_keys:
@@ -183,6 +186,10 @@ class UpdatePingView(View):
             rpids_ping_map[rpid] = ping_data
 
         raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys())
+        ec2_instances = EC2Instance.objects.filter(rpid__in=rpids_ping_map.keys())
+        ec2_instances_map = {}
+        for ec2_instance in ec2_instances:
+            ec2_instances_map[ec2_instance.rpid] = ec2_instance
         for raspberry_pi in raspberry_pis:
             ping_data = rpids_ping_map.get(raspberry_pi.rpid)
             rpid = ping_data['rpid']
@@ -190,6 +197,7 @@ class UpdatePingView(View):
             version = ping_data['raspberry_pi_version']
             restart_required = ping_data['restart_required']
             last_ping = ping_data.get('last_ping')
+            last_troubleshoot = ping_data.get('last_troubleshoot')
 
             if last_ping:
                 raspberry_pi.update_ping(last_ping)
@@ -200,14 +208,15 @@ class UpdatePingView(View):
             if restart_required:
                 raspberry_pi.restart_required = False
             raspberry_pi.version = version
+            ec2_instance = ec2_instances_map[rpid]
 
-            if last_ping and ping_data.get('last_troubleshoot') == last_ping:
-                ec2_instance = raspberry_pi.get_ec2_instance()
-                ec2_instance.last_troubleshoot = last_ping
-                if ping_data.get('tunnel_up'):
-                    ec2_instance.tunnel_up_date = last_ping
-                    ec2_instance.tunnel_up = True
-                ec2_instance.save()
+            if last_troubleshoot:
+                if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
+                    ec2_instance.last_troubleshoot = last_ping
+                    if ping_data.get('tunnel_up'):
+                        ec2_instance.tunnel_up_date = last_ping
+                        ec2_instance.tunnel_up = True
+                    ec2_instance.save()
 
         bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])
         return JsonResponse({
