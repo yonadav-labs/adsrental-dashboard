@@ -121,7 +121,7 @@ class SignupForm(forms.Form):
     email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
     first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
     last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    phone = forms.CharField(label='Phone', required=True, widget=forms.TextInput(attrs={'size': 40, 'placeholder': '(734) 555-12-12'}))
+    phone = forms.CharField(label='Phone', required=True, widget=forms.TextInput(attrs={'size': 40, 'placeholder': '(XXX) XXX-XXXX'}))
     facebook_profile_url = forms.CharField(label='Facebook Profile Url', required=True, widget=forms.URLInput(attrs={'size': 40}))
     fb_email = forms.CharField(label='Facebook Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
     fb_secret = forms.CharField(label='Facebook Password', required=True, widget=forms.TextInput(attrs={'size': 40}))
