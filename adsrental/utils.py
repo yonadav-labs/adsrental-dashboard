@@ -318,6 +318,9 @@ class PingCacheHelper(object):
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
 
+        if not ec2_instance:
+            return True
+
         if ec2_instance_status != ec2_instance.status:
             return False
 
