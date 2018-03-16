@@ -227,6 +227,7 @@ class UpdatePingView(View):
             rpids_ping_map[rpid] = ping_data
 
         rpids = []
+        invalidated_rpids = []
         raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys())
         ec2_instances = EC2Instance.objects.filter(rpid__in=rpids_ping_map.keys()).select_related('lead')
         ec2_instances_map = {}
@@ -262,10 +263,12 @@ class UpdatePingView(View):
 
             if not self.is_ping_data_valid(ping_data, ec2_instance):
                 PingCacheHelper().delete(rpid)
+                invalidated_rpids.append(rpid)
 
         bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])
         bulk_update(ec2_instances, update_fields=['last_troubleshoot', 'tunnel_up_date'])
         return JsonResponse({
             'rpids': rpids,
+            'invalidated': invalidated_rpids,
             'result': True,
         })
