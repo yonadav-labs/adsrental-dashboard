@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import json
+import datetime
 from distutils.version import StrictVersion
 
 from django.core.cache import cache
@@ -72,6 +73,7 @@ class LogView(View):
         ec2_instance = lead and lead.get_ec2_instance()
         ping_data = {
             'v': settings.CACHE_VERSION,
+            'created': timezone.now(),
             'rpid': rpid,
             'lead_status': lead and lead.status,
             'raspberry_pi_version': version,
@@ -86,6 +88,24 @@ class LogView(View):
         }
         return ping_data
 
+    @classmethod
+    def is_ping_data_valid(cls, ping_data, now):
+        if not ping_data:
+            return False
+
+        if ping_data.get('v') != settings.CACHE_VERSION:
+            return False
+
+        created = ping_data.get('created')
+        if not created:
+            return False
+
+        ping_data_older_than = now - datetime.timedelta(seconds=cls.PING_DATA_TTL_SECONDS)
+        if ping_data.get('created') < ping_data_older_than:
+            return False
+
+        return True
+
     def get_ping_data(self, request, update_ping=False, refresh=False):
         rpid = request.GET.get('rpid')
         troubleshoot = request.GET.get('troubleshoot')
@@ -97,7 +117,7 @@ class LogView(View):
         ping_data = None
         if not refresh:
             ping_data = cache.get(ping_key)
-        if not ping_data or ping_data.get('v') != settings.CACHE_VERSION:
+        if not self.is_ping_data_valid(ping_data, now):
             ping_data = self.get_actual_ping_data(request)
         else:
             if ping_data.get('restart_required'):
