@@ -80,6 +80,7 @@ class LeadAdmin(admin.ModelAdmin):
         'touch',
         'restart_raspberry_pi',
         'sync_to_adsdb',
+        'clear_ping_cache',
     )
     readonly_fields = ('created', 'updated', 'status', )
     raw_id_fields = ('raspberry_pi', )
@@ -343,6 +344,11 @@ class LeadAdmin(admin.ModelAdmin):
             lead.touch()
             messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
 
+    def clear_ping_cache(self, request, queryset):
+        for lead in queryset:
+            lead.clear_ping_cache()
+            messages.info(request, 'Lead {} cache is removed. Next ping will get data from DB.'.format(lead.email))
+
     status_field.allow_tags = True
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
@@ -390,3 +396,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     phone_field.short_description = 'Phone'
     phone_field.admin_order_field = 'phone'
+
+    sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
+
+    clear_ping_cache.short_description = 'DEBUG: Clear ping cache'
