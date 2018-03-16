@@ -14,7 +14,7 @@ from django.utils import dateformat
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
-from adsrental.utils import CustomerIOClient, ShipStationClient
+from adsrental.utils import CustomerIOClient, ShipStationClient, PingCacheHelper
 
 
 class Lead(models.Model, FulltextSearchMixin):
@@ -317,6 +317,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.status = value
         self.save()
+        self.clear_ping_cache()
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
@@ -344,6 +345,7 @@ class Lead(models.Model, FulltextSearchMixin):
             raspberry_pi.last_seen = None
             raspberry_pi.first_seen = None
             raspberry_pi.save()
+        self.clear_ping_cache()
         LeadChange(lead=self, field='pi_delivered', value=False, old_value=old_value, edited_by=edited_by).save()
         return True
 
@@ -354,34 +356,41 @@ class Lead(models.Model, FulltextSearchMixin):
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_AVAILABLE_BANNED)
         else:
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
-        return self.set_status(Lead.STATUS_BANNED, edited_by)
+        result = self.set_status(Lead.STATUS_BANNED, edited_by)
+        self.clear_ping_cache()
+        return result
 
     def unban(self, edited_by):
         self.ban_reason = None
         self.save()
-        return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
+        result = self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
+        self.clear_ping_cache()
+        return result
 
     def disqualify(self, edited_by):
         self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
+        self.clear_ping_cache()
 
     def qualify(self, edited_by):
         result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
         if result:
             self.qualified_date = timezone.now()
             self.save()
+            self.clear_ping_cache()
 
     def assign_raspberry_pi(self):
-        if not self.raspberry_pi:
-            self.raspberry_pi = RaspberryPi.get_free_or_create()
-            self.save()
-            self.raspberry_pi.leadid = self.leadid
-            self.raspberry_pi.first_seen = None
-            self.raspberry_pi.last_seen = None
-            self.raspberry_pi.first_tested = None
-            self.raspberry_pi.save()
-            return True
+        if self.raspberry_pi:
+            return False
 
-        return False
+        self.raspberry_pi = RaspberryPi.get_free_or_create()
+        self.save()
+        self.raspberry_pi.leadid = self.leadid
+        self.raspberry_pi.first_seen = None
+        self.raspberry_pi.last_seen = None
+        self.raspberry_pi.first_tested = None
+        self.raspberry_pi.save()
+        self.clear_ping_cache()
+        return True
 
     def add_shipstation_order(self):
         if not settings.MANAGE_EC2:
@@ -511,6 +520,10 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_banned(self):
         return self.status == Lead.STATUS_BANNED
+
+    def clear_ping_cache(self):
+        if self.raspberry_pi:
+            PingCacheHelper().delete(self.raspberry_pi.rpid)
 
 
 class ReportProxyLead(Lead):

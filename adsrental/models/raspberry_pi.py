@@ -83,10 +83,6 @@ class RaspberryPi(models.Model):
 
         return None
 
-    @staticmethod
-    def get_ping_key(rpid):
-        return 'ping_{}'.format(rpid)
-
     def get_ec2_instance(self):
         lead = self.get_lead()
         if not lead:

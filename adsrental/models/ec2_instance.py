@@ -10,7 +10,7 @@ from django.utils import timezone
 from django_bulk_update.manager import BulkUpdateManager
 import paramiko
 
-from adsrental.utils import BotoResource
+from adsrental.utils import BotoResource, PingCacheHelper
 
 
 class EC2Instance(models.Model):
@@ -226,6 +226,7 @@ class EC2Instance(models.Model):
         self.last_synced = timezone.now()
 
         self.save()
+        self.clear_ping_cache()
 
         if tags_changed:
             self.set_ec2_tags()
@@ -475,3 +476,7 @@ class EC2Instance(models.Model):
             tags.append({'Key': 'Name', 'Value': self.rpid})
         boto_resource = BotoResource().get_resource('ec2')
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
+
+    def clear_ping_cache(self):
+        if self.raspberry_pi:
+            PingCacheHelper().delete(self.rpid)

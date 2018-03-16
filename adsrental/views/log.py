@@ -2,10 +2,8 @@ from __future__ import unicode_literals
 
 import os
 import json
-import datetime
 from distutils.version import StrictVersion
 
-from django.core.cache import cache
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
@@ -17,7 +15,7 @@ from django.shortcuts import Http404
 
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.utils import PingCacheHelper
 
 
 class ShowLogDirView(View):
@@ -64,84 +62,6 @@ class LogView(View):
                 message=message,
             ))
 
-    def get_actual_ping_data(self, request):
-        rpid = request.GET.get('rpid')
-        ip_address = request.META.get('REMOTE_ADDR')
-        version = request.GET.get('version')
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
-        raspberry_pi = lead and lead.raspberry_pi
-        ec2_instance = lead and lead.get_ec2_instance()
-        ping_data = {
-            'v': settings.CACHE_VERSION,
-            'created': timezone.now(),
-            'rpid': rpid,
-            'lead_status': lead and lead.status,
-            'raspberry_pi_version': version,
-            'wrong_password': lead and lead.wrong_password,
-            'restart_required': raspberry_pi and raspberry_pi.restart_required,
-            'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
-            'ec2_instance_status': ec2_instance and ec2_instance.status,
-            'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
-            'ec2_ip_address': ec2_instance and ec2_instance.ip_address,
-            'ip_address': ip_address,
-            'last_ping': None,
-        }
-        return ping_data
-
-    @classmethod
-    def is_ping_data_valid(cls, ping_data, now):
-        if not ping_data:
-            return False
-
-        if ping_data.get('v') != settings.CACHE_VERSION:
-            return False
-
-        created = ping_data.get('created')
-        if not created:
-            return False
-
-        ping_data_older_than = now - datetime.timedelta(seconds=cls.PING_DATA_TTL_SECONDS)
-        if ping_data.get('created') < ping_data_older_than:
-            return False
-
-        return True
-
-    def get_ping_data(self, request, update_ping=False, refresh=False):
-        rpid = request.GET.get('rpid')
-        troubleshoot = request.GET.get('troubleshoot')
-        main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
-        reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
-        now = timezone.now()
-
-        ping_key = RaspberryPi.get_ping_key(rpid)
-        ping_data = None
-        if not refresh:
-            ping_data = cache.get(ping_key)
-        if not self.is_ping_data_valid(ping_data, now):
-            ping_data = self.get_actual_ping_data(request)
-        else:
-            if ping_data.get('restart_required'):
-                ping_data['restart_required'] = False
-
-        if update_ping:
-            ping_data['last_ping'] = now
-
-        if troubleshoot:
-            tunnel_up = main_tunnel_up and reverse_tunnel_up
-            ping_data['tunnel_up'] = tunnel_up
-            ping_data['last_troubleshoot'] = now
-
-        cache.set(ping_key, ping_data, self.PING_DATA_TTL_SECONDS)
-        ping_keys = cache.get('ping_keys', [])
-        if ping_key not in ping_keys:
-            ping_keys.append(ping_key)
-            cache.set('ping_keys', ping_keys)
-
-        if self.fix_ec2_state(request, rpid, lead_status=ping_data['lead_status'], ec2_instance_status=ping_data['ec2_instance_status']):
-            cache.delete(ping_key)
-
-        return ping_data
-
     def fix_ec2_state(self, request, rpid, lead_status, ec2_instance_status):
         if Lead.is_status_active(lead_status):
             if not EC2Instance.is_status_active(ec2_instance_status):
@@ -178,13 +98,22 @@ class LogView(View):
             return JsonResponse({'result': True, 'source': 'client'})
 
         if 'h' in request.GET:
-            ping_data = self.get_ping_data(request, update_ping=False, refresh=True)
+            ping_cache_helper = PingCacheHelper()
+            ping_data = ping_cache_helper.get_data_for_request(request)
             return HttpResponse(ping_data.get('ec2_hostname') or '')
 
         if 'p' in request.GET:
             hostname = request.GET.get('hostname')
-            ping_data = self.get_ping_data(request, update_ping=True)
+            ping_cache_helper = PingCacheHelper()
+            ping_data = ping_cache_helper.get_data_for_request(request)
+            ping_data['last_ping'] = timezone.now()
+            ping_cache_helper.set(rpid, ping_data)
+
+            if self.fix_ec2_state(request, rpid, lead_status=ping_data['lead_status'], ec2_instance_status=ping_data['ec2_instance_status']):
+                ping_cache_helper.delete(rpid)
+
             lead_status = ping_data['lead_status']
+            wrong_password = ping_data.get('wrong_password')
             ec2_instance_id = ping_data['ec2_instance_id']
             ec2_hostname = ping_data['ec2_hostname']
             ec2_ip_address = ping_data['ec2_ip_address']
@@ -195,6 +124,14 @@ class LogView(View):
                 return self.json_response(request, rpid, {
                     'result': False,
                     'reason': 'Lead not found',
+                    'rpid': rpid,
+                    'source': 'ping',
+                })
+
+            if wrong_password:
+                return self.json_response(request, rpid, {
+                    'result': False,
+                    'reason': 'Wrong password',
                     'rpid': rpid,
                     'source': 'ping',
                 })
@@ -223,10 +160,12 @@ class LogView(View):
                     new_config_required = True
                     if version and StrictVersion(version) < StrictVersion('1.1.2'):
                         restart_required = True
+                    ping_cache_helper.delete(rpid)
 
             if raspberry_pi_restart_required:
                 self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
                 restart_required = True
+                ping_cache_helper.delete(rpid)
 
             response_data = {
                 'result': True,

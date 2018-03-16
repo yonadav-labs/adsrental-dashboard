@@ -252,6 +252,7 @@ class LeadAdmin(admin.ModelAdmin):
 
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
+            lead.clear_ping_cache()
             messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     def ban(self, request, queryset):
@@ -326,6 +327,7 @@ class LeadAdmin(admin.ModelAdmin):
             if lead.wrong_password_date is None:
                 lead.wrong_password_date = timezone.now()
                 lead.save()
+                lead.clear_ping_cache()
                 messages.info(request, 'Lead {} password is marked as wrong.'.format(lead.email))
 
     def report_correct_password(self, request, queryset):
@@ -333,6 +335,7 @@ class LeadAdmin(admin.ModelAdmin):
             if lead.wrong_password_date is not None:
                 lead.wrong_password_date = None
                 lead.save()
+                lead.clear_ping_cache()
                 messages.info(request, 'Lead {} password is marked as correct.'.format(lead.email))
 
     def touch(self, request, queryset):

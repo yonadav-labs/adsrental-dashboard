@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 import json
 import time
 import uuid
+import datetime
 
 import requests
 import boto3
+from django.utils import timezone
+from django.core.cache import cache
 from django.conf import settings
 from django.apps import apps
 import customerio
@@ -273,3 +276,103 @@ class BotoResource(object):
         EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
         instance = EC2Instance.upsert_from_boto(instance)
         return instance
+
+
+class PingCacheHelper(object):
+    KEY_TEMPLATE = 'ping_{}'
+    KEYS = 'ping_keys'
+    TTL_SECONDS = 300
+    CACHE_VERSION = '1.0.1'
+
+    def __init__(self):
+        self.cache = cache
+
+    def get_key(self, rpid):
+        return self.KEY_TEMPLATE.format(rpid)
+
+    def get(self, rpid):
+        data = self.cache.get(self.get_key(rpid))
+        if not self.is_valid(data):
+            return None
+        return data
+
+    def is_valid(self, data):
+        if not data:
+            return False
+
+        if data.get('v') != settings.CACHE_VERSION:
+            return False
+
+        created = data.get('created')
+        if not created:
+            return False
+
+        data_older_than = timezone.now() - datetime.timedelta(seconds=self.TTL_SECONDS)
+        if data.get('created') < data_older_than:
+            return False
+
+        return True
+
+    def set(self, rpid, data):
+        key = self.get_key(rpid)
+        self.cache.set(key, data, self.TTL_SECONDS)
+        keys = cache.get(self.KEYS, [])
+        if key not in keys:
+            keys.append(key)
+            cache.set(self.KEYS, keys)
+
+    def get_actual_data(self, request):
+        rpid = request.GET.get('rpid')
+        ip_address = request.META.get('REMOTE_ADDR')
+        version = request.GET.get('version')
+        Lead = apps.get_model('adsrental', 'Lead')
+        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
+        raspberry_pi = lead and lead.raspberry_pi
+        ec2_instance = lead and lead.get_ec2_instance()
+        restart_required = raspberry_pi and raspberry_pi.restart_required
+        if restart_required:
+            raspberry_pi.restart_required = False
+            raspberry_pi.save()
+
+        data = {
+            'v': self.CACHE_VERSION,
+            'created': timezone.now(),
+            'rpid': rpid,
+            'lead_status': lead and lead.status,
+            'raspberry_pi_version': version,
+            'wrong_password': lead and lead.wrong_password_date is not None,
+            'restart_required': restart_required,
+            'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
+            'ec2_instance_status': ec2_instance and ec2_instance.status,
+            'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
+            'ec2_ip_address': ec2_instance and ec2_instance.ip_address,
+            'ip_address': ip_address,
+            'last_ping': None,
+        }
+
+        return data
+
+    def delete(self, rpid):
+        return self.cache.delete(self.get_key(rpid))
+
+    def get_data_for_request(self, request):
+        rpid = request.GET.get('rpid')
+        troubleshoot = request.GET.get('troubleshoot')
+        main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
+        reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
+        now = timezone.now()
+
+        ping_key = self.get_key(rpid)
+        ping_data = cache.get(ping_key)
+        if not self.is_valid(ping_data):
+            ping_data = self.get_actual_data(request)
+        else:
+            if ping_data.get('restart_required'):
+                ping_data['restart_required'] = False
+
+        if troubleshoot:
+            tunnel_up = main_tunnel_up and reverse_tunnel_up
+            ping_data['tunnel_up'] = tunnel_up
+            ping_data['last_troubleshoot'] = now
+
+        return ping_data
