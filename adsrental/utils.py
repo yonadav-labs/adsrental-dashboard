@@ -323,7 +323,6 @@ class PingCacheHelper(object):
 
     def get_actual_data(self, request):
         rpid = request.GET.get('rpid')
-        ip_address = request.META.get('REMOTE_ADDR')
         version = request.GET.get('version')
         Lead = apps.get_model('adsrental', 'Lead')
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
@@ -346,7 +345,6 @@ class PingCacheHelper(object):
             'ec2_instance_status': ec2_instance and ec2_instance.status,
             'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
             'ec2_ip_address': ec2_instance and ec2_instance.ip_address,
-            'ip_address': ip_address,
             'last_ping': None,
         }
 
@@ -358,6 +356,7 @@ class PingCacheHelper(object):
     def get_data_for_request(self, request):
         rpid = request.GET.get('rpid')
         troubleshoot = request.GET.get('troubleshoot')
+        ip_address = request.META.get('REMOTE_ADDR')
         main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
         reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
         now = timezone.now()
@@ -369,6 +368,8 @@ class PingCacheHelper(object):
         else:
             if ping_data.get('restart_required'):
                 ping_data['restart_required'] = False
+
+        ping_data['ip_address'] = ip_address
 
         if troubleshoot:
             tunnel_up = main_tunnel_up and reverse_tunnel_up
