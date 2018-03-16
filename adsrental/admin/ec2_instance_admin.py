@@ -5,8 +5,10 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.core.cache import cache
 
 from adsrental.models.ec2_instance import EC2Instance
+from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 
@@ -156,6 +158,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             if ec2_instance.lead and ec2_instance.lead.raspberry_pi:
                 ec2_instance.lead.raspberry_pi.restart_required = True
                 ec2_instance.lead.raspberry_pi.save()
+                cache.delete(RaspberryPi.get_ping_key(ec2_instance.rpid))
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
