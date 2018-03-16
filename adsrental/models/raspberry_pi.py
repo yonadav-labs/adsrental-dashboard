@@ -38,7 +38,7 @@ class RaspberryPi(models.Model):
     """
 
     online_hours_ttl = 6
-    online_minutes_ttl = 5
+    online_minutes_ttl = 30
     first_tested_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
