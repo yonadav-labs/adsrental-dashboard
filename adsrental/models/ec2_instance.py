@@ -226,7 +226,6 @@ class EC2Instance(models.Model):
         self.last_synced = timezone.now()
 
         self.save()
-        self.clear_ping_cache()
 
         if tags_changed:
             self.set_ec2_tags()

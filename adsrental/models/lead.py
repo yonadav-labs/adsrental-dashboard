@@ -188,6 +188,9 @@ class Lead(models.Model, FulltextSearchMixin):
     class Meta:
         db_table = 'lead'
 
+    def is_wrong_password(self):
+        return self.wrong_password_date is not None
+
     def sync_to_adsdb(self):
         if self.company != self.COMPANY_FBM:
             return False
@@ -317,7 +320,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.status = value
         self.save()
-        self.clear_ping_cache()
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
@@ -345,7 +347,6 @@ class Lead(models.Model, FulltextSearchMixin):
             raspberry_pi.last_seen = None
             raspberry_pi.first_seen = None
             raspberry_pi.save()
-        self.clear_ping_cache()
         LeadChange(lead=self, field='pi_delivered', value=False, old_value=old_value, edited_by=edited_by).save()
         return True
 
@@ -357,26 +358,22 @@ class Lead(models.Model, FulltextSearchMixin):
         else:
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
         result = self.set_status(Lead.STATUS_BANNED, edited_by)
-        self.clear_ping_cache()
         return result
 
     def unban(self, edited_by):
         self.ban_reason = None
         self.save()
         result = self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
-        self.clear_ping_cache()
         return result
 
     def disqualify(self, edited_by):
         self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
-        self.clear_ping_cache()
 
     def qualify(self, edited_by):
         result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
         if result:
             self.qualified_date = timezone.now()
             self.save()
-            self.clear_ping_cache()
 
     def assign_raspberry_pi(self):
         if self.raspberry_pi:
@@ -389,7 +386,6 @@ class Lead(models.Model, FulltextSearchMixin):
         self.raspberry_pi.last_seen = None
         self.raspberry_pi.first_tested = None
         self.raspberry_pi.save()
-        self.clear_ping_cache()
         return True
 
     def add_shipstation_order(self):

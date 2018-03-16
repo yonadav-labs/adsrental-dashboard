@@ -14,7 +14,7 @@ from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_history_month import LeadHistoryMonth
-from adsrental.utils import BotoResource
+from adsrental.utils import BotoResource, PingCacheHelper
 
 
 class SyncEC2View(View):
@@ -190,6 +190,26 @@ class UpdatePingView(View):
 
     * rpid - if provided, process only one lead, used for debug purposes
     '''
+    def is_ping_data_valid(self, ping_data, ec2_instance):
+        ec2_ip_address = ping_data['ec2_ip_address']
+        ec2_instance_status = ping_data['ec2_instance_status']
+        wrong_password = ping_data['wrong_password']
+        lead_status = ping_data['lead_status']
+
+        if ec2_instance_status != ec2_instance.status:
+            return False
+
+        if ec2_ip_address != ec2_instance.ip_address:
+            return False
+
+        if ec2_instance.lead and lead_status != ec2_instance.lead.status:
+            return False
+
+        if ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
+            return False
+
+        return True
+
     def get(self, request):
         ping_keys = cache.get('ping_keys', [])
         rpid = request.GET.get('rpid')
@@ -206,14 +226,16 @@ class UpdatePingView(View):
             rpid = ping_data['rpid']
             rpids_ping_map[rpid] = ping_data
 
+        rpids = []
         raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys())
-        ec2_instances = EC2Instance.objects.filter(rpid__in=rpids_ping_map.keys())
+        ec2_instances = EC2Instance.objects.filter(rpid__in=rpids_ping_map.keys()).select_related('lead')
         ec2_instances_map = {}
         for ec2_instance in ec2_instances:
             ec2_instances_map[ec2_instance.rpid] = ec2_instance
         for raspberry_pi in raspberry_pis:
             ping_data = rpids_ping_map.get(raspberry_pi.rpid)
             rpid = ping_data['rpid']
+            rpids.append(rpid)
             ip_address = ping_data['ip_address']
             version = ping_data['raspberry_pi_version']
             restart_required = ping_data['restart_required']
@@ -238,9 +260,12 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up_date = last_ping
                         ec2_instance.tunnel_up = True
 
+            if not self.is_ping_data_valid(ping_data, ec2_instance):
+                PingCacheHelper().delete(rpid)
+
         bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])
         bulk_update(ec2_instances, update_fields=['last_troubleshoot', 'tunnel_up_date'])
         return JsonResponse({
-            'ping_keys': ping_keys,
+            'rpids': rpids,
             'result': True,
         })
