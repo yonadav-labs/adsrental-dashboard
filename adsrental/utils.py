@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import json
 import time
 import uuid
-import datetime
 
 import requests
 import boto3
@@ -303,13 +302,13 @@ class PingCacheHelper(object):
         if data.get('v') != settings.CACHE_VERSION:
             return False
 
-        created = data.get('created')
-        if not created:
-            return False
+        # created = data.get('created')
+        # if not created:
+        #     return False
 
-        data_older_than = timezone.now() - datetime.timedelta(seconds=self.TTL_SECONDS)
-        if data.get('created') < data_older_than:
-            return False
+        # data_older_than = timezone.now() - datetime.timedelta(seconds=self.TTL_SECONDS)
+        # if data.get('created') < data_older_than:
+        #     return False
 
         return True
 
