@@ -190,27 +190,9 @@ class UpdatePingView(View):
 
     * rpid - if provided, process only one lead, used for debug purposes
     '''
-    def is_ping_data_valid(self, ping_data, ec2_instance):
-        ec2_ip_address = ping_data['ec2_ip_address']
-        ec2_instance_status = ping_data['ec2_instance_status']
-        wrong_password = ping_data['wrong_password']
-        lead_status = ping_data['lead_status']
-
-        if ec2_instance_status != ec2_instance.status:
-            return False
-
-        if ec2_ip_address != ec2_instance.ip_address:
-            return False
-
-        if ec2_instance.lead and lead_status != ec2_instance.lead.status:
-            return False
-
-        if ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
-            return False
-
-        return True
 
     def get(self, request):
+        ping_cache_helper = PingCacheHelper()
         ping_keys = cache.get('ping_keys', [])
         rpid = request.GET.get('rpid')
         if rpid:
@@ -220,8 +202,6 @@ class UpdatePingView(View):
         for ping_key in ping_keys:
             ping_data = cache.get(ping_key)
             if not ping_data:
-                continue
-            if ping_data.get('v') != settings.CACHE_VERSION:
                 continue
             rpid = ping_data['rpid']
             rpids_ping_map[rpid] = ping_data
@@ -261,8 +241,8 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up_date = last_ping
                         ec2_instance.tunnel_up = True
 
-            if not self.is_ping_data_valid(ping_data, ec2_instance):
-                PingCacheHelper().delete(rpid)
+            if not ping_cache_helper.is_data_consistent(ping_data, ec2_instance):
+                ping_cache_helper.delete(rpid)
                 invalidated_rpids.append(rpid)
 
         bulk_update(raspberry_pis, update_fields=['ip_address', 'first_seen', 'first_tested', 'online_since_date', 'last_seen', 'version'])

@@ -291,11 +291,11 @@ class PingCacheHelper(object):
 
     def get(self, rpid):
         data = self.cache.get(self.get_key(rpid))
-        if not self.is_valid(data):
+        if not self.is_data_valid(data):
             return None
         return data
 
-    def is_valid(self, data):
+    def is_data_valid(self, data):
         if not data:
             return False
 
@@ -309,6 +309,26 @@ class PingCacheHelper(object):
         # data_older_than = timezone.now() - datetime.timedelta(seconds=self.TTL_SECONDS)
         # if data.get('created') < data_older_than:
         #     return False
+
+        return True
+
+    def is_data_consistent(self, data, ec2_instance):
+        ec2_ip_address = data['ec2_ip_address']
+        ec2_instance_status = data['ec2_instance_status']
+        wrong_password = data['wrong_password']
+        lead_status = data['lead_status']
+
+        if ec2_instance_status != ec2_instance.status:
+            return False
+
+        if ec2_ip_address != ec2_instance.ip_address:
+            return False
+
+        if ec2_instance.lead and lead_status != ec2_instance.lead.status:
+            return False
+
+        if ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
+            return False
 
         return True
 
@@ -338,7 +358,7 @@ class PingCacheHelper(object):
             'rpid': rpid,
             'lead_status': lead and lead.status,
             'raspberry_pi_version': version,
-            'wrong_password': lead and lead.wrong_password_date is not None,
+            'wrong_password': lead.is_wrong_password() if lead else False,
             'restart_required': restart_required,
             'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
             'ec2_instance_status': ec2_instance and ec2_instance.status,
@@ -350,7 +370,12 @@ class PingCacheHelper(object):
         return data
 
     def delete(self, rpid):
-        return self.cache.delete(self.get_key(rpid))
+        key = self.get_key(rpid)
+        self.cache.delete(key)
+        keys = cache.get(self.KEYS, [])
+        if key in keys:
+            keys = [i for i in keys if i != key]
+            cache.set(self.KEYS, keys)
 
     def get_data_for_request(self, request):
         rpid = request.GET.get('rpid')
@@ -362,7 +387,7 @@ class PingCacheHelper(object):
 
         ping_key = self.get_key(rpid)
         ping_data = cache.get(ping_key)
-        if not self.is_valid(ping_data):
+        if not ping_data:
             ping_data = self.get_actual_data(request)
         else:
             if ping_data.get('restart_required'):
