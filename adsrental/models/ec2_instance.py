@@ -478,5 +478,4 @@ class EC2Instance(models.Model):
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
 
     def clear_ping_cache(self):
-        if self.raspberry_pi:
-            PingCacheHelper().delete(self.rpid)
+        PingCacheHelper().delete(self.rpid)

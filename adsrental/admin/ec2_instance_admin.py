@@ -8,7 +8,6 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
-from adsrental.utils import PingCacheHelper
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 
 
@@ -52,6 +51,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'start',
         'stop',
         'restart_raspberry_pi',
+        'clear_ping_cache',
     )
     raw_id_fields = ('lead', )
 
@@ -157,7 +157,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             if ec2_instance.lead and ec2_instance.lead.raspberry_pi:
                 ec2_instance.lead.raspberry_pi.restart_required = True
                 ec2_instance.lead.raspberry_pi.save()
-                PingCacheHelper().delete(ec2_instance.rpid)
+                ec2_instance.clear_ping_cache()
 
     def check_missing(self, request, queryset):
         leads = Lead.objects.filter(
@@ -167,6 +167,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         )
         for lead in leads:
             EC2Instance.launch_for_lead(lead)
+
+    def clear_ping_cache(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.clear_ping_cache()
 
     lead_link.short_description = 'Lead'
     lead_link.allow_tags = True
@@ -191,3 +195,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     last_seen.allow_tags = True
     last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
+
+    clear_ping_cache.short_description = 'DEBUG: Clear ping cache'
