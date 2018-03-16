@@ -224,7 +224,7 @@ class UpdatePingView(View):
                 raspberry_pi.update_ping(last_ping)
             if raspberry_pi.ip_address != ip_address:
                 raspberry_pi.ip_address = ip_address
-            if raspberry_pi.version != version:
+            if raspberry_pi.version != version and version:
                 raspberry_pi.version = version
             if restart_required:
                 raspberry_pi.restart_required = False
