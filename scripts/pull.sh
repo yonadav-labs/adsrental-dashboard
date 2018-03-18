@@ -7,6 +7,7 @@ if [ "$1" = "migrate" ]; then
     docker-compose -f docker-compose.dev.yml build
     docker-compose -f docker-compose.dev.yml run web python manage.py migrate adsrental
     cd ~/dashboard/
+    git pull
     docker-compose -f docker-compose.dev.yml build
     docker-compose -f docker-compose.dev.yml up --remove-orphans -d
     exit
