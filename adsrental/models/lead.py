@@ -10,6 +10,7 @@ from django.db import models
 from django.conf import settings
 from django.apps import apps
 from django.utils import dateformat
+from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
@@ -178,9 +179,12 @@ class Lead(models.Model, FulltextSearchMixin):
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
     splashtop_id = models.CharField(max_length=255, blank=True, null=True, help_text='Splashtop ID reported by user.')
     adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
+    tracking_info = models.TextField(blank=True, null=True, help_text='Raw response from secure.shippingapis.com')
+    pi_sent = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    pi_sent = models.DateTimeField(null=True, blank=True)
+
+    objects = BulkUpdateManager()
 
     def __str__(self):
         return self.leadid
@@ -461,39 +465,52 @@ class Lead(models.Model, FulltextSearchMixin):
             # self.pi_delivered = True
             self.save()
 
-    def update_pi_delivered(self):
-        if not self.usps_tracking_code:
+    def update_pi_delivered(self, pi_delivered, tracking_info_xml):
+        if pi_delivered is None:
             return
+
+        self.tracking_info = tracking_info_xml
+        self.pi_delivered = pi_delivered
+
+    def get_shippingapis_tracking_info(self):
+        if not self.usps_tracking_code:
+            return None
 
         xml = '<TrackRequest USERID="039ADCRU4974"><TrackID ID="{}"></TrackID></TrackRequest>'.format(self.usps_tracking_code)
         url = 'https://secure.shippingapis.com/ShippingAPI.dll'
-        response = requests.get(url, params={
-            'API': 'TrackV2',
-            'xml': xml,
-        })
         try:
-            tree = ElementTree.fromstring(response.text)
+            response = requests.get(url, params={
+                'API': 'TrackV2',
+                'xml': xml,
+            })
+        except requests.exceptions.ConnectionError:
+            return None
+
+        return response.text
+
+    def get_pi_delivered_from_tracking_info_xml(self, tracking_info_xml):
+        if tracking_info_xml is None:
+            return None
+        try:
+            tree = ElementTree.fromstring(tracking_info_xml)
         except:
-            return
-        pi_delivered = False
+            return None
+
         track_info = tree.find('TrackInfo')
         if track_info is None:
-            return
+            return None
 
-        track_details = track_info.findall('TrackDetail')
-        pi_delivered = False
-        for track_detail in track_details:
-            if not track_detail.text:
-                continue
-            if track_detail.text.lower().startswith('delivered'):
-                pi_delivered = True
-                break
+        track_summary = track_info.find('TrackSummary')
+        if track_summary is not None and track_summary.text and 'was delivered' in track_summary.text.lower():
+            return True
+        # track_details = track_info.findall('TrackDetail')
+        # for track_detail in track_details:
+        #     if not track_detail.text:
+        #         continue
+        #     if 'delivered' in track_detail.text.lower():
+        #         return True
 
-        if self.pi_delivered != pi_delivered:
-            self.pi_delivered = pi_delivered
-            if self.pi_delivered:
-                CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_DELIVERED, tracking_code=self.usps_tracking_code)
-            self.save()
+        return False
 
     def check_ec2_status(self):
         ec2_instance = self.get_ec2_instance()

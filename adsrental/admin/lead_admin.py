@@ -69,7 +69,6 @@ class LeadAdmin(admin.ModelAdmin):
     )
     actions = (
         # 'update_from_shipstation',
-        # 'update_pi_delivered',
         'mark_as_qualified',
         'mark_as_disqualified',
         'ban',
@@ -211,10 +210,6 @@ class LeadAdmin(admin.ModelAdmin):
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
             lead.update_from_shipstation()
-
-    def update_pi_delivered(self, request, queryset):
-        for lead in queryset:
-            lead.update_pi_delivered()
 
     def mark_as_qualified(self, request, queryset):
         for lead in queryset:
