@@ -51,7 +51,7 @@ if not instances:
 instance = None
 for i in instances:
     instance = i
-print 'Connecting to instance', instance.id, instance.tags, instance.public_dns_name, instance.state['Name']
+print('Connecting to instance', instance.id, instance.tags, instance.public_dns_name, instance.state['Name'])
 
 hostname = instance.public_dns_name
 
@@ -62,5 +62,5 @@ command = 'rdpy-rdpclient.py -w {width} -l {height} -u Administrator -p {passwor
     hostname=hostname,
     password=password,
 )
-print command
+print(command)
 os.system(command)

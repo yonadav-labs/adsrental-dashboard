@@ -63,11 +63,11 @@ class Command(BaseCommand):
 
         ec2_instances = ec2_instances.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION).select_related('lead', 'lead__raspberry_pi').order_by('-rpid')
 
-        print 'Total', ec2_instances.count()
+        print('Total', ec2_instances.count())
         if test:
             for ec2_instance in ec2_instances:
                 info_str = ec2_instance.rpid + '\t' + ec2_instance.lead.name() + '\t' + ec2_instance.lead.email + '\t' + ec2_instance.lead.raspberry_pi.version
-                print info_str + '\t' + 'Test'
+                print(info_str + '\t' + 'Test')
             return
 
         pool = ThreadPool(processes=threads)

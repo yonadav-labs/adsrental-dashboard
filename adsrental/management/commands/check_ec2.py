@@ -41,7 +41,6 @@ class Command(BaseCommand):
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         ).resource('ec2', region_name=settings.AWS_REGION)
-        print 'Starting...'
 
         private_key = paramiko.RSAKey.from_private_key_file("/app/cert/farmbot.pem")
         ssh = paramiko.SSHClient()
@@ -57,9 +56,8 @@ class Command(BaseCommand):
             # raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1),
             email__in=emails.split(','),
         ).select_related('raspberry_pi').order_by('email')
-        print len(leads), emails.split(',')
+        print(len(leads), emails.split(','))
         for lead in leads:
-            print lead, lead.email
             instances = boto_client.instances.filter(
                 Filters=[
                     {
@@ -73,7 +71,6 @@ class Command(BaseCommand):
                 instance = i
 
             if instance is None:
-                print 'NO_EC2:', lead.email
                 continue
 
             public_dns_name = instance.public_dns_name
@@ -91,35 +88,30 @@ class Command(BaseCommand):
             try:
                 response = requests.get('http://{}:13608'.format(public_dns_name), timeout=10)
             except Exception as e:
-                print 'EC2_WEB_DOWN:', instance_rpid, instance_email, public_dns_name, ':', e
+                print('EC2_WEB_DOWN:', instance_rpid, instance_email, public_dns_name, ':', e)
 
             if response and instance.id not in response.text:
-                print 'EC2_WEB_INVALID:', instance_rpid, instance_email, public_dns_name, ':', response.text, 'instead of', instance.id
+                print('EC2_WEB_INVALID:', instance_rpid, instance_email, public_dns_name, ':', response.text, 'instead of', instance.id)
 
-            # print 'CONNECTING:', instance_rpid, instance_email, public_dns_name
             cmd_to_execute = 'netstat'
             try:
                 ssh.connect(public_dns_name, username='Administrator', port=40594, pkey=private_key, timeout=5)
                 ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
 
             except Exception as e:
-                print 'SSH_DOWN:', instance_rpid, instance_email, public_dns_name, e
+                print('SSH_DOWN:', instance_rpid, instance_email, public_dns_name, e)
                 continue
 
             netstat_out = ssh_stdout.read()
             ssh_tunnel_up = True
-            # print 'OUT', netstat_out
             if ':2046' not in netstat_out:
                 ssh_tunnel_up = False
-                print 'RPI_SSH_DOWN:', instance_rpid, instance_email, public_dns_name
-            # if ':3808' not in netstat_out:
-            #     print 'EC2_PROXY_DOWN:', instance_rpid, instance_email, public_dns_name
-            # print 'ERR', ssh_stderr.read()
+                print('RPI_SSH_DOWN:', instance_rpid, instance_email, public_dns_name)
 
             cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
             if '0x1' not in ssh_stdout.read():
-                print 'EC2_PROXY_DOWN:', instance_rpid, instance_email, public_dns_name
+                print('EC2_PROXY_DOWN:', instance_rpid, instance_email, public_dns_name)
                 if fix_proxy:
                     cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
                     ssh.exec_command(cmd_to_execute)

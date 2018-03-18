@@ -233,7 +233,6 @@ class BotoResource(object):
             self.get_resource('ec2').create_tags(
                 Resources=[instance.id], Tags=tags)
         except:
-            print 'Cound not add tag for', instance.id, key, '=', value
             pass
 
     def launch_instance(self, rpid, email):
