@@ -2,11 +2,14 @@ from __future__ import unicode_literals
 
 import os
 import datetime
+import requests
+from multiprocessing.pool import ThreadPool
 
 from django.core.cache import cache
 from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
+from django.utils import timezone
 from django_bulk_update.helper import bulk_update
 
 from adsrental.models.ec2_instance import EC2Instance
@@ -14,7 +17,7 @@ from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_history_month import LeadHistoryMonth
-from adsrental.utils import BotoResource, PingCacheHelper
+from adsrental.utils import BotoResource, PingCacheHelper, CustomerIOClient
 
 
 class SyncEC2View(View):
@@ -251,4 +254,173 @@ class UpdatePingView(View):
             'rpids': rpids,
             'invalidated': invalidated_rpids,
             'result': True,
+        })
+
+
+class SyncDeliveredView(View):
+    '''
+    Get data from *https://secure.shippingapis.com/ShippingAPI.dll* and update *pi_delivered* field in :model:`adsrental.Lead.`
+    Run by cron hourly.
+
+    Parameters:
+
+    * all - if 'true' runs through all leads including delivered. this can take a while.
+    * test - if 'true' does not make any changes to DB or send customerIO events
+    * days_ago - check only leads shipped N days ago. Default 31
+    * threads - amount of threads to send requests to remote server. Default 10.
+    '''
+    def get_tracking_info(self, lead):
+        tracking_info_xml = lead.get_shippingapis_tracking_info()
+        return [lead.email, tracking_info_xml]
+
+    def get(self, request):
+        leads = []
+        delivered = []
+        not_delivered = []
+        errors = []
+        changed = []
+        all = request.GET.get('all') == 'true'
+        test = request.GET.get('test') == 'true'
+        threads = int(request.GET.get('threads', 10))
+        days_ago = int(request.GET.get('days_ago', 31))
+        if all:
+            leads = Lead.objects.filter(
+                status__in=Lead.STATUSES_ACTIVE,
+                usps_tracking_code__isnull=False,
+                ship_date__gte=timezone.now() - datetime.timedelta(days=days_ago),
+            )
+        else:
+            leads = Lead.objects.filter(
+                status__in=Lead.STATUSES_ACTIVE,
+                usps_tracking_code__isnull=False,
+                pi_delivered=False,
+                ship_date__gte=timezone.now() - datetime.timedelta(days=days_ago),
+            )
+        pool = ThreadPool(processes=threads)
+        results = pool.map(self.get_tracking_info, leads)
+        results_map = dict(results)
+        for lead in leads:
+            tracking_info_xml = results_map.get(lead.email)
+            pi_delivered = lead.get_pi_delivered_from_tracking_info_xml(tracking_info_xml)
+            if pi_delivered is None:
+                errors.append(lead.email)
+                continue
+            lead.tracking_info = tracking_info_xml
+            if pi_delivered is not None and pi_delivered != lead.pi_delivered:
+                changed.append(lead.email)
+                if not test and pi_delivered:
+                    CustomerIOClient().send_lead_event(lead, CustomerIOClient.EVENT_DELIVERED, tracking_code=lead.usps_tracking_code)
+            lead.update_pi_delivered(pi_delivered, tracking_info_xml)
+
+            if pi_delivered:
+                delivered.append(lead.email)
+            else:
+                not_delivered.append(lead.email)
+
+        if not test:
+            bulk_update(leads, update_fields=['tracking_info', 'pi_delivered'])
+        else:
+            bulk_update(leads, update_fields=['tracking_info', ])
+
+        return JsonResponse({
+            'all': all,
+            'result': True,
+            'changed': changed,
+            'delivered': delivered,
+            'not_delivered': not_delivered,
+            'errors': errors,
+        })
+
+
+class SyncFromShipStationView(View):
+    '''
+    Get shipments from shipstation API and populate *usps_tracking_code* in :model:`adsrental.Lead` identified by *shipstation_order_number*.
+    Runs hourly by cron.
+
+    Parameters:
+
+    * days_ago - Get orders that were created X days ago. If not provided, gets orders 1 day ago.
+    * force - if 'true' removes tracking codes that are not present in SS.
+    '''
+    def get(self, request):
+        order_numbers = []
+        orders_new = []
+        orders_not_found = []
+        days_ago = int(request.GET.get('days_ago', '1'))
+        force = request.GET.get('force')
+        request_params = {}
+        date_start = timezone.now() - datetime.timedelta(days=days_ago)
+        request_params['shipDateStart'] = date_start.strftime(settings.SYSTEM_DATE_FORMAT)
+
+        last_page = False
+        page = 0
+        while not last_page:
+            if page:
+                request_params['page'] = page
+            page += 1
+            response = requests.get(
+                'https://ssapi.shipstation.com/shipments',
+                params=request_params,
+                auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
+            ).json()
+            last_page = len(response['shipments']) < 100
+
+            for row in response['shipments']:
+                order_number = row['orderNumber']
+                lead = Lead.objects.filter(shipstation_order_number=order_number).first()
+                if not lead:
+                    orders_not_found.append(order_number)
+                    continue
+
+                if force:
+                    lead.usps_tracking_code = None
+                if not lead.usps_tracking_code:
+                    orders_new.append(order_number)
+                lead.update_from_shipstation(row)
+                order_numbers.append(order_number)
+
+        return JsonResponse({
+            'result': True,
+            'order_numbers': order_numbers,
+            'orders_new': orders_new,
+            'orders_not_found': orders_not_found,
+            'days_ago': days_ago,
+        })
+
+
+class SyncOfflineView(View):
+    '''
+    Check :model:`adsrental.RaspberryPi` state and close sessions if device is offline. Send *offline* Cutomer.io event.
+    Run by cron every 10 minutes.
+
+    Parameters:
+
+    * test - if 'true' does not close sessions and generate events, just provides output.
+    '''
+    def get(self, request):
+        reported_offline_leads = []
+        now = timezone.now()
+        test = request.GET.get('test')
+        customerio_client = CustomerIOClient()
+        for lead in Lead.objects.filter(
+            raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 60),
+            raspberry_pi__last_offline_reported__lt=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
+            pi_delivered=True,
+            raspberry_pi__first_seen__isnull=False,
+            status__in=Lead.STATUSES_ACTIVE,
+        ).select_related('raspberry_pi'):
+            offline_hours_ago = 1
+            if lead.raspberry_pi.last_seen:
+                offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
+            reported_offline_leads.append(lead.email)
+            if test:
+                continue
+
+            customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
+            lead.raspberry_pi.report_offline()
+
+        return JsonResponse({
+            'test': test,
+            'result': True,
+            'reported_offline_leads': reported_offline_leads,
         })
