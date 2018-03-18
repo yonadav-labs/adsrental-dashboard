@@ -1,5 +1,10 @@
-class HeadersMiddleware(object):
-    def process_response(self, req, resp):
-        resp["Access-Control-Allow-Origin"] = "*"
-        resp["Access-Control-Allow-Headers"] = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
-        return resp
+class HeadersMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Headers"] = "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+
+        return response

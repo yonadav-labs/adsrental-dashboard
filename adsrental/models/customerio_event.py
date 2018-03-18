@@ -24,7 +24,7 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
         (NAME_AVAILABLE_BANNED, 'Banned from available status'),
     ]
 
-    lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None, help_text='Linked lead.')
+    lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None, help_text='Linked lead.', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, choices=NAME_CHOICES, help_text='Event name. Used in customer.io filters.')
     kwargs = models.TextField(blank=True, null=True, help_text='Extra data sent to event, like hours_offline')
     sent = models.BooleanField(default=True, help_text='Is published to customer.io or not.')

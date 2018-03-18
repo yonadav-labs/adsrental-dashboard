@@ -15,7 +15,7 @@ class LeadHistory(models.Model):
         verbose_name = 'Lead History'
         verbose_name_plural = 'Lead Histories'
 
-    lead = models.ForeignKey('adsrental.Lead')
+    lead = models.ForeignKey('adsrental.Lead', on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
     checks_offline = models.IntegerField(default=0)
     checks_online = models.IntegerField(default=0)

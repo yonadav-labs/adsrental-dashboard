@@ -6,10 +6,11 @@ import unicodecsv as csv
 
 from django.contrib import admin
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
+from django.utils.safestring import mark_safe
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
@@ -92,11 +93,11 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,
-        )
+        ))
 
     def links(self, obj):
         result = []
@@ -108,7 +109,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 o='-5',
             )),
         ))
-        return ', '.join(result)
+        return mark_safe(', '.join(result))
 
     def export_as_csv(self, request, queryset):
         field_names = [i[0] for i in self.csv_fields]
@@ -187,6 +188,3 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
 
     lead_link.short_description = 'Lead'
-    lead_link.allow_tags = True
-
-    links.allow_tags = True

@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.utils.safestring import mark_safe
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
@@ -58,11 +59,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def lead_link(self, obj):
         if obj.lead is None:
             return obj.email
-        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=obj.lead.email,
             q=obj.lead.email,
-        )
+        ))
 
     def lead_status(self, obj):
         return obj.lead and obj.lead.status
@@ -70,12 +71,12 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
-        return '<a target="_blank" href="{url}?q={q}">{rpid} {status}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{rpid} {status}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
             status='(online)' if obj.lead.raspberry_pi.online() else '',
             q=obj.lead.raspberry_pi.rpid,
-        )
+        ))
 
     def raspberry_pi_online(self, obj):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.online()
@@ -88,14 +89,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             return None
 
         d = obj.lead.raspberry_pi.last_seen
-        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
+        return mark_safe(u'<span title="{}">{}</span>'.format(d, naturaltime(d)))
 
     def last_troubleshoot_field(self, obj):
         if obj.last_troubleshoot is None:
             return 'Never'
 
         d = obj.last_troubleshoot
-        return u'<span title="{}">{}</span>'.format(d, naturaltime(d))
+        return mark_safe(u'<span title="{}">{}</span>'.format(d, naturaltime(d)))
 
     def tunnel_up_date_field(self, obj):
         if obj.tunnel_up_date is None:
@@ -103,10 +104,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
         d = obj.tunnel_up_date
         is_tunnel_up = obj.is_tunnel_up()
-        return u'<span title="{}">{}</span>'.format(
+        return mark_safe(u'<span title="{}">{}</span>'.format(
             d,
             'Yes' if is_tunnel_up else naturaltime(d),
-        )
+        ))
 
     def links(self, obj):
         links = []
@@ -131,7 +132,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         links.append('<a target="_blank" href="http://{hostname}:13608">Web</a>'.format(
             hostname=obj.hostname,
         ))
-        return ', '.join(links)
+        return mark_safe(', '.join(links))
 
     def update_ec2_tags(self, request, queryset):
         for ec2_instance in queryset:
@@ -173,27 +174,20 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             ec2_instance.clear_ping_cache()
 
     lead_link.short_description = 'Lead'
-    lead_link.allow_tags = True
 
     raspberry_pi_link.short_description = 'RaspberryPi'
-    raspberry_pi_link.allow_tags = True
-
-    links.allow_tags = True
 
     raspberry_pi_version.short_description = 'RPi Version'
 
     raspberry_pi_online.boolean = True
     raspberry_pi_online.short_description = 'RPi Online'
 
-    last_troubleshoot_field.allow_tags = True
     last_troubleshoot_field.short_description = 'Troubleshoot'
     last_troubleshoot_field.admin_order_field = 'last_troubleshoot'
 
-    tunnel_up_date_field.allow_tags = True
     tunnel_up_date_field.short_description = 'Tunnel up'
     tunnel_up_date_field.admin_order_field = 'tunnel_up_date'
 
-    last_seen.allow_tags = True
     last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
 
     clear_ping_cache.short_description = 'DEBUG: Clear ping cache'

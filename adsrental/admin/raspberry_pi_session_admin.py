@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone, timesince
+from django.utils.safestring import mark_safe
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
 
@@ -31,11 +32,10 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
                 rpid=obj.raspberry_pi,
             ))
 
-        return '\n'.join(result)
+        return mark_safe('\n'.join(result))
 
     def duration(self, obj):
         end_date = obj.end_date or timezone.now()
         return timesince.timesince(obj.start_date, end_date)
 
     raspberry_pi_link.short_description = 'Raspberry Pi'
-    raspberry_pi_link.allow_tags = True

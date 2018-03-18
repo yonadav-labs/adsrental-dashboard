@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter
@@ -19,11 +20,11 @@ class LeadHistoryAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,
-        )
+        ))
 
     def email(self, obj):
         return obj.lead.email
@@ -41,8 +42,6 @@ class LeadHistoryAdmin(admin.ModelAdmin):
         return obj.is_wrong_password()
 
     lead_link.short_description = 'Lead'
-    lead_link.allow_tags = True
-    lead_link.allow_tags = True
 
     active.boolean = True
 

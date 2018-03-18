@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
@@ -102,20 +103,19 @@ class ReportLeadAdmin(admin.ModelAdmin):
         return obj.raspberry_pi and obj.raspberry_pi.last_seen
 
     def last_touch(self, obj):
-        return '<span title="Touched {} times">{}</span>'.format(
+        return mark_safe('<span title="Touched {} times">{}</span>'.format(
             obj.touch_count,
             naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
-        )
+        ))
 
     def raspberry_pi_link(self, obj):
-        result = []
-        if obj.raspberry_pi:
-            result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
-                url=reverse('admin:adsrental_raspberrypi_changelist'),
-                rpid=obj.raspberry_pi,
-            ))
+        if not obj.raspberry_pi:
+            return None
 
-        return result
+        return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            rpid=obj.raspberry_pi,
+        ))
 
     def mark_as_qualified(self, request, queryset):
         for lead in queryset:
@@ -235,9 +235,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
             'objects': queryset,
             'form': form,
         })
-
-    last_touch.allow_tags = True
-    raspberry_pi_link.allow_tags = True
 
     last_touch.admin_order_field = 'last_touch_date'
     raspberry_pi_link.admin_order_field = 'raspberry_pi__rpid'

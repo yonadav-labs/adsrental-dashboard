@@ -81,7 +81,7 @@ class EC2Instance(models.Model):
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='RPID that was inserted to EC2 metadata')
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Lead email')
-    lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead')
+    lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL)
     hostname = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 hostname. Updates everytime EC2 restarts. RPi use it to create tunnels.')
     ip_address = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 IP. Updates everytime EC2 restarts.')
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING, help_text='Status of EC2, same as in AWS UI')

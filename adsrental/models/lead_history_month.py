@@ -25,7 +25,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
-    lead = models.ForeignKey('adsrental.Lead', help_text='Linked lead.')
+    lead = models.ForeignKey('adsrental.Lead', help_text='Linked lead.', on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
     days_offline = models.IntegerField(default=0, help_text='Days when device had been online less than 12 hours.')
     days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 12 hours.')

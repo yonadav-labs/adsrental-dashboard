@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-import urllib
+from urllib.parse import urlencode
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -33,7 +33,7 @@ class CustomIndexDashboard(Dashboard):
             children=[
                 [_('Master Report for Facebook Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         account_type='facebook',
                         status='Active',
                         company__exact='FBM',
@@ -41,14 +41,14 @@ class CustomIndexDashboard(Dashboard):
                 )],
                 [_('Master Report for Google Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         account_type='google',
                         status='active',
                     )),
                 )],
                 [_('Master Report for ACM Google Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         account_type='google',
                         status='Active',
                         company__exact='ACM',
@@ -56,13 +56,13 @@ class CustomIndexDashboard(Dashboard):
                 )],
                 [_('Check Report for current month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         date=datetime.date.today().replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
                     )),
                 )],
                 [_('Check Report for previous month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
                     )),
                 )],
@@ -71,7 +71,7 @@ class CustomIndexDashboard(Dashboard):
                     now.strftime(settings.HUMAN_DATE_FORMAT),
                 )), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         shipped_date='current_week',
                     )),
                 )],
@@ -80,7 +80,7 @@ class CustomIndexDashboard(Dashboard):
                     prev_week_end.strftime(settings.HUMAN_DATE_FORMAT),
                 )), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         shipped_date='previous_week',
                     )),
                 )],
@@ -89,13 +89,13 @@ class CustomIndexDashboard(Dashboard):
                     now.strftime(settings.HUMAN_DATE_FORMAT),
                 )), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         shipped_date='current_month',
                     )),
                 )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
-                    urllib.urlencode(dict(
+                    urlencode(dict(
                         lead_status='Active',
                         online='online',
                         tunnel_up='no',

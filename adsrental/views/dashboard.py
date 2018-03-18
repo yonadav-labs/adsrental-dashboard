@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 import datetime
-import urllib
+from urllib.parse import urlencode
 
 from django.views import View
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -67,7 +67,7 @@ class SetPasswordView(View):
             lead.save()
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
-                urllib.urlencode(dict(
+                urlencode(dict(
                     search=lead.email,
                 )),
             ))

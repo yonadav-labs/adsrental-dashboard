@@ -4,9 +4,10 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.utils import timezone
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
 from adsrental.models.lead import Lead
@@ -94,22 +95,22 @@ class LeadAdmin(admin.ModelAdmin):
 
     def name(self, obj):
         if obj.note:
-            return '<span class="has_note" title="{}">{}</span>'.format(
+            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
                 obj.note,
                 obj.name(),
-            )
+            ))
         return obj.name()
 
     def status_field(self, obj):
         title = 'Show changes'
         if obj.ban_reason:
             title = 'Banned for {}'.format(obj.ban_reason)
-        return '<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
             title=title,
             status=obj.status,
-        )
+        ))
 
     def bundler_field(self, obj):
         if obj.bundler:
@@ -124,19 +125,19 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.get_phone_formatted()
 
     def last_touch(self, obj):
-        return '<span title="Touched {} times">{}</span>'.format(
+        return mark_safe('<span title="Touched {} times">{}</span>'.format(
             obj.touch_count,
             naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
-        )
+        ))
 
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
-            return '<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(
+            return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(
                 naturaltime(obj.raspberry_pi.first_tested),
-            )
+            ))
 
         return None
 
@@ -145,7 +146,7 @@ class LeadAdmin(admin.ModelAdmin):
             return None
 
         first_seen = obj.raspberry_pi.get_first_seen()
-        return u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen))
+        return mark_safe(u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
 
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
@@ -153,36 +154,36 @@ class LeadAdmin(admin.ModelAdmin):
 
         last_seen = obj.raspberry_pi.get_last_seen()
 
-        return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
+        return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def facebook_account_column(self, obj):
-        return '{} {}'.format(
+        return mark_safe('{} {}'.format(
             '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '',
             obj.facebook_account_status,
-        )
+        ))
 
     def google_account_column(self, obj):
-        return '{} {}'.format(
+        return mark_safe('{} {}'.format(
             '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '',
             obj.google_account_status,
-        )
+        ))
 
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:
             return None
 
-        return '<span title="{}">{}</span> <a href="{}" target="_blank">Fix</a>'.format(
+        return mark_safe('<span title="{}">{}</span> <a href="{}" target="_blank">Fix</a>'.format(
             obj.wrong_password_date,
             naturaltime(obj.wrong_password_date),
             reverse('dashboard_set_password', kwargs=dict(lead_id=obj.leadid)),
-        )
+        ))
 
     def raspberry_pi_link(self, obj):
         if obj.raspberry_pi:
-            return '<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+            return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
                 rpid=obj.raspberry_pi,
-            )
+            ))
 
     def links(self, obj):
         result = []
@@ -193,7 +194,7 @@ class LeadAdmin(admin.ModelAdmin):
                 'rpid': obj.raspberry_pi.rpid,
             })))
 
-        return ', '.join(result)
+        return mark_safe(', '.join(result))
 
     def ec2_instance_link(self, obj):
         result = []
@@ -205,7 +206,7 @@ class LeadAdmin(admin.ModelAdmin):
                 q=ec2_instance.instance_id,
             ))
 
-        return '\n'.join(result)
+        return mark_safe('\n'.join(result))
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
@@ -338,50 +339,43 @@ class LeadAdmin(admin.ModelAdmin):
             lead.touch()
             messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
 
-    status_field.allow_tags = True
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
 
     wrong_password_date_field.short_description = 'Wrong Password'
-    wrong_password_date_field.allow_tags = True
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
 
-    tested_field.allow_tags = True
     tested_field.short_description = 'Tested'
 
-    last_touch.allow_tags = True
     last_touch.admin_order_field = 'last_touch_date'
     id_field.short_description = 'ID'
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
-    ec2_instance_link.allow_tags = True
-    email_field.allow_tags = True
+
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
+
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
+
     raspberry_pi_link.short_description = 'Raspberry PI'
-    raspberry_pi_link.allow_tags = True
+
     first_seen.empty_value_display = 'Never'
     first_seen.admin_order_field = 'raspberry_pi__first_seen'
-    first_seen.allow_tags = True
+
     last_seen.empty_value_display = 'Never'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
-    last_seen.allow_tags = True
+
     facebook_account_column.short_description = 'Facebook Account'
-    facebook_account_column.allow_tags = True
+
     google_account_column.admin_order_field = 'facebook_account'
     google_account_column.short_description = 'Google Account'
-    google_account_column.allow_tags = True
     google_account_column.admin_order_field = 'google_account'
 
     bundler_field.short_description = 'Bundler'
     bundler_field.admin_order_field = 'utm_source'
 
-    name.allow_tags = True
     name.admin_order_field = 'first_name'
-
-    links.allow_tags = True
 
     phone_field.short_description = 'Phone'
     phone_field.admin_order_field = 'phone'

@@ -2,11 +2,12 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone, timesince
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.utils.safestring import mark_safe
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
@@ -49,11 +50,11 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         lead = obj.get_lead()
         if lead is None:
             return obj.leadid
-        return '<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.email,
             q=lead.leadid,
-        )
+        ))
 
     def lead_status(self, obj):
         return obj.lead and obj.lead.status
@@ -70,7 +71,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
                 q=ec2_instance.instance_id,
             ))
 
-        return '\n'.join(result)
+        return mark_safe('\n'.join(result))
 
     def online(self, obj):
         return obj.online()
@@ -90,16 +91,16 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def first_tested_field(self, obj):
         if not obj.first_tested:
-            return '<img src="/static/admin/img/icon-no.svg" title="Never" alt="False">'
+            return mark_safe('<img src="/static/admin/img/icon-no.svg" title="Never" alt="False">')
 
-        return '<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(naturaltime(obj.first_tested))
+        return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(naturaltime(obj.first_tested)))
 
     def first_seen_field(self, obj):
         if obj.first_seen is None:
             return None
 
         first_seen = obj.get_first_seen()
-        return u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen))
+        return mark_safe(u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
 
     def last_seen_field(self, obj):
         if obj.last_seen is None:
@@ -107,7 +108,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
         last_seen = obj.get_last_seen()
 
-        return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
+        return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def restart_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
@@ -129,32 +130,25 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             rpid=obj.rpid,
         ))
 
-        return ', '.join(links)
+        return mark_safe(', '.join(links))
 
     lead_link.short_description = 'Lead'
-    lead_link.allow_tags = True
 
     ec2_instance_link.short_description = 'EC2 Instance'
-    ec2_instance_link.allow_tags = True
 
     online.boolean = True
 
     tunnel_online.boolean = True
 
     first_tested_field.short_description = 'Tested'
-    first_tested_field.allow_tags = True
     first_tested_field.admin_order_field = 'first_tested'
 
     first_seen_field.short_description = 'First Seen'
     first_seen_field.empty_value_display = 'Never'
-    first_seen_field.allow_tags = True
     first_seen_field.admin_order_field = 'first_seen'
 
     last_seen_field.short_description = 'Last Seen'
     last_seen_field.empty_value_display = 'Never'
-    last_seen_field.allow_tags = True
     last_seen_field.admin_order_field = 'last_seen'
-
-    links.allow_tags = True
 
     uptime.admin_order_field = 'online_since_date'

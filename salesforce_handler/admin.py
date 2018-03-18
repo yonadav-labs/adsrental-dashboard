@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from .models import Lead, RaspberryPi, Ec2Instance, BrowserExtension
@@ -44,8 +44,6 @@ class LeadAdmin(admin.ModelAdmin):
 
         return u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen))
 
-    last_seen.allow_tags = True
-    email_field.allow_tags = True
     email_field.short_description = 'Email'
     email_field.admin_order_field = 'email'
     online.boolean = True
@@ -62,8 +60,6 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             '<a href="/log/{}" target="_blank">Logs</a>'.format(obj.name),
             '<a href="/rdp.php?i={}&h={}" target="_blank">RDP</a>'.format(obj.name, obj.name),
         ])
-
-    links.allow_tags = True
 
 
 class Ec2InstanceAdmin(admin.ModelAdmin):
