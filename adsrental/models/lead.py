@@ -471,13 +471,23 @@ class Lead(models.Model, FulltextSearchMixin):
             'API': 'TrackV2',
             'xml': xml,
         })
-
-        tree = ElementTree.fromstring(response.text)
-        pi_delivered = False
         try:
-            pi_delivered = 'delivered' in tree.find('TrackInfo').getchildren()[0].text
+            tree = ElementTree.fromstring(response.text)
         except:
-            pass
+            return
+        pi_delivered = False
+        track_info = tree.find('TrackInfo')
+        if track_info is None:
+            return
+
+        track_details = track_info.findall('TrackDetail')
+        pi_delivered = False
+        for track_detail in track_details:
+            if not track_detail.text:
+                continue
+            if track_detail.text.lower().startswith('delivered'):
+                pi_delivered = True
+                break
 
         if self.pi_delivered != pi_delivered:
             self.pi_delivered = pi_delivered
