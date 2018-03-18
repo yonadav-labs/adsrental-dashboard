@@ -1,10 +1,10 @@
 @reboot /root/pull.sh restart
 
-# 0 * * * * /usr/bin/curl --silent https://adsrental.com/cron/sync_ec2/?pending=true\&execute=true >> /root/cron.log
+# 0 * * * * /usr/bin/curl --silent https://adsrental.com/cron/sync_ec2/?pending=true\&execute=true >> /root/logs/cron_sync_ec2.log
 # 0 * * * * bash /root/dashboard/scripts/revive_rpis.sh
 0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
-0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/sync_from_shipstation/?days_ago=1 >> /root/cron_sync_from_shipstation.log
-0 * * * * /usr/bin/curl https://adsrental.com/app/cron/sync_delivered/ >> /root/cron_sync_delivered.log
-0 * * * * /usr/bin/curl --silent https://adsrental.com/cron/lead_history/?now=true >> /root/cron_lead_history.log
-*/10 * * * * /usr/bin/curl --silent https://adsrental.com/cron/sync_offline/ >> /root/cron_sync_offline.log
-*/2 * * * * /usr/bin/curl https://adsrental.com/cron/update_ping/ >> /root/cron_update_ping.log
+0 * * * * /usr/bin/curl --silent https://adsrental.com/app/cron/sync_from_shipstation/?days_ago=1 >> /root/logs/cron_sync_from_shipstation.log
+0 * * * * /usr/bin/curl https://adsrental.com/app/cron/sync_delivered/ >> /root/logs/cron_sync_delivered.log
+0 * * * * /usr/bin/curl --silent https://adsrental.com/cron/lead_history/?now=true >> /root/logs/cron_lead_history.log
+*/10 * * * * /usr/bin/curl --silent https://adsrental.com/cron/sync_offline/ >> /root/logs/cron_sync_offline.log
+*/2 * * * * /usr/bin/curl https://adsrental.com/cron/update_ping/ >> /root/logs/cron_update_ping.log
