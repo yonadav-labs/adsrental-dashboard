@@ -74,6 +74,8 @@ class SyncDeliveredView(View):
 
         if not test:
             bulk_update(leads, update_fields=['tracking_info', 'pi_delivered'])
+        else:
+            bulk_update(leads, update_fields=['tracking_info', ])
 
         return JsonResponse({
             'all': all,
