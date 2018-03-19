@@ -11,7 +11,10 @@ class ThankyouView(View):
     page where use can provide his *splashtop_id*. Populates *splashtop_id* in :model:`adsrental.Lead`.
     '''
     def get(self, request, leadid=None):
-        return render(request, 'thankyou.html')
+        lead = Lead.objects.filter(leadid=leadid).first()
+        return render(request, 'thankyou.html', dict(
+            email=lead and lead.email,
+        ))
 
     def post(self, request, leadid=None):
         lead = Lead.objects.filter(leadid=leadid).first()
