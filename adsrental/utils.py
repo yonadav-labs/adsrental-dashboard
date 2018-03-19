@@ -380,7 +380,7 @@ class PingCacheHelper(object):
             cache.set(self.KEYS, keys)
 
     def get_data_for_request(self, request):
-        rpid = request.GET.get('rpid')
+        rpid = request.GET.get('rpid', '').strip()
         troubleshoot = request.GET.get('troubleshoot')
         ip_address = request.META.get('REMOTE_ADDR')
         version = request.GET.get('version')
