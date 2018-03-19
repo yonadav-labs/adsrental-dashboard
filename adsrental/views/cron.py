@@ -84,7 +84,7 @@ class SyncEC2View(View):
         if pending:
             boto_resource = BotoResource().get_resource()
             updated_rpids = []
-            instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING])
+            instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING]).order_by('created')
             for instance in instances:
                 if execute:
                     boto_instance = instance.get_boto_instance(boto_resource)
