@@ -406,7 +406,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return '{} {}'.format(self.first_name, self.last_name)
 
     def safe_name(self):
-        return self.name().encode('ascii', errors='replace')
+        return self.name().encode('ascii', errors='replace').decode()
 
     def str(self):
         return 'Lead {} ({})'.format(self.name(), self.email)
@@ -435,12 +435,12 @@ class Lead(models.Model, FulltextSearchMixin):
                 '00N46000009whHb': request and request.META.get('HTTP_USER_AGENT'),
                 '00N4600000B0zip': 1,
                 '00N4600000B1Sup': 'Available',
-                'Facebook_Email__c': base64.b64encode(self.fb_email.encode()),
-                'Facebook_Password__c': base64.b64encode(self.fb_secret.encode()),
+                'Facebook_Email__c': base64.b64encode(self.fb_email.encode()).decode(),
+                'Facebook_Password__c': base64.b64encode(self.fb_secret.encode()).decode(),
                 'Facebook_Friends__c': self.fb_friends,
                 'Account_Name__c': self.account_name,
                 'email': self.email,
-                'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(self.email.encode())),
+                'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(self.email.encode()).decode()),
             }
         )
         return response
@@ -493,7 +493,7 @@ class Lead(models.Model, FulltextSearchMixin):
             return None
         try:
             tree = ElementTree.fromstring(tracking_info_xml)
-        except:
+        except Exception:
             return None
 
         track_info = tree.find('TrackInfo')
@@ -530,7 +530,7 @@ class Lead(models.Model, FulltextSearchMixin):
         ec2_instance = None
         try:
             ec2_instance = self.ec2instance
-        except:
+        except Exception:
             pass
         return ec2_instance
 
