@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import uuid
-import base64
 import json
 
 from django.views import View
@@ -67,7 +66,7 @@ class SignupView(View):
 
         lead = Lead.objects.filter(email=data['email']).first()
         if lead:
-            return redirect('thankyou_email', b64_email=base64.b64encode(lead.email.encode()).decode())
+            return redirect('thankyou_email', leadid=lead.leadid)
 
         lead_id = str(uuid.uuid4()).replace('-', '')
         last_account_name = Lead.objects.filter(account_name__startswith='ACT').order_by('-account_name').first().account_name
@@ -102,4 +101,4 @@ class SignupView(View):
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
         customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_APPROVED, account_type='facebook')
-        return redirect('thankyou_email', b64_email=base64.b64encode(lead.email.encode()).decode())
+        return redirect('thankyou_email', leadid=lead.leadid)
