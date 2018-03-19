@@ -232,7 +232,7 @@ class BotoResource(object):
         try:
             self.get_resource('ec2').create_tags(
                 Resources=[instance.id], Tags=tags)
-        except:
+        except Exception:
             pass
 
     def launch_instance(self, rpid, email):
@@ -311,7 +311,7 @@ class PingCacheHelper(object):
 
         return True
 
-    def is_data_consistent(self, data, ec2_instance):
+    def is_data_consistent(self, data, ec2_instance, raspberry_pi):
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
         wrong_password = data['wrong_password']

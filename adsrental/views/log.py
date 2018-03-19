@@ -154,7 +154,7 @@ class LogView(View):
                 if version and StrictVersion(version) < StrictVersion('1.1.2'):
                     restart_required = True
 
-            if hostname:
+            if hostname is not None:
                 if ec2_hostname != hostname and ec2_ip_address != hostname:
                     self.add_log(request, rpid, 'Hostname changed, restarting')
                     new_config_required = True
