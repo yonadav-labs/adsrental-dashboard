@@ -153,10 +153,10 @@ class LeadHistoryView(View):
             leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
-            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
-            d = d.replace(day=1)
+            start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
+            start_date = start_date.replace(day=1)
             for lead in leads:
-                LeadHistoryMonth.get_or_create(lead=lead, date=d).aggregate()
+                LeadHistoryMonth.get_or_create(lead=lead, date=start_date).aggregate()
             return JsonResponse({
                 'result': True,
             })
@@ -202,7 +202,7 @@ class UpdatePingView(View):
         ping_keys = cache.get('ping_keys', [])
         rpid = request.GET.get('rpid')
         if rpid:
-            ping_keys = [RaspberryPi.get_ping_key(rpid)]
+            ping_keys = [ping_cache_helper.get_key(rpid)]
 
         rpids_ping_map = {}
         for ping_key in ping_keys:
@@ -247,7 +247,7 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up_date = last_ping
                         ec2_instance.tunnel_up = True
 
-            if not ping_cache_helper.is_data_consistent(ping_data, ec2_instance, raspberry_pi):
+            if not ping_cache_helper.is_data_consistent(ping_data, ec2_instance):
                 ping_cache_helper.delete(rpid)
                 invalidated_rpids.append(rpid)
 

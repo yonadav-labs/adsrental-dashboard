@@ -47,7 +47,8 @@ class EC2Instance(models.Model):
 
     1. Check if RPi online is green. If it is not - device is turned off, so proxy does not work. Ask user to check his device and if green LED is blinking.
     2. Check Tunnel up column. If it is *Yes* then just wait. RaspberryPi device tries to revive tunnel every 10 minutes and it works in 95% of cases.
-    3. If you waited longer than 10 minutes and tunnel is still down, choose *Stop* action for this EC2. Tunnel should be up once EC2 restarts. Takes 1-10 minutes.
+    3. If you waited longer than 10 minutes and tunnel is still down, choose *Stop* action for this EC2.
+       Tunnel should be up once EC2 restarts. Takes 1-10 minutes.
 
     **I see black window when I connect to EC2**
 
@@ -82,7 +83,9 @@ class EC2Instance(models.Model):
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='RPID that was inserted to EC2 metadata')
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Lead email')
     lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL)
-    hostname = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 hostname. Updates everytime EC2 restarts. RPi use it to create tunnels.')
+    hostname = models.CharField(
+        max_length=255, blank=True, null=True, help_text='Public EC2 hostname. Updates everytime EC2 restarts. RPi use it to create tunnels.',
+    )
     ip_address = models.CharField(max_length=255, blank=True, null=True, help_text='Public EC2 IP. Updates everytime EC2 restarts.')
     status = models.CharField(choices=STATUS_CHOICES, max_length=255, db_index=True, default=STATUS_MISSING, help_text='Status of EC2, same as in AWS UI')
     is_duplicate = models.BooleanField(default=False, help_text='Obsolete field')
@@ -212,7 +215,7 @@ class EC2Instance(models.Model):
             self.save()
             return self
 
-        Lead = apps.get_app_config('adsrental').get_model('Lead')
+        lead_model = apps.get_app_config('adsrental').get_model('Lead')
         tags_changed = False
         rpid = self.get_tag(boto_instance, 'Name')
         lead_email = self.get_tag(boto_instance, 'Email')
@@ -220,7 +223,7 @@ class EC2Instance(models.Model):
         self.status = boto_instance.state['Name']
         is_active = self.is_active()
 
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first() if is_active else None
+        lead = lead_model.objects.filter(raspberry_pi__rpid=rpid).first() if is_active else None
 
         self.email = lead_email
         self.rpid = rpid
@@ -240,12 +243,6 @@ class EC2Instance(models.Model):
 
     def __str__(self):
         return self.instance_id
-        if self.is_tunnel_up():
-            return self.instance_id
-        if self.is_running():
-            return '{} (down)'.format(self.instance_id)
-
-        return '{} ({})'.format(self.instance_id, self.status)
 
     def get_ssh(self):
         '''
@@ -257,7 +254,7 @@ class EC2Instance(models.Model):
         ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=20)
         return ssh
 
-    def ssh_execute(self, cmd, input=None, ssh=None, blocking=True):
+    def ssh_execute(self, cmd, input_list=None, ssh=None, blocking=True):
         '''
         Safe execute SSH command on EC2 and get output.
         '''
@@ -267,8 +264,8 @@ class EC2Instance(models.Model):
             except Exception:
                 return None
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
-        if input:
-            for line in input:
+        if input_list:
+            for line in input_list:
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
         if blocking:
@@ -356,7 +353,7 @@ class EC2Instance(models.Model):
     def restart(self):
         'Restart instance. DO not use, as it can take up to 10 minutes.'
         if not settings.MANAGE_EC2:
-            return
+            return False
         self.stop(blocking=True)
         self.start(blocking=True)
         return True
@@ -393,7 +390,7 @@ class EC2Instance(models.Model):
     def mark_as_missing(self):
         'Mark instance that not present in AWS.'
         self.status = self.STATUS_MISSING
-        self.tunnel_up = False
+        self.tunnel_up_date = None
         self.save()
 
     def troubleshoot(self):
@@ -430,17 +427,17 @@ class EC2Instance(models.Model):
 
     def troubleshoot_proxy(self):
         'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'
-        cmd_to_execute = '''reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable'''
+        cmd_to_execute = 'reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable'
         output = self.ssh_execute(cmd_to_execute)
         if '0x1' in output:
             return
 
         ssh = self.get_ssh()
-        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'''
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'
         ssh.exec_command(cmd_to_execute)
-        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'''
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'
         ssh.exec_command(cmd_to_execute)
-        cmd_to_execute = '''reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'''
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'
         ssh.exec_command(cmd_to_execute)
         ssh.close()
 
@@ -449,7 +446,7 @@ class EC2Instance(models.Model):
         if not self.lead or not self.lead.raspberry_pi:
             return
 
-        if not self.tunnel_up:
+        if self.tunnel_up_date is None:
             return
 
         raspberry_pi = self.lead.raspberry_pi
@@ -484,4 +481,5 @@ class EC2Instance(models.Model):
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
 
     def clear_ping_cache(self):
+        'Delete cache for this instance RPID.'
         PingCacheHelper().delete(self.rpid)

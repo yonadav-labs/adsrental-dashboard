@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+'Helper classes'
 import json
 import time
 import uuid
@@ -17,6 +16,7 @@ from adsrental.models.customerio_event import CustomerIOEvent
 
 
 class CustomerIOClient(object):
+    '''Manages lead data ans send events for leads to customer.io'''
     EVENT_SHIPPED = 'shipped'
     EVENT_DELIVERED = 'delivered'
     EVENT_OFFLINE = 'offline'
@@ -32,9 +32,22 @@ class CustomerIOClient(object):
             settings.CUSTOMERIO_SITE_ID, settings.CUSTOMERIO_API_KEY)
 
     def get_client(self):
+        '''
+        Get customer.io client
+
+        Returns:
+            customerio.CustomerIO instance.
+        '''
         return self.client
 
     def send_lead(self, lead):
+        '''
+        Save lead info like email and phone to customer.io database.
+
+        *lead* - :model:`adsrental.Lead` instance
+
+        Returns customerio.CustomerIO instance.
+        '''
         clean_phone = '+1' + (''.join([i for i in lead.phone if i.isdigit()]))
         if self.client:
             self.client.identify(
@@ -55,6 +68,15 @@ class CustomerIOClient(object):
             )
 
     def send_lead_event(self, lead, event, **kwargs):
+        '''
+        Create a new :model:`adsrental.Lead` event, like banned or approved.
+
+        *lead* - :model:`adsrental.Lead` instance
+        *event* - event name, should be one of listed.
+        All other keyword arguments are passed to  CustomerIOEvent kwrags
+
+        Returns customerio.CustomerIO instance.
+        '''
         send = True
         if not self.client:
             send = False
@@ -70,18 +92,22 @@ class CustomerIOClient(object):
             self.client.track(customer_id=lead.leadid, name=event, **kwargs)
 
     def is_enabled(self):
+        'Check if client is initialized.'
         return self.client is not None
 
 
 class ShipStationClient(object):
+    'Handles order creation and check on shipstation.'
     def __init__(self):
         self.client = ShipStation(
             key=settings.SHIPSTATION_API_KEY, secret=settings.SHIPSTATION_API_SECRET)
 
     def get_client(self):
+        'Get native shipstation client'
         return self.client
 
     def add_lead_order(self, lead):
+        'Create order for given lead.'
         if not lead.shipstation_order_number:
             random_str = str(uuid.uuid4()).replace('-', '')[:10]
             lead.shipstation_order_number = '{}__{}'.format(lead.raspberry_pi.rpid, random_str)
@@ -123,6 +149,7 @@ class ShipStationClient(object):
         return order
 
     def submit_orders(self):
+        'Submit all created or changed orders.'
         for order in self.client.orders:
             self.post(
                 endpoint='/orders/createorder',
@@ -130,18 +157,21 @@ class ShipStationClient(object):
             )
 
     def post(self, endpoint='', data=None):
+        'Rewrite original shipstaion.post method to catch exceptions.'
         url = '{}{}'.format(self.client.url, endpoint)
         headers = {'content-type': 'application/json'}
-        r = requests.post(
+        response = requests.post(
             url,
             auth=(self.client.key, self.client.secret),
             data=data,
             headers=headers
         )
-        if r.status_code not in [200, 201]:
-            raise ValueError('Shipstation Error', r.status_code, r.text)
+        if response.status_code not in [200, 201]:
+            raise ValueError('Shipstation Error', response.status_code, response.text)
 
-    def get_lead_order_data(self, lead):
+    @staticmethod
+    def get_lead_order_data(lead):
+        'Get order data for lead.'
         if not lead.shipstation_order_number:
             return None
         data = requests.get(
@@ -155,6 +185,7 @@ class ShipStationClient(object):
 
 
 class BotoResource(object):
+    'Handles AWS boto operations.'
     def __init__(self):
         self.session = boto3.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -163,6 +194,7 @@ class BotoResource(object):
         self.resources = {}
 
     def get_resource(self, service='ec2'):
+        'Get boto resource for given service. Chaches results.'
         if not self.resources.get(service):
             resource = self.session.resource(
                 service, region_name=settings.AWS_REGION)
@@ -171,6 +203,7 @@ class BotoResource(object):
         return self.resources[service]
 
     def get_first_rpid_instance(self, rpid):
+        'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
                 {
@@ -209,6 +242,7 @@ class BotoResource(object):
 
     @staticmethod
     def get_instance_tag(instance, key):
+        'Get instance tag value by key'
         if not instance.tags:
             return None
 
@@ -219,6 +253,7 @@ class BotoResource(object):
         return None
 
     def set_instance_tag(self, instance, key, value):
+        'Set instance tag value by key'
         tags = instance.tags or []
         key_found = False
         for tagpair in tags:
@@ -236,6 +271,7 @@ class BotoResource(object):
             pass
 
     def launch_instance(self, rpid, email):
+        'Start otr create AWS EC2 instance for given RPID'
         instance = self.get_first_rpid_instance(rpid)
         if not instance:
             self.get_resource('ec2').create_instances(
@@ -271,12 +307,13 @@ class BotoResource(object):
             if not instance:
                 raise ValueError('Boto did not create isntance. Try again.')
 
-        EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
-        instance = EC2Instance.upsert_from_boto(instance)
+        ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
+        instance = ec2_instance_model.upsert_from_boto(instance)
         return instance
 
 
 class PingCacheHelper(object):
+    'Simplifies cache operations for updating timestamps'
     KEY_TEMPLATE = 'ping_{}'
     KEYS = 'ping_keys'
     TTL_SECONDS = 300
@@ -286,15 +323,19 @@ class PingCacheHelper(object):
         self.cache = cache
 
     def get_key(self, rpid):
+        'Get keys string for given rpid'
         return self.KEY_TEMPLATE.format(rpid)
 
     def get(self, rpid):
+        'Get data for rpid if it is valid'
         data = self.cache.get(self.get_key(rpid))
         if not self.is_data_valid(data):
             return None
         return data
 
-    def is_data_valid(self, data):
+    @staticmethod
+    def is_data_valid(data):
+        'Check if cache data is valid'
         if not data:
             return False
 
@@ -311,33 +352,38 @@ class PingCacheHelper(object):
 
         return True
 
-    def is_data_consistent(self, data, ec2_instance, raspberry_pi):
+    @staticmethod
+    def is_data_consistent(data, ec2_instance):
+        'Check if cache data is consistent against current DB state'
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
 
-        if not ec2_instance:
-            return True
-
-        if ec2_instance_status != ec2_instance.status:
+        if ec2_instance and ec2_instance_status != ec2_instance.status:
             return False
 
-        if ec2_instance.is_status_temp():
+        if ec2_instance and ec2_instance.is_status_temp():
             return False
 
-        if ec2_ip_address != ec2_instance.ip_address:
+        if ec2_instance and ec2_ip_address != ec2_instance.ip_address:
             return False
 
-        if ec2_instance.lead and lead_status != ec2_instance.lead.status:
+        if ec2_instance and ec2_instance.lead and lead_status != ec2_instance.lead.status:
             return False
 
-        if ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
+        if ec2_instance and ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
             return False
 
         return True
 
     def set(self, rpid, data):
+        '''
+        Create cache entry for rpid
+
+        *rpid* - rpid string
+        *data* - redis-compatible data to set
+        '''
         key = self.get_key(rpid)
         self.cache.set(key, data, self.TTL_SECONDS)
         keys = cache.get(self.KEYS, [])
@@ -346,8 +392,13 @@ class PingCacheHelper(object):
             cache.set(self.KEYS, keys)
 
     def get_actual_data(self, rpid):
-        Lead = apps.get_model('adsrental', 'Lead')
-        lead = Lead.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
+        '''
+        Get data for rpid for DB
+
+        *rpid* - rpid string
+        '''
+        lead_model = apps.get_model('adsrental', 'Lead')
+        lead = lead_model.objects.filter(raspberry_pi__rpid=rpid).select_related('ec2instance', 'raspberry_pi').first()
         raspberry_pi = lead and lead.raspberry_pi
         ec2_instance = lead and lead.get_ec2_instance()
         restart_required = raspberry_pi and raspberry_pi.restart_required
@@ -372,6 +423,7 @@ class PingCacheHelper(object):
         return data
 
     def delete(self, rpid):
+        '''Delete cache data for rpid'''
         key = self.get_key(rpid)
         self.cache.delete(key)
         keys = cache.get(self.KEYS, [])
@@ -380,6 +432,7 @@ class PingCacheHelper(object):
             cache.set(self.KEYS, keys)
 
     def get_data_for_request(self, request):
+        '''Get data from cache or db using request.GET'''
         rpid = request.GET.get('rpid', '').strip()
         troubleshoot = request.GET.get('troubleshoot')
         ip_address = request.META.get('REMOTE_ADDR')

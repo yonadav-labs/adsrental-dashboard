@@ -47,12 +47,15 @@ class LeadHistory(models.Model):
         lead_history.save()
 
     def is_online(self):
+        'Check iff device was online for more than 12 checks.'
         return self.checks_online > self.checks_offline
 
     def is_active(self):
+        'Check password was not reported as wrong and device was online'
         return not self.is_wrong_password() and self.is_online()
 
     def is_wrong_password(self):
+        'Check if password for this dayn was reported wrong at lead once.'
         return self.checks_wrong_password
 
     @classmethod
