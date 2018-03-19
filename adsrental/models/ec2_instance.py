@@ -264,7 +264,7 @@ class EC2Instance(models.Model):
         if not ssh:
             try:
                 ssh = self.get_ssh()
-            except:
+            except Exception:
                 return None
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input:
@@ -275,7 +275,7 @@ class EC2Instance(models.Model):
             try:
                 stderr = ssh_stderr.read()
                 stdout = ssh_stdout.read()
-            except:
+            except Exception:
                 return None
             ssh.close()
             return 'OUT: {}\nERR: {}'.format(stdout, stderr)
@@ -410,7 +410,7 @@ class EC2Instance(models.Model):
         self.troubleshoot_status()
         try:
             self.troubleshoot_proxy()
-        except:
+        except Exception:
             pass
 
         self.save()
@@ -464,7 +464,7 @@ class EC2Instance(models.Model):
             return
         try:
             self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
-        except:
+        except Exception:
             raise
 
         self.password = settings.EC2_ADMIN_PASSWORD

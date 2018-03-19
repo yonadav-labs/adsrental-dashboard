@@ -64,7 +64,7 @@ class LogView(View):
 
     def fix_ec2_state(self, request, rpid, lead_status, ec2_instance_status):
         if Lead.is_status_active(lead_status):
-            if not EC2Instance.is_status_active(ec2_instance_status):
+            if not EC2Instance.is_status_running(ec2_instance_status):
                 ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
                 if not ec2_instance:
                     self.add_log(request, rpid, 'Trying to launch missing EC2')
