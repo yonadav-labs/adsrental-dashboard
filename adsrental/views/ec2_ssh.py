@@ -11,7 +11,7 @@ class StartReverseTunnelView(View):
         ec2_instance = EC2Instance.objects.get(rpid=rpid)
         try:
             ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
-        except:
+        except Exception:
             return JsonResponse(dict(result=False))
         return JsonResponse(dict(result=True))
 
@@ -22,6 +22,6 @@ class GetNetstatView(View):
         output = ''
         try:
             output = ec2_instance.ssh_execute('netstat -an')
-        except:
+        except Exception:
             pass
         return HttpResponse(output, content_type='text/plain')
