@@ -278,7 +278,7 @@ class EC2Instance(models.Model):
             except Exception:
                 return None
             ssh.close()
-            return 'OUT: {}\nERR: {}'.format(stdout, stderr)
+            return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
 
         return True
 
