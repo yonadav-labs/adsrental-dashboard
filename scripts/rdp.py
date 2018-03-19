@@ -86,7 +86,9 @@ if not instances:
 
 instance = None
 for i in instances:
-    instance = i
+    if i.state['Name'] == 'running':
+        instance = i
+
 print('Connecting to instance', instance.id, instance.tags, instance.public_dns_name, instance.state['Name'])
 
 hostname = instance.public_dns_name

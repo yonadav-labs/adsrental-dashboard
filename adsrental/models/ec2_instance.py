@@ -322,6 +322,7 @@ class EC2Instance(models.Model):
         boto_instance.terminate()
         self.status = self.STATUS_TERMINATED
         self.lead = None
+        self.rpid = None
         self.save()
         return True
 
