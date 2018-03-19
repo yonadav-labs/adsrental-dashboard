@@ -425,7 +425,10 @@ class TunnelUpListFilter(SimpleListFilter):
         if self.value() == 'yes':
             return queryset.filter(tunnel_up_date__gt=now - datetime.timedelta(seconds=EC2Instance.TUNNEL_UP_TTL_SECONDS))
         if self.value() == 'no':
-            return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=EC2Instance.TUNNEL_UP_TTL_SECONDS))
+            return queryset.filter(
+                Q(tunnel_up_date__lte=now - datetime.timedelta(seconds=EC2Instance.TUNNEL_UP_TTL_SECONDS)) |
+                Q(tunnel_up_date__isnull=True, lead__raspberry_pi__last_seen__isnull=False)
+            )
         if self.value() == 'no_1hour':
             return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60))
         if self.value() == 'no_1day':
