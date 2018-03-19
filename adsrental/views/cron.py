@@ -111,7 +111,7 @@ class SyncEC2View(View):
                 if lead.is_active() and not lead.get_ec2_instance():
                     if execute:
                         EC2Instance.launch_for_lead(lead)
-                    launched_rpids.append(lead.raspberry_id.rpid)
+                    launched_rpids.append(lead.raspberry_pi.rpid)
 
             return JsonResponse({
                 'launched_rpids': launched_rpids,
