@@ -56,6 +56,9 @@ class SyncEC2View(View):
             deleted_rpids = []
             existing_instance_ids = []
             for boto_instance in boto_instances:
+                status = boto_instance.state['Name']
+                if status == EC2Instance.STATUS_TERMINATED:
+                    continue
                 counter += 1
                 existing_instance_ids.append(boto_instance.id)
                 instance = EC2Instance.upsert_from_boto(boto_instance, ec2_instances_map.get(boto_instance.id))
