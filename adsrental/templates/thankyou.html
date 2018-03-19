@@ -61,7 +61,6 @@
 			<div class="container">
 				<form method="POST">
 					{% csrf_token %}
-					<input type="hidden" name="email" value="{{email}}" />
 					<input type="text" name="splashtop_id" value="" required placeholder="Splashtop ID" />
 					<button class="click-btn">Submit</button>
 				</form>

@@ -1,5 +1,3 @@
-import base64
-
 from django import template
 
 register = template.Library()
@@ -14,8 +12,3 @@ def relative_url(urlencode, field_name, value):
     encoded_querystring = '&'.join(filtered_querystring)
     url = '{}&{}'.format(url, encoded_querystring)
     return url
-
-
-@register.filter
-def b64encode(value):
-    return base64.b64encode(value)
