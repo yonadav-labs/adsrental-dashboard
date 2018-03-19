@@ -152,6 +152,12 @@ class EC2Instance(models.Model):
         for instance in instances:
             return instance
 
+    def is_status_temp(self):
+        '''
+        Check if status is not *Stopping* or *Pending*
+        '''
+        return self.status in [self.STATUS_PENDING, self.STATUS_STOPPING]
+
     @classmethod
     def is_status_active(cls, status):
         '''

@@ -1,9 +1,45 @@
 #!/usr/bin/env python
 import os
 import argparse
+from pathlib import Path
 
 import boto3
 
+
+remmina_template = '''[remmina]
+disableclipboard=0
+ssh_auth=0
+clientname=
+quality=0
+ssh_charset=
+ssh_privatekey=
+console=0
+resolution=
+group=
+password=FFyY5EresaY6/GxvPzqkLg==
+name={rpid}
+ssh_loopback=0
+shareprinter=0
+ssh_username=
+ssh_server=
+security=
+protocol=RDP
+execpath=
+sound=off
+exec=
+ssh_enabled=0
+username=Administrator
+sharefolder=
+domain=
+server={hostname}:23255
+colordepth=32
+window_maximize=1
+window_height=967
+viewmode=1
+window_width=1812
+scale=1
+sharesmartcard=0
+'''
 
 parser = argparse.ArgumentParser(description='Connect to RDP by RPID or email.')
 parser.add_argument('--rpid', help='RPID for Raspberry Pi')
@@ -18,7 +54,7 @@ if args.rpid:
         rpid = args.rpid
 
 if not args.rpid and not args.email:
-    rpid = raw_input('Enter RPID: ')
+    rpid = input('Enter RPID: ')
 
 boto_client = boto3.Session(
     aws_access_key_id='AKIAJ3IUVXDRV2ZS2QLQ',
@@ -55,12 +91,14 @@ print('Connecting to instance', instance.id, instance.tags, instance.public_dns_
 
 hostname = instance.public_dns_name
 
-password = 'AdsInc18'
-command = 'rdpy-rdpclient.py -w {width} -l {height} -u Administrator -p {password} {hostname}:23255'.format(
-    width=1024,
-    height=800,
-    hostname=hostname,
-    password=password,
-)
+fname = '{home}/.remmina/{rpid}.remmina'.format(home=str(Path.home()), rpid=rpid)
+with open(fname, 'w') as f:
+    f.write(remmina_template.format(
+        hostname=hostname,
+        rpid=rpid,
+    ))
+    f.flush()
+
+command = 'remmina -c {}'.format(fname)
 print(command)
 os.system(command)

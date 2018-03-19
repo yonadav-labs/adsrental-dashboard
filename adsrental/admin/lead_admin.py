@@ -307,7 +307,7 @@ class LeadAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead in queryset:
             if lead.unban(request.user):
-                EC2Instance.launch_for_lead(lead)
+                # EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
     def sync_to_adsdb(self, request, queryset):

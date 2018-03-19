@@ -323,6 +323,9 @@ class PingCacheHelper(object):
         if ec2_instance_status != ec2_instance.status:
             return False
 
+        if ec2_instance.is_status_temp():
+            return False
+
         if ec2_ip_address != ec2_instance.ip_address:
             return False
 
