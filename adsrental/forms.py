@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import base64
 import re
 
 from django import forms
@@ -179,7 +178,7 @@ class SignupForm(forms.Form):
     def clean_fb_email(self):
         value = self.cleaned_data['fb_email'].lower()
         existing_valus = [i[0] for i in Lead.objects.all().values_list('fb_email')]
-        if base64.b64encode(value) in existing_valus:
+        if value in existing_valus:
             raise forms.ValidationError("This Facebook email is already registered")
 
         return value
