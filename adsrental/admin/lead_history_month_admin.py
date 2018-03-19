@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
-import urllib
+from urllib.parse import urlencode
 import unicodecsv as csv
 
 from django.contrib import admin
@@ -103,7 +103,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         result = []
         result.append('<a target="_blank" href="{url}?{query}">Timestamps</a>'.format(
             url=reverse('admin:adsrental_leadhistory_changelist'),
-            query=urllib.urlencode(dict(
+            query=urlencode(dict(
                 date=obj.date.strftime(settings.SYSTEM_DATE_FORMAT),
                 q=obj.lead.email,
                 o='-5',
