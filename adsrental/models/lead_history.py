@@ -1,9 +1,9 @@
-from __future__ import unicode_literals
-
+'LeadHistory class'
 import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.db import models
+from adsrental.models.lead import Lead
 
 
 class LeadHistory(models.Model):
@@ -15,7 +15,7 @@ class LeadHistory(models.Model):
         verbose_name = 'Lead History'
         verbose_name_plural = 'Lead Histories'
 
-    lead = models.ForeignKey('adsrental.Lead', on_delete=models.CASCADE)
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
     checks_offline = models.IntegerField(default=0)
     checks_online = models.IntegerField(default=0)
@@ -24,6 +24,7 @@ class LeadHistory(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def check_lead(self):
+        'Update stats for this entry'
         if not self.lead.is_active():
             self.checks_offline += 1
             return
@@ -38,6 +39,7 @@ class LeadHistory(models.Model):
 
     @classmethod
     def upsert_for_lead(cls, lead):
+        'Create or update stats for this entry'
         today = datetime.date.today()
         lead_history = cls.objects.filter(lead=lead, date=today).first()
         if not lead_history:
@@ -60,6 +62,7 @@ class LeadHistory(models.Model):
 
     @classmethod
     def get_queryset_for_month(cls, year, month, lead_ids=None):
+        'Get all entries for given year and month'
         date__gte = datetime.date(year, month, 1)
         date__lt = datetime.date(year, month, 1) + relativedelta(months=1)
         result = cls.objects.filter(date__gte=date__gte, date__lt=date__lt)

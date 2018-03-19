@@ -330,7 +330,7 @@ class EC2Instance(models.Model):
         *blocking* - waits until instance enters *Running* state.
         '''
         if not settings.MANAGE_EC2:
-            return
+            return False
         boto_instance = self.get_boto_instance()
         self.update_from_boto(boto_instance)
         if self.status != self.STATUS_STOPPED:
@@ -365,7 +365,7 @@ class EC2Instance(models.Model):
         *blocking* - waits until instance enters *Stopped* state.
         '''
         if not settings.MANAGE_EC2:
-            return
+            return False
         boto_instance = self.get_boto_instance()
         self.update_from_boto(boto_instance)
         if self.status not in (self.STATUS_RUNNING, self.STATUS_PENDING):
