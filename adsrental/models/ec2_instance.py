@@ -248,6 +248,8 @@ class EC2Instance(models.Model):
         '''
         Create SSH connection to EC2
         '''
+        logger = paramiko.util.logging.getLogger()
+        logger.propagate = False
         private_key = paramiko.RSAKey.from_private_key_file(settings.FARMBOT_KEY)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
