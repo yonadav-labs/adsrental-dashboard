@@ -255,8 +255,8 @@ class Lead(models.Model, FulltextSearchMixin):
 
         result = response.content
         data = response.json()
-        if 'id' in data:
-            self.adsdb_account_id = data['id']
+        if data.get('account_data') and 'id' in data.get('account_data')[0]:
+            self.adsdb_account_id = data.get('account_data')[0]['id']
         self.is_sync_adsdb = True
         self.save()
         return result

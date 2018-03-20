@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+'Views for sync from ADSDB'
 import json
 import uuid
 
@@ -7,10 +6,9 @@ from django.views import View
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.shortcuts import Http404
-from adsrental.decorators import basicauth_required
 from django.views.decorators.csrf import csrf_exempt
 
-
+from adsrental.decorators import basicauth_required
 from adsrental.models.lead import Lead
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler import Bundler
@@ -42,6 +40,7 @@ class ADSDBLeadView(View):
 
     @method_decorator(basicauth_required)
     def put(self, request):
+        'Update lead info from ADSDB'
         if not request.user.is_staff:
             raise Http404
 
@@ -59,11 +58,12 @@ class ADSDBLeadView(View):
         if not lead:
             raise Http404
 
-        self.update_lead(lead, data, request.user)
+        self._update_lead(lead, data, request.user)
 
         return JsonResponse(dict(result=True))
 
-    def update_field(self, lead, field_name, value, edited_by):
+    @staticmethod
+    def _update_field(lead, field_name, value, edited_by):
         old_value = getattr(lead, field_name)
         if old_value == value:
             return False
@@ -71,30 +71,32 @@ class ADSDBLeadView(View):
         setattr(lead, field_name, value)
         lead.save()
         LeadChange(lead=lead, old_value=old_value, value=value, edited_by=edited_by).save()
+        return True
 
-    def clean_phone(self, value):
+    @staticmethod
+    def _clean_phone(value):
         if value.startswith('+1'):
             value = value[2:]
 
         digits = ''.join([i for i in value if i.isdigit()])
         return digits
 
-    def update_lead(self, lead, data, user):
+    def _update_lead(self, lead, data, user):
         if 'first_name' in data:
-            self.update_field(lead, 'first_name', data.get('first_name'), user)
+            self._update_field(lead, 'first_name', data.get('first_name'), user)
         if 'last_name' in data:
-            self.update_field(lead, 'last_name', data.get('last_name'), user)
+            self._update_field(lead, 'last_name', data.get('last_name'), user)
         if 'fb_username' in data:
-            self.update_field(lead, 'fb_email', data.get('fb_username'), user)
+            self._update_field(lead, 'fb_email', data.get('fb_username'), user)
         if 'fb_password' in data:
-            self.update_field(lead, 'fb_secret', data.get('fb_password'), user)
+            self._update_field(lead, 'fb_secret', data.get('fb_password'), user)
         if 'google_username' in data:
-            self.update_field(lead, 'google_email', data.get('google_username'), user)
+            self._update_field(lead, 'google_email', data.get('google_username'), user)
         if 'google_password' in data:
-            self.update_field(lead, 'google_password', data.get('google_password'), user)
+            self._update_field(lead, 'google_password', data.get('google_password'), user)
         if 'phone' in data:
-            phone = self.clean_phone(data.get('phone'))
-            self.update_field(lead, 'phone', phone, user)
+            phone = self._clean_phone(data.get('phone'))
+            self._update_field(lead, 'phone', phone, user)
         if 'status' in data:
             if data.get('status') == '3':
                 lead.ban(user)
@@ -102,6 +104,7 @@ class ADSDBLeadView(View):
                 lead.unban(user)
 
     def post(self, request):
+        'Create lead info from ADSDB. Not used.'
         if not request.user.is_staff:
             raise Http404
 

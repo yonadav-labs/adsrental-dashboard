@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+'Views that are called by local CRON'
 import os
 import datetime
 from multiprocessing.pool import ThreadPool
@@ -35,13 +34,13 @@ class SyncEC2View(View):
     ec2_max_results = 300
 
     def get(self, request):
-        all = request.GET.get('all')
+        process_all = request.GET.get('all') == 'true'
         pending = request.GET.get('pending')
         terminate_stopped = request.GET.get('terminate_stopped')
         missing = request.GET.get('missing')
         execute = request.GET.get('execute')
 
-        if all:
+        if process_all:
             boto_resource = BotoResource().get_resource()
             ec2_instances = EC2Instance.objects.all()
             ec2_instances_map = {}
@@ -300,11 +299,11 @@ class SyncDeliveredView(View):
         not_delivered = []
         errors = []
         changed = []
-        all = request.GET.get('all') == 'true'
+        process_all = request.GET.get('all') == 'true'
         test = request.GET.get('test') == 'true'
         threads = int(request.GET.get('threads', 10))
         days_ago = int(request.GET.get('days_ago', 31))
-        if all:
+        if process_all:
             leads = Lead.objects.filter(
                 status__in=Lead.STATUSES_ACTIVE,
                 usps_tracking_code__isnull=False,

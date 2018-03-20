@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+'Obsolete, should be moved'
 from django.views import View
 from django.http import FileResponse, HttpResponseRedirect
 from django.shortcuts import Http404
@@ -9,7 +8,9 @@ from adsrental.models.lead import Lead
 
 
 class PiConfigView(View):
+    'Get pi.conf file'
     def get(self, request, rpid):
+        'Get pi.conf file'
         back = request.META.get('HTTP_REFERER')
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
         if not lead:
