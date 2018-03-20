@@ -264,7 +264,7 @@ class EC2Instance(models.Model):
         if not ssh:
             try:
                 ssh = self.get_ssh()
-            except paramiko.ssh_exception.SSHException:
+            except (paramiko.ssh_exception.SSHException, EOFError):
                 raise SSHConnectException('Cannot connect, EC2 SSH is down')
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input_list:
