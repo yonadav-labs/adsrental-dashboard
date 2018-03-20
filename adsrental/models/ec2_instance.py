@@ -12,6 +12,10 @@ import paramiko
 from adsrental.utils import BotoResource, PingCacheHelper
 
 
+class SSHConnectException(Exception):
+    pass
+
+
 class EC2Instance(models.Model):
     """
     Stores a single EC2 Instance entry, related to :model:`adsrental.Lead`. It does not have direct connection to
@@ -258,7 +262,10 @@ class EC2Instance(models.Model):
         Safe execute SSH command on EC2 and get output.
         '''
         if not ssh:
-            ssh = self.get_ssh()
+            try:
+                ssh = self.get_ssh()
+            except paramiko.ssh_exception.SSHException:
+                raise SSHConnectException('Cannot connect, EC2 SSH is down')
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input_list:
             for line in input_list:

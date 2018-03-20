@@ -25,5 +25,5 @@ class PiConfigView(View):
 
         content = rpid
         response = FileResponse(content, content_type='application/text')
-        response['Content-Disposition'] = 'attachment; filename="pi.conf"'.format(rpid)
+        response['Content-Disposition'] = 'attachment; filename="pi.conf"'
         return response
