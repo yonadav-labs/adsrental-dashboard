@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
+'Lead model'
 import base64
 import datetime
 
-import requests
 from xml.etree import ElementTree
+import requests
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
@@ -193,9 +192,11 @@ class Lead(models.Model, FulltextSearchMixin):
         db_table = 'lead'
 
     def is_wrong_password(self):
+        'Is password reported as wrong now'
         return self.wrong_password_date is not None
 
     def sync_to_adsdb(self):
+        'Send lead info to ADSDB'
         if self.company != self.COMPANY_FBM:
             return False
         if self.status != Lead.STATUS_IN_PROGRESS:
@@ -261,12 +262,14 @@ class Lead(models.Model, FulltextSearchMixin):
         return result
 
     def touch(self):
+        'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
         self.last_touch_date = timezone.now()
         self.touch_count += 1
         self.sync_to_adsdb()
         self.save()
 
     def get_address(self):
+        'Get address as a string.'
         return ', '.join([
             self.street or '',
             self.city or '',
@@ -276,6 +279,7 @@ class Lead(models.Model, FulltextSearchMixin):
         ])
 
     def get_phone_formatted(self):
+        'Get phone to show to end user.'
         if not self.phone:
             return None
 
@@ -286,9 +290,15 @@ class Lead(models.Model, FulltextSearchMixin):
 
     @classmethod
     def get_online_filter(cls):
+        '''
+        Get online condition ty use as a filter like
+
+        Lead.objects.filter(Lead.get_online_filter())
+        '''
         return cls.get_timedelta_filter('raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
     def get_pi_sent_this_month(self):
+        'Obsolete.'
         if not self.pi_sent:
             return False
         now = timezone.now()
@@ -298,6 +308,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return False
 
     def set_status(self, value, edited_by):
+        'Change status, create LeadChangeinstance.'
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
         if value == self.status:
@@ -328,6 +339,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return True
 
     def is_ready_for_testing(self):
+        'Check if RaspberryPi is ready to be tested.'
         if self.raspberry_pi.first_tested:
             return False
         if self.raspberry_pi.first_seen:
@@ -336,6 +348,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return True
 
     def prepare_for_reshipment(self, edited_by):
+        'Clear timestamps, perepare for testing, create LeadChange.'
         old_value = self.pi_delivered
         self.shipstation_order_number = None
         self.pi_delivered = False
@@ -355,6 +368,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return True
 
     def ban(self, edited_by, reason=None):
+        'Mark lead as banned, send cutomer.io event.'
         self.ban_reason = reason
         self.save()
         if self.status == Lead.STATUS_AVAILABLE:
@@ -365,21 +379,25 @@ class Lead(models.Model, FulltextSearchMixin):
         return result
 
     def unban(self, edited_by):
+        'Restores lead previous status before banned.'
         self.ban_reason = None
         self.save()
         result = self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
         return result
 
     def disqualify(self, edited_by):
+        'Set lead status as disqualified.'
         self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
 
     def qualify(self, edited_by):
+        'Set lead status as qualified.'
         result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
         if result:
             self.qualified_date = timezone.now()
             self.save()
 
     def assign_raspberry_pi(self):
+        'Assign new or existing RaspberryPi if does not exist, prepare it for testing.'
         if self.raspberry_pi:
             return False
 
@@ -393,6 +411,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return True
 
     def add_shipstation_order(self):
+        'Create shipstation order if does not exist.'
         if not settings.MANAGE_EC2:
             return False
 
@@ -403,15 +422,19 @@ class Lead(models.Model, FulltextSearchMixin):
         return True
 
     def name(self):
+        'get first and last name as a single string.'
         return '{} {}'.format(self.first_name, self.last_name)
 
     def safe_name(self):
+        'Use only ascii characters for name to send to shipstation, for example.'
         return self.name().encode('ascii', errors='replace').decode()
 
     def str(self):
+        'Obsolete.'
         return 'Lead {} ({})'.format(self.name(), self.email)
 
     def send_web_to_lead(self, request=None):
+        'Obsolete.'
         response = requests.post(
             'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
             data={
@@ -446,6 +469,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return response
 
     def update_from_shipstation(self, data=None):
+        'Set tracking number if item was sent, set ship_date if empty.'
         if data is None:
             data = requests.get(
                 'https://ssapi.shipstation.com/shipments',
@@ -466,6 +490,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.save()
 
     def update_pi_delivered(self, pi_delivered, tracking_info_xml):
+        'Set pi_delivered and tracking_info'
         if pi_delivered is None:
             return
 
@@ -473,6 +498,7 @@ class Lead(models.Model, FulltextSearchMixin):
         self.pi_delivered = pi_delivered
 
     def get_shippingapis_tracking_info(self):
+        'Get tracking info as XML string from secure.shippingapis.com'
         if not self.usps_tracking_code:
             return None
 
@@ -489,6 +515,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return response.text
 
     def get_pi_delivered_from_tracking_info_xml(self, tracking_info_xml):
+        'Check XML string secure.shippingapis.com if device had been delivered.'
         if tracking_info_xml is None:
             return None
         try:
@@ -513,6 +540,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return False
 
     def check_ec2_status(self):
+        'Check if EC is stopped for active lead and stopped for banned.'
         ec2_instance = self.get_ec2_instance()
         if not ec2_instance:
             return
@@ -527,27 +555,33 @@ class Lead(models.Model, FulltextSearchMixin):
             ec2_instance.stop()
 
     def get_ec2_instance(self):
+        'Get corresponding EC2 object.'
         try:
             return self.ec2instance
         except Lead.ec2instance.RelatedObjectDoesNotExist:
             return None
 
     def is_active(self):
+        'Check if RaspberryPi is assigned and lead is not banned.'
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
 
     @classmethod
     def is_status_active(cls, status):
+        'Check if status is not banned.'
         return status in cls.STATUSES_ACTIVE
 
     def is_banned(self):
+        'Check if lead is banned.'
         return self.status == Lead.STATUS_BANNED
 
     def clear_ping_cache(self):
+        'Remove ping cache for this lead. Obsolete.'
         if self.raspberry_pi:
             PingCacheHelper().delete(self.raspberry_pi.rpid)
 
 
 class ReportProxyLead(Lead):
+    'A proxy model to register Lead in admin UI twice for Reports'
     class Meta:
         proxy = True
         verbose_name = 'Report Lead'
