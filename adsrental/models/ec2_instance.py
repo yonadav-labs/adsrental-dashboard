@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+import socket
 import datetime
 import time
 
@@ -266,8 +265,11 @@ class EC2Instance(models.Model):
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
         if blocking:
-            stderr = ssh_stderr.read()
-            stdout = ssh_stdout.read()
+            try:
+                stderr = ssh_stderr.read()
+                stdout = ssh_stdout.read()
+            except socket.timeout:
+                return ''
             ssh.close()
             return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
 
