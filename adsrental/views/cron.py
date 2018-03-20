@@ -226,11 +226,14 @@ class UpdatePingView(View):
             ip_address = ping_data['ip_address']
             version = ping_data['raspberry_pi_version']
             restart_required = ping_data['restart_required']
+            wrong_password = ping_data.get('wrong_password', False)
+            lead_status = ping_data.get('lead_status')
             last_ping = ping_data.get('last_ping')
             last_troubleshoot = ping_data.get('last_troubleshoot')
 
-            if last_ping:
+            if last_ping and Lead.is_status_active(lead_status) and not wrong_password:
                 raspberry_pi.update_ping(last_ping)
+
             if raspberry_pi.ip_address != ip_address:
                 raspberry_pi.ip_address = ip_address
             if raspberry_pi.version != version and version:
