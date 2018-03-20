@@ -235,31 +235,35 @@ class Lead(models.Model, FulltextSearchMixin):
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
 
-        if self.adsdb_account_id:
-            url = 'https://www.adsdb.io/api/v1/accounts/update-s'
-            response = requests.post(
-                url,
-                json={
-                    'account_id': int(self.adsdb_account_id),
-                    'data': data,
-                },
-                auth=auth,
-            )
-        else:
+        if not self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/create-s'
             response = requests.post(
                 url,
                 json=[data],
                 auth=auth,
             )
+            response_json = response.json()
+            if response.status_code == 200:
+                self.adsdb_account_id = response_json.get('account_data')[0]['id']
+                self.is_sync_adsdb = True
+                self.save()
+                return response_json
+            if response.status_code == 409:
+                self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
+                self.save()
 
-        result = response.content
-        data = response.json()
-        if data.get('account_data') and 'id' in data.get('account_data')[0]:
-            self.adsdb_account_id = data.get('account_data')[0]['id']
-        self.is_sync_adsdb = True
-        self.save()
-        return result
+        url = 'https://www.adsdb.io/api/v1/accounts/update-s'
+        response = requests.post(
+            url,
+            json={
+                'account_id': int(self.adsdb_account_id),
+                'data': data,
+            },
+            auth=auth,
+        )
+
+        response_json = response.json()
+        return response_json
 
     def touch(self):
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
