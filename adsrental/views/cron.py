@@ -166,7 +166,7 @@ class LeadHistoryView(View):
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
             if force:
-                LeadHistory.objects.filter(date=d).delete()
+                LeadHistory.objects.filter(date=d, rpid=rpid).delete()
             for lead in leads:
                 if not force:
                     lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
@@ -175,10 +175,25 @@ class LeadHistoryView(View):
 
                 log_filename = '{}.log'.format(d.strftime('%Y%m%d'))
                 log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, lead.raspberry_pi.rpid, log_filename)
-                is_online = os.path.exists(log_path)
-                LeadHistory(lead=lead, date=d, checks_online=24 if is_online else 0, checks_offline=24 if not is_online else 0).save()
+                checks_online = 0
+                checks_offline = 24
+                checks_wrong_password = 0
+                if os.path.exists(log_path):
+                    file_data = open(log_path).read()
+                    pings_online = file_data.count('"result": true')
+                    checks_online = min(pings_online // 20, 24)
+                    checks_offline = 24 - checks_online
+                    if 'Wrong password' in file_data:
+                        checks_wrong_password = 1
+                LeadHistory(
+                    lead=lead,
+                    date=d,
+                    checks_online=checks_online,
+                    checks_offline=checks_offline,
+                    checks_wrong_password=checks_wrong_password,
+                ).save()
                 # print lead, is_online
-                results.append([lead.email, is_online])
+                results.append([lead.email, checks_online])
 
             return JsonResponse({
                 'results': results,
