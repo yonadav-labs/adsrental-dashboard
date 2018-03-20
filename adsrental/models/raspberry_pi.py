@@ -76,12 +76,7 @@ class RaspberryPi(models.Model):
         return item
 
     def get_lead(self):
-        try:
-            return self.lead
-        except:
-            pass
-
-        return None
+        return self.lead
 
     def get_ec2_instance(self):
         lead = self.get_lead()

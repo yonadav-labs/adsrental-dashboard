@@ -493,7 +493,7 @@ class Lead(models.Model, FulltextSearchMixin):
             return None
         try:
             tree = ElementTree.fromstring(tracking_info_xml)
-        except Exception:
+        except ElementTree.ParseError:
             return None
 
         track_info = tree.find('TrackInfo')
@@ -527,12 +527,7 @@ class Lead(models.Model, FulltextSearchMixin):
             ec2_instance.stop()
 
     def get_ec2_instance(self):
-        ec2_instance = None
-        try:
-            ec2_instance = self.ec2instance
-        except Exception:
-            pass
-        return ec2_instance
+        return self.ec2instance
 
     def is_active(self):
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None

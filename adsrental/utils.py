@@ -5,6 +5,7 @@ import uuid
 
 import requests
 import boto3
+from botocore.exceptions import ClientError
 from django.utils import timezone
 from django.core.cache import cache
 from django.conf import settings
@@ -267,7 +268,7 @@ class BotoResource(object):
         try:
             self.get_resource('ec2').create_tags(
                 Resources=[instance.id], Tags=tags)
-        except Exception:
+        except ClientError:
             pass
 
     def launch_instance(self, rpid, email):

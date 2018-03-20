@@ -47,7 +47,7 @@ class ADSDBLeadView(View):
 
         try:
             data = json.loads(request.body)
-        except Exception:
+        except ValueError:
             return HttpResponseBadRequest('No JSON could be decoded')
 
         lead = None
@@ -107,7 +107,7 @@ class ADSDBLeadView(View):
 
         try:
             data = json.loads(request.body)
-        except Exception:
+        except ValueError:
             return HttpResponseBadRequest('No JSON could be decoded')
 
         lead_id = str(uuid.uuid4()).replace('-', '')
