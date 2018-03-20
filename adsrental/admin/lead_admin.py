@@ -179,11 +179,13 @@ class LeadAdmin(admin.ModelAdmin):
         ))
 
     def raspberry_pi_link(self, obj):
-        if obj.raspberry_pi:
-            return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
-                url=reverse('admin:adsrental_raspberrypi_changelist'),
-                rpid=obj.raspberry_pi,
-            ))
+        if not obj.raspberry_pi:
+            return None
+
+        return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            rpid=obj.raspberry_pi,
+        ))
 
     def links(self, obj):
         result = []
@@ -261,7 +263,7 @@ class LeadAdmin(admin.ModelAdmin):
                     if lead.get_ec2_instance():
                         lead.get_ec2_instance().stop()
                     messages.info(request, 'Lead {} is banned.'.format(lead.email))
-                return
+                return None
         else:
             form = AdminLeadBanForm()
 
@@ -289,7 +291,7 @@ class LeadAdmin(admin.ModelAdmin):
                         messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
 
                     messages.success(request, 'RPID {} is ready to be tested.'.format(lead.raspberry_pi.rpid))
-                return
+                return None
         else:
             rpids = [i.raspberry_pi.rpid for i in queryset if i.raspberry_pi]
             form = AdminPrepareForReshipmentForm(initial=dict(

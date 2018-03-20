@@ -92,23 +92,23 @@ class RaspberryPi(models.Model):
         self.save()
         RaspberryPiSession.end(self)
 
-    def update_ping(self, d=None):
-        if d is None:
-            d = timezone.now()
+    def update_ping(self, now=None):
+        if now is None:
+            now = timezone.now()
 
         if not self.first_tested:
-            self.first_tested = d
+            self.first_tested = now
             lead = self.get_lead()
             if lead:
                 lead.tested = True
                 lead.save()
             return True
 
-        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > d:
+        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
             return False
 
         if self.online_since_date is None:
-            self.online_since_date = d
+            self.online_since_date = now
             RaspberryPiSession.start(self)
 
         lead = self.get_lead()
@@ -117,11 +117,11 @@ class RaspberryPi(models.Model):
             lead.sync_to_adsdb()
 
         if not self.first_seen:
-            self.first_seen = d
-            self.last_seen = d
+            self.first_seen = now
+            self.last_seen = now
             return True
 
-        self.last_seen = d
+        self.last_seen = now
         return True
 
     def online(self):
@@ -160,15 +160,15 @@ class RaspberryPi(models.Model):
         return self.rpid
 
     @staticmethod
-    def get_max_datetime(a, b):
-        if not a:
-            return b
-        if not b:
-            return a
-        if a > b:
-            return a
+    def get_max_datetime(date1, date2):
+        if not date1:
+            return date2
+        if not date2:
+            return date1
+        if date1 > date2:
+            return date1
 
-        return b
+        return date2
 
     class Meta:
         db_table = 'raspberry_pi'

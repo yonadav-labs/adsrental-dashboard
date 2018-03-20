@@ -423,11 +423,11 @@ class SyncOfflineView(View):
         test = request.GET.get('test')
         customerio_client = CustomerIOClient()
         for lead in Lead.objects.filter(
-            raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 60),
-            raspberry_pi__last_offline_reported__lt=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
-            pi_delivered=True,
-            raspberry_pi__first_seen__isnull=False,
-            status__in=Lead.STATUSES_ACTIVE,
+                raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 60),
+                raspberry_pi__last_offline_reported__lt=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
+                pi_delivered=True,
+                raspberry_pi__first_seen__isnull=False,
+                status__in=Lead.STATUSES_ACTIVE,
         ).select_related('raspberry_pi'):
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
