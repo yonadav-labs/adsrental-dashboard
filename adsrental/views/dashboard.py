@@ -29,6 +29,7 @@ class CheckSentView(View):
 
 
 class SetPasswordView(View):
+    @method_decorator(login_required)
     def get(self, request, lead_id):
         lead = Lead.objects.get(leadid=lead_id)
         is_facebook_account = lead.facebook_account
@@ -46,6 +47,7 @@ class SetPasswordView(View):
             is_google_account=is_google_account,
         ))
 
+    @method_decorator(login_required)
     def post(self, request, lead_id):
         form = SetPasswordForm(request.POST)
         lead = Lead.objects.get(leadid=lead_id)
