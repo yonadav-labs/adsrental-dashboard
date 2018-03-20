@@ -166,7 +166,7 @@ class LeadHistoryView(View):
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
             if force:
-                LeadHistory.objects.filter(date=d, rpid=rpid).delete()
+                LeadHistory.objects.filter(date=d, lead__raspberry_pi__rpid=rpid).delete()
             for lead in leads:
                 if not force:
                     lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
