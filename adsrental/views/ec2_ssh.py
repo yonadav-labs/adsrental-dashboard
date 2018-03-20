@@ -16,7 +16,7 @@ class StartReverseTunnelView(View):
         try:
             ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
         except SSHConnectException:
-            ec2_instance.stop()
+            # ec2_instance.stop()
             return JsonResponse(dict(result=False))
         return JsonResponse(dict(result=True))
 
