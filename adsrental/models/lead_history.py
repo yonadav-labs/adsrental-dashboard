@@ -11,6 +11,8 @@ class LeadHistory(models.Model):
     Aggregated daily stats for :model:`adsrental.Lead`.
     Used to calculate payments to leads.
     '''
+    ONLINE_CHECKS_MIN = 12
+
     class Meta:
         verbose_name = 'Lead History'
         verbose_name_plural = 'Lead Histories'
@@ -50,7 +52,7 @@ class LeadHistory(models.Model):
 
     def is_online(self):
         'Check iff device was online for more than 12 checks.'
-        return self.checks_online > self.checks_offline
+        return self.checks_online > self.ONLINE_CHECKS_MIN
 
     def is_active(self):
         'Check password was not reported as wrong and device was online'
