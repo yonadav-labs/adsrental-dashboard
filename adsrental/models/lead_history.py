@@ -12,6 +12,7 @@ class LeadHistory(models.Model):
     Used to calculate payments to leads.
     '''
     ONLINE_CHECKS_MIN = 12
+    WRONG_PASSWORD_CHECKS_MIN = 1
 
     class Meta:
         verbose_name = 'Lead History'
@@ -59,8 +60,8 @@ class LeadHistory(models.Model):
         return not self.is_wrong_password() and self.is_online()
 
     def is_wrong_password(self):
-        'Check if password for this dayn was reported wrong at lead once.'
-        return self.checks_wrong_password
+        'Check if password for this day was reported wrong at lead once.'
+        return self.checks_wrong_password > self.WRONG_PASSWORD_CHECKS_MIN
 
     @classmethod
     def get_queryset_for_month(cls, year, month, lead_ids=None):
