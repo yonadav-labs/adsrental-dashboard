@@ -343,7 +343,7 @@ class SyncDeliveredView(View):
             bulk_update(leads, update_fields=['tracking_info', ])
 
         return JsonResponse({
-            'all': all,
+            'all': process_all,
             'result': True,
             'changed': changed,
             'delivered': delivered,
