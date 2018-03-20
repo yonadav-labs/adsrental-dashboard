@@ -248,8 +248,6 @@ class EC2Instance(models.Model):
         '''
         Create SSH connection to EC2
         '''
-        logger = paramiko.util.logging.getLogger()
-        logger.propagate = False
         private_key = paramiko.RSAKey.from_private_key_file(settings.FARMBOT_KEY)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -261,21 +259,15 @@ class EC2Instance(models.Model):
         Safe execute SSH command on EC2 and get output.
         '''
         if not ssh:
-            try:
-                ssh = self.get_ssh()
-            except Exception:
-                return None
+            ssh = self.get_ssh()
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input_list:
             for line in input_list:
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
         if blocking:
-            try:
-                stderr = ssh_stderr.read()
-                stdout = ssh_stdout.read()
-            except Exception:
-                return None
+            stderr = ssh_stderr.read()
+            stdout = ssh_stdout.read()
             ssh.close()
             return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
 
@@ -408,10 +400,7 @@ class EC2Instance(models.Model):
             return False
 
         self.troubleshoot_status()
-        try:
-            self.troubleshoot_proxy()
-        except Exception:
-            pass
+        self.troubleshoot_proxy()
 
         self.save()
         return True
@@ -462,11 +451,7 @@ class EC2Instance(models.Model):
         'Obsolete method. Was used to update all old non-human-friendly passwords.'
         if self.password == settings.EC2_ADMIN_PASSWORD:
             return
-        try:
-            self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
-        except Exception:
-            raise
-
+        self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
         self.password = settings.EC2_ADMIN_PASSWORD
         self.save()
 
