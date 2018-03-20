@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 import os
 import datetime
-import requests
 from multiprocessing.pool import ThreadPool
 
+import requests
 from django.core.cache import cache
 from django.views import View
 from django.http import JsonResponse
