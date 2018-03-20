@@ -14,7 +14,7 @@ class StartReverseTunnelView(View):
             return JsonResponse(dict(result=False))
 
         try:
-            output = ec2_instance.ssh_execute('netstat -an')
+            ec2_instance.ssh_execute('netstat -an')
         except SSHConnectException:
             ec2_instance.stop()
             return JsonResponse(dict(result=False))
