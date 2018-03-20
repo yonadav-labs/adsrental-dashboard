@@ -527,7 +527,10 @@ class Lead(models.Model, FulltextSearchMixin):
             ec2_instance.stop()
 
     def get_ec2_instance(self):
-        return self.ec2instance
+        try:
+            return self.ec2instance
+        except Lead.ec2instance.RelatedObjectDoesNotExist:
+            return None
 
     def is_active(self):
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
