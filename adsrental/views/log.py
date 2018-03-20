@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import json
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion  # pylint: disable=no-name-in-module,import-error
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
