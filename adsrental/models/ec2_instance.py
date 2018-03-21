@@ -254,7 +254,12 @@ class EC2Instance(models.Model):
         private_key = paramiko.RSAKey.from_private_key_file(settings.FARMBOT_KEY)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=20)
+
+        try:
+            ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=20)
+        except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout):
+            raise SSHConnectException('Cannot connect, EC2 SSH is down')
+
         return ssh
 
     def ssh_execute(self, cmd, input_list=None, ssh=None, blocking=True):
@@ -262,11 +267,9 @@ class EC2Instance(models.Model):
         Safe execute SSH command on EC2 and get output.
         '''
         if not ssh:
-            try:
-                ssh = self.get_ssh()
-            except (paramiko.ssh_exception.SSHException, EOFError):
-                raise SSHConnectException('Cannot connect, EC2 SSH is down')
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
+            ssh = self.get_ssh()
+        
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input_list:
             for line in input_list:
                 ssh_stdin.write('{}\n'.format(line))
