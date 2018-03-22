@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
-from dateutil.relativedelta import relativedelta
 import calendar
 import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.utils import timezone
 from django.db import models
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.mixins import FulltextSearchMixin
+from adsrental.models.lead import Lead
 
 
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
@@ -25,7 +26,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
-    lead = models.ForeignKey('adsrental.Lead', help_text='Linked lead.', on_delete=models.CASCADE)
+    lead = models.ForeignKey(Lead, help_text='Linked lead.', on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
     days_offline = models.IntegerField(default=0, help_text='Days when device had been online less than 12 hours.')
     days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 12 hours.')
@@ -62,11 +63,12 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         return cls(lead=lead, date=date_month)
 
     def get_max_payment(self):
-        if not self.lead.raspberry_pi or not self.lead.raspberry_pi.first_seen:
+        raspberry_pi = self.lead.raspberry_pi
+        if not raspberry_pi or not raspberry_pi.first_seen:
             return 0.
-        if self.lead.google_account and self.lead.raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+        if self.lead.google_account and raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
             return self.NEW_MAX_PAYMENT
-        if self.lead.facebook_account and self.lead.raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
+        if self.lead.facebook_account and raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
             return self.NEW_MAX_PAYMENT
 
         return self.MAX_PAYMENT

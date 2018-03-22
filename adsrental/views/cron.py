@@ -33,6 +33,86 @@ class SyncEC2View(View):
     '''
     ec2_max_results = 300
 
+    def _handler_process_all(self, terminate_stopped, execute):
+        boto_resource = BotoResource().get_resource()
+        ec2_instances = EC2Instance.objects.all()
+        ec2_instances_map = {}
+        for ec2_instance in ec2_instances:
+            ec2_instances_map[ec2_instance.instance_id] = ec2_instance
+        boto_instances = boto_resource.instances.filter(
+            MaxResults=self.ec2_max_results,
+        )
+
+        counter = 0
+        terminated_rpids = []
+        deleted_rpids = []
+        existing_instance_ids = []
+        for boto_instance in boto_instances:
+            status = boto_instance.state['Name']
+            if status == EC2Instance.STATUS_TERMINATED:
+                continue
+            counter += 1
+            existing_instance_ids.append(boto_instance.id)
+            instance = EC2Instance.upsert_from_boto(boto_instance, ec2_instances_map.get(boto_instance.id))
+            if terminate_stopped:
+                if instance and instance.status == EC2Instance.STATUS_STOPPED and not instance.lead:
+                    if execute:
+                        instance.terminate()
+                    terminated_rpids.append(instance.rpid)
+
+        for instance in ec2_instances:
+            if instance.instance_id not in existing_instance_ids:
+                deleted_rpids.append(instance.rpid)
+                instance.lead = None
+                instance.save()
+                instance.delete()
+
+        return JsonResponse({
+            'total': counter,
+            'terminated_rpids': terminated_rpids,
+            'deleted_rpids': deleted_rpids,
+            'result': True,
+        })
+
+    def _handler_pending(self, execute):
+        boto_resource = BotoResource().get_resource()
+        updated_rpids = []
+        instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING]).order_by('created')
+        for instance in instances:
+            if execute:
+                boto_instance = instance.get_boto_instance(boto_resource)
+                instance.update_from_boto(boto_instance)
+            updated_rpids.append((instance.rpid, instance.status))
+
+        return JsonResponse({
+            'updated_rpids': updated_rpids,
+            'result': True,
+        })
+
+    def _handler_missing(self, execute):
+        launched_rpids = []
+        started_rpids = []
+        instances = EC2Instance.objects.filter(lead__isnull=False).select_related('lead')
+        for instance in instances:
+            lead = instance.lead
+            if lead.is_active() and not instance.is_running():
+                if execute:
+                    instance.start(blocking=True)
+                started_rpids.append(instance.rpid)
+
+        leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, ec2instance__isnull=True).select_related('raspberry_pi', 'ec2instance')
+        for lead in leads:
+            if lead.is_active() and not lead.get_ec2_instance():
+                if execute:
+                    EC2Instance.launch_for_lead(lead)
+                launched_rpids.append(lead.raspberry_pi.rpid)
+
+        return JsonResponse({
+            'launched_rpids': launched_rpids,
+            'started_rpids': started_rpids,
+            'result': True,
+        })
+
     def get(self, request):
         process_all = request.GET.get('all') == 'true'
         pending = request.GET.get('pending')
@@ -41,82 +121,17 @@ class SyncEC2View(View):
         execute = request.GET.get('execute')
 
         if process_all:
-            boto_resource = BotoResource().get_resource()
-            ec2_instances = EC2Instance.objects.all()
-            ec2_instances_map = {}
-            for ec2_instance in ec2_instances:
-                ec2_instances_map[ec2_instance.instance_id] = ec2_instance
-            boto_instances = boto_resource.instances.filter(
-                MaxResults=self.ec2_max_results,
-            )
+            return self._handler_process_all(terminate_stopped, execute)
 
-            counter = 0
-            terminated_rpids = []
-            deleted_rpids = []
-            existing_instance_ids = []
-            for boto_instance in boto_instances:
-                status = boto_instance.state['Name']
-                if status == EC2Instance.STATUS_TERMINATED:
-                    continue
-                counter += 1
-                existing_instance_ids.append(boto_instance.id)
-                instance = EC2Instance.upsert_from_boto(boto_instance, ec2_instances_map.get(boto_instance.id))
-                if terminate_stopped:
-                    if instance and instance.status == EC2Instance.STATUS_STOPPED and not instance.lead:
-                        if execute:
-                            instance.terminate()
-                        terminated_rpids.append(instance.rpid)
-
-            for instance in ec2_instances:
-                if instance.instance_id not in existing_instance_ids:
-                    deleted_rpids.append(instance.rpid)
-                    instance.lead = None
-                    instance.save()
-                    instance.delete()
-
-            return JsonResponse({
-                'total': counter,
-                'terminated_rpids': terminated_rpids,
-                'deleted_rpids': deleted_rpids,
-                'result': True,
-            })
         if pending:
-            boto_resource = BotoResource().get_resource()
-            updated_rpids = []
-            instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING]).order_by('created')
-            for instance in instances:
-                if execute:
-                    boto_instance = instance.get_boto_instance(boto_resource)
-                    instance.update_from_boto(boto_instance)
-                updated_rpids.append((instance.rpid, instance.status))
+            return self._handler_pending(execute)
 
-            return JsonResponse({
-                'updated_rpids': updated_rpids,
-                'result': True,
-            })
         if missing:
-            launched_rpids = []
-            started_rpids = []
-            instances = EC2Instance.objects.filter(lead__isnull=False).select_related('lead')
-            for instance in instances:
-                lead = instance.lead
-                if lead.is_active() and not instance.is_running():
-                    if execute:
-                        instance.start(blocking=True)
-                    started_rpids.append(instance.rpid)
+            return self._handler_missing(execute)
 
-            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, ec2instance__isnull=True).select_related('raspberry_pi', 'ec2instance')
-            for lead in leads:
-                if lead.is_active() and not lead.get_ec2_instance():
-                    if execute:
-                        EC2Instance.launch_for_lead(lead)
-                    launched_rpids.append(lead.raspberry_pi.rpid)
-
-            return JsonResponse({
-                'launched_rpids': launched_rpids,
-                'started_rpids': started_rpids,
-                'result': True,
-            })
+        return JsonResponse({
+            'result': False,
+        })
 
 
 class LeadHistoryView(View):
@@ -265,10 +280,10 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up = True
 
             if not ping_cache_helper.is_data_consistent(
-                ping_data,
-                ec2_instance=ec2_instance,
-                lead=ec2_instance and ec2_instance.lead,
-                raspberry_pi=raspberry_pi,
+                    ping_data,
+                    ec2_instance=ec2_instance,
+                    lead=ec2_instance and ec2_instance.lead,
+                    raspberry_pi=raspberry_pi,
             ):
                 ping_cache_helper.delete(rpid)
                 invalidated_rpids.append(rpid)
