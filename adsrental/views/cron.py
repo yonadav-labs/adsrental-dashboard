@@ -267,7 +267,7 @@ class UpdatePingView(View):
             if not ping_cache_helper.is_data_consistent(
                 ping_data,
                 ec2_instance=ec2_instance,
-                lead=ec2_instance.lead,
+                lead=ec2_instance and ec2_instance.lead,
                 raspberry_pi=raspberry_pi,
             ):
                 ping_cache_helper.delete(rpid)
