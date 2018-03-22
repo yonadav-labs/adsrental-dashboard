@@ -53,6 +53,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'stop',
         'restart_raspberry_pi',
         'clear_ping_cache',
+        'terminate',
     )
     raw_id_fields = ('lead', )
 
@@ -173,6 +174,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         for ec2_instance in queryset:
             ec2_instance.clear_ping_cache()
 
+    def terminate(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.terminate()
+
     lead_link.short_description = 'Lead'
 
     raspberry_pi_link.short_description = 'RaspberryPi'
@@ -191,3 +196,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
 
     clear_ping_cache.short_description = 'DEBUG: Clear ping cache'
+
+    terminate.short_description = 'DEBUG: Terminate'
