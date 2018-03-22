@@ -206,13 +206,17 @@ class LeadHistoryView(View):
                     checks_offline=checks_offline,
                     checks_wrong_password=checks_wrong_password,
                 ).save()
-                # print lead, is_online
                 results.append([lead.email, checks_online])
 
             return JsonResponse({
                 'results': results,
                 'result': True,
             })
+
+        return JsonResponse({
+            'results': results,
+            'result': False,
+        })
 
 
 class UpdatePingView(View):

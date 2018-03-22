@@ -92,6 +92,7 @@ class DashboardView(View):
     @method_decorator(login_required)
     def get(self, request):
         form = DashboardForm(request.GET)
+        entries = []
         if form.is_valid():
             entries = self.get_entries(request.user)
             if form.cleaned_data['ec2_state']:
@@ -178,8 +179,8 @@ class DashboardView(View):
             except EmptyPage:
                 entries = paginator.page(paginator.num_pages)
 
-            return render(request, 'dashboard.html', dict(
-                utm_source=request.user.utm_source,
-                entries=entries,
-                form=form,
-            ))
+        return render(request, 'dashboard.html', dict(
+            utm_source=request.user.utm_source,
+            entries=entries,
+            form=form,
+        ))
