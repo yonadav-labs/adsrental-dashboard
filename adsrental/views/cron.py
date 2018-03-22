@@ -264,7 +264,12 @@ class UpdatePingView(View):
                         ec2_instance.tunnel_up_date = last_ping
                         ec2_instance.tunnel_up = True
 
-            if not ping_cache_helper.is_data_consistent(ping_data, ec2_instance):
+            if not ping_cache_helper.is_data_consistent(
+                ping_data,
+                ec2_instance=ec2_instance,
+                lead=ec2_instance.lead,
+                raspberry_pi=raspberry_pi,
+            ):
                 ping_cache_helper.delete(rpid)
                 invalidated_rpids.append(rpid)
 

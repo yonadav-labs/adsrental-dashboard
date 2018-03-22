@@ -354,12 +354,16 @@ class PingCacheHelper(object):
         return True
 
     @staticmethod
-    def is_data_consistent(data, ec2_instance):
+    def is_data_consistent(data, ec2_instance, lead, raspberry_pi):
         'Check if cache data is consistent against current DB state'
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
+        restart_required = data.get('restart_required', False)
+
+        if restart_required != raspberry_pi.restart_required:
+            return False
 
         if ec2_instance and ec2_instance_status != ec2_instance.status:
             return False
@@ -370,10 +374,10 @@ class PingCacheHelper(object):
         if ec2_instance and ec2_ip_address != ec2_instance.ip_address:
             return False
 
-        if ec2_instance and ec2_instance.lead and lead_status != ec2_instance.lead.status:
+        if lead and lead_status != lead.status:
             return False
 
-        if ec2_instance and ec2_instance.lead and wrong_password != ec2_instance.lead.is_wrong_password():
+        if lead and wrong_password != lead.is_wrong_password():
             return False
 
         return True

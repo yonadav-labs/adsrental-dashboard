@@ -154,18 +154,16 @@ class LogView(View):
                 if version and StrictVersion(version) < StrictVersion('1.1.2'):
                     restart_required = True
 
-            if hostname is not None:
+            if hostname is not None and ec2_hostname:
                 if ec2_hostname != hostname and ec2_ip_address != hostname:
                     self.add_log(request, rpid, 'Hostname changed, restarting')
                     new_config_required = True
                     if version and StrictVersion(version) < StrictVersion('1.1.2'):
                         restart_required = True
-                    ping_cache_helper.delete(rpid)
 
             if raspberry_pi_restart_required:
                 self.add_log(request, rpid, 'Restarting RaspberryPi on demand')
                 restart_required = True
-                ping_cache_helper.delete(rpid)
 
             response_data = {
                 'result': True,
