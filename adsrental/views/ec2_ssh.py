@@ -9,8 +9,8 @@ class StartReverseTunnelView(View):
     'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
     def get(self, request, rpid):
         'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid.strip()).first()
-        if not ec2_instance or not ec2_instance.is_running():
+        ec2_instance = EC2Instance.objects.filter(rpid=rpid.strip(), status=EC2Instance.STATUS_RUNNING).first()
+        if not ec2_instance:
             return JsonResponse(dict(result=False))
 
         try:
@@ -25,8 +25,8 @@ class GetNetstatView(View):
     'Get netstat output from EC2. Used as a fallback if RaspberryPi cannot get it by itself'
     def get(self, request, rpid):
         'Get netstat output from EC2. Used as a fallback if RaspberryPi cannot get it by itself'
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid.strip()).first()
-        if not ec2_instance or not ec2_instance.is_running():
+        ec2_instance = EC2Instance.objects.filter(rpid=rpid.strip(), status=EC2Instance.STATUS_RUNNING).first()
+        if not ec2_instance:
             return HttpResponse('')
 
         try:
