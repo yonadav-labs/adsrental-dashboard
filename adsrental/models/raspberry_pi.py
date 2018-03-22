@@ -75,7 +75,11 @@ class RaspberryPi(models.Model):
         return item
 
     def get_lead(self):
-        return self.lead
+        'Get linked Lead object'
+        try:
+            return self.lead
+        except RaspberryPi.lead.RelatedObjectDoesNotExist:
+            return None
 
     def get_ec2_instance(self):
         lead = self.get_lead()
