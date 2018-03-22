@@ -518,7 +518,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return response.text
 
-    def get_pi_delivered_from_tracking_info_xml(self, tracking_info_xml):
+    def get_pi_delivered_from_xml(self, tracking_info_xml):
         'Check XML string secure.shippingapis.com if device had been delivered.'
         if tracking_info_xml is None:
             return None

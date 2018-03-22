@@ -163,16 +163,16 @@ class LeadHistoryView(View):
             leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
-            d = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
+            date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
             if force:
-                LeadHistory.objects.filter(date=d, lead__raspberry_pi__rpid=rpid).delete()
+                LeadHistory.objects.filter(date=date, lead__raspberry_pi__rpid=rpid).delete()
             for lead in leads:
                 if not force:
-                    lead_history = LeadHistory.objects.filter(lead=lead, date=d).first()
+                    lead_history = LeadHistory.objects.filter(lead=lead, date=date).first()
                     if lead_history:
                         continue
 
-                log_filename = '{}.log'.format(d.strftime('%Y%m%d'))
+                log_filename = '{}.log'.format(date.strftime('%Y%m%d'))
                 log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, lead.raspberry_pi.rpid, log_filename)
                 checks_online = 0
                 checks_offline = 24
@@ -186,7 +186,7 @@ class LeadHistoryView(View):
                         checks_wrong_password = 1
                 LeadHistory(
                     lead=lead,
-                    date=d,
+                    date=date,
                     checks_online=checks_online,
                     checks_offline=checks_offline,
                     checks_wrong_password=checks_wrong_password,
@@ -326,7 +326,7 @@ class SyncDeliveredView(View):
         results_map = dict(results)
         for lead in leads:
             tracking_info_xml = results_map.get(lead.email)
-            pi_delivered = lead.get_pi_delivered_from_tracking_info_xml(tracking_info_xml)
+            pi_delivered = lead.get_pi_delivered_from_xml(tracking_info_xml)
             if pi_delivered is None:
                 errors.append(lead.email)
                 continue

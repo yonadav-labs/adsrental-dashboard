@@ -268,7 +268,7 @@ class EC2Instance(models.Model):
         '''
         if not ssh:
             ssh = self.get_ssh()
-        
+
         ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
         if input_list:
             for line in input_list:

@@ -89,25 +89,25 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         if obj.lead is None or obj.lead.raspberry_pi is None or obj.lead.raspberry_pi.last_seen is None:
             return None
 
-        d = obj.lead.raspberry_pi.last_seen
-        return mark_safe(u'<span title="{}">{}</span>'.format(d, naturaltime(d)))
+        date = obj.lead.raspberry_pi.last_seen
+        return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
 
     def last_troubleshoot_field(self, obj):
         if obj.last_troubleshoot is None:
             return 'Never'
 
-        d = obj.last_troubleshoot
-        return mark_safe(u'<span title="{}">{}</span>'.format(d, naturaltime(d)))
+        date = obj.last_troubleshoot
+        return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
 
     def tunnel_up_date_field(self, obj):
         if obj.tunnel_up_date is None:
             return 'Never'
 
-        d = obj.tunnel_up_date
+        date = obj.tunnel_up_date
         is_tunnel_up = obj.is_tunnel_up()
         return mark_safe(u'<span title="{}">{}</span>'.format(
-            d,
-            'Yes' if is_tunnel_up else naturaltime(d),
+            date,
+            'Yes' if is_tunnel_up else naturaltime(date),
         ))
 
     def links(self, obj):
