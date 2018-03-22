@@ -354,10 +354,24 @@ class PingCacheHelper(object):
         return True
 
     @staticmethod
-    def is_data_consistent(data, ec2_instance, lead, raspberry_pi):
-        'Check if cache data is consistent against current DB state'
+    def is_ec2_instance_data_consistent(data, ec2_instance):
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
+
+        if ec2_instance_status != ec2_instance.status:
+            return False
+
+        if ec2_instance.is_status_temp():
+            return False
+
+        if ec2_ip_address != ec2_instance.ip_address:
+            return False
+
+        return True
+
+    @classmethod
+    def is_data_consistent(cls, data, ec2_instance, lead, raspberry_pi):
+        'Check if cache data is consistent against current DB state'
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
         restart_required = data.get('restart_required', False)
@@ -365,13 +379,7 @@ class PingCacheHelper(object):
         if restart_required != raspberry_pi.restart_required:
             return False
 
-        if ec2_instance and ec2_instance_status != ec2_instance.status:
-            return False
-
-        if ec2_instance and ec2_instance.is_status_temp():
-            return False
-
-        if ec2_instance and ec2_ip_address != ec2_instance.ip_address:
+        if ec2_instance and not cls.is_ec2_instance_data_consistent(data, ec2_instance):
             return False
 
         if lead and lead_status != lead.status:
@@ -442,6 +450,7 @@ class PingCacheHelper(object):
         troubleshoot = request.GET.get('troubleshoot')
         ip_address = request.META.get('REMOTE_ADDR')
         version = request.GET.get('version')
+        reported_hostname = request.GET.get('hostname')
         main_tunnel_up = request.GET.get('tunnel_up', '0') == '1'
         reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
         now = timezone.now()
@@ -455,6 +464,7 @@ class PingCacheHelper(object):
                 ping_data['restart_required'] = False
 
         ping_data['ip_address'] = ip_address
+        ping_data['reported_hostname'] = reported_hostname
         ping_data['raspberry_pi_version'] = version
 
         if troubleshoot:
