@@ -6,6 +6,7 @@ import unicodecsv as csv
 
 from django.contrib import admin
 from django.utils import timezone
+from django.shortcuts import render
 from django.urls import reverse
 from django.conf import settings
 from django.contrib import messages
@@ -14,7 +15,9 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
+from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListFilter, LeadStatusListFilter
+from adsrental.forms import AdminPrepareForReshipmentForm
 
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
@@ -62,7 +65,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'start_ec2',
         'report_wrong_password',
         'report_correct_password',
-        'prepare_for_reshipment',
+        'prepare_for_testing',
         'touch',
     )
 
@@ -186,5 +189,36 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
             else:
                 messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
+
+    def prepare_for_testing(self, request, queryset):
+        if 'do_action' in request.POST:
+            form = AdminPrepareForReshipmentForm(request.POST)
+            if form.is_valid():
+                rpids = form.cleaned_data['rpids']
+                queryset = Lead.objects.filter(raspberry_pi__rpid__in=rpids)
+                for lead in queryset:
+                    if lead.is_banned():
+                        lead.unban(request.user)
+                        messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+
+                    if lead.first_tested:
+                        lead.prepare_for_reshipment(request.user)
+                        messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
+
+                    messages.success(request, 'RPID {} is ready to be tested.'.format(lead.raspberry_pi.rpid))
+                return None
+        else:
+            rpids = [i.lead.rpid for i in queryset if i.lead]
+            form = AdminPrepareForReshipmentForm(initial=dict(
+                rpids='\n'.join(rpids),
+            ))
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'prepare_for_testing',
+            'title': 'Prepare for reshipment following leads',
+            'button': 'Prepare for reshipment',
+            'objects': queryset,
+            'form': form,
+        })
 
     lead_link.short_description = 'Lead'
