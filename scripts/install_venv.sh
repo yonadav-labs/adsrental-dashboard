@@ -8,5 +8,5 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-pip install pylint autopep8 rope
+pip install pylint autopep8 rope pylint_django
 pip install -U -r requirements.txt
