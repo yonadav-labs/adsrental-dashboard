@@ -134,38 +134,38 @@ class LogView(View):
 
         self.fix_ec2_state(request, rpid, lead_status=ping_data['lead_status'], ec2_instance_status=ping_data['ec2_instance_status'])
 
-        lead_status = ping_data['lead_status']
-        wrong_password = ping_data.get('wrong_password')
-
-        if not Lead.is_status_active(lead_status):
-            return self.json_response(request, rpid, {
-                'result': False,
-                'reason': 'Lead not found',
-                'rpid': rpid,
-                'source': 'ping',
-            })
-
-        if wrong_password:
-            return self.json_response(request, rpid, {
-                'result': False,
-                'reason': 'Wrong password',
-                'rpid': rpid,
-                'source': 'ping',
-            })
-
         self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
+
         response_data = self._get_ping_response_data(request, rpid, ping_data)
         return self.json_response(request, rpid, response_data)
 
     def _get_ping_response_data(self, request, rpid, ping_data):
+        lead_status = ping_data['lead_status']
+        wrong_password = ping_data.get('wrong_password')
+
+        reason = None
+        result = True
+
+        if not Lead.is_status_active(lead_status):
+            reason = 'Lead not found or banned'
+            result = False
+
+        if wrong_password:
+            reason = 'Wrong password'
+            result = False
+
+        response_data = {
+            'source': 'ping',
+            'result': result,
+        }
+
+        if not result:
+            response_data['reason'] = reason
+            return response_data
+
         restart_required = self._get_restart_required(ping_data)
         new_config_required = self._get_new_config_required(ping_data)
         update_required = self._get_update_required(ping_data)
-
-        response_data = {
-            'result': True,
-            'source': 'ping',
-        }
 
         if new_config_required:
             self.add_log(request, rpid, 'Hostname changed, restarting')
