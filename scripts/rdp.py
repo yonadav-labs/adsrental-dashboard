@@ -16,7 +16,7 @@ ssh_privatekey=
 console=0
 resolution=
 group=
-password=FFyY5EresaY6/GxvPzqkLg==
+password=AlS+TjAugTD6El8ST/5Aeg==
 name={rpid}
 ssh_loopback=0
 shareprinter=0

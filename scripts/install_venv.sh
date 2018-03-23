@@ -8,5 +8,5 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-pip install flake8==3.5.0 autopep8==1.3.4
+pip install pylint autopep8 rope pylint_django
 pip install -U -r requirements.txt
