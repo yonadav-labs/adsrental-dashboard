@@ -197,6 +197,8 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def sync_to_adsdb(self):
         'Send lead info to ADSDB'
+        if not settings.ADSDB_SYNC_ENABLED:
+            return False
         if self.company != self.COMPANY_FBM:
             return False
         if self.status != Lead.STATUS_IN_PROGRESS:
