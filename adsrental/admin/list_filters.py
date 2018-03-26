@@ -372,8 +372,8 @@ class DateMonthListFilter(SimpleListFilter):
         month_start = datetime.date.today().replace(day=1)
         choices = []
         for i in range(3):
-            d = month_start - relativedelta(months=i)
-            choices.append((d.strftime(settings.SYSTEM_DATE_FORMAT), d.strftime('%b %Y')))
+            date_month = month_start - relativedelta(months=i)
+            choices.append((date_month.strftime(settings.SYSTEM_DATE_FORMAT), date_month.strftime('%b %Y')))
 
         return choices
 
@@ -503,9 +503,9 @@ class BundlerListFilter(SimpleListFilter):
                 lookup_value.extend(current_value)
                 lookup_value.append(lookup)
             else:
-                for v in current_value:
-                    if v != lookup:
-                        lookup_value.append(v)
+                for value in current_value:
+                    if value != lookup:
+                        lookup_value.append(value)
 
             lookup_value = ','.join([str(i) for i in lookup_value if i])
             if lookup_value:

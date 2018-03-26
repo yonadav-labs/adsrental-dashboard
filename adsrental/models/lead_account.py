@@ -173,9 +173,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.ban_reason = reason
         self.save()
         if self.status == LeadAccount.STATUS_AVAILABLE:
-            CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_AVAILABLE_BANNED)
+            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_AVAILABLE_BANNED)
         else:
-            CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_BANNED)
+            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED)
         result = self.set_status(LeadAccount.STATUS_BANNED, edited_by)
         if result:
             if not LeadAccount.get_active_lead_accounts(self.lead):

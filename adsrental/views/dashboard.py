@@ -35,7 +35,7 @@ class SetPasswordView(View):
         is_facebook_account = lead.facebook_account
         is_google_account = lead.google_account
         form = SetPasswordForm(initial=dict(
-            id=lead.leadid,
+            leadid=lead.leadid,
             lead_email=lead.email,
             email=lead.fb_email if is_facebook_account else lead.google_email,
             new_password=lead.fb_secret if is_facebook_account else lead.google_password,

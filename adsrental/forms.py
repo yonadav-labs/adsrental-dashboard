@@ -58,7 +58,7 @@ class DashboardForm(forms.Form):
 
 
 class SetPasswordForm(forms.Form):
-    id = forms.CharField(label='ID', widget=forms.TextInput(attrs={'readonly': True}))
+    leadid = forms.CharField(label='ID', widget=forms.TextInput(attrs={'readonly': True}))
     lead_email = forms.CharField(label='Lead Email', widget=forms.TextInput(attrs={'readonly': True}))
     email = forms.CharField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
     new_password = forms.CharField(label='Password')

@@ -1,13 +1,13 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.conf.urls import handler404, handler500
+from django.conf.urls import handler404, handler500  # pylint: disable=W0611
 import debug_toolbar
 
 from adsrental.views.errors import Error404View, Error500View
 
 admin.site.site_header = 'Adsrental Administration'
 
-urlpatterns = [
+urlpatterns = [  # pylint: disable=C0103
     url(r'^app/admin_tools/', include('admin_tools.urls')),
     # url(r'^admin/', admin.site.urls),
     url(r'^', include('adsrental.urls')),
@@ -17,5 +17,5 @@ urlpatterns = [
     url(r'^__debug__/', include(debug_toolbar.urls)),
 ]
 
-handler404 = Error404View.as_view()  # noqa: F811
-handler500 = Error500View.as_view()  # noqa: F811
+handler404 = Error404View.as_view()  # pylint: disable=C0103
+handler500 = Error500View.as_view()  # pylint: disable=C0103

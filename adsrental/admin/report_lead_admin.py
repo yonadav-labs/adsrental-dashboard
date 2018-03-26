@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
 class ReportLeadAdmin(admin.ModelAdmin):
@@ -32,7 +32,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         # 'state',
         # 'postal_code',
         'pi_delivered',
-        'is_sync_adsdb',
+        # 'is_sync_adsdb',
         'account_type',
         'company',
         'email',
@@ -43,7 +43,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'billed',
         'touch_count',
         'last_touch',
-        'wrong_password',
         'first_seen',
         'last_seen',
     )
@@ -51,7 +50,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         StatusListFilter,
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
-        WrongPasswordListFilter,
+        LeadAccountWrongPasswordListFilter,
         TouchCountListFilter,
         'company',
         ShipDateListFilter,
@@ -71,6 +70,17 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
     )
     list_per_page = 500
+
+    def get_queryset(self, request):
+        queryset = super(ReportLeadAdmin, self).get_queryset(request)
+        queryset = queryset.select_related(
+            # 'raspberry_pi',
+            'ec2instance',
+            'bundler',
+        ).prefetch_related(
+            'lead_accounts',
+        )
+        return queryset
 
     def rpid(self, obj):
         return obj.raspberry_pi and obj.raspberry_pi.rpid

@@ -11,7 +11,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, StatusListFilter
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
@@ -20,6 +20,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'id',
         'lead_link',
         'account_type',
+        'status',
         'username',
         'password',
         'friends',
@@ -32,6 +33,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     list_filter = (
         'account_type',
         'bundler_paid',
+        StatusListFilter,
         WrongPasswordListFilter,
         QualifiedDateListFilter,
     )
@@ -115,7 +117,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead_account in queryset:
             if lead_account.unban(request.user):
-                lead_account.lead.unban(request.user)
                 EC2Instance.launch_for_lead(lead_account.lead)
                 messages.info(request, 'Lead Account {} is unbanned.'.format(lead_account))
 
