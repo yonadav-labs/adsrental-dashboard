@@ -18,6 +18,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     model = LeadAccount
     list_display = (
         'id',
+        'rpid',
         'lead_link',
         'account_type',
         'status',
