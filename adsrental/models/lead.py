@@ -147,7 +147,7 @@ class Lead(models.Model, FulltextSearchMixin):
     google_account = models.BooleanField(default=False, help_text='True if account is google. google_account_status, google_email, google_password should be also filled')
     facebook_account = models.BooleanField(default=False, help_text='True if account is Facebook. facebook_account_status, fb_email, fb_secret should be also filled')
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
-    raspberry_pi = models.OneToOneField('adsrental.RaspberryPi', null=True, blank=True, default=None, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
+    raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
     wrong_password = models.BooleanField(default=False, help_text='Is password wrong now. Should be merged with wrong_password_date')
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')

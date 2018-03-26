@@ -41,6 +41,7 @@ class RaspberryPi(models.Model):
     first_tested_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
+    # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
     rpid = models.CharField(primary_key=True, max_length=255, unique=True)
     leadid = models.CharField(max_length=255, blank=True, null=True)
     first_seen = models.DateTimeField(blank=True, null=True)

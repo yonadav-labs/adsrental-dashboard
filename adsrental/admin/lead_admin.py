@@ -29,8 +29,7 @@ class LeadAdmin(admin.ModelAdmin):
         'email_field',
         'phone_field',
         'bundler_field',
-        'google_account_column',
-        'facebook_account_column',
+        'accounts_field',
         'links',
         'tested_field',
         'last_touch',
@@ -40,9 +39,9 @@ class LeadAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'usps_tracking_code',
         'online',
-        'wrong_password_date_field',
+        # 'wrong_password_date_field',
         'pi_delivered',
-        'bundler_paid',
+        # 'bundler_paid',
     )
     list_filter = (
         StatusListFilter,
@@ -59,7 +58,8 @@ class LeadAdmin(admin.ModelAdmin):
         'bundler_paid',
         'pi_delivered',
     )
-    list_select_related = ('raspberry_pi', 'ec2instance', 'bundler', )
+    # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
+    # list_prefetch_related = ('lead_accounts', )
     search_fields = (
         'leadid',
         'account_name',
@@ -70,19 +70,31 @@ class LeadAdmin(admin.ModelAdmin):
     )
     actions = (
         # 'update_from_shipstation',
-        'mark_as_qualified',
-        'mark_as_disqualified',
-        'ban',
-        'unban',
-        'report_wrong_password',
-        'report_correct_password',
+        # 'mark_as_qualified',
+        # 'mark_as_disqualified',
+        # 'ban',
+        # 'unban',
+        # 'report_wrong_password',
+        # 'report_correct_password',
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
         'sync_to_adsdb',
     )
     readonly_fields = ('created', 'updated', 'status', )
-    raw_id_fields = ('raspberry_pi', )
+    # raw_id_fields = ('raspberry_pi', )
+
+
+    def get_queryset(self, request):
+        queryset = super(LeadAdmin, self).get_queryset(request)
+        queryset = queryset.select_related(
+            # 'raspberry_pi',
+            'ec2instance',
+            'bundler',
+        ).prefetch_related(
+            'lead_accounts',
+        )
+        return queryset
 
     def get_actions(self, request):
         actions = super(LeadAdmin, self).get_actions(request)
@@ -156,18 +168,6 @@ class LeadAdmin(admin.ModelAdmin):
 
         return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
-    def facebook_account_column(self, obj):
-        return mark_safe('{} {}'.format(
-            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.facebook_account else '',
-            obj.facebook_account_status,
-        ))
-
-    def google_account_column(self, obj):
-        return mark_safe('{} {}'.format(
-            '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.google_account else '',
-            obj.google_account_status,
-        ))
-
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:
             return None
@@ -209,6 +209,17 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         return mark_safe('\n'.join(result))
+
+    def accounts_field(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            result.append('<a href="{}?q={}">{}</a>'.format(
+                reverse('admin:adsrental_leadaccount_changelist'),
+                lead_account.username,
+                lead_account,
+            ))
+
+        return mark_safe(', '.join(result))
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
@@ -360,6 +371,8 @@ class LeadAdmin(admin.ModelAdmin):
     online.boolean = True
     online.admin_order_field = 'raspberry_pi__first_seen'
 
+    accounts_field.short_description = 'Accounts'
+
     raspberry_pi_link.short_description = 'Raspberry PI'
 
     first_seen.empty_value_display = 'Never'
@@ -367,12 +380,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     last_seen.empty_value_display = 'Never'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
-
-    facebook_account_column.short_description = 'Facebook Account'
-
-    google_account_column.admin_order_field = 'facebook_account'
-    google_account_column.short_description = 'Google Account'
-    google_account_column.admin_order_field = 'google_account'
 
     bundler_field.short_description = 'Bundler'
     bundler_field.admin_order_field = 'utm_source'
