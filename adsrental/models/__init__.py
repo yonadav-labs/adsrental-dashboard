@@ -8,3 +8,4 @@ from adsrental.models.lead_history_month import LeadHistoryMonth  # noqa: F401
 from adsrental.models.bundler import Bundler  # noqa: F401
 from adsrental.models.lead_change import LeadChange  # noqa: F401
 from adsrental.models.raspberry_pi_session import RaspberryPiSession  # noqa: F401
+from adsrental.models.lead_account import LeadAccount  # noqa: F401
