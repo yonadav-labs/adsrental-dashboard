@@ -418,7 +418,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def add_shipstation_order(self):
         'Create shipstation order if does not exist.'
-        if not settings.MANAGE_EC2:
+        if not settings.MANAGE_SHIPSTATION:
             return False
 
         shipstation_client = ShipStationClient()
