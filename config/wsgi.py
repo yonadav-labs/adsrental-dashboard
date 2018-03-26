@@ -7,5 +7,5 @@ from config.environment import SETTINGS_MODULE
 
 pymysql.install_as_MySQLdb()
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", SETTINGS_MODULE)
-application = get_wsgi_application()
-app = application
+application = get_wsgi_application()  # pylint: disable=C0103
+app = application  # pylint: disable=C0103

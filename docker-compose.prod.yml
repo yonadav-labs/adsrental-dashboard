@@ -18,10 +18,9 @@ services:
     command: /app/scripts/server.sh
     privileged: true
     environment:
-      ENV: dev
+      ENV: prod
       HTTPS: 'on'
       wsgi.url_scheme: 'https'
-      UWSGI_INI: /app/config/nginx/uwsgi_debug.ini
     volumes:
       - ./cert/:/app/cert/
       - ./config/:/app/config/

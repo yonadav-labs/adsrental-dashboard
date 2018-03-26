@@ -552,11 +552,11 @@ class Lead(models.Model, FulltextSearchMixin):
             return
 
         ec2_instance.update_from_boto()
-        EC2Instance = apps.get_app_config('adsrental').get_model('EC2Instance')
+        ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
-            EC2Instance.launch_for_lead(self)
+            ec2_instance_model.launch_for_lead(self)
         if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance.is_running():
-            EC2Instance.launch_for_lead(self)
+            ec2_instance_model.launch_for_lead(self)
         if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
             ec2_instance.stop()
 
