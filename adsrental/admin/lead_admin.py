@@ -4,11 +4,12 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 
-from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm
+from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
@@ -72,6 +73,8 @@ class LeadAdmin(admin.ModelAdmin):
         'mark_as_disqualified',
         'ban',
         'unban',
+        'report_wrong_password',
+        'report_correct_password',
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
@@ -314,6 +317,54 @@ class LeadAdmin(admin.ModelAdmin):
             'objects': queryset,
             'form': form,
         })
+
+    def report_wrong_password(self, request, queryset):
+        if queryset.count() != 1:
+            messages.error(request, 'Only one lead account can be selected.')
+            return None
+
+        lead = queryset.first()
+        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=True).first()
+
+        if not lead_account:
+            messages.error(request, 'Lead has no active accounts with correct password.')
+            return None
+
+        lead_account.wrong_password_date = timezone.now()
+        lead_account.save()
+        messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+
+    def report_correct_password(self, request, queryset):
+        if queryset.count() != 1:
+            messages.error(request, 'Only one lead account can be selected.')
+            return None
+
+        lead = queryset.first()
+        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
+        if not lead_account:
+            messages.error(request, 'Lead has no active accounts with wrong password.')
+            return None
+
+        if 'do_action' in request.POST:
+            form = AdminLeadAccountPasswordForm(request.POST)
+            if form.is_valid():
+                new_password = form.cleaned_data['new_password']
+                lead_account.password = new_password
+                lead_account.wrong_password_date = None
+                lead_account.save()
+                messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
+                return None
+        else:
+            form = AdminLeadAccountPasswordForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'report_correct_password',
+            'title': 'Set new pasword for {}'.format(lead_account),
+            'button': 'Save password',
+            'objects': queryset,
+            'form': form,
+        })
+
 
     def touch(self, request, queryset):
         for lead in queryset:

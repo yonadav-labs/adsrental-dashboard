@@ -29,7 +29,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'wrong_password_date_field',
         'created',
     )
-    list_select_related = ('lead', )
+    list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
         'account_type',
         'bundler_paid',
@@ -47,6 +47,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'report_correct_password',
         'sync_to_adsdb',
     )
+
+    def rpid(self, obj):
+        ec2_instance = obj.lead.get_ec2_instance()
+        return ec2_instance.rpid if ec2_instance else None
 
     def lead_link(self, obj):
         lead = obj.lead

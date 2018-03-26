@@ -259,7 +259,6 @@ class UpdatePingView(View):
             ip_address = ping_data['ip_address']
             version = ping_data['raspberry_pi_version']
             restart_required = ping_data['restart_required']
-            wrong_password = ping_data.get('wrong_password', False)
             lead_status = ping_data.get('lead_status')
             last_ping = ping_data.get('last_ping')
             last_troubleshoot = ping_data.get('last_troubleshoot')
