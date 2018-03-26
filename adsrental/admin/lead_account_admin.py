@@ -58,10 +58,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if not obj.wrong_password_date:
             return None
 
-        return mark_safe('<span title="{}">{}</span> <a href="{}" target="_blank">Fix</a>'.format(
+        return mark_safe('<span title="{}">{}</span>'.format(
             obj.wrong_password_date,
             naturaltime(obj.wrong_password_date),
-            reverse('dashboard_set_password', kwargs=dict(lead_id=obj.lead.leadid)),
         ))
 
     def mark_as_qualified(self, request, queryset):
