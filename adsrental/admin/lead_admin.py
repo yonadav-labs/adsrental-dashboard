@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -39,7 +39,7 @@ class LeadAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'usps_tracking_code',
         'online',
-        # 'wrong_password_date_field',
+        'wrong_password_field',
         'pi_delivered',
         # 'bundler_paid',
     )
@@ -47,7 +47,7 @@ class LeadAdmin(admin.ModelAdmin):
         StatusListFilter,
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
-        WrongPasswordListFilter,
+        LeadAccountWrongPasswordListFilter,
         TouchCountListFilter,
         'company',
         ShipDateListFilter,
@@ -55,7 +55,6 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
         'is_sync_adsdb',
-        'bundler_paid',
         'pi_delivered',
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
@@ -168,15 +167,8 @@ class LeadAdmin(admin.ModelAdmin):
 
         return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
-    def wrong_password_date_field(self, obj):
-        if not obj.wrong_password_date:
-            return None
-
-        return mark_safe('<span title="{}">{}</span> <a href="{}" target="_blank">Fix</a>'.format(
-            obj.wrong_password_date,
-            naturaltime(obj.wrong_password_date),
-            reverse('dashboard_set_password', kwargs=dict(lead_id=obj.leadid)),
-        ))
+    def wrong_password_field(self, obj):
+        return obj.is_wrong_password()
 
     def raspberry_pi_link(self, obj):
         if not obj.raspberry_pi:
@@ -355,8 +347,8 @@ class LeadAdmin(admin.ModelAdmin):
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
 
-    wrong_password_date_field.short_description = 'Wrong Password'
-    wrong_password_date_field.admin_order_field = 'wrong_password_date'
+    wrong_password_field.short_description = 'Wrong Password'
+    wrong_password_field.boolean = True
 
     tested_field.short_description = 'Tested'
 

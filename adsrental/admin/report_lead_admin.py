@@ -4,13 +4,11 @@ from django.contrib import admin
 from django.urls import reverse
 from django.shortcuts import render
 from django.contrib import messages
-from django.utils import timezone
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 
-from adsrental.forms import AdminLeadBanForm, AdminPrepareForReshipmentForm
+from adsrental.forms import AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
-from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, WrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
@@ -68,12 +66,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     search_fields = ('leadid', 'account_name', 'first_name', 'last_name', 'raspberry_pi__rpid', 'email', )
     list_select_related = ('raspberry_pi', 'bundler', )
     actions = (
-        'mark_as_qualified',
-        'mark_as_disqualified',
-        'ban',
-        'unban',
-        'report_wrong_password',
-        'report_correct_password',
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
@@ -117,34 +109,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
             rpid=obj.raspberry_pi,
         ))
 
-    def mark_as_qualified(self, request, queryset):
-        for lead in queryset:
-            if lead.is_banned():
-                messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
-                continue
-
-            lead.qualify(request.user)
-            if lead.assign_raspberry_pi():
-                messages.success(
-                    request, 'Lead {} has new Raspberry Pi assigned: {}'.format(lead.email, lead.raspberry_pi.rpid))
-
-            EC2Instance.launch_for_lead(lead)
-            if lead.add_shipstation_order():
-                messages.success(
-                    request, '{} order created: {}'.format(lead.email, lead.shipstation_order_number))
-            else:
-                messages.info(
-                    request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead.email, lead.shipstation_order_number))
-
-    def mark_as_disqualified(self, request, queryset):
-        for lead in queryset:
-            if lead.is_banned():
-                messages.warning(request, 'Lead {} is {}, skipping'.format(lead.email, lead.status))
-                continue
-
-            lead.disqualify(request.user)
-            messages.info(request, 'Lead {} is disqualified.'.format(lead.email))
-
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
@@ -155,50 +119,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
             lead.raspberry_pi.save()
             lead.clear_ping_cache()
             messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
-
-    def ban(self, request, queryset):
-        if 'do_action' in request.POST:
-            form = AdminLeadBanForm(request.POST)
-            if form.is_valid():
-                reason = form.cleaned_data['reason']
-                for lead in queryset:
-                    lead.ban(request.user, reason)
-                    if lead.get_ec2_instance():
-                        lead.get_ec2_instance().stop()
-                    messages.info(request, 'Lead {} is banned.'.format(lead.email))
-                return
-        else:
-            form = AdminLeadBanForm()
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban',
-            'title': 'Choose reason to ban following leads',
-            'button': 'Ban',
-            'objects': queryset,
-            'form': form,
-        })
-
-    def unban(self, request, queryset):
-        for lead in queryset:
-            if lead.unban(request.user):
-                EC2Instance.launch_for_lead(lead)
-                messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
-
-    def report_wrong_password(self, request, queryset):
-        for lead in queryset:
-            if lead.wrong_password_date is None:
-                lead.wrong_password_date = timezone.now()
-                lead.save()
-                lead.clear_ping_cache()
-                messages.info(request, 'Lead {} password is marked as wrong.'.format(lead.email))
-
-    def report_correct_password(self, request, queryset):
-        for lead in queryset:
-            if lead.wrong_password_date is not None:
-                lead.wrong_password_date = None
-                lead.save()
-                lead.clear_ping_cache()
-                messages.info(request, 'Lead {} password is marked as correct.'.format(lead.email))
 
     def touch(self, request, queryset):
         for lead in queryset:
@@ -221,7 +141,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
                         messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
 
                     messages.success(request, 'RPID {} is ready to be tested.'.format(lead.raspberry_pi.rpid))
-                return
+                return None
         else:
             rpids = [i.raspberry_pi.rpid for i in queryset if i.raspberry_pi]
             form = AdminPrepareForReshipmentForm(initial=dict(
@@ -243,8 +163,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     account_type.admin_order_field = 'facebook_account'
 
     raspberry_pi_link.short_description = 'RPID'
-
-    mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
 
     bundler_field.short_description = 'Bundler'
     bundler_field.admin_order_field = 'utm_source'

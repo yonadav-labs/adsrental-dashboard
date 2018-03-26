@@ -227,4 +227,4 @@ class AdminPrepareForReshipmentForm(forms.Form):
 
     def clean_rpids(self):
         value = self.cleaned_data['rpids']
-        return re.findall('RP\d+', value)
+        return re.findall(r'RP\d+', value)

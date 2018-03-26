@@ -63,8 +63,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'export_as_csv',
         'restart_raspberry_pi',
         'start_ec2',
-        'report_wrong_password',
-        'report_correct_password',
         'prepare_for_testing',
         'touch',
     )
@@ -158,22 +156,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
             messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
-
-    def report_wrong_password(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
-            if lead.wrong_password_date is None:
-                lead.wrong_password_date = timezone.now()
-                lead.save()
-                messages.info(request, 'Lead {} password is marked as wrong.'.format(lead.email))
-
-    def report_correct_password(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
-            if lead.wrong_password_date is not None:
-                lead.wrong_password_date = None
-                lead.save()
-                messages.info(request, 'Lead {} password is marked as correct.'.format(lead.email))
 
     def touch(self, request, queryset):
         for lead_history_month in queryset:

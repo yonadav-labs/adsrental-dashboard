@@ -22,7 +22,7 @@ class LeadStatusListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return Lead.STATUS_CHOICES + [
-            ('Active',  'Active'),
+            ('Active', 'Active'),
         ]
 
     def queryset(self, request, queryset):
@@ -30,6 +30,7 @@ class LeadStatusListFilter(SimpleListFilter):
             return queryset.filter(lead__status__in=Lead.STATUSES_ACTIVE)
         if self.value():
             return queryset.filter(lead__status=self.value())
+        return None
 
 
 class StatusListFilter(SimpleListFilter):
@@ -38,7 +39,7 @@ class StatusListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return Lead.STATUS_CHOICES + [
-            ('Active',  'Active'),
+            ('Active', 'Active'),
         ]
 
     def queryset(self, request, queryset):
@@ -46,6 +47,7 @@ class StatusListFilter(SimpleListFilter):
             return queryset.filter(status__in=Lead.STATUSES_ACTIVE)
         if self.value():
             return queryset.filter(status=self.value())
+        return None
 
 
 class TouchCountListFilter(SimpleListFilter):
@@ -63,6 +65,7 @@ class TouchCountListFilter(SimpleListFilter):
             return queryset.filter(touch_count__lt=10)
         if self.value() == 'more10':
             return queryset.filter(touch_count__gte=10)
+        return None
 
 
 class RaspberryPiFirstTestedListFilter(SimpleListFilter):
@@ -71,11 +74,11 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('this_week',  'This week'),
-            ('previous_week',  'Previous week'),
-            ('this_month',  'This month'),
-            ('previous_month',  'Previous month'),
-            ('not',  'Not yet'),
+            ('this_week', 'This week'),
+            ('previous_week', 'Previous week'),
+            ('this_month', 'This month'),
+            ('previous_month', 'Previous month'),
+            ('not', 'Not yet'),
         )
 
     def queryset(self, request, queryset):
@@ -99,6 +102,7 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
             return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
         if self.value() == 'not':
             return queryset.filter(raspberry_pi__first_tested__isnull=True)
+        return None
 
 
 class OnlineListFilter(SimpleListFilter):
@@ -150,6 +154,7 @@ class OnlineListFilter(SimpleListFilter):
             return queryset.filter(**{
                 filter_field__isnull: True,
             })
+        return None
 
 
 class RaspberryPiOnlineListFilter(OnlineListFilter):
@@ -203,6 +208,7 @@ class ShipDateListFilter(SimpleListFilter):
                 ship_date__gte=prev_month_start.date(),
                 ship_date__lte=prev_month_end.date(),
             )
+        return None
 
 
 class QualifiedDateListFilter(SimpleListFilter):
@@ -248,6 +254,7 @@ class QualifiedDateListFilter(SimpleListFilter):
                 qualified_date__gte=prev_month_start,
                 qualified_date__lte=prev_month_end,
             )
+        return None
 
 
 class AccountTypeListFilter(SimpleListFilter):
@@ -265,6 +272,7 @@ class AccountTypeListFilter(SimpleListFilter):
             return queryset.filter(facebook_account=True)
         if self.value() == 'google':
             return queryset.filter(google_account=True)
+        return None
 
 
 class WrongPasswordListFilter(SimpleListFilter):
@@ -298,6 +306,41 @@ class WrongPasswordListFilter(SimpleListFilter):
             return queryset.filter(
                 wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
             )
+        return None
+
+
+class LeadAccountWrongPasswordListFilter(SimpleListFilter):
+    title = 'Wrong Password'
+    parameter_name = 'wrong_password'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('no', 'No'),
+            ('yes', 'Yes'),
+            ('yes_0_2days', 'Wrong for 0-2 days'),
+            ('yes_3_5days', 'Wrong for 3-5 days'),
+            ('yes_5days', 'Wrong for more than 5 days'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'no':
+            return queryset.filter(lead_account__wrong_password_date__isnull=True)
+        if self.value() == 'yes':
+            return queryset.filter(lead_account__wrong_password_date__isnull=False)
+        if self.value() == 'yes_0_2days':
+            return queryset.filter(
+                lead_account__wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+            )
+        if self.value() == 'yes_3_5days':
+            return queryset.filter(
+                lead_account__wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                lead_account__wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        if self.value() == 'yes_5days':
+            return queryset.filter(
+                lead_account__wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        return None
 
 
 class LeadRaspberryPiVersionListFilter(SimpleListFilter):
@@ -318,6 +361,7 @@ class LeadRaspberryPiVersionListFilter(SimpleListFilter):
             return queryset.filter(version__isnull=False).exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'null':
             return queryset.filter(lead__raspberry_pi__version__isnull=True)
+        return None
 
 
 class DateMonthListFilter(SimpleListFilter):
@@ -346,6 +390,7 @@ class DateMonthListFilter(SimpleListFilter):
                 date__gte=month_start,
                 date__lte=month_end,
             )
+        return None
 
 
 class HistoryStatusListFilter(SimpleListFilter):
@@ -360,6 +405,7 @@ class HistoryStatusListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'hide_zeroes':
             return queryset.filter(days_online__gt=0)
+        return None
 
 
 class LastTroubleshootListFilter(SimpleListFilter):
@@ -386,6 +432,7 @@ class LastTroubleshootListFilter(SimpleListFilter):
             return queryset.filter(last_troubleshoot__gte=timezone.now() - datetime.timedelta(hours=24))
         if self.value() == 'older':
             return queryset.filter(last_troubleshoot__lt=timezone.now() - datetime.timedelta(hours=24))
+        return None
 
 
 class VersionListFilter(SimpleListFilter):
@@ -406,6 +453,7 @@ class VersionListFilter(SimpleListFilter):
             return queryset.filter(version__isnull=False).exclude(version=settings.RASPBERRY_PI_VERSION)
         if self.value() == 'null':
             return queryset.filter(version__isnull=True)
+        return None
 
 
 class TunnelUpListFilter(SimpleListFilter):
@@ -433,6 +481,7 @@ class TunnelUpListFilter(SimpleListFilter):
             return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60))
         if self.value() == 'no_1day':
             return queryset.filter(tunnel_up_date__lte=now - datetime.timedelta(seconds=60 * 60 * 24))
+        return None
 
 
 class BundlerListFilter(SimpleListFilter):
@@ -493,3 +542,4 @@ class BundlerListFilter(SimpleListFilter):
             return queryset.filter(bundler__isnull=True)
         if self.value():
             return queryset.filter(bundler_id__in=self.value())
+        return None

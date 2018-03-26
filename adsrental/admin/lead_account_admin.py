@@ -129,7 +129,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def report_correct_password(self, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead account can be selected.')
-            return
+            return None
 
         lead_account = queryset.first()
 
@@ -169,3 +169,5 @@ class LeadAccountAdmin(admin.ModelAdmin):
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
 
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
+
+    mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'

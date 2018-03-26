@@ -37,7 +37,7 @@ class LeadHistory(models.Model):
         else:
             self.checks_offline += 1
 
-        if self.lead.wrong_password_date:
+        if self.lead.is_wrong_password():
             self.checks_wrong_password += 1
 
     @classmethod

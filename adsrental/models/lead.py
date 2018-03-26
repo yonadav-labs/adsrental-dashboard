@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django.apps import apps
-from django.utils import dateformat
 from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi import RaspberryPi
@@ -193,79 +192,11 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_wrong_password(self):
         'Is password reported as wrong now'
-        return self.wrong_password_date is not None
+        for lead_account in self.lead_accounts.all():
+            if lead_account.active and lead_account.wrong_password_date:
+                return True
 
-    def sync_to_adsdb(self):
-        'Send lead info to ADSDB'
-        if not settings.ADSDB_SYNC_ENABLED:
-            return False
-        if self.company != self.COMPANY_FBM:
-            return False
-        if self.status != Lead.STATUS_IN_PROGRESS:
-            return False
-        if self.facebook_account and self.touch_count < 10:
-            return False
-        bundler_adsdb_id = self.bundler and self.bundler.adsdb_id
-        ec2_instance = self.get_ec2_instance()
-        data = dict(
-            first_name=self.first_name,
-            last_name=self.last_name,
-            email=self.email,
-            last_seen=dateformat.format(self.raspberry_pi.last_seen, 'j E Y H:i') if self.raspberry_pi and self.raspberry_pi.last_seen else None,
-            phone=self.phone,
-            ec2_hostname=ec2_instance.hostname if ec2_instance else None,
-            utm_source_id=bundler_adsdb_id or settings.DEFAULT_ADSDB_BUNDLER_ID,
-            rp_id=self.raspberry_pi.rpid if self.raspberry_pi else None,
-        )
-
-        if self.facebook_account:
-            data['api_id'] = 146
-            data['username'] = self.fb_email
-            data['fb_username'] = self.fb_email
-            data['fb_password'] = self.fb_secret
-        if self.google_account:
-            data['api_id'] = 147
-            data['username'] = self.google_email
-            data['google_username'] = self.google_email
-            data['google_password'] = self.google_password
-
-        # import json
-        # raise ValueError(json.dumps({
-        #             'account_id': int(self.adsdb_account_id),
-        #             'data': data,
-        #         }))
-
-        auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
-
-        if not self.adsdb_account_id:
-            url = 'https://www.adsdb.io/api/v1/accounts/create-s'
-            response = requests.post(
-                url,
-                json=[data],
-                auth=auth,
-            )
-            response_json = response.json()
-            if response.status_code == 200:
-                self.adsdb_account_id = response_json.get('account_data')[0]['id']
-                self.is_sync_adsdb = True
-                self.save()
-                return response_json
-            if response.status_code == 409:
-                self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
-                self.save()
-
-        url = 'https://www.adsdb.io/api/v1/accounts/update-s'
-        response = requests.post(
-            url,
-            json={
-                'account_id': int(self.adsdb_account_id),
-                'data': data,
-            },
-            auth=auth,
-        )
-
-        response_json = response.json()
-        return response_json
+        return False
 
     def touch(self):
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
@@ -324,17 +255,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
         if value == self.STATUS_QUALIFIED and old_value == self.STATUS_IN_PROGRESS:
             return False
-
-        if value == self.STATUS_BANNED:
-            if self.facebook_account:
-                self.facebook_account_status = Lead.STATUS_BANNED
-            if self.google_account:
-                self.google_account_status = Lead.STATUS_BANNED
-        else:
-            if self.facebook_account:
-                self.facebook_account_status = Lead.STATUS_AVAILABLE
-            if self.google_account:
-                self.google_account_status = Lead.STATUS_AVAILABLE
 
         if self.status != Lead.STATUS_BANNED:
             self.old_status = self.status
