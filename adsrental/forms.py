@@ -7,6 +7,7 @@ from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 
 
 class DashboardForm(forms.Form):
@@ -211,6 +212,14 @@ class LandingForm(forms.Form):
 
 class AdminLeadBanForm(forms.Form):
     reason = forms.ChoiceField(choices=Lead.BAN_REASON_CHOICES)
+
+
+class AdminLeadAccountBanForm(forms.Form):
+    reason = forms.ChoiceField(choices=LeadAccount.BAN_REASON_CHOICES)
+
+
+class AdminLeadAccountPasswordForm(forms.Form):
+    new_password = forms.CharField(label='Password')
 
 
 class AdminPrepareForReshipmentForm(forms.Form):
