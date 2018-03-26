@@ -51,7 +51,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
     old_status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     ban_reason = models.CharField(max_length=50, choices=BAN_REASON_CHOICES, null=True, blank=True, help_text='Populated from ban form')
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPE_CHOICES)

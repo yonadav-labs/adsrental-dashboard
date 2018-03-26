@@ -9,6 +9,7 @@ from django.shortcuts import Http404
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.utils import CustomerIOClient
 
@@ -96,6 +97,16 @@ class SignupView(View):
             photo_id=data['photo_id'],
         )
         lead.save()
+
+        lead_account = LeadAccount(
+            lead=lead,
+            username=data['fb_email'],
+            password=data['fb_secret'],
+            friends=data['fb_friends'],
+            url=data['facebook_profile_url'],
+            status=LeadAccount.STATUS_AVAILABLE,
+        )
+        lead_account.save()
         # lead.send_web_to_lead()
 
         customerio_client = CustomerIOClient()

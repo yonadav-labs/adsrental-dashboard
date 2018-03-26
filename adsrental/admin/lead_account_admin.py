@@ -11,6 +11,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
+from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
@@ -30,6 +31,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
     list_select_related = ('lead', )
     list_filter = (
         'account_type',
+        'bundler_paid',
+        WrongPasswordListFilter,
+        QualifiedDateListFilter,
     )
     search_fields = ('lead__leadid', 'username', )
     actions = (
@@ -39,6 +43,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'unban',
         'report_wrong_password',
         'report_correct_password',
+        'sync_to_adsdb',
     )
 
     def lead_link(self, obj):
@@ -150,8 +155,18 @@ class LeadAccountAdmin(admin.ModelAdmin):
             'form': form,
         })
 
+    def sync_to_adsdb(self, request, queryset):
+        for lead_account in queryset:
+            result = lead_account.sync_to_adsdb()
+            if result:
+                messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
+            else:
+                messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = 'lead__leadid'
 
     wrong_password_date_field.short_description = 'Wrong Password'
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
+
+    sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
