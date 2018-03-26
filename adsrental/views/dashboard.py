@@ -58,6 +58,7 @@ class SetPasswordView(View):
                 lead_account.save()
                 value = lead_account.password
                 LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
+                break
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
                 urlencode(dict(

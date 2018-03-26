@@ -85,7 +85,7 @@
                         {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
                     </td>
                     <td>
-                        {% if entry.wrong_password_date %}
+                        {% if entry.is_wrong_password %}
                             <span class="glyphicon glyphicon-ok" style="color: red;"></span>
                             <a target="_blank" href="{% url 'dashboard_set_password' lead_id=entry.leadid %}">Fix</a>
                         {% else %}
