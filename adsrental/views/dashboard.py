@@ -54,19 +54,12 @@ class SetPasswordView(View):
         is_facebook_account = lead.facebook_account
         is_google_account = lead.google_account
         if form.is_valid():
-            if is_facebook_account:
-                old_value = lead.fb_secret
-                lead.fb_secret = form.cleaned_data['new_password']
-                value = lead.fb_secret
-                LeadChange(lead=lead, field='fb_secret', value=value, old_value=old_value, edited_by=request.user).save()
-            if is_google_account:
-                old_value = lead.google_password
-                lead.google_password = form.cleaned_data['new_password']
-                value = lead.google_password
-                LeadChange(lead=lead, field='google_password', value=value, old_value=old_value, edited_by=request.user).save()
-            lead.wrong_password = False
-            lead.wrong_password_date = None
-            lead.save()
+            for lead_account in lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False):
+                old_value = lead_account.password
+                lead_account.password = form.cleaned_data['new_password']
+                lead_account.save()
+                value = lead_account.password
+                LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
                 urlencode(dict(
