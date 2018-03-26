@@ -51,8 +51,6 @@ class SetPasswordView(View):
     def post(self, request, lead_id):
         form = SetPasswordForm(request.POST)
         lead = Lead.objects.get(leadid=lead_id)
-        is_facebook_account = lead.facebook_account
-        is_google_account = lead.google_account
         if form.is_valid():
             for lead_account in lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False):
                 old_value = lead_account.password

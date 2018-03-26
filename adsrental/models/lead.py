@@ -202,7 +202,7 @@ class Lead(models.Model, FulltextSearchMixin):
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
         self.last_touch_date = timezone.now()
         self.touch_count += 1
-        self.sync_to_adsdb()
+        # self.sync_to_adsdb()
         self.save()
 
     def get_address(self):
