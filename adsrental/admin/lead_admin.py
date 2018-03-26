@@ -321,14 +321,14 @@ class LeadAdmin(admin.ModelAdmin):
     def report_wrong_password(self, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead account can be selected.')
-            return None
+            return
 
         lead = queryset.first()
         lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=True).first()
 
         if not lead_account:
             messages.error(request, 'Lead has no active accounts with correct password.')
-            return None
+            return
 
         lead_account.wrong_password_date = timezone.now()
         lead_account.save()
