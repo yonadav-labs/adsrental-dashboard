@@ -2,6 +2,7 @@
 import json
 import time
 import uuid
+import datetime
 
 import requests
 import boto3
@@ -317,7 +318,7 @@ class PingCacheHelper(object):
     'Simplifies cache operations for updating timestamps'
     KEY_TEMPLATE = 'ping_{}'
     KEYS = 'ping_keys'
-    TTL_SECONDS = 300
+    TTL_SECONDS = 600
     CACHE_VERSION = '1.0.1'
 
     def __init__(self):
@@ -375,6 +376,10 @@ class PingCacheHelper(object):
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
         restart_required = data.get('restart_required', False)
+        created = data.get('created')
+
+        if not created:
+            return False
 
         if restart_required != raspberry_pi.restart_required:
             return False
@@ -386,6 +391,10 @@ class PingCacheHelper(object):
             return False
 
         if lead and wrong_password != lead.is_wrong_password():
+            return False
+
+        data_older_than = timezone.now() - datetime.timedelta(seconds=cls.TTL_SECONDS)
+        if data.get('created') < data_older_than:
             return False
 
         return True
