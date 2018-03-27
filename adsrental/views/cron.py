@@ -256,31 +256,8 @@ class UpdatePingView(View):
             ping_data = rpids_ping_map.get(raspberry_pi.rpid)
             rpid = ping_data['rpid']
             rpids.append(rpid)
-            ip_address = ping_data['ip_address']
-            version = ping_data['raspberry_pi_version']
-            restart_required = ping_data['restart_required']
-            lead_status = ping_data.get('lead_status')
-            last_ping = ping_data.get('last_ping')
-            last_troubleshoot = ping_data.get('last_troubleshoot')
-
-            if last_ping and Lead.is_status_active(lead_status):
-                raspberry_pi.update_ping(last_ping)
-
-            if raspberry_pi.ip_address != ip_address:
-                raspberry_pi.ip_address = ip_address
-            if raspberry_pi.version != version and version:
-                raspberry_pi.version = version
-            if restart_required:
-                raspberry_pi.restart_required = False
-            raspberry_pi.version = version
             ec2_instance = ec2_instances_map.get(rpid)
-
-            if ec2_instance and last_troubleshoot:
-                if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
-                    ec2_instance.last_troubleshoot = last_ping
-                    if ping_data.get('tunnel_up'):
-                        ec2_instance.tunnel_up_date = last_ping
-                        ec2_instance.tunnel_up = True
+            self.process_ping_data(ping_data, raspberry_pi, ec2_instance)
 
             if not ping_cache_helper.is_data_consistent(
                     ping_data,
@@ -298,6 +275,32 @@ class UpdatePingView(View):
             'invalidated': invalidated_rpids,
             'result': True,
         })
+
+    def process_ping_data(self, ping_data, raspberry_pi, ec2_instance):
+        ip_address = ping_data['ip_address']
+        version = ping_data['raspberry_pi_version']
+        restart_required = ping_data['restart_required']
+        lead_status = ping_data.get('lead_status')
+        last_ping = ping_data.get('last_ping')
+        last_troubleshoot = ping_data.get('last_troubleshoot')
+
+        if last_ping and Lead.is_status_active(lead_status):
+            raspberry_pi.update_ping(last_ping)
+
+        if raspberry_pi.ip_address != ip_address:
+            raspberry_pi.ip_address = ip_address
+        if raspberry_pi.version != version and version:
+            raspberry_pi.version = version
+        if restart_required:
+            raspberry_pi.restart_required = False
+        raspberry_pi.version = version
+
+        if ec2_instance and last_troubleshoot:
+            if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
+                ec2_instance.last_troubleshoot = last_ping
+                if ping_data.get('tunnel_up'):
+                    ec2_instance.tunnel_up_date = last_ping
+                    ec2_instance.tunnel_up = True
 
 
 class SyncDeliveredView(View):
