@@ -112,22 +112,22 @@ class DashboardView(View):
                 entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)
                 if value == 'no':
                     entries = entries.filter(
-                        wrong_password_date__isnull=True)
+                        lead_account__wrong_password_date__isnull=True)
                 if value == 'yes':
                     entries = entries.filter(
-                        wrong_password_date__isnull=False)
+                        lead_account__wrong_password_date__isnull=False)
                 if value == 'yes_0_2days':
                     entries = entries.filter(
-                        wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                        lead_account__wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
                     )
                 if value == 'yes_3_5days':
                     entries = entries.filter(
-                        wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
-                        wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+                        lead_account__wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                        lead_account__wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
                     )
                 if value == 'yes_5days':
                     entries = entries.filter(
-                        wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+                        lead_account__wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
                     )
 
             if form.cleaned_data['lead_status']:
