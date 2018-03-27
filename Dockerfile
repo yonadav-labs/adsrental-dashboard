@@ -8,6 +8,7 @@ RUN mkdir -p /app/
 WORKDIR /app
 
 ADD ./requirements.txt /app/requirements.txt
+RUN pip install -U pip
 RUN pip install -r /app/requirements.txt
 
 RUN mkdir -p /app/media/
