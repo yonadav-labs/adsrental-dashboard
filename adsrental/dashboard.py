@@ -155,8 +155,8 @@ class CustomAppIndexDashboard(AppIndexDashboard):
             )
         ]
 
-    def init_with_context(self, context):
-        """
-        Use this method if you need to access the request context.
-        """
-        return super(CustomAppIndexDashboard, self).init_with_context(context)
+    # def init_with_context(self, context):
+    #     """
+    #     Use this method if you need to access the request context.
+    #     """
+    #     return super(CustomAppIndexDashboard, self).init_with_context(context)
