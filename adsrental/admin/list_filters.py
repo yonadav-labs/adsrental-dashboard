@@ -120,7 +120,7 @@ class OnlineListFilter(SimpleListFilter):
             ('never', 'Never'),
         )
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, queryset):  # pylint: disable=R0911
         filter_field__gte = '{}__gte'.format(self.filter_field)
         filter_field__lte = '{}__lte'.format(self.filter_field)
         filter_field__isnull = '{}__isnull'.format(self.filter_field)
