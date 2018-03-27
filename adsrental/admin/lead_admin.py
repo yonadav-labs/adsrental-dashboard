@@ -86,10 +86,10 @@ class LeadAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super(LeadAdmin, self).get_queryset(request)
         queryset = queryset.select_related(
-            # 'raspberry_pi',
             'ec2instance',
             'bundler',
         ).prefetch_related(
+            'raspberry_pi',
             'lead_accounts',
         )
         return queryset
