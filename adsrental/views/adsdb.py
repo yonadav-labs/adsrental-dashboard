@@ -53,10 +53,10 @@ class ADSDBLeadView(View):
         lead_account = None
         if data.get('account_id'):
             lead_account = LeadAccount.objects.filter(adsdb_account_id=str(data.get('account_id'))).order_by('-created').first()
-        if lead is None and data.get('email'):
+        if lead_account is None and data.get('email'):
             lead_account = LeadAccount.objects.filter(username=data.get('email')).order_by('-created').first()
 
-        if not lead:
+        if not lead_account:
             raise Http404
 
         self._update_lead_account(lead_account, data, request.user)
