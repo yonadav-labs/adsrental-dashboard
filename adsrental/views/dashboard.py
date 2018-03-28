@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.forms import DashboardForm, SetPasswordForm
@@ -155,9 +156,9 @@ class DashboardView(View):
             if form.cleaned_data['account_type']:
                 value = form.cleaned_data['account_type']
                 if value == 'facebook':
-                    entries = entries.filter(facebook_account=True)
+                    entries = entries.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
                 if value == 'google':
-                    entries = entries.filter(google_account=True)
+                    entries = entries.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
             order = request.GET.get('order', '-raspberry_pi__last_seen')
             entries = entries.order_by(order)
