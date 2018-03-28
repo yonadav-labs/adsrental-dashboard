@@ -2,7 +2,6 @@
 import json
 import time
 import uuid
-import datetime
 
 import requests
 import boto3

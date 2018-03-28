@@ -32,7 +32,6 @@
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' '-account_name' %}">Account</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'utm_source' %}">UTM</a></th>
-                <th>Facebook</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
                 <th>Address</th>
@@ -54,7 +53,6 @@
                     <td>{{entry.first_name}} {{entry.last_name}}</td>
                     <td>{{ entry.account_name }}</td>
                     <td>{{ entry.utm_source }}</td>
-                    <td>{{ entry.fb_email }}</td>
                     <td>{{ entry.status }}</td>
                     <td>{{entry.phone}}</td>
                     <td>
@@ -82,7 +80,7 @@
                     <td>{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
                     <td>{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
                     <td>
-                        {% if entry.bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
+                        {% if entry.is_bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
                     </td>
                     <td>
                         {% if entry.is_wrong_password %}

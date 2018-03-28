@@ -1,5 +1,4 @@
 'Lead model'
-import base64
 import datetime
 
 from xml.etree import ElementTree
@@ -95,28 +94,6 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_DISQUALIFIED, 'Disqualified'),
     ]
 
-    BAN_REASON_CHOICES = (
-        ('Google - Policy', 'Google - Policy', ),
-        ('Google - Billing', 'Google - Billing', ),
-        ('Google - Unresponsive User', 'Google - Unresponsive User', ),
-        ('Facebook - Policy', 'Facebook - Policy', ),
-        ('Facebook - Suspicious', 'Facebook - Suspicious', ),
-        ('Facebook - Lockout', 'Facebook - Lockout', ),
-        ('Facebook - Unresponsive User', 'Facebook - Unresponsive User', ),
-        ('Duplicate', 'Duplicate', ),
-        ('Bad ad account', 'Bad ad account', ),
-        ('Other', 'Other', ),
-    )
-
-    DISQUALIFY_REASON_CHOICES = (
-        ('Doesn\'t meet friend requirements', 'Doesn\'t meet friend requirements', ),
-        ('Doesn\'t meet age requirements', 'Doesn\'t meet age requirements', ),
-        ('Fake FB', 'Fake FB', ),
-        ('Fake Google', 'Fake Google', ),
-        ('Non US account', 'Non US account', ),
-        ('Other', 'Other', ),
-    )
-
     COMPANY_EMPTY = '[Empty]'
     COMPANY_ACM = 'ACM'
     COMPANY_FBM = 'FBM'
@@ -136,47 +113,29 @@ class Lead(models.Model, FulltextSearchMixin):
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available', help_text='All statuses except for Banned are considered as Active')
     email = models.CharField(max_length=255, blank=True, null=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
-    ban_reason = models.CharField(max_length=40, choices=BAN_REASON_CHOICES, null=True, blank=True, help_text='Populated from ban form')
-    disqualify_reason = models.CharField(max_length=40, choices=DISQUALIFY_REASON_CHOICES, null=True, blank=True, help_text='Not used')
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
     account_name = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Obsolete, was used in SF, should be removed')
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True, help_text='Tracking code. Populated by sync_from-shipstation once order is shipped')
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Bundler UTM. Obsolete, use bundler instead')
-    google_account = models.BooleanField(default=False, help_text='True if account is google. google_account_status, google_email, google_password should be also filled')
-    facebook_account = models.BooleanField(default=False, help_text='True if account is Facebook. facebook_account_status, fb_email, fb_secret should be also filled')
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
     raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
-    wrong_password = models.BooleanField(default=False, help_text='Is password wrong now. Should be merged with wrong_password_date')
-    wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
-    bundler_paid = models.BooleanField(default=False, help_text='Is revenue paid to bundler.')
     pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi deliveered to end user.')
     billed = models.BooleanField(default=False, help_text='Does lead received his payment.')
     tested = models.BooleanField(default=False, help_text='Obsolete field. Use first_tested instead.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was touched for the last time.')
     ship_date = models.DateField(blank=True, null=True, help_text='Date when order was shipped. Populated from shipstation sync.')
-    qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead.')
-    facebook_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
-    google_account_status = models.CharField(max_length=255, choices=[(STATUS_AVAILABLE, 'Available'), (STATUS_BANNED, 'Banned')], blank=True, null=True)
-    fb_email = models.CharField(max_length=255, blank=True, null=True)
-    fb_secret = models.CharField(max_length=255, blank=True, null=True)
-    google_email = models.CharField(max_length=255, blank=True, null=True)
-    google_password = models.CharField(max_length=255, blank=True, null=True)
-    fb_friends = models.BigIntegerField(default=0)
-    fb_profile_url = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=50, blank=True, null=True)
     country = models.CharField(max_length=50, blank=True, null=True, default='United States')
     state = models.CharField(max_length=50, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     company = models.CharField(max_length=20, default=COMPANY_EMPTY, choices=COMPANY_CHOICES)
-    is_sync_adsdb = models.BooleanField(default=False, help_text='Obsolete field. Use adsdb_account_id instead.')
     customerio_enabled = models.BooleanField(default=True, help_text='If False, customer.io event will not be sent for this lead. However, they are created.')
     photo_id = models.FileField(blank=True, null=True, help_text='Photo uploaded by user on registration.')
     splashtop_id = models.CharField(max_length=255, blank=True, null=True, help_text='Splashtop ID reported by user.')
-    adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
     tracking_info = models.TextField(blank=True, null=True, help_text='Raw response from secure.shippingapis.com')
     pi_sent = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -194,6 +153,14 @@ class Lead(models.Model, FulltextSearchMixin):
         'Is password reported as wrong now'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.wrong_password_date:
+                return True
+
+        return False
+
+    def is_bundler_paid(self):
+        'Is bundler paid for any account'
+        for lead_account in self.lead_accounts.all():
+            if lead_account.active and lead_account.bundler_paid:
                 return True
 
         return False
@@ -295,8 +262,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def ban(self, edited_by, reason=None):
         'Mark lead as banned, send cutomer.io event.'
-        self.ban_reason = reason
-        self.save()
         if self.status == Lead.STATUS_AVAILABLE:
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_AVAILABLE_BANNED)
         else:
@@ -306,21 +271,17 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def unban(self, edited_by):
         'Restores lead previous status before banned.'
-        self.ban_reason = None
-        self.save()
         result = self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
         return result
 
     def disqualify(self, edited_by):
         'Set lead status as disqualified.'
-        self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
+        return self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
 
     def qualify(self, edited_by):
         'Set lead status as qualified.'
         result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
-        if result:
-            self.qualified_date = timezone.now()
-            self.save()
+        return result
 
     def assign_raspberry_pi(self):
         'Assign new or existing RaspberryPi if does not exist, prepare it for testing.'
@@ -358,41 +319,6 @@ class Lead(models.Model, FulltextSearchMixin):
     def str(self):
         'Obsolete.'
         return 'Lead {} ({})'.format(self.name(), self.email)
-
-    def send_web_to_lead(self, request=None):
-        'Obsolete.'
-        response = requests.post(
-            'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
-            data={
-                'oid': '00D460000015t1L',
-                'first_name': self.first_name,
-                'last_name': self.last_name,
-                'company': self.company,
-                'city': self.city,
-                'state': self.status,
-                'phone': self.phone,
-                'street': self.street,
-                'country': self.country,
-                'zip': self.postal_code,
-                '00N4600000AuUxk': self.leadid,
-                'debug': 1,
-                'debugEmail': 'volshebnyi@gmail.com',
-                '00N46000009vg39': request and request.META.get('REMOTE_ADDR'),
-                '00N46000009vg3J': 'ISP',
-                '00N46000009wgvp': self.fb_profile_url,
-                '00N46000009whHW': self.utm_source,
-                '00N46000009whHb': request and request.META.get('HTTP_USER_AGENT'),
-                '00N4600000B0zip': 1,
-                '00N4600000B1Sup': 'Available',
-                'Facebook_Email__c': base64.b64encode(self.fb_email.encode()).decode(),
-                'Facebook_Password__c': base64.b64encode(self.fb_secret.encode()).decode(),
-                'Facebook_Friends__c': self.fb_friends,
-                'Account_Name__c': self.account_name,
-                'email': self.email,
-                'Photo_Id_Url__c': 'https://adsrental.com/app/photo/{}/'.format(base64.b64encode(self.email.encode()).decode()),
-            }
-        )
-        return response
 
     def update_from_shipstation(self, data=None):
         'Set tracking number if item was sent, set ship_date if empty.'

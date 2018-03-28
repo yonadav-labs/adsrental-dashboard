@@ -21,7 +21,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'rpid',
         'lead_link',
         'account_type',
-        'status',
+        'status_field',
         'username',
         'password',
         'friends',
@@ -59,6 +59,17 @@ class LeadAccountAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,
+        ))
+
+    def status_field(self, obj):
+        title = 'Show changes'
+        if obj.ban_reason:
+            title = 'Banned for {}'.format(obj.ban_reason)
+        return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
+            url=reverse('admin:adsrental_leadchange_changelist'),
+            q=obj.leadid,
+            title=title,
+            status=obj.status,
         ))
 
     def wrong_password_date_field(self, obj):
@@ -170,6 +181,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = 'lead__leadid'
+
+    status_field.short_description = 'Status'
+    status_field.admin_order_field = 'status'
 
     wrong_password_date_field.short_description = 'Wrong Password'
     wrong_password_date_field.admin_order_field = 'wrong_password_date'

@@ -77,9 +77,9 @@ class DashboardView(View):
 
     def get_entries(self, user):
         if not user.utm_source:
-            return Lead.objects.all().select_related('raspberry_pi')
+            return Lead.objects.all().prefetch_related('raspberry_pi', 'lead_accounts')
 
-        return Lead.objects.filter(utm_source=user.utm_source).select_related('raspberry_pi')
+        return Lead.objects.filter(utm_source=user.utm_source).prefetch_related('raspberry_pi', 'lead_accounts')
 
     @method_decorator(login_required)
     def get(self, request):

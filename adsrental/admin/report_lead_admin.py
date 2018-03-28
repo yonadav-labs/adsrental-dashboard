@@ -52,7 +52,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
         QualifiedDateListFilter,
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
-        'is_sync_adsdb',
         'lead_account__bundler_paid',
         'pi_delivered',
     )

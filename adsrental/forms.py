@@ -210,10 +210,6 @@ class LandingForm(forms.Form):
     last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'name', }))
 
 
-class AdminLeadBanForm(forms.Form):
-    reason = forms.ChoiceField(choices=Lead.BAN_REASON_CHOICES)
-
-
 class AdminLeadAccountBanForm(forms.Form):
     reason = forms.ChoiceField(choices=LeadAccount.BAN_REASON_CHOICES)
 

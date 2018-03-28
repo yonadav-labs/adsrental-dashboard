@@ -55,7 +55,6 @@ class LeadAdmin(admin.ModelAdmin):
         QualifiedDateListFilter,
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
-        'is_sync_adsdb',
         'pi_delivered',
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
@@ -118,8 +117,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     def status_field(self, obj):
         title = 'Show changes'
-        if obj.ban_reason:
-            title = 'Banned for {}'.format(obj.ban_reason)
         return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
