@@ -19,6 +19,14 @@ from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineList
 class LeadAccountInline(admin.StackedInline):
     model = LeadAccount
     max_num = 2
+    readonly_fields = (
+        'created',
+        'updated',
+        'status',
+        'old_status',
+        'wrong_password_date',
+        'qualified_date',
+    )
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -92,6 +100,7 @@ class LeadAdmin(admin.ModelAdmin):
         'created',
         'updated',
         'status',
+        'old_status',
     )
     # raw_id_fields = ('raspberry_pi', )
 

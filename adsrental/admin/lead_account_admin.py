@@ -48,6 +48,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'report_correct_password',
         'sync_to_adsdb',
     )
+    readonly_fields = (
+        'created',
+        'updated',
+        'status',
+        'old_status',
+        'wrong_password_date',
+        'qualified_date',
+    )
 
 
     def get_queryset(self, request):
