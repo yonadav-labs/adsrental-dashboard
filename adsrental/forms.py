@@ -155,8 +155,8 @@ class SignupForm(forms.Form):
 
     def clean_email(self):
         value = self.cleaned_data['email'].lower()
-        existing_valus = [i[0] for i in Lead.objects.all().values_list('email')]
-        if value in existing_valus:
+        lead = Lead.objects.filter(email=value).first()
+        if lead:
             raise forms.ValidationError("This email is already registered")
 
         return value
@@ -170,16 +170,16 @@ class SignupForm(forms.Form):
 
     def clean_facebook_profile_url(self):
         value = self.cleaned_data['facebook_profile_url'].lower()
-        existing_valus = [i[0] for i in Lead.objects.all().values_list('fb_profile_url')]
-        if value in existing_valus:
+        lead_account = LeadAccount.objects.filter(url=value, active=True).first()
+        if lead_account:
             raise forms.ValidationError("This Facebook profile URL is already registered")
 
         return value
 
     def clean_fb_email(self):
         value = self.cleaned_data['fb_email'].lower()
-        existing_valus = [i[0] for i in Lead.objects.all().values_list('fb_email')]
-        if value in existing_valus:
+        lead_account = LeadAccount.objects.filter(username=value, active=True).first()
+        if lead_account:
             raise forms.ValidationError("This Facebook email is already registered")
 
         return value
