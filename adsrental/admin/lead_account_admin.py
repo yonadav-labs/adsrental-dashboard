@@ -67,7 +67,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             title = 'Banned for {}'.format(obj.ban_reason)
         return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
-            q=obj.leadid,
+            q=obj.lead.leadid,
             title=title,
             status=obj.status,
         ))
