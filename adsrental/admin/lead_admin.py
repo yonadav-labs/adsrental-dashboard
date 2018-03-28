@@ -80,7 +80,11 @@ class LeadAdmin(admin.ModelAdmin):
         'touch',
         'restart_raspberry_pi',
     )
-    readonly_fields = ('created', 'updated', 'status', )
+    readonly_fields = (
+        'created',
+        'updated',
+        'status',
+    )
     # raw_id_fields = ('raspberry_pi', )
 
 

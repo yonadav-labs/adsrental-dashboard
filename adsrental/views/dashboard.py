@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 from django.views import View
 from django.urls import reverse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, Http404
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -32,19 +32,18 @@ class SetPasswordView(View):
     @method_decorator(login_required)
     def get(self, request, lead_id):
         lead = Lead.objects.get(leadid=lead_id)
-        is_facebook_account = lead.facebook_account
-        is_google_account = lead.google_account
+        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
+        if not lead_account:
+            raise Http404
         form = SetPasswordForm(initial=dict(
             leadid=lead.leadid,
             lead_email=lead.email,
-            email=lead.fb_email if is_facebook_account else lead.google_email,
-            new_password=lead.fb_secret if is_facebook_account else lead.google_password,
+            email=lead_account.username,
+            new_password=lead_account.password,
         ))
         return render(request, 'dashboard_lead_password.html', dict(
             form=form,
             lead=lead,
-            is_facebook_account=is_facebook_account,
-            is_google_account=is_google_account,
         ))
 
     @method_decorator(login_required)
@@ -52,13 +51,14 @@ class SetPasswordView(View):
         form = SetPasswordForm(request.POST)
         lead = Lead.objects.get(leadid=lead_id)
         if form.is_valid():
-            for lead_account in lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False):
-                old_value = lead_account.password
-                lead_account.password = form.cleaned_data['new_password']
-                lead_account.save()
-                value = lead_account.password
-                LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
-                break
+            lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
+            if not lead_account:
+                raise Http404
+            old_value = lead_account.password
+            lead_account.password = form.cleaned_data['new_password']
+            lead_account.save()
+            value = lead_account.password
+            LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
                 urlencode(dict(
