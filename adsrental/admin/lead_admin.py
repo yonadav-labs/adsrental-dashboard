@@ -11,8 +11,13 @@ from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+
+
+class LeadAccountInline(admin.StackedInline):
+    model = LeadAccount
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -56,6 +61,9 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
         'pi_delivered',
+    )
+    inlines = (
+        LeadAccountInline,
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
     # list_prefetch_related = ('lead_accounts', )
