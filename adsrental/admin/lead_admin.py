@@ -18,6 +18,7 @@ from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineList
 
 class LeadAccountInline(admin.StackedInline):
     model = LeadAccount
+    max_num = 2
 
 
 class LeadAdmin(admin.ModelAdmin):
