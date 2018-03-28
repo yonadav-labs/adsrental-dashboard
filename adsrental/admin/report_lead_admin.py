@@ -27,19 +27,14 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'last_name',
         'utm_source',
         'status',
-        # 'street',
-        # 'city',
-        # 'state',
-        # 'postal_code',
         'pi_delivered',
-        # 'is_sync_adsdb',
-        'account_type',
+        'accounts_field',
         'company',
         'email',
         # 'phone',
         'raspberry_pi_link',
         'bundler_field',
-        'bundler_paid',
+        'bundler_paid_field',
         'billed',
         'touch_count',
         'last_touch',
@@ -119,6 +114,24 @@ class ReportLeadAdmin(admin.ModelAdmin):
             rpid=obj.raspberry_pi,
         ))
 
+    def accounts_field(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            result.append('<a href="{}?q={}">{}</a>'.format(
+                reverse('admin:adsrental_leadaccount_changelist'),
+                lead_account.username,
+                lead_account,
+            ))
+
+        return mark_safe(', '.join(result))
+
+    def bundler_paid_field(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.bundler_paid:
+                return True
+
+        return False
+
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
@@ -176,3 +189,8 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
     bundler_field.short_description = 'Bundler'
     bundler_field.admin_order_field = 'utm_source'
+
+    accounts_field.short_description = 'Accounts'
+
+    bundler_paid_field.short_description = 'Bundler paid'
+    bundler_paid_field.boolean = True

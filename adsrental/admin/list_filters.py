@@ -11,6 +11,7 @@ from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
 
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
@@ -269,9 +270,9 @@ class AccountTypeListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'facebook':
-            return queryset.filter(facebook_account=True)
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
         if self.value() == 'google':
-            return queryset.filter(google_account=True)
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         return None
 
 

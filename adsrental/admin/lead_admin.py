@@ -41,7 +41,7 @@ class LeadAdmin(admin.ModelAdmin):
         'online',
         'wrong_password_field',
         'pi_delivered',
-        # 'bundler_paid',
+        'bundler_paid_field',
     )
     list_filter = (
         StatusListFilter,
@@ -50,6 +50,7 @@ class LeadAdmin(admin.ModelAdmin):
         LeadAccountWrongPasswordListFilter,
         TouchCountListFilter,
         'company',
+        'lead_account__bundler_paid',
         ShipDateListFilter,
         QualifiedDateListFilter,
         RaspberryPiFirstTestedListFilter,
@@ -211,6 +212,13 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         return mark_safe(', '.join(result))
+
+    def bundler_paid_field(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.bundler_paid:
+                return True
+
+        return False
 
     def update_from_shipstation(self, request, queryset):
         for lead in queryset:
@@ -407,3 +415,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     phone_field.short_description = 'Phone'
     phone_field.admin_order_field = 'phone'
+
+    bundler_paid_field.short_description = 'Bundler paid'
+    bundler_paid_field.boolean = True
