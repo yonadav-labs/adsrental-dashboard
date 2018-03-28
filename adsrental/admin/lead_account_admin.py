@@ -18,8 +18,8 @@ class LeadAccountAdmin(admin.ModelAdmin):
     model = LeadAccount
     list_display = (
         'id',
-        'rpid',
         'lead_link',
+        'raspberry_pi_field',
         'account_type',
         'status_field',
         'username',
@@ -49,9 +49,16 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'sync_to_adsdb',
     )
 
-    def rpid(self, obj):
-        ec2_instance = obj.lead.get_ec2_instance()
-        return ec2_instance.rpid if ec2_instance else None
+
+    def get_queryset(self, request):
+        queryset = super(LeadAccountAdmin, self).get_queryset(request)
+        queryset = queryset.prefetch_related(
+            'lead',
+            'lead__bundler',
+            'lead__raspberry_pi',
+            'lead__ec2instance',
+        )
+        return queryset
 
     def lead_link(self, obj):
         lead = obj.lead
@@ -59,6 +66,15 @@ class LeadAccountAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,
+        ))
+
+    def raspberry_pi_field(self, obj):
+        if not obj.lead.raspberry_pi:
+            return None
+
+        return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            rpid=obj.lead.raspberry_pi,
         ))
 
     def status_field(self, obj):
@@ -184,6 +200,8 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
+
+    raspberry_pi_field.short_description = 'Raspberry PI'
 
     wrong_password_date_field.short_description = 'Wrong Password'
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
