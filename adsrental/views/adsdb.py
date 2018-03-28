@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from adsrental.decorators import basicauth_required
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler import Bundler
 
@@ -49,16 +50,16 @@ class ADSDBLeadView(View):
         except ValueError:
             return HttpResponseBadRequest('No JSON could be decoded')
 
-        lead = None
+        lead_account = None
         if data.get('account_id'):
-            lead = Lead.objects.filter(adsdb_account_id=str(data.get('account_id'))).order_by('-created').first()
+            lead_account = LeadAccount.objects.filter(adsdb_account_id=str(data.get('account_id'))).order_by('-created').first()
         if lead is None and data.get('email'):
-            lead = Lead.objects.filter(email=data.get('email')).order_by('-created').first()
+            lead_account = LeadAccount.objects.filter(username=data.get('email')).order_by('-created').first()
 
         if not lead:
             raise Http404
 
-        self._update_lead(lead, data, request.user)
+        self._update_lead_account(lead_account, data, request.user)
 
         return JsonResponse(dict(result=True))
 
@@ -81,27 +82,27 @@ class ADSDBLeadView(View):
         digits = ''.join([i for i in value if i.isdigit()])
         return digits
 
-    def _update_lead(self, lead, data, user):
+    def _update_lead_account(self, lead_account, data, user):
         if 'first_name' in data:
-            self._update_field(lead, 'first_name', data.get('first_name'), user)
+            self._update_field(lead_account.lead, 'first_name', data.get('first_name'), user)
         if 'last_name' in data:
-            self._update_field(lead, 'last_name', data.get('last_name'), user)
+            self._update_field(lead_account.lead, 'last_name', data.get('last_name'), user)
         if 'fb_username' in data:
-            self._update_field(lead, 'fb_email', data.get('fb_username'), user)
+            self._update_field(lead_account, 'username', data.get('fb_username'), user)
         if 'fb_password' in data:
-            self._update_field(lead, 'fb_secret', data.get('fb_password'), user)
+            self._update_field(lead_account, 'password', data.get('fb_password'), user)
         if 'google_username' in data:
-            self._update_field(lead, 'google_email', data.get('google_username'), user)
+            self._update_field(lead_account, 'username', data.get('google_username'), user)
         if 'google_password' in data:
-            self._update_field(lead, 'google_password', data.get('google_password'), user)
+            self._update_field(lead_account, 'password', data.get('google_password'), user)
         if 'phone' in data:
             phone = self._clean_phone(data.get('phone'))
-            self._update_field(lead, 'phone', phone, user)
+            self._update_field(lead_account.lead, 'phone', phone, user)
         if 'status' in data:
             if data.get('status') == '3':
-                lead.ban(user)
+                lead_account.ban(user)
             else:
-                lead.unban(user)
+                lead_account.unban(user)
 
     def post(self, request):
         'Create lead info from ADSDB. Not used.'
