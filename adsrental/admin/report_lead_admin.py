@@ -53,7 +53,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         RaspberryPiFirstTestedListFilter,
         BundlerListFilter,
         'is_sync_adsdb',
-        'bundler_paid',
+        'lead_account__bundler_paid',
         'pi_delivered',
     )
     readonly_fields = ('created', 'updated', )
