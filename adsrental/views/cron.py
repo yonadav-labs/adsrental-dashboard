@@ -297,9 +297,9 @@ class UpdatePingView(View):
 
         if ec2_instance and last_troubleshoot:
             if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
-                ec2_instance.last_troubleshoot = last_ping
+                ec2_instance.last_troubleshoot = last_troubleshoot
                 if ping_data.get('tunnel_up'):
-                    ec2_instance.tunnel_up_date = last_ping
+                    ec2_instance.tunnel_up_date = last_troubleshoot
                     ec2_instance.tunnel_up = True
 
 

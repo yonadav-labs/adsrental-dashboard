@@ -393,9 +393,9 @@ class PingCacheHelper(object):
         if lead and wrong_password != lead.is_wrong_password():
             return False
 
-        data_older_than = timezone.now() - datetime.timedelta(seconds=cls.TTL_SECONDS)
-        if data.get('created') < data_older_than:
-            return False
+        # data_older_than = timezone.now() - datetime.timedelta(seconds=cls.TTL_SECONDS)
+        # if data.get('created') < data_older_than:
+        #     return False
 
         return True
 
