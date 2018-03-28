@@ -90,8 +90,10 @@ class LeadAdmin(admin.ModelAdmin):
         'mark_as_disqualified',
         'ban',
         'unban',
-        'report_wrong_password',
-        'report_correct_password',
+        'report_wrong_google_password',
+        'report_correct_google_password',
+        'report_wrong_facebook_password',
+        'report_correct_facebook_password',
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
@@ -344,31 +346,27 @@ class LeadAdmin(admin.ModelAdmin):
             'form': form,
         })
 
-    def report_wrong_password(self, request, queryset):
+    def report_wrong_google_password(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True, wrong_password_date__isnull=True).first()
+
+            if not lead_account:
+                messages.error(request, 'Lead {} has no active google account with correct password.'.format(lead.email))
+                continue
+
+            lead_account.wrong_password_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+
+    def report_correct_google_password(self, request, queryset):
         if queryset.count() != 1:
-            messages.error(request, 'Only one lead account can be selected.')
-            return
-
-        lead = queryset.first()
-        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=True).first()
-
-        if not lead_account:
-            messages.error(request, 'Lead has no active accounts with correct password.')
-            return
-
-        lead_account.wrong_password_date = timezone.now()
-        lead_account.save()
-        messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
-
-    def report_correct_password(self, request, queryset):
-        if queryset.count() != 1:
-            messages.error(request, 'Only one lead account can be selected.')
+            messages.error(request, 'Only one lead can be selected.')
             return None
 
         lead = queryset.first()
-        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
+        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True, wrong_password_date__isnull=False).first()
         if not lead_account:
-            messages.error(request, 'Lead has no active accounts with wrong password.')
+            messages.error(request, 'Lead has no active google account with wrong password.')
             return None
 
         if 'do_action' in request.POST:
@@ -391,6 +389,48 @@ class LeadAdmin(admin.ModelAdmin):
             'form': form,
         })
 
+    def report_wrong_facebook_password(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True, wrong_password_date__isnull=True).first()
+
+            if not lead_account:
+                messages.error(request, 'Lead {} has no active facebook account with correct password.'.format(lead.email))
+                continue
+
+            lead_account.wrong_password_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+
+    def report_correct_facebook_password(self, request, queryset):
+        if queryset.count() != 1:
+            messages.error(request, 'Only one lead can be selected.')
+            return None
+
+        lead = queryset.first()
+        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True, wrong_password_date__isnull=False).first()
+        if not lead_account:
+            messages.error(request, 'Lead has no active facebook account with wrong password.')
+            return None
+
+        if 'do_action' in request.POST:
+            form = AdminLeadAccountPasswordForm(request.POST)
+            if form.is_valid():
+                new_password = form.cleaned_data['new_password']
+                lead_account.password = new_password
+                lead_account.wrong_password_date = None
+                lead_account.save()
+                messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
+                return None
+        else:
+            form = AdminLeadAccountPasswordForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'report_correct_password',
+            'title': 'Set new pasword for {}'.format(lead_account),
+            'button': 'Save password',
+            'objects': queryset,
+            'form': form,
+        })
 
     def touch(self, request, queryset):
         for lead in queryset:
