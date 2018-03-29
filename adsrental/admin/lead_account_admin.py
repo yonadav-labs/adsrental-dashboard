@@ -15,9 +15,15 @@ from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateL
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     model = LeadAccount
     list_display = (
         'id',
+        'name',
         'lead_link',
         'raspberry_pi_field',
         'account_type',
@@ -70,11 +76,20 @@ class LeadAccountAdmin(admin.ModelAdmin):
         )
         return queryset
 
+
+    def name(self, obj):
+        if obj.note:
+            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
+                obj.note,
+                obj.lead.name(),
+            ))
+        return obj.lead.name()
+
     def lead_link(self, obj):
         lead = obj.lead
         return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
-            lead=lead.name(),
+            lead=lead.leadid,
             q=lead.leadid,
         ))
 
