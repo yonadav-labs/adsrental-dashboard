@@ -36,6 +36,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_wrong_password',
         'max_payment',
         'amount',
+        'remaining_amount',
         'links',
     )
     csv_fields = (
@@ -58,7 +59,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         HistoryStatusListFilter,
         LeadStatusListFilter,
     )
-    list_select_related = ('lead', 'lead__raspberry_pi')
     actions = (
         'export_as_csv',
         'restart_raspberry_pi',
@@ -66,6 +66,19 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'prepare_for_testing',
         'touch',
     )
+
+    def get_queryset(self, request):
+        queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
+        if 'date' not in request.GET:
+            queryset = queryset.filter(date=datetime.date.today().replace(day=1))
+
+        queryset = queryset.prefetch_related(
+            'lead',
+            'lead__raspberry_pi',
+            'lead__lead_accounts',
+        )
+
+        return queryset
 
     def leadid(self, obj):
         return obj.lead and obj.lead.leadid
@@ -79,18 +92,14 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def lead_address(self, obj):
         return obj.lead and obj.lead.get_address()
 
-    def get_queryset(self, request):
-        queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
-        if 'date' not in request.GET:
-            queryset = queryset.filter(date=datetime.date.today().replace(day=1))
-
-        return queryset
-
     def max_payment(self, obj):
         return '${}'.format(round(obj.get_max_payment(), 2))
 
     def amount(self, obj):
         return '${}'.format(round(obj.get_amount(), 2))
+
+    def remaining_amount(self, obj):
+        return '${}'.format(round(obj.get_remaining_amount(), 2))
 
     def lead_link(self, obj):
         lead = obj.lead

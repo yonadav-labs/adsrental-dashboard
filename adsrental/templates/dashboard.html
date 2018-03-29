@@ -35,8 +35,7 @@
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
                 <th>Address</th>
-                <th>Google</th>
-                <th>Facebook</th>
+                <th>Accounts</th>
                 <th>Online</th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__first_seen' %}">First Seen</a></th>
                 <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__last_seen' %}">Last Seen</a></th>
@@ -63,12 +62,9 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if entry.google_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}
-                        {{ entry.google_account_status }}
-                    </td>
-                    <td>
-                        {% if entry.facebook_account %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}
-                        {{ entry.facebook_account_status }}
+                        {% for lead_account in entry.lead_accounts.all %}
+                            {{ lead_account }}
+                        {% endfor %}
                     </td>
                     <td>
                         {% if entry.raspberry_pi.online %}

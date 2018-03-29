@@ -78,13 +78,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     def rpid(self, obj):
         return obj.raspberry_pi and obj.raspberry_pi.rpid
 
-    def account_type(self, obj):
-        if obj.facebook_account:
-            return 'Facebook'
-        if obj.google_account:
-            return 'Google'
-        return 'n/a'
-
     def bundler_field(self, obj):
         if obj.bundler:
             return obj.bundler
@@ -181,7 +174,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
     raspberry_pi_link.admin_order_field = 'raspberry_pi__rpid'
     first_seen.admin_order_field = 'raspberry_pi__first_seen'
     last_seen.admin_order_field = 'raspberry_pi__last_seen'
-    account_type.admin_order_field = 'facebook_account'
 
     raspberry_pi_link.short_description = 'RPID'
 

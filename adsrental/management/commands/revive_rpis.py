@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 
 
@@ -57,9 +58,9 @@ class Command(BaseCommand):
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))
 
         if facebook:
-            ec2_instances = ec2_instances.filter(lead__facebook_account=True)
+            ec2_instances = ec2_instances.filter(lead__lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
         if google:
-            ec2_instances = ec2_instances.filter(lead__google_account=True)
+            ec2_instances = ec2_instances.filter(lead__lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
         ec2_instances = ec2_instances.exclude(lead__raspberry_pi__version=settings.RASPBERRY_PI_VERSION).select_related('lead', 'lead__raspberry_pi').order_by('-rpid')
 

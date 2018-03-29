@@ -10,6 +10,7 @@ from django.db import models
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 
 
 class LeadHistoryMonth(models.Model, FulltextSearchMixin):
@@ -63,15 +64,46 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         return cls(lead=lead, date=date_month)
 
     def get_max_payment(self):
+        result = 0.
         raspberry_pi = self.lead.raspberry_pi
         if not raspberry_pi or not raspberry_pi.first_seen:
-            return 0.
-        if self.lead.google_account and raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
-            return self.NEW_MAX_PAYMENT
-        if self.lead.facebook_account and raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
-            return self.NEW_MAX_PAYMENT
+            return result
+        for lead_account in self.lead.lead_accounts.all():
+            if not lead_account.active:
+                continue
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                if raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
 
-        return self.MAX_PAYMENT
+        return result
+
+    def get_max_payment_remaining(self):
+        result = 0.
+        raspberry_pi = self.lead.raspberry_pi
+        if not raspberry_pi or not raspberry_pi.first_seen:
+            return result
+        for lead_account in self.lead.lead_accounts.all():
+            if not lead_account.active or lead_account.bundler_paid:
+                continue
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                if raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
+
+        return result
 
     def get_amount(self):
         if not self.days_online:
@@ -80,4 +112,13 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         days_in_month = calendar.monthrange(self.date.year, self.date.month)[1]
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
+        return max_payment * days_online_valid / days_in_month
+
+    def get_remaining_amount(self):
+        if not self.days_online:
+            return 0
+
+        days_in_month = calendar.monthrange(self.date.year, self.date.month)[1]
+        days_online_valid = max(self.days_online - self.days_wrong_password, 0)
+        max_payment = self.get_max_payment_remaining()
         return max_payment * days_online_valid / days_in_month

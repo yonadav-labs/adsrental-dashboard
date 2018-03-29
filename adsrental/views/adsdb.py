@@ -122,14 +122,6 @@ class ADSDBLeadView(View):
         if not bundler:
             return HttpResponseBadRequest('Bundler ID not found')
 
-        is_facebook_account = False
-        if data.get('fb_username'):
-            is_facebook_account = True
-
-        is_google_account = False
-        if data.get('google_username'):
-            is_google_account = True
-
         lead = Lead(
             leadid=lead_id,
             account_name=account_name,
@@ -140,16 +132,6 @@ class ADSDBLeadView(View):
             phone=data['phone'],
             bundler=bundler,
             utm_source=bundler.utm_source,
-            facebook_account=True,
-            facebook_account_status=Lead.STATUS_AVAILABLE if is_facebook_account else None,
-            fb_email=data.get('fb_username'),
-            fb_secret=data.get('fb_password'),
-            fb_friends=data.get('fb_friends'),
-            fb_profile_url=data.get('fb_profile_url'),
-            google_account=is_google_account,
-            google_account_status=Lead.STATUS_AVAILABLE if is_facebook_account else None,
-            google_email=data.get('google_username'),
-            google_password=data.get('google_password'),
             street=data['street'],
             city=data['city'],
             state=data['state'],
