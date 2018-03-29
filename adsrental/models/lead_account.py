@@ -68,7 +68,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     objects = BulkUpdateManager()
 
     def __str__(self):
-        return '{} ({})'.format(self.username, self.account_type)
+        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
+            return 'Facebook lead {}'.format(self.username)
+        if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
+            return 'Google lead {}'.format(self.username)
+
+        return 'Unknown lead {}'.format(self.username)
 
     def is_wrong_password(self):
         'Is password reported as wrong now'
