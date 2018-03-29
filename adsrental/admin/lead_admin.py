@@ -105,7 +105,8 @@ class LeadAdmin(admin.ModelAdmin):
         'status',
         'old_status',
     )
-    # raw_id_fields = ('raspberry_pi', )
+    exclude = ('tracking_info', )
+    raw_id_fields = ('raspberry_pi', )
 
 
     def get_queryset(self, request):
