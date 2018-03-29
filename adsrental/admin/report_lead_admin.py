@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
+from adsrental.models.lead_account import LeadAccount
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
@@ -35,7 +36,8 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'raspberry_pi_link',
         'bundler_field',
         'bundler_paid_field',
-        'billed',
+        'facebook_billed',
+        'google_billed',
         'touch_count',
         'last_touch',
         'first_seen',
@@ -123,6 +125,20 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
         return False
 
+    def facebook_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return lead_account.billed
+
+        return False
+
+    def google_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                return lead_account.billed
+
+        return False
+
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
@@ -184,3 +200,6 @@ class ReportLeadAdmin(admin.ModelAdmin):
 
     bundler_paid_field.short_description = 'Bundler paid'
     bundler_paid_field.boolean = True
+
+    facebook_billed.boolean = True
+    google_billed.boolean = True
