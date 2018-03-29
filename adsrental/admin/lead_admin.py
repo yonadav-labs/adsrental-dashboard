@@ -196,7 +196,16 @@ class LeadAdmin(admin.ModelAdmin):
         return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def wrong_password_field(self, obj):
-        return obj.is_wrong_password()
+        for lead_account in obj.lead_accounts.all():
+            if not lead_account.wrong_password_date:
+                continue
+
+            return mark_safe('<span title="{}">{}</span>'.format(
+                lead_account.wrong_password_date,
+                naturaltime(lead_account.wrong_password_date),
+            ))
+        
+        return None
 
     def raspberry_pi_link(self, obj):
         if not obj.raspberry_pi:
@@ -502,7 +511,7 @@ class LeadAdmin(admin.ModelAdmin):
     status_field.admin_order_field = 'status'
 
     wrong_password_field.short_description = 'Wrong Password'
-    wrong_password_field.boolean = True
+    wrong_password_field.admin_order_field = 'lead_account__wrong_password_date'
 
     tested_field.short_description = 'Tested'
 
