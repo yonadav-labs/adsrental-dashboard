@@ -51,6 +51,7 @@ class LeadAdmin(admin.ModelAdmin):
         'last_seen',
         'ec2_instance_link',
         'raspberry_pi_link',
+        'ip_address',
         'usps_tracking_code',
         'online',
         'wrong_password_field',
@@ -146,6 +147,9 @@ class LeadAdmin(admin.ModelAdmin):
             title=title,
             status=obj.status,
         ))
+
+    def ip_address(self, obj):
+        return obj.raspberry_pi and obj.raspberry_pi.ip_address
 
     def bundler_field(self, obj):
         if obj.bundler:
