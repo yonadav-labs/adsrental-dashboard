@@ -350,10 +350,14 @@ class LeadAdmin(admin.ModelAdmin):
 
     def report_wrong_google_password(self, request, queryset):
         for lead in queryset:
-            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True, wrong_password_date__isnull=True).first()
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True).first()
 
             if not lead_account:
-                messages.error(request, 'Lead {} has no active google account with correct password.'.format(lead.email))
+                messages.info(request, 'Lead {} has no active google account.'.format(lead.email))
+                continue
+
+            if lead_account.is_wrong_password():
+                messages.info(request, 'Lead Account {} was already marked as wrong, skipping.'.format(lead_account))
                 continue
 
             lead_account.wrong_password_date = timezone.now()
@@ -366,9 +370,13 @@ class LeadAdmin(admin.ModelAdmin):
             return None
 
         lead = queryset.first()
-        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True, wrong_password_date__isnull=False).first()
+        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True).first()
         if not lead_account:
-            messages.error(request, 'Lead has no active google account with wrong password.')
+            messages.error(request, 'Lead has no active google account.')
+            return None
+
+        if not lead_account.is_wrong_password():
+            messages.info(request, 'Lead Account {} is not marked as wrong, skipping.'.format(lead_account))
             return None
 
         if 'do_action' in request.POST:
@@ -393,10 +401,14 @@ class LeadAdmin(admin.ModelAdmin):
 
     def report_wrong_facebook_password(self, request, queryset):
         for lead in queryset:
-            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True, wrong_password_date__isnull=True).first()
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
 
             if not lead_account:
-                messages.error(request, 'Lead {} has no active facebook account with correct password.'.format(lead.email))
+                messages.error(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if lead_account.is_wrong_password():
+                messages.info(request, 'Lead Account {} was already marked as wrong, skipping.'.format(lead_account))
                 continue
 
             lead_account.wrong_password_date = timezone.now()
@@ -409,9 +421,13 @@ class LeadAdmin(admin.ModelAdmin):
             return None
 
         lead = queryset.first()
-        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True, wrong_password_date__isnull=False).first()
+        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
         if not lead_account:
-            messages.error(request, 'Lead has no active facebook account with wrong password.')
+            messages.error(request, 'Lead has no active facebook account.')
+            return None
+
+        if not lead_account.is_wrong_password():
+            messages.info(request, 'Lead Account {} is not marked as wrong, skipping.'.format(lead_account))
             return None
 
         if 'do_action' in request.POST:
