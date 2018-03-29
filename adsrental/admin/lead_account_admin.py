@@ -114,6 +114,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
         ))
 
     def last_touch(self, obj):
+        if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            return None
+
         return mark_safe('<span title="Touched {} times">{}</span>'.format(
             obj.touch_count,
             naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
