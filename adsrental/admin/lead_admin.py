@@ -432,7 +432,9 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
-            form = AdminLeadAccountPasswordForm()
+            form = AdminLeadAccountPasswordForm(initial=dict(
+                new_password=lead_account.password,
+            ))
 
         return render(request, 'admin/action_with_form.html', {
             'action_name': 'report_correct_google_password',
@@ -483,7 +485,9 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
-            form = AdminLeadAccountPasswordForm()
+            form = AdminLeadAccountPasswordForm(initial=dict(
+                new_password=lead_account.password,
+            ))
 
         return render(request, 'admin/action_with_form.html', {
             'action_name': 'report_correct_facebook_password',
