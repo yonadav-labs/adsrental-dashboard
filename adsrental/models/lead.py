@@ -169,7 +169,7 @@ class Lead(models.Model, FulltextSearchMixin):
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
         self.last_touch_date = timezone.now()
         self.touch_count += 1
-        # self.sync_to_adsdb()
+        self.sync_to_adsdb()
         self.save()
 
     def get_address(self):
@@ -431,6 +431,12 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.raspberry_pi:
             PingCacheHelper().delete(self.raspberry_pi.rpid)
 
+    def sync_to_adsdb(self):
+        result = False
+        for lead_account in self.lead_accounts.filter(active=True):
+            result = lead_account.sync_to_adsdb()
+
+        return result
 
 class ReportProxyLead(Lead):
     'A proxy model to register Lead in admin UI twice for Reports'
