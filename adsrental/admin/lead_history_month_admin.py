@@ -36,7 +36,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_wrong_password',
         'max_payment',
         'amount',
-        'remaining_amount',
         'links',
     )
     csv_fields = (
@@ -75,7 +74,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         queryset = queryset.prefetch_related(
             'lead',
             'lead__raspberry_pi',
-            'lead__lead_accounts',
         )
 
         return queryset
@@ -93,13 +91,10 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         return obj.lead and obj.lead.get_address()
 
     def max_payment(self, obj):
-        return '${}'.format(round(obj.get_max_payment(), 2))
+        return '${}'.format(round(obj.max_payment, 2)) if obj.max_payment is not None else None
 
     def amount(self, obj):
-        return '${}'.format(round(obj.get_amount(), 2))
-
-    def remaining_amount(self, obj):
-        return '${}'.format(round(obj.get_remaining_amount(), 2))
+        return '${}'.format(round(obj.amount, 2)) if obj.amount is not None else None
 
     def lead_link(self, obj):
         lead = obj.lead
