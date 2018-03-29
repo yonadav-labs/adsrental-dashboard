@@ -383,7 +383,7 @@ class LeadAdmin(admin.ModelAdmin):
             form = AdminLeadAccountPasswordForm()
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'report_correct_password',
+            'action_name': 'report_correct_google_password',
             'title': 'Set new pasword for {}'.format(lead_account),
             'button': 'Save password',
             'objects': queryset,
@@ -426,7 +426,7 @@ class LeadAdmin(admin.ModelAdmin):
             form = AdminLeadAccountPasswordForm()
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'report_correct_password',
+            'action_name': 'report_correct_facebook_password',
             'title': 'Set new pasword for {}'.format(lead_account),
             'button': 'Save password',
             'objects': queryset,
