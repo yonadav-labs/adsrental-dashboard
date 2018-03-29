@@ -97,6 +97,7 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
+        'sync_to_adsdb',
     )
     readonly_fields = (
         'created',
@@ -437,6 +438,15 @@ class LeadAdmin(admin.ModelAdmin):
             lead.touch()
             messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
 
+    def sync_to_adsdb(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(active=True):
+                result = lead_account.sync_to_adsdb()
+                if result:
+                    messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
+                else:
+                    messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
 
@@ -476,3 +486,5 @@ class LeadAdmin(admin.ModelAdmin):
 
     bundler_paid_field.short_description = 'Bundler paid'
     bundler_paid_field.boolean = True
+
+    sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
