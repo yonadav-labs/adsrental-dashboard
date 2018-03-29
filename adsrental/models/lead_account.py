@@ -89,7 +89,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return False
 
         lead = self.lead
-        if lead.company != self.COMPANY_FBM:
+        if lead.company != lead.COMPANY_FBM:
             return False
         if lead.status != lead.STATUS_IN_PROGRESS:
             return False
