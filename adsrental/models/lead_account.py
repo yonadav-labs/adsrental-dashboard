@@ -62,6 +62,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     bundler_paid = models.BooleanField(default=False, help_text='Is revenue paid to bundler.')
     adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
     active = models.BooleanField(default=True, help_text='If false, entry considered as deleted')
+    billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
+    last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')
+    touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead account.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -98,7 +101,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return False
         if lead.status != lead.STATUS_IN_PROGRESS:
             return False
-        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK and lead.touch_count < 10:
+        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK and self.touch_count < 10:
             return False
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
@@ -229,3 +232,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     @classmethod
     def get_active_lead_accounts(cls, lead):
         return cls.objects.filter(lead=lead, active=True, status__in=cls.STATUSES_ACTIVE)
+
+    def touch(self):
+        'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
+        if self.account_type != self.ACCOUNT_TYPE_FACEBOOK:
+            return
+
+        self.last_touch_date = timezone.now()
+        self.touch_count += 1
+        self.sync_to_adsdb()
+        self.save()

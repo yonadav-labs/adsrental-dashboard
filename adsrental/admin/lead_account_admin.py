@@ -26,8 +26,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'password',
         'friends',
         'bundler_paid',
+        'last_touch',
         'adsdb_account_id',
         'wrong_password_date_field',
+        'billed',
         'created',
     )
     list_select_related = ('lead', 'lead__ec2instance')
@@ -94,6 +96,12 @@ class LeadAccountAdmin(admin.ModelAdmin):
             q=obj.lead.leadid,
             title=title,
             status=obj.status,
+        ))
+
+    def last_touch(self, obj):
+        return mark_safe('<span title="Touched {} times">{}</span>'.format(
+            obj.touch_count,
+            naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
         ))
 
     def wrong_password_date_field(self, obj):
@@ -202,6 +210,12 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
             else:
                 messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+
+
+    def touch(self, request, queryset):
+        for lead_account in queryset:
+            lead_account.touch()
+            messages.info(request, 'Lead Account {} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = 'lead__leadid'
