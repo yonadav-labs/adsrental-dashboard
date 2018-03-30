@@ -13,6 +13,8 @@ from django_bulk_update.helper import bulk_update
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
+from adsrental.models.user import User
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_history_month import LeadHistoryMonth
@@ -469,4 +471,45 @@ class SyncOfflineView(View):
             'test': test,
             'result': True,
             'reported_offline_leads': reported_offline_leads,
+        })
+
+
+
+class AutoBanView(View):
+    '''
+    Check every entry :model:`adsrental.LeadAccount` and ban in if auto_ban_enabled is True
+    and password is worng for more than 2 weeks or :model:`adsrental.RaspberryPi` is offline for 2 weeks.
+
+    Parameters:
+
+    * execute - ban accounts, dry run otherwise
+    * days_wrong_password - set  days wrong password after which account is banned, 14 by default
+    * days_offline - set days offline after which account is banned, 14 by default
+    '''
+    def get(self, request):
+        admin_user = User.objects.get(email=settings.ADMIN_USER_EMAIL)
+        banned_wrong_password = []
+        banned_offline = []
+        now = timezone.now()
+        execute = request.GET.get('execute', '') == 'true'
+        days_wrong_password = int(request.GET.get('days_wrong_password', 14))
+        days_offline = int(request.GET.get('days_offline', 14))
+        for lead_account in LeadAccount.objects.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password), active=True, auto_ban_enabled=True):
+            banned_wrong_password.append(str(lead_account))
+            if execute:
+                lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
+                lead_account.charge_back = True
+                lead_account.save()
+        for lead_account in LeadAccount.objects.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline), active=True, auto_ban_enabled=True):
+            banned_offline.append(str(lead_account))
+            if execute:
+                lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
+                lead_account.charge_back = True
+                lead_account.save()
+
+        return JsonResponse({
+            'execute': execute,
+            'result': True,
+            'banned_wrong_password': banned_wrong_password,
+            'banned_offline': banned_offline,
         })

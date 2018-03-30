@@ -35,6 +35,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (ACCOUNT_TYPE_GOOGLE, 'Google', ),
     ]
 
+    BAN_REASON_AUTO_OFFLINE = 'auto_offline'
+    BAN_REASON_AUTO_WRONG_PASSWORD = 'auto_wrong_password'
+
     BAN_REASON_CHOICES = (
         ('Google - Policy', 'Google - Policy', ),
         ('Google - Billing', 'Google - Billing', ),
@@ -45,6 +48,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         ('Facebook - Unresponsive User', 'Facebook - Unresponsive User', ),
         ('Duplicate', 'Duplicate', ),
         ('Bad ad account', 'Bad ad account', ),
+        (BAN_REASON_AUTO_OFFLINE, 'Auto: offline for 2 weeks', ),
+        (BAN_REASON_AUTO_WRONG_PASSWORD, 'Auto: wrong password for 2 weeks', ),
         ('Other', 'Other', ),
     )
 
@@ -66,6 +71,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead account.')
+    auto_ban_enabled = models.BooleanField(default=True, help_text='If true, lead account is banned after two weeks of offline or wrong password.')
+    charge_back = models.BooleanField(default=False, help_text='Set to true on auto-ban. True if charge back should be billed to lead.')
+    charge_back_billed = models.BooleanField(default=False, help_text='If change back on auto ban billed.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

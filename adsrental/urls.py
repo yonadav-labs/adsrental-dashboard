@@ -15,12 +15,12 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, SyncDeliveredView, SyncFromShipStationView, SyncOfflineView
+from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, SyncDeliveredView, SyncFromShipStationView, SyncOfflineView, AutoBanView
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
 
-urlpatterns = [
+urlpatterns = [  # pylint: disable=C0103
     url(r'^$', LandingView.as_view(), name='home'),
     url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^cron/sync_ec2/$', SyncEC2View.as_view(), name='cron_sync_ec2'),
     url(r'^cron/lead_history/$', LeadHistoryView.as_view(), name='cron_lead_history'),
     url(r'^cron/update_ping/$', UpdatePingView.as_view(), name='cron_update_ping'),
+    url(r'^cron/auto_ban/$', AutoBanView.as_view(), name='cron_auto_ban'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
     url(r'^thankyou/(?P<leadid>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^thankyou.html$', MainView.as_view(), name='main'),
