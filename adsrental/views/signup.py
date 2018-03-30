@@ -105,6 +105,7 @@ class SignupView(View):
             friends=data['fb_friends'],
             url=data['facebook_profile_url'],
             status=LeadAccount.STATUS_AVAILABLE,
+            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
         )
         lead_account.save()
         # lead.send_web_to_lead()
