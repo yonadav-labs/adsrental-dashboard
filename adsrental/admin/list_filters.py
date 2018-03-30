@@ -69,7 +69,7 @@ class TouchCountListFilter(SimpleListFilter):
         return None
 
 
-class RaspberryPiFirstTestedListFilter(SimpleListFilter):
+class RaspberryPiFirstSeenListFilter(SimpleListFilter):
     title = 'Delivered Date'
     parameter_name = 'delivered_date'
 
@@ -86,23 +86,23 @@ class RaspberryPiFirstTestedListFilter(SimpleListFilter):
         if self.value() == 'this_week':
             end_date = timezone.now()
             start_date = (end_date - datetime.timedelta(days=end_date.weekday())).replace(hour=0, minute=0, second=0)
-            return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
+            return queryset.filter(raspberry_pi__first_seen__gte=start_date, raspberry_pi__first_seen__lte=end_date)
         if self.value() == 'previous_week':
             now = timezone.now()
             end_date = (now - datetime.timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0)
             start_date = end_date - datetime.timedelta(hours=24 * 7)
-            return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
+            return queryset.filter(raspberry_pi__first_seen__gte=start_date, raspberry_pi__first_seen__lte=end_date)
         if self.value() == 'this_month':
             end_date = timezone.now()
             start_date = end_date.replace(day=1, hour=0, minute=0, second=0)
-            return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
+            return queryset.filter(raspberry_pi__first_seen__gte=start_date, raspberry_pi__first_seen__lte=end_date)
         if self.value() == 'previous_month':
             now = timezone.now()
             end_date = now.replace(day=1, hour=0, minute=0, second=0)
             start_date = (end_date - datetime.timedelta(hours=1)).replace(day=1, hour=0, minute=0, second=0)
-            return queryset.filter(raspberry_pi__first_tested__gte=start_date, raspberry_pi__first_tested__lte=end_date)
+            return queryset.filter(raspberry_pi__first_seen__gte=start_date, raspberry_pi__first_seen__lte=end_date)
         if self.value() == 'not':
-            return queryset.filter(raspberry_pi__first_tested__isnull=True)
+            return queryset.filter(raspberry_pi__first_seen__isnull=True)
         return None
 
 

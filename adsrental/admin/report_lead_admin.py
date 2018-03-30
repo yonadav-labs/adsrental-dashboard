@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from adsrental.forms import AdminPrepareForReshipmentForm
 from adsrental.models.lead import ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, TouchCountListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstSeenListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
 class ReportLeadAdmin(admin.ModelAdmin):
@@ -52,7 +52,7 @@ class ReportLeadAdmin(admin.ModelAdmin):
         'company',
         ShipDateListFilter,
         QualifiedDateListFilter,
-        RaspberryPiFirstTestedListFilter,
+        RaspberryPiFirstSeenListFilter,
         BundlerListFilter,
         'lead_account__bundler_paid',
         'pi_delivered',

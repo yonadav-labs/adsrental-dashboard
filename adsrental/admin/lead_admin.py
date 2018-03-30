@@ -13,7 +13,7 @@ from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentFo
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstTestedListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstSeenListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
 
 
 class LeadAccountInline(admin.StackedInline):
@@ -68,7 +68,7 @@ class LeadAdmin(admin.ModelAdmin):
         'lead_account__bundler_paid',
         ShipDateListFilter,
         QualifiedDateListFilter,
-        RaspberryPiFirstTestedListFilter,
+        RaspberryPiFirstSeenListFilter,
         BundlerListFilter,
         'pi_delivered',
     )
