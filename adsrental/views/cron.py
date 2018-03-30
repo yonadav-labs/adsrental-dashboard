@@ -494,18 +494,30 @@ class AutoBanView(View):
         execute = request.GET.get('execute', '') == 'true'
         days_wrong_password = int(request.GET.get('days_wrong_password', 14))
         days_offline = int(request.GET.get('days_offline', 14))
-        for lead_account in LeadAccount.objects.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password), active=True, auto_ban_enabled=True):
+        for lead_account in LeadAccount.objects.filter(
+                wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
+                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                status=LeadAccount.STATUS_IN_PROGRESS,
+                active=True,
+                auto_ban_enabled=True,
+        ):
             banned_wrong_password.append(str(lead_account))
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
-                lead_account.charge_back = True
-                lead_account.save()
-        for lead_account in LeadAccount.objects.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline), active=True, auto_ban_enabled=True):
+                # lead_account.charge_back = True
+                # lead_account.save()
+        for lead_account in LeadAccount.objects.filter(
+                lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
+                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                status=LeadAccount.STATUS_IN_PROGRESS,
+                active=True,
+                auto_ban_enabled=True,
+        ):
             banned_offline.append(str(lead_account))
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
-                lead_account.charge_back = True
-                lead_account.save()
+                # lead_account.charge_back = True
+                # lead_account.save()
 
         return JsonResponse({
             'execute': execute,
