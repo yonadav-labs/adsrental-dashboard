@@ -20,8 +20,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
     )
     list_select_related = ('lead', )
     list_filter = (
-        'value',
-        'old_value',
+        'field',
     )
     search_fields = ('lead__leadid', )
 
