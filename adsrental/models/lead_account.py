@@ -110,7 +110,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return False
         if lead.status != lead.STATUS_IN_PROGRESS:
             return False
-        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK and self.touch_count < 10:
+        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK and self.touch_count < 5:
             return False
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
