@@ -177,16 +177,3 @@ class DashboardView(View):
             entries=entries,
             form=form,
         ))
-
-
-class BundlerDashboardView(View):
-    @method_decorator(login_required)
-    def get(self, request):
-        bundler = request.user.bundler
-        if not bundler:
-            raise Http404
-
-        return render(request, 'bundler_dashboard.html', dict(
-            user=request.user,
-            bundler=bundler,
-        ))
