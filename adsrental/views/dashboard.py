@@ -77,10 +77,10 @@ class DashboardView(View):
     items_per_page = 100
 
     def get_entries(self, user):
-        if not user.utm_source:
+        if not user.bundler:
             return Lead.objects.all().prefetch_related('raspberry_pi', 'lead_accounts')
 
-        return Lead.objects.filter(utm_source=user.utm_source).prefetch_related('raspberry_pi', 'lead_accounts')
+        return Lead.objects.filter(utm_source=user.bundler.utm_source).prefetch_related('raspberry_pi', 'lead_accounts')
 
     @method_decorator(login_required)
     def get(self, request):
@@ -173,7 +173,19 @@ class DashboardView(View):
                 entries = paginator.page(paginator.num_pages)
 
         return render(request, 'dashboard.html', dict(
-            utm_source=request.user.utm_source,
+            utm_source=request.user.bundler and request.user.bundler.utm_source,
             entries=entries,
             form=form,
+        ))
+
+
+class BundlerDashboardView(View):
+    def get(self, request):
+        bundler = request.user.bundler
+        if not bundler:
+            raise Http404
+
+        return render(request, 'bundler_dashboard.html', dict(
+            user=request.user,
+            bundler=bundler,
         ))

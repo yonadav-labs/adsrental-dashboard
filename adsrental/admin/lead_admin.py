@@ -153,7 +153,12 @@ class LeadAdmin(admin.ModelAdmin):
 
     def bundler_field(self, obj):
         if obj.bundler:
-            return obj.bundler
+            return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+                url=reverse('admin:adsrental_bundler_changelist'),
+                q=obj.bundler.email,
+                title=obj.bundler.utm_source,
+                text=obj.bundler,
+            ))
 
         return obj.utm_source
 
@@ -204,7 +209,7 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.wrong_password_date,
                 naturaltime(lead_account.wrong_password_date),
             ))
-        
+
         return None
 
     def raspberry_pi_link(self, obj):

@@ -25,6 +25,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'pause',
         'activate',
     )
+    search_fields = ('utm_source', 'email', )
 
     def get_queryset(self, request):
         qs = super(BundlerAdmin, self).get_queryset(request)
@@ -62,7 +63,7 @@ class BundlerAdmin(admin.ModelAdmin):
                 ))
             else:
                 messages.success(request, 'Bundler {} has no leads.'.format(
-                    bundler, leads.count(),
+                    bundler,
                 ))
             leads = Lead.objects.filter(bundler=bundler).exclude(utm_source=bundler.utm_source)
             if leads:

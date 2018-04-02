@@ -7,7 +7,7 @@ from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
-from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
+from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView, BundlerDashboardView
 from adsrental.views.report import ReportView
 from adsrental.views.rdp import RDPDownloadView
 from adsrental.views.farming import PiConfigView
@@ -19,6 +19,7 @@ from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, S
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
+
 
 urlpatterns = [  # pylint: disable=C0103
     url(r'^$', LandingView.as_view(), name='home'),
@@ -35,6 +36,7 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^thankyou/(?P<leadid>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^thankyou.html$', MainView.as_view(), name='main'),
     url(r'^report/$', ReportView.as_view(), name='report'),
+    url(r'^dashboard/bundler/$', BundlerDashboardView.as_view(), name='dashboard_bundler'),
     url(r'^dashboard/$', DashboardView.as_view(), name='dashboard'),
     url(r'^dashboard/check_sent/$', CheckSentView.as_view(), name='dashboard_check_sent'),
     url(r'^dashboard/set_password/(?P<lead_id>.*)/$', SetPasswordView.as_view(), name='dashboard_set_password'),

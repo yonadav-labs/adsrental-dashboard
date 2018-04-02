@@ -9,7 +9,11 @@
               <div class="container">
                 <h1 class="display-3">Welcome to RentYourSocialMedia</h1>
                 <p>
-                    Your UTM Source is {{user.utm_source}}. If you want to see your leads, just click on the button below.
+                  {% if bundler %}
+                    Your UTM Source is {{bundler.utm_source}}. If you want to see your leads, just click on the button below.
+                  {% else %}
+                    You can see all leads, just click on the button below.
+                  {% endif %}
                 </p>
                 <p>
                   <a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a>

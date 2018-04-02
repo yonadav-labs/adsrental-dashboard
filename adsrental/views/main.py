@@ -11,4 +11,5 @@ class MainView(View):
     def get(self, request):
         return render(request, 'main.html', dict(
             user=request.user,
+            bundler=request.user.bundler,
         ))
