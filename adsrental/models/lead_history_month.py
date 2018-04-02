@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import calendar
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -79,24 +78,33 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         for lead_account in self.lead.lead_accounts.all():
             if not lead_account.active:
                 continue
+
+            created_date = max(raspberry_pi.first_seen, lead_account.created)
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                if raspberry_pi.first_seen > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+                if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
                     result += self.NEW_MAX_PAYMENT
                 else:
                     result += self.MAX_PAYMENT
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                if raspberry_pi.first_seen > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
+                if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
                     result += self.NEW_MAX_PAYMENT
                 else:
                     result += self.MAX_PAYMENT
 
         return result
 
+    def get_last_day(self):
+        next_month = self.date.replace(day=28) + datetime.timedelta(days=4)
+        return next_month - datetime.timedelta(days=next_month.day)
+
+    def get_first_day(self):
+        return self.date.replace(day=1)
+
     def get_amount(self):
         if not self.days_online:
             return 0
 
-        days_in_month = calendar.monthrange(self.date.year, self.date.month)[1]
+        days_in_month = (self.get_last_day() - self.get_first_day()).days
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
         return max_payment * days_online_valid / days_in_month
