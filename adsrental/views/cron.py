@@ -172,7 +172,10 @@ class LeadHistoryView(View):
             start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             start_date = start_date.replace(day=1)
             for lead in leads:
-                LeadHistoryMonth.get_or_create(lead=lead, date=start_date).aggregate()
+                item = LeadHistoryMonth.get_or_create(lead=lead, date=start_date)
+                item.aggregate()
+                if item.amount or item.id:
+                    item.save()
             return JsonResponse({
                 'result': True,
             })

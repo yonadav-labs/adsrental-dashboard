@@ -60,7 +60,6 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         self.max_payment = self.get_max_payment()
         self.amount = self.get_amount()
-        self.save()
 
     @classmethod
     def get_or_create(cls, lead, date):
