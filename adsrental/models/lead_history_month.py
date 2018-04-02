@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-from dateutil.relativedelta import relativedelta
 
 from django.utils import timezone
 from django.db import models
@@ -43,8 +42,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         self.days_wrong_password = 0
         lead_histories = LeadHistory.objects.filter(
             lead=self.lead,
-            date__gte=self.date.replace(day=1),
-            date__lt=self.date + relativedelta(months=1),
+            date__gte=self.get_first_day(),
+            date__lte=self.get_last_day(),
         ).prefetch_related(
             'lead',
             'lead__raspberry_pi',
