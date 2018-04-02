@@ -33,6 +33,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least once.')
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
     amount = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
+    paid = models.BooleanField(default=False, help_text='Is sum paid to lead')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

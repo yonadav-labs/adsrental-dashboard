@@ -36,6 +36,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_wrong_password',
         'max_payment',
         'amount',
+        'paid',
         'links',
     )
     csv_fields = (
@@ -57,6 +58,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         DateMonthListFilter,
         HistoryStatusListFilter,
         LeadStatusListFilter,
+        'paid',
     )
     actions = (
         'export_as_csv',
