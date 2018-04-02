@@ -15,6 +15,7 @@ ${HOME}/new-pi/client_log.sh "Hourly script for ${EC2_INSTANCE}"
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Restart Tunnel.url"'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Firefox.lnk"'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Public\Desktop\Firefox.lnk"'
+ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
 
 TASKLIST_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'tasklist'`
 TASKLIST_FIREFOX=`echo "$TASKLIST_OUTPUT" | grep 'firefox.exe'`
@@ -26,5 +27,3 @@ if ! [ "$TASKLIST_FIREFOX" == "" ]; then
         ssh Administrator@${EC2_INSTANCE} -p 40594 "taskkill /IM FirefoxPortable.exe /F"
     fi
 fi
-
-C:\Users\Public\Desktop\Firefox.lnk
