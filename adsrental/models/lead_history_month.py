@@ -1,7 +1,6 @@
 import datetime
 import decimal
 
-from django.utils import timezone
 from django.db import models
 
 from adsrental.models.lead_history import LeadHistory
