@@ -22,7 +22,7 @@ from adsrental.forms import AdminPrepareForReshipmentForm
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
     model = LeadHistoryMonth
-    admin_caching_enabled = True
+    # admin_caching_enabled = True
     list_per_page = 5000
     list_display = (
         'id',

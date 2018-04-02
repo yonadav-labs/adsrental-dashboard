@@ -105,7 +105,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         if not self.days_online:
             return 0
 
-        days_in_month = (self.get_last_day() - self.get_first_day()).days
+        days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
         return max_payment * days_online_valid / days_in_month
