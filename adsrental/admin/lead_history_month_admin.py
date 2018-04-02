@@ -36,7 +36,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_wrong_password',
         'max_payment',
         'amount',
-        'paid',
+        'amount_paid',
         'links',
     )
     csv_fields = (
@@ -52,13 +52,13 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         ('days_offline', 'Days offline'),
         ('days_wrong_password', 'Days wrong password'),
         ('amount', 'Amount'),
+        ('amount_paid', 'Paid'),
     )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (
         DateMonthListFilter,
         HistoryStatusListFilter,
         LeadStatusListFilter,
-        'paid',
     )
     actions = (
         'export_as_csv',
@@ -67,6 +67,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'prepare_for_testing',
         'touch',
     )
+    # list_editable = ('amount_paid', )
 
     def get_queryset(self, request):
         queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
@@ -97,6 +98,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def amount(self, obj):
         return '${}'.format(round(obj.amount, 2)) if obj.amount is not None else None
+
+    def amount_paid(self, obj):
+        return '${}'.format(round(obj.amount_paid, 2)) if obj.amount_paid is not None else None
 
     def lead_link(self, obj):
         lead = obj.lead

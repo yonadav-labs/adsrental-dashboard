@@ -180,6 +180,7 @@ class DashboardView(View):
 
 
 class BundlerDashboardView(View):
+    @method_decorator(login_required)
     def get(self, request):
         bundler = request.user.bundler
         if not bundler:
