@@ -21,8 +21,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
     MAX_PAYMENT = 25.
     NEW_MAX_PAYMENT = 15.
-    NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.date(2018, 3, 19, tzinfo=timezone.get_default_timezone())
-    NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.date(2018, 3, 29, tzinfo=timezone.get_default_timezone())
+    NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
+    NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
     lead = models.ForeignKey(Lead, help_text='Linked lead.', on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
