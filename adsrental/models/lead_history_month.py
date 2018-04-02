@@ -1,6 +1,5 @@
-from __future__ import unicode_literals
-
 import datetime
+import decimal
 
 from django.utils import timezone
 from django.db import models
@@ -31,8 +30,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 12 hours.')
     days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least once.')
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
-    amount = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
-    amount_paid = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
+    amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
+    amount_paid = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
