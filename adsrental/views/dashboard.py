@@ -57,6 +57,7 @@ class SetPasswordView(View):
                 raise Http404
             old_value = lead_account.password
             lead_account.password = form.cleaned_data['new_password']
+            lead_account.wrong_password_date = None
             lead_account.save()
             value = lead_account.password
             LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
