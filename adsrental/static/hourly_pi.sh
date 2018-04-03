@@ -25,9 +25,9 @@ if [ "$DIR_OUTPUT" == "" ]; then
     ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Administrator\\Desktop\\Browser.exe'
     ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Public\\Desktop\\Browser.exe'
     ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Public\\Desktop\\Firefox.lnk'
-    ssh Administrator@${EC2_INSTANCE} -p 40594 'reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d C:\\Users\\Administrator\\firefox_wp.png /f'
-    ssh Administrator@${EC2_INSTANCE} -p 40594 'RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters'
 fi
+ssh Administrator@${EC2_INSTANCE} -p 40594 'reg add "HKEY_CURRENT_USER\\Control Panel\\Desktop" /v Wallpaper /t REG_SZ /d C:\\Users\\Administrator\\firefox_wp.png /f'
+ssh Administrator@${EC2_INSTANCE} -p 40594 'RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters'
 
 
 TASKLIST_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'tasklist'`
