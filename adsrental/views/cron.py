@@ -503,6 +503,7 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
+                bundler_paid=True,
         ):
             banned_wrong_password.append([str(lead_account), lead_account.wrong_password_date])
             if execute:
