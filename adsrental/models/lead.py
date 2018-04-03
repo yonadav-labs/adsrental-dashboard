@@ -445,3 +445,10 @@ class ReportProxyLead(Lead):
         proxy = True
         verbose_name = 'Report Lead'
         verbose_name_plural = 'Report Leads'
+
+class ReadOnlyLead(Lead):
+    'Read only Lead model'
+    class Meta:
+        proxy = True
+        verbose_name = 'Read-only Lead'
+        verbose_name_plural = 'Read-only Leads'

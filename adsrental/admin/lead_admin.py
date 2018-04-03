@@ -10,7 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
-from adsrental.models.lead import Lead
+from adsrental.models.lead import Lead, ReadOnlyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstSeenListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
@@ -124,8 +124,10 @@ class LeadAdmin(admin.ModelAdmin):
 
     def get_actions(self, request):
         actions = super(LeadAdmin, self).get_actions(request)
-        if 'delete_selected' in actions:
-            del actions['delete_selected']
+        keys = list(actions.keys())
+        for key in keys:
+            if key not in self.actions:
+                del actions[key]
         return actions
 
     def id_field(self, obj):
@@ -557,3 +559,72 @@ class LeadAdmin(admin.ModelAdmin):
     bundler_paid_field.boolean = True
 
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
+
+
+class ReadOnlyLeadAdmin(LeadAdmin):
+    model = ReadOnlyLead
+
+    list_display = (
+        'name',
+        'status',
+        'email_field',
+        'phone_field',
+        'bundler',
+        'accounts_field',
+        'links',
+        'tested_field',
+        'last_touch',
+        'first_seen',
+        'last_seen',
+        'raspberry_pi',
+        'ip_address',
+        'usps_tracking_code',
+        'online',
+        'wrong_password_field',
+        'pi_delivered',
+        'bundler_paid_field',
+    )
+
+    actions = (
+        # 'update_from_shipstation',
+        'mark_as_qualified',
+        'mark_as_disqualified',
+        'ban_google_account',
+        'unban_google_account',
+        'ban_facebook_account',
+        'unban_facebook_account',
+        'report_wrong_google_password',
+        'report_correct_google_password',
+        'report_wrong_facebook_password',
+        'report_correct_facebook_password',
+        # 'prepare_for_testing',
+        'touch',
+        # 'restart_raspberry_pi',
+        # 'sync_to_adsdb',
+    )
+
+    # We cannot call super().get_fields(request, obj) because that method calls
+    # get_readonly_fields(request, obj), causing infinite recursion. Ditto for
+    # super().get_form(request, obj). So we  assume the default ModelForm.
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields or [f.name for f in self.model._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    # Allow viewing objects but not actually changing them.
+    def has_change_permission(self, request, obj=None):
+        return (request.method in ['GET', 'HEAD'] and
+                super().has_change_permission(request, obj))
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def accounts_field(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            result.append(str(lead_account))
+
+        return mark_safe(', '.join(result))
+
+    accounts_field.short_description = 'Accounts'

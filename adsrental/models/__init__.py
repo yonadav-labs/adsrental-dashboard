@@ -1,5 +1,5 @@
 from adsrental.models.user import User  # noqa: F401
-from adsrental.models.lead import Lead  # noqa: F401
+from adsrental.models.lead import Lead, ReadOnlyLead  # noqa: F401
 from adsrental.models.raspberry_pi import RaspberryPi  # noqa: F401
 from adsrental.models.customerio_event import CustomerIOEvent  # noqa: F401
 from adsrental.models.ec2_instance import EC2Instance  # noqa: F401

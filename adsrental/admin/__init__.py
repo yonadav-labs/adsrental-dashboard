@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from adsrental.admin.lead_admin import LeadAdmin
+from adsrental.admin.lead_admin import LeadAdmin, ReadOnlyLeadAdmin
 from adsrental.admin.raspberry_pi_admin import RaspberryPiAdmin
 from adsrental.admin.custom_user_admin import CustomUserAdmin
 from adsrental.admin.customerio_event_admin import CustomerIOEventAdmin
@@ -28,3 +28,4 @@ admin.site.register(LeadHistoryMonthAdmin.model, LeadHistoryMonthAdmin)
 admin.site.register(LeadChangeAdmin.model, LeadChangeAdmin)
 admin.site.register(RaspberryPiSessionAdmin.model, RaspberryPiSessionAdmin)
 admin.site.register(LeadAccountAdmin.model, LeadAccountAdmin)
+admin.site.register(ReadOnlyLeadAdmin.model, ReadOnlyLeadAdmin)
