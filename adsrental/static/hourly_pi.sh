@@ -17,6 +17,19 @@ ${HOME}/new-pi/client_log.sh "Hourly script for ${EC2_INSTANCE}"
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Public\Desktop\Firefox.lnk"'
 ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
 
+
+DIR_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Administrator\\firefox_wp.png' | grep png`
+if [ "$DIR_OUTPUT" == "" ]; then
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/firefox_wp.png -OutFile C:\\Users\\Administrator\\firefox_wp.png'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Administrator\\Desktop\\Browser.exe'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Public\\Desktop\\Browser.exe'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\\Users\\Public\\Desktop\\Firefox.lnk'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d C:\\Users\\Administrator\\firefox_wp.png /f'
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters'
+fi
+
+
 TASKLIST_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'tasklist'`
 TASKLIST_FIREFOX=`echo "$TASKLIST_OUTPUT" | grep 'firefox.exe'`
 if ! [ "$TASKLIST_FIREFOX" == "" ]; then
