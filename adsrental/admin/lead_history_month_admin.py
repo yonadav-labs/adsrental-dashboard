@@ -193,7 +193,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                         lead.unban(request.user)
                         messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
-                    if lead.first_tested:
+                    if lead.raspberry_pi.first_tested:
                         lead.prepare_for_reshipment(request.user)
                         messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
 

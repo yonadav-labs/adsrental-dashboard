@@ -70,6 +70,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     active = models.BooleanField(default=True, help_text='If false, entry considered as deleted')
     billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')
+    security_checkpoint_date = models.DateTimeField(blank=True, null=True, help_text='Date when security checkpoint has been reported.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead account.')
     auto_ban_enabled = models.BooleanField(default=True, help_text='If true, lead account is banned after two weeks of offline or wrong password.')
     charge_back = models.BooleanField(default=False, help_text='Set to true on auto-ban. True if charge back should be billed to lead.')
