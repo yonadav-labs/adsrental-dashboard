@@ -97,6 +97,10 @@ class LeadAdmin(admin.ModelAdmin):
         'report_correct_google_password',
         'report_wrong_facebook_password',
         'report_correct_facebook_password',
+        'report_security_checkpoint_google',
+        'report_security_checkpoint_google_resolved',
+        'report_security_checkpoint_facebook',
+        'report_security_checkpoint_facebook_resolved',
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
@@ -397,6 +401,70 @@ class LeadAdmin(admin.ModelAdmin):
             'objects': queryset,
             'form': form,
         })
+
+    def report_security_checkpoint_google(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active google account.'.format(lead.email))
+                continue
+
+            if lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
+
+    def report_security_checkpoint_google_resolved(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active google account.'.format(lead.email))
+                continue
+
+            if not lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = None
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
+
+    def report_security_checkpoint_facebook(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
+
+    def report_security_checkpoint_facebook_resolved(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if not lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = None
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
 
     def report_wrong_google_password(self, request, queryset):
         for lead in queryset:

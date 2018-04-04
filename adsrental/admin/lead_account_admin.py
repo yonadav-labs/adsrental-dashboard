@@ -35,6 +35,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'last_touch',
         'adsdb_account_id',
         'wrong_password_date_field',
+        'security_checkpoint_date_field',
         'billed',
         'created',
     )
@@ -129,6 +130,15 @@ class LeadAccountAdmin(admin.ModelAdmin):
         return mark_safe('<span title="{}">{}</span>'.format(
             obj.wrong_password_date,
             naturaltime(obj.wrong_password_date),
+        ))
+
+    def security_checkpoint_date_field(self, obj):
+        if not obj.security_checkpoint_date:
+            return None
+
+        return mark_safe('<span title="{}">{}</span>'.format(
+            obj.security_checkpoint_date,
+            naturaltime(obj.security_checkpoint_date),
         ))
 
     def mark_as_qualified(self, request, queryset):
@@ -245,6 +255,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     wrong_password_date_field.short_description = 'Wrong Password'
     wrong_password_date_field.admin_order_field = 'wrong_password_date'
+
+    security_checkpoint_date_field.short_description = 'Security Checkpoint'
+    security_checkpoint_date_field.admin_order_field = 'security_checkpoint_date'
 
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
 

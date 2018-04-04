@@ -88,6 +88,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return 'Unknown lead {}'.format(self.username)
 
+    def is_security_checkpoint_reported(self):
+        return self.security_checkpoint_date is not None
+
     def is_wrong_password(self):
         'Is password reported as wrong now'
         return self.wrong_password_date is not None
