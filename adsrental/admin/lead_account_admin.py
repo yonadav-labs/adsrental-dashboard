@@ -273,13 +273,19 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         'created',
     )
 
+    editable_fields = (
+        'note',
+    )
+
     actions = None
 
     # We cannot call super().get_fields(request, obj) because that method calls
     # get_readonly_fields(request, obj), causing infinite recursion. Ditto for
     # super().get_form(request, obj). So we  assume the default ModelForm.
     def get_readonly_fields(self, request, obj=None):
-        return self.fields or [f.name for f in self.model._meta.fields]
+        fields = self.fields or [f.name for f in self.model._meta.fields]
+        fields = list(filter(lambda x: x not in self.editable_fields, fields))
+        return fields
 
     def has_add_permission(self, request):
         return False

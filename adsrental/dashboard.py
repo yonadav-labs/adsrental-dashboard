@@ -18,11 +18,20 @@ class CustomIndexDashboard(Dashboard):
     """
     def init_with_context(self, context):
         # append a link list module for "quick links"
+        request = context['request']
         now = timezone.now()
         current_week_start = now - datetime.timedelta(days=now.weekday())
         prev_week_end = current_week_start - datetime.timedelta(days=1)
         prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
         current_month_start = now - datetime.timedelta(days=now.day - 1)
+
+        if not request.user.is_superuser:
+            # append an app list module for "Applications"
+            self.children.append(modules.AppList(
+                _('Applications'),
+                exclude=('django.contrib.*',),
+            ))
+            return
 
         self.children.append(modules.LinkList(
             _('Reports'),
