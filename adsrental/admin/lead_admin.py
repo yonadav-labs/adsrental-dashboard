@@ -576,6 +576,7 @@ class ReadOnlyLeadAdmin(LeadAdmin):
         'last_touch',
         'first_seen',
         'last_seen',
+        'ec2_hostname',
         'raspberry_pi',
         'ip_address',
         'usps_tracking_code',
@@ -620,10 +621,18 @@ class ReadOnlyLeadAdmin(LeadAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def ec2_hostname(self, obj):
+        ec2_instance = obj.get_ec2_instance()
+        return ec2_instance and ec2_instance.hostname
+
     def accounts_field(self, obj):
         result = []
         for lead_account in obj.lead_accounts.all():
-            result.append(str(lead_account))
+            result.append('<a href="{}?q={}">{}</a>'.format(
+                reverse('admin:adsrental_readonlyleadaccount_changelist'),
+                lead_account.username,
+                lead_account,
+            ))
 
         return mark_safe(', '.join(result))
 

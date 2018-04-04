@@ -252,3 +252,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.touch_count += 1
         self.sync_to_adsdb()
         self.save()
+
+
+class ReadOnlyLeadAccount(LeadAccount):
+    'Read only LeadAccount model'
+    class Meta:
+        proxy = True
+        verbose_name = 'Read-only Lead Account'
+        verbose_name_plural = 'Read-only Lead Accounts'

@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
-from adsrental.models.lead_account import LeadAccount
+from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, StatusListFilter
@@ -249,3 +249,65 @@ class LeadAccountAdmin(admin.ModelAdmin):
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
 
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
+
+
+
+
+class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
+    model = ReadOnlyLeadAccount
+    list_display = (
+        'id',
+        'name',
+        'lead_link',
+        'raspberry_pi_field',
+        'account_type',
+        'status',
+        'username',
+        'password',
+        'friends',
+        'bundler_paid',
+        'last_touch',
+        'adsdb_account_id',
+        'wrong_password_date_field',
+        'billed',
+        'created',
+    )
+
+    actions = None
+
+    # We cannot call super().get_fields(request, obj) because that method calls
+    # get_readonly_fields(request, obj), causing infinite recursion. Ditto for
+    # super().get_form(request, obj). So we  assume the default ModelForm.
+    def get_readonly_fields(self, request, obj=None):
+        return self.fields or [f.name for f in self.model._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    # Allow viewing objects but not actually changing them.
+    # def has_change_permission(self, request, obj=None):
+    #     return (request.method in ['GET', 'HEAD'] and
+    #             super().has_change_permission(request, obj))
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def lead_link(self, obj):
+        lead = obj.lead
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+            url=reverse('admin:adsrental_readonlylead_changelist'),
+            lead=lead.leadid,
+            q=lead.leadid,
+        ))
+
+
+    def raspberry_pi_field(self, obj):
+        if not obj.lead.raspberry_pi:
+            return None
+
+        return obj.lead.raspberry_pi
+
+    lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = 'lead__leadid'
+
+    raspberry_pi_field.short_description = 'Raspberry Pi'

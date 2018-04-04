@@ -13,7 +13,7 @@ from adsrental.admin.raspberry_pi_session_admin import RaspberryPiSessionAdmin
 from adsrental.admin.lead_change_admin import LeadChangeAdmin
 from adsrental.admin.bundler_admin import BundlerAdmin
 from adsrental.admin.lead_history_admin import LeadHistoryAdmin
-from adsrental.admin.lead_account_admin import LeadAccountAdmin
+from adsrental.admin.lead_account_admin import LeadAccountAdmin, ReadOnlyLeadAccountAdmin
 
 
 admin.site.register(CustomUserAdmin.model, CustomUserAdmin)
@@ -29,3 +29,4 @@ admin.site.register(LeadChangeAdmin.model, LeadChangeAdmin)
 admin.site.register(RaspberryPiSessionAdmin.model, RaspberryPiSessionAdmin)
 admin.site.register(LeadAccountAdmin.model, LeadAccountAdmin)
 admin.site.register(ReadOnlyLeadAdmin.model, ReadOnlyLeadAdmin)
+admin.site.register(ReadOnlyLeadAccountAdmin.model, ReadOnlyLeadAccountAdmin)
