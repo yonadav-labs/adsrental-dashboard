@@ -81,7 +81,7 @@ class DashboardView(View):
         if not user.bundler:
             return Lead.objects.all().prefetch_related('raspberry_pi', 'lead_accounts')
 
-        return Lead.objects.filter(utm_source=user.bundler.utm_source).prefetch_related('raspberry_pi', 'lead_accounts')
+        return Lead.objects.filter(bundler=user.bundler).prefetch_related('raspberry_pi', 'lead_accounts')
 
     @method_decorator(login_required)
     def get(self, request):
