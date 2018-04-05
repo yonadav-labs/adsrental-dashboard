@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
             None,
             {
                 'fields': [
-                    'utm_source',
+                    'bundler',
                 ],
             },
         ),

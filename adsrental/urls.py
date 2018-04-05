@@ -5,6 +5,7 @@ from django.conf.urls import url
 
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
+from adsrental.views.bundler import BundlerReportView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
@@ -57,4 +58,5 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^ec2_ssh/get_netstat/(?P<rpid>.*)/$', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
     url(r'^rpi/ec2_data/(?P<rpid>.*)/$', EC2DataView.as_view(), name='rpi_ec2_data'),
     url(r'^adsdb/lead/$', ADSDBLeadView.as_view(), name='adsdb_lead'),
+    url(r'^bundler/report/$', BundlerReportView.as_view(), name='bundler_report'),
 ]

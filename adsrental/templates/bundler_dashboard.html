@@ -4,22 +4,22 @@
 {% load humanize %}
 {% load helpers %}
 
-{% block title %}Adsrental | Dashboard{% endblock %}
+{% block title %}Adsrental | Bundler Dashboard{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h3>Leads by status</h3>
+    <h3>Leads by qualified date</h3>
     <table id="results" class="table table-striped">
         <thead>
             <tr>
-                <th>Status</th>
+                <th>Qualified date</th>
                 <th>Number of leads</th>
             </tr>
         </thead>
-        {% for entry in status_entries %}
+        {% for entry in entries %}
             <tbody>
                 <tr>
-                    <td>{{ entry.status }}</td>
+                    <td>{{ entry.date }}</td>
                     <td>{{ entry.count }}</td>
                 </tr>
             </tbody>
