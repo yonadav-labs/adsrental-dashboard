@@ -80,6 +80,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
+    class Meta:
+        permissions = (
+            ("view", "Can access lead account info"),
+        )
+
     def __str__(self):
         if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
             return 'Facebook lead {}'.format(self.username)

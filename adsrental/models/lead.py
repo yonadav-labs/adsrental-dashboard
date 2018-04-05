@@ -80,6 +80,11 @@ class Lead(models.Model, FulltextSearchMixin):
 
     If anything goes wrong, report to @Vlad in Slack.
     """
+    class Meta:
+        db_table = 'lead'
+        permissions = (
+            ("view", "Can access lead info"),
+        )
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
@@ -145,9 +150,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def __str__(self):
         return self.leadid
-
-    class Meta:
-        db_table = 'lead'
 
     def is_wrong_password(self):
         'Is password reported as wrong now'
