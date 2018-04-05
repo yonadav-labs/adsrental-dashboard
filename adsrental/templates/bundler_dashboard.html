@@ -7,28 +7,38 @@
 {% block title %}Adsrental | Bundler Dashboard{% endblock %}
 
 {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+
 <div class="container">
     <h3>Leads by qualified date</h3>
-    <table id="results" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Qualified date</th>
-                <th>Number of leads</th>
-            </tr>
-        </thead>
-        {% for entry in entries %}
-            <tbody>
-                <tr>
-                    <td>{{ entry.date }}</td>
-                    <td>{{ entry.count }}</td>
-                </tr>
-            </tbody>
-        {% empty %}
-            <tfoot>
-                <tr>
-                    <th colspan="100">No entries found</th>
-                </tr>
-            </tfoot>
-        {% endfor %}
-    </table>
+
+    <canvas id="myChart" style="width: 900px; height: 300px;"></canvas>
+
+    <script>
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var labels = JSON.parse('{{ entries_keys_json|escapejs }}');
+    var data = JSON.parse('{{ entries_values_json|escapejs }}');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Qualified leads by date',
+                data: data,
+                backgroundColor: 'rgba(44, 44, 255, 0.2)',
+                borderColor: 'rgba(44, 44, 255, 0.8)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true
+                    }
+                }]
+            }
+        }
+    });
+    </script>
 {% endblock %}
