@@ -1,39 +1,33 @@
 [
-  {
-    "model": "sites.site",
-    "pk": 1,
-    "fields": {
-      "name": "RentYourSocialMedia Dashboard",
-      "domain": "rentyoursocialmedia.com"
+    {
+        "model": "sites.site",
+        "pk": 1,
+        "fields": {
+            "name": "RentYourSocialMedia Dashboard",
+            "domain": "rentyoursocialmedia.com"
+        }
+    },
+    {
+        "model": "sites.site",
+        "pk": 2,
+        "fields": {
+            "name": "Adsrental Dashboard (Local)",
+            "domain": "localhost:7443"
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "Buyer",
+            "permissions": [
+                1156,
+                1157,
+                1158,
+                1159,
+                1160,
+                1161
+            ]
+        }
     }
-  },
-  {
-    "model": "sites.site",
-    "pk": 2,
-    "fields": {
-      "name": "Adsrental Dashboard (Local)",
-      "domain": "localhost:7443"
-    }
-  },
-  {
-    "model": "adsrental.user",
-    "pk": "044f6628-9beb-49eb-b902-19b6e44702cb",
-    "fields": {
-      "password": "pbkdf2_sha256$36000$V1vIx86gEk1s$GnTUmuWTdxG/xZre62EDgCiRhUN+kawzjjXqmSIv27Q=",
-      "last_login": "2017-05-23T14:31:38.340Z",
-      "is_superuser": true,
-      "date_joined": "2017-05-23T14:31:19.347Z",
-      "email": "admin@email.com",
-      "username": "admin@email.com",
-      "first_name": "Vlad",
-      "last_name": "Emelianov",
-      "is_active": true,
-      "utm_source": "",
-      "is_staff": true,
-      "groups": [],
-      "user_permissions": [],
-      "created": "2017-07-18T03:27:38.177694Z",
-      "updated": "2017-07-18T03:27:38.177694Z"
-    }
-  }
 ]
