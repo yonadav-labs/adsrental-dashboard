@@ -13,7 +13,7 @@ from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentFo
 from adsrental.models.lead import Lead, ReadOnlyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstSeenListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter
+from adsrental.admin.list_filters import StatusListFilter, RaspberryPiOnlineListFilter, AccountTypeListFilter, LeadAccountWrongPasswordListFilter, RaspberryPiFirstSeenListFilter, TouchCountListFilter, BundlerListFilter, ShipDateListFilter, QualifiedDateListFilter, LeadAccountSecurityCheckpointListFilter
 
 
 class LeadAccountInline(admin.StackedInline):
@@ -55,6 +55,7 @@ class LeadAdmin(admin.ModelAdmin):
         'usps_tracking_code',
         'online',
         'wrong_password_field',
+        'security_checkpoint_field',
         'pi_delivered',
         'bundler_paid_field',
     )
@@ -71,6 +72,7 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiFirstSeenListFilter,
         BundlerListFilter,
         'pi_delivered',
+        LeadAccountSecurityCheckpointListFilter,
     )
     inlines = (
         LeadAccountInline,
@@ -214,6 +216,18 @@ class LeadAdmin(admin.ModelAdmin):
             return mark_safe('<span title="{}">{}</span>'.format(
                 lead_account.wrong_password_date,
                 naturaltime(lead_account.wrong_password_date),
+            ))
+
+        return None
+
+    def security_checkpoint_field(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if not lead_account.security_checkpoint_date:
+                continue
+
+            return mark_safe('<span title="{}">{}</span>'.format(
+                lead_account.security_checkpoint_date,
+                naturaltime(lead_account.security_checkpoint_date),
             ))
 
         return None
@@ -591,6 +605,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     wrong_password_field.short_description = 'Wrong Password'
     wrong_password_field.admin_order_field = 'lead_account__wrong_password_date'
+
+    security_checkpoint_field.short_description = 'Security Checkpoint'
+    security_checkpoint_field.admin_order_field = 'lead_account__security_checkpoint_date'
 
     tested_field.short_description = 'Tested'
 

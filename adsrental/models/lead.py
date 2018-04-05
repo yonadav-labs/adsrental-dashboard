@@ -157,6 +157,14 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
+    def is_security_checkpoint_reported(self):
+        'Is password reported as wrong now'
+        for lead_account in self.lead_accounts.all():
+            if lead_account.active and lead_account.security_checkpoint_date:
+                return True
+
+        return False
+
     def is_bundler_paid(self):
         'Is bundler paid for any account'
         for lead_account in self.lead_accounts.all():

@@ -132,6 +132,28 @@ class DashboardView(View):
                         lead_account__wrong_password_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
                     )
 
+            if form.cleaned_data['security_checkpoint']:
+                value = form.cleaned_data['security_checkpoint']
+                if value == 'no':
+                    entries = entries.filter(
+                        lead_account__security_checkpoint_date__isnull=True)
+                if value == 'yes':
+                    entries = entries.filter(
+                        lead_account__security_checkpoint_date__isnull=False)
+                if value == 'yes_0_2days':
+                    entries = entries.filter(
+                        lead_account__security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                    )
+                if value == 'yes_3_5days':
+                    entries = entries.filter(
+                        lead_account__security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                        lead_account__security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+                    )
+                if value == 'yes_5days':
+                    entries = entries.filter(
+                        lead_account__security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+                    )
+
             if form.cleaned_data['lead_status']:
                 value = form.cleaned_data['lead_status']
                 entries = entries.filter(status=value)

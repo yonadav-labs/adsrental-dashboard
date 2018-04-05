@@ -26,6 +26,14 @@ class DashboardForm(forms.Form):
         ('yes_3_5days', 'Wrong for 3-5 days'),
         ('yes_5days', 'Wrong for more than 5 days'),
     )
+    SECURITY_CHECKPOINT_CHOICES = (
+        ('', 'All'),
+        ('no', 'No'),
+        ('yes', 'Reported'),
+        ('yes_0_2days', 'Reported for 0-2 days'),
+        ('yes_3_5days', 'Reported for 3-5 days'),
+        ('yes_5days', 'Reported for more than 5 days'),
+    )
     LEAD_STATUS_CHOICES = (
         ('', 'All'),
         ('Available', 'Available'),
@@ -52,6 +60,7 @@ class DashboardForm(forms.Form):
     lead_status = forms.ChoiceField(label='Lead Status', choices=LEAD_STATUS_CHOICES, required=False)
     ec2_state = forms.ChoiceField(label='EC2 State', choices=EC2_STATE_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
+    security_checkpoint = forms.ChoiceField(label='Security Checkpoint', choices=SECURITY_CHECKPOINT_CHOICES, required=False)
     banned = forms.ChoiceField(label='Banned', choices=BANNED_CHOICES, required=False)
     pi_delivered = forms.ChoiceField(label='Delivered', choices=PI_DELIVERED_CHOICES, required=False)
     account_type = forms.ChoiceField(label='Account Type', choices=ACCOUNT_TYPE_CHOICES, required=False)

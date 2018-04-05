@@ -344,6 +344,40 @@ class LeadAccountWrongPasswordListFilter(SimpleListFilter):
         return None
 
 
+class LeadAccountSecurityCheckpointListFilter(SimpleListFilter):
+    title = 'Securty Checkpoint reported'
+    parameter_name = 'security_checkpoint'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('no', 'No'),
+            ('yes', 'Reported'),
+            ('yes_0_2days', 'Reported for 0-2 days'),
+            ('yes_3_5days', 'Reported for 3-5 days'),
+            ('yes_5days', 'Reported for more than 5 days'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'no':
+            return queryset.filter(lead_account__security_checkpoint_date__isnull=True)
+        if self.value() == 'yes':
+            return queryset.filter(lead_account__security_checkpoint_date__isnull=False)
+        if self.value() == 'yes_0_2days':
+            return queryset.filter(
+                lead_account__security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+            )
+        if self.value() == 'yes_3_5days':
+            return queryset.filter(
+                lead_account__security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                lead_account__security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        if self.value() == 'yes_5days':
+            return queryset.filter(
+                lead_account__security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        return None
+
+
 class LeadRaspberryPiVersionListFilter(SimpleListFilter):
     title = 'RaspberryPi version'
     parameter_name = 'version'
