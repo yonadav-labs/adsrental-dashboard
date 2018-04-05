@@ -16,12 +16,15 @@ class BundlerReportView(View):
     @method_decorator(login_required)
     def get(self, request):
         bundler = request.user.bundler
-        if not bundler:
-            raise Http404
+        # if not bundler:
+        #     raise Http404
+
+        lead_accounts = LeadAccount.objects.filter(qualified_date__isnull=False)
+        if bundler:
+            lead_accounts = lead_accounts.filter(lead__bundler=bundler)
 
         lead_accounts_by_date = (
-            LeadAccount.objects
-            .filter(lead__bundler=bundler, qualified_date__isnull=False)
+            lead_accounts
             .annotate(date=TruncDay('qualified_date'))
             .values('date') 
             .annotate(count=Count('id')) 
