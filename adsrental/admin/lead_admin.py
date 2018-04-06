@@ -268,7 +268,7 @@ class LeadAdmin(admin.ModelAdmin):
         if ec2_instance:
             result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
                 url=reverse('admin:adsrental_ec2instance_changelist'),
-                ec2_instance=ec2_instance,
+                ec2_instance=ec2_instance.hostname or ec2_instance.status.capitalize(),
                 q=ec2_instance.instance_id,
             ))
 
