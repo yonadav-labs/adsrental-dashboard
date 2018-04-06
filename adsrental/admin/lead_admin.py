@@ -706,6 +706,9 @@ class ReportLeadAdmin(LeadAdmin):
 
         return False
 
+    google_billed.boolean = True
+    facebook_billed.boolean = True
+
 
 class ReadOnlyLeadAdmin(LeadAdmin):
     model = ReadOnlyLead
