@@ -507,7 +507,10 @@ class AutoBanView(View):
                 auto_ban_enabled=True,
                 bundler_paid=True,
         ):
-            banned_wrong_password.append([str(lead_account), lead_account.wrong_password_date])
+            banned_wrong_password.append({
+                'account': str(lead_account),
+                'wrong_password_date': lead_account.wrong_password_date.date()
+            })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
                 # lead_account.charge_back = True
@@ -520,7 +523,10 @@ class AutoBanView(View):
                 active=True,
                 auto_ban_enabled=True,
         ):
-            banned_offline.append([str(lead_account), lead_account.lead.raspberry_pi.last_seen])
+            banned_offline.append({
+                'account': str(lead_account),
+                'last_seen': lead_account.lead.raspberry_pi.last_seen.date()
+            })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
                 # lead_account.charge_back = True
@@ -533,7 +539,10 @@ class AutoBanView(View):
                 active=True,
                 auto_ban_enabled=True,
         ):
-            banned_security_checkpoint.append([str(lead_account), lead_account.security_checkpoint_date])
+            banned_security_checkpoint.append({
+                'account': str(lead_account),
+                'security_checkpoint_date': lead_account.security_checkpoint_date.date()
+            })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_CHECKPOINT)
                 # lead_account.charge_back = True
