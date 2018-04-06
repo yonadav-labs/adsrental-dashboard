@@ -674,6 +674,7 @@ class ReportLeadAdmin(LeadAdmin):
         'last_name',
         'utm_source',
         'status',
+        'links',
         'pi_delivered',
         'accounts_field',
         'company',
