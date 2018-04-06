@@ -15,6 +15,7 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
     NAME_APPROVED = 'lead_approved'
     NAME_BANNED = 'banned'
     NAME_AVAILABLE_BANNED = 'available_banned'
+    NAME_SECURITY_CHECKPOINT = 'security_checkpoint'
     NAME_CHOICES = [
         (NAME_SHIPPED, 'Shipped'),
         (NAME_DELIVERED, 'Delivered'),
@@ -22,6 +23,7 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
         (NAME_APPROVED, 'Approved'),
         (NAME_BANNED, 'Banned'),
         (NAME_AVAILABLE_BANNED, 'Banned from available status'),
+        (NAME_SECURITY_CHECKPOINT, 'Security checkpoint reported'),
     ]
 
     lead = models.ForeignKey('adsrental.Lead', null=True, blank=True, default=None, help_text='Linked lead.', on_delete=models.CASCADE)
