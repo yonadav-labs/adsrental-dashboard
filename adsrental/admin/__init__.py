@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from adsrental.admin.lead_admin import LeadAdmin, ReadOnlyLeadAdmin
+from adsrental.admin.lead_admin import LeadAdmin, ReadOnlyLeadAdmin, ReportLeadAdmin
 from adsrental.admin.raspberry_pi_admin import RaspberryPiAdmin
 from adsrental.admin.custom_user_admin import CustomUserAdmin
 from adsrental.admin.customerio_event_admin import CustomerIOEventAdmin
 from adsrental.admin.ec2_instance_admin import EC2InstanceAdmin
-from adsrental.admin.report_lead_admin import ReportLeadAdmin
 from adsrental.admin.lead_history_month_admin import LeadHistoryMonthAdmin
 from adsrental.admin.raspberry_pi_session_admin import RaspberryPiSessionAdmin
 from adsrental.admin.lead_change_admin import LeadChangeAdmin

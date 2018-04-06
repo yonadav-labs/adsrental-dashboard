@@ -10,7 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
-from adsrental.models.lead import Lead, ReadOnlyLead
+from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import \
@@ -656,6 +656,54 @@ class LeadAdmin(admin.ModelAdmin):
     bundler_paid_field.boolean = True
 
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
+
+
+
+class ReportLeadAdmin(LeadAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
+    model = ReportProxyLead
+    admin_caching_enabled = True
+    list_display = (
+        'leadid',
+        # 'rpid',
+        'first_name',
+        'last_name',
+        'utm_source',
+        'status',
+        'pi_delivered',
+        'accounts_field',
+        'company',
+        'email',
+        # 'phone',
+        'raspberry_pi_link',
+        'bundler_field',
+        'bundler_paid_field',
+        'facebook_billed',
+        'google_billed',
+        'touch_count',
+        'last_touch',
+        'first_seen',
+        'last_seen',
+    )
+    list_per_page = 500
+
+    def facebook_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return lead_account.billed
+
+        return False
+
+    def google_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                return lead_account.billed
+
+        return False
 
 
 class ReadOnlyLeadAdmin(LeadAdmin):
