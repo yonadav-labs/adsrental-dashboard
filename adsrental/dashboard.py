@@ -52,7 +52,7 @@ class CustomIndexDashboard(Dashboard):
                     reverse('admin:adsrental_reportproxylead_changelist'),
                     urlencode(dict(
                         account_type='google',
-                        status='active',
+                        status='Active',
                     )),
                 )],
                 [_('Master Report for ACM Google Accounts'), '{}?{}'.format(
