@@ -28,8 +28,8 @@ class BundlerAdmin(admin.ModelAdmin):
     search_fields = ('utm_source', 'email', )
 
     def get_queryset(self, request):
-        qs = super(BundlerAdmin, self).get_queryset(request)
-        return qs.annotate(leads_count=Count('lead'))
+        queryset = super(BundlerAdmin, self).get_queryset(request)
+        return queryset.annotate(leads_count=Count('lead'))
 
     def pause(self, request, queryset):
         'Inactivate bundler and prevent leads registration for his utm_source'

@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from django.shortcuts import render, Http404
+from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -26,13 +26,13 @@ class BundlerReportView(View):
         lead_accounts_by_date = (
             lead_accounts
             .annotate(date=TruncDay('qualified_date'))
-            .values('date') 
-            .annotate(count=Count('id')) 
-            .values_list('date', 'count') 
+            .values('date')
+            .annotate(count=Count('id'))
+            .values_list('date', 'count')
         )
         lead_accounts_by_date_dict = {}
-        for dt, value in lead_accounts_by_date:
-            lead_accounts_by_date_dict[dt.date()] = value
+        for qualified_date, value in lead_accounts_by_date:
+            lead_accounts_by_date_dict[qualified_date.date()] = value
 
         entries = []
         now = timezone.now()
