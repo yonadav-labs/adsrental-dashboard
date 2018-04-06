@@ -220,7 +220,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
-            form = AdminLeadAccountPasswordForm()
+            form = AdminLeadAccountPasswordForm(initial=dict(
+                old_password=lead_account.password,
+                new_password=lead_account.password,
+            ))
 
 
         return render(request, 'admin/action_with_form.html', {

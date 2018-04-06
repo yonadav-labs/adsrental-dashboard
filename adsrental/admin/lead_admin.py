@@ -522,6 +522,7 @@ class LeadAdmin(admin.ModelAdmin):
                 return None
         else:
             form = AdminLeadAccountPasswordForm(initial=dict(
+                old_password=lead_account.password,
                 new_password=lead_account.password,
             ))
 
@@ -575,6 +576,7 @@ class LeadAdmin(admin.ModelAdmin):
                 return None
         else:
             form = AdminLeadAccountPasswordForm(initial=dict(
+                old_password=lead_account.password,
                 new_password=lead_account.password,
             ))
 

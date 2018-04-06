@@ -224,7 +224,8 @@ class AdminLeadAccountBanForm(forms.Form):
 
 
 class AdminLeadAccountPasswordForm(forms.Form):
-    new_password = forms.CharField(label='Password')
+    old_password = forms.CharField(label='Old password', widget=forms.TextInput(attrs=dict(readonly=True)), required=False)
+    new_password = forms.CharField(label='New password')
 
 
 class AdminPrepareForReshipmentForm(forms.Form):
