@@ -148,7 +148,12 @@ class LogView(View):
 
         if not Lead.is_status_active(lead_status):
             reason = 'Lead not found or banned'
-            result = False
+            response_data = {
+                'reason': reason,
+                'source': 'ping',
+                'result': result,
+            }
+            return response_data
 
         if wrong_password:
             reason = 'Wrong password'
@@ -158,10 +163,6 @@ class LogView(View):
             'source': 'ping',
             'result': result,
         }
-
-        if not result:
-            response_data['reason'] = reason
-            return response_data
 
         restart_required = self._get_restart_required(ping_data)
         new_config_required = self._get_new_config_required(ping_data)
