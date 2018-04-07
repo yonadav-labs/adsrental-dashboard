@@ -57,15 +57,15 @@ class TouchCountListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('less10', 'Less than 10 only'),
-            ('more10', '10 or more'),
+            ('less5', 'Less than 5 only'),
+            ('more5', '5 or more'),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'less10':
-            return queryset.filter(touch_count__lt=10)
-        if self.value() == 'more10':
-            return queryset.filter(touch_count__gte=10)
+        if self.value() == 'less5':
+            return queryset.filter(touch_count__lt=5)
+        if self.value() == 'more5':
+            return queryset.filter(touch_count__gte=5)
         return None
 
 

@@ -187,9 +187,9 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.get_phone_formatted()
 
     def last_touch(self, obj):
-        return mark_safe('<span title="Touched {} times">{}</span>'.format(
+        return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
+            'Last touched {}'.format(naturaltime(obj.last_touch_date)) if obj.last_touch_date else 'Never touched',
             obj.touch_count,
-            naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never',
         ))
 
     def online(self, obj):
@@ -208,7 +208,7 @@ class LeadAdmin(admin.ModelAdmin):
             return None
 
         first_seen = obj.raspberry_pi.get_first_seen()
-        return mark_safe(u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
+        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
 
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
@@ -216,14 +216,14 @@ class LeadAdmin(admin.ModelAdmin):
 
         last_seen = obj.raspberry_pi.get_last_seen()
 
-        return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
+        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def wrong_password_field(self, obj):
         for lead_account in obj.lead_accounts.all():
             if not lead_account.wrong_password_date:
                 continue
 
-            return mark_safe('<span title="{}">{}</span>'.format(
+            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
                 lead_account.wrong_password_date,
                 naturaltime(lead_account.wrong_password_date),
             ))
@@ -235,7 +235,7 @@ class LeadAdmin(admin.ModelAdmin):
             if not lead_account.security_checkpoint_date:
                 continue
 
-            return mark_safe('<span title="{}">{}</span>'.format(
+            return mark_safe('<span class="has_note"     title="{}">{}</span>'.format(
                 lead_account.security_checkpoint_date,
                 naturaltime(lead_account.security_checkpoint_date),
             ))
@@ -623,7 +623,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     tested_field.short_description = 'Tested'
 
-    last_touch.admin_order_field = 'last_touch_date'
+    last_touch.admin_order_field = 'touch_count'
+    last_touch.short_description = 'Touch count'
+
     id_field.short_description = 'ID'
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
     ec2_instance_link.short_description = 'EC2 instance'
