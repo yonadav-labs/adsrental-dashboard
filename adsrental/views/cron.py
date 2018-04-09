@@ -561,8 +561,8 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_CHECKPOINT)
-                lead_account.charge_back = True
-                lead_account.save()
+                # lead_account.charge_back = True
+                # lead_account.save()
 
         return JsonResponse({
             'execute': execute,
