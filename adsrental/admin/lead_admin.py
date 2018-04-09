@@ -713,7 +713,10 @@ class ReportLeadAdmin(LeadAdmin):
         return False
 
     google_billed.boolean = True
+    google_billed.admin_order_field = 'lead_account__billed'
+
     facebook_billed.boolean = True
+    facebook_billed.admin_order_field = 'lead_account__billed'
 
 
 class ReadOnlyLeadAdmin(LeadAdmin):
