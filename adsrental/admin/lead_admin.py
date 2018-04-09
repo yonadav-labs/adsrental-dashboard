@@ -672,6 +672,48 @@ class ReportLeadAdmin(LeadAdmin):
     model = ReportProxyLead
     admin_caching_enabled = True
     list_per_page = 500
+    list_display = (
+        # 'id_field',
+        'name',
+        'status_field',
+        'links',
+        'email_field',
+        'phone_field',
+        'bundler_field',
+        'accounts_field',
+        'tested_field',
+        'last_touch',
+        'first_seen',
+        'last_seen',
+        'ec2_instance_link',
+        'raspberry_pi_link',
+        'ip_address',
+        'usps_tracking_code',
+        'online',
+        'wrong_password_field',
+        'security_checkpoint_field',
+        'pi_delivered',
+        'bundler_paid_field',
+        'facebook_billed',
+        'google_billed',
+    )
+
+    def facebook_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return lead_account.billed
+
+        return False
+
+    def google_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                return lead_account.billed
+
+        return False
+
+    google_billed.boolean = True
+    facebook_billed.boolean = True
 
 
 class ReadOnlyLeadAdmin(LeadAdmin):
