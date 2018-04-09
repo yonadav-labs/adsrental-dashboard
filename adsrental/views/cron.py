@@ -460,7 +460,7 @@ class SyncOfflineView(View):
                 raspberry_pi__first_seen__isnull=False,
                 status__in=Lead.STATUSES_ACTIVE,
         ).exclude(
-                raspberry_pi__last_offline_reported__gte=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
+            raspberry_pi__last_offline_reported__gte=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
         ).select_related('raspberry_pi'):
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
@@ -476,7 +476,7 @@ class SyncOfflineView(View):
                 security_checkpoint_date__isnull=False,
                 status__in=LeadAccount.STATUSES_ACTIVE,
         ).exclude(
-                last_security_checkpoint_reported__gte=now - datetime.timedelta(hours=LeadAccount.LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL),
+            last_security_checkpoint_reported__gte=now - datetime.timedelta(hours=LeadAccount.LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL),
         ).select_related('raspberry_pi'):
             reported_checkpoint.append(str(lead_account))
             if test:
