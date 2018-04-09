@@ -55,3 +55,18 @@ fi
 # else
 #     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 # fi
+
+
+LAST_TROUBLESHOOT_FILE="${HOME}/.last_troubleshoot"
+if [ -e "$LAST_TROUBLESHOOT_FILE" ]; then
+    LAST_TROUBLESHOOT_SECONDS_AGO=$((`date +%s` - `stat -L --format %Y $LAST_TROUBLESHOOT_FILE`))
+else
+    LAST_TROUBLESHOOT_SECONDS_AGO="9999999"
+fi
+if [[ "$LAST_TROUBLESHOOT_SECONDS_AGO" -gt "6000" ]]; then
+	cat ${SCRIPT_DIR}/crontab.txt | crontab
+    ${HOME}/new-pi/client_log.sh "Force revive"
+    bash ${SCRIPT_DIR}/get_config.sh
+    bash ${SCRIPT_DIR}/start_tunnel.sh
+    bash ${SCRIPT_DIR}/start_reverse_tunnel.sh
+fi
