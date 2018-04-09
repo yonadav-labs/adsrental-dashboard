@@ -476,7 +476,7 @@ class SyncOfflineView(View):
                 security_checkpoint_date__isnull=False,
                 status__in=LeadAccount.STATUSES_ACTIVE,
         ).exclude(
-                last_security_checkpoint_reported__gte=now - datetime.timedelta(hours=LeadAccounts.LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL),
+                last_security_checkpoint_reported__gte=now - datetime.timedelta(hours=LeadAccount.LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL),
         ).select_related('raspberry_pi'):
             reported_checkpoint.append(str(lead_account))
             if test:
