@@ -41,14 +41,17 @@ if ! [ "$TASKLIST_FIREFOX" == "" ]; then
     fi
 fi
 
-HAS_ANTIDETECT="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Antidetect_7.3.zip' | grep Antidetect`"
-if [ "$HAS_ANTIDETECT" == "" ]; then
-    ${HOME}/new-pi/client_log.sh "Antidetect is not downloaded..."
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell iwr -outf C:\\Antidetect_7.3.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.zip"
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Remove-Item -path 'C:\\Antidetect' -recurse"
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Expand-Archive -force c:\\Antidetect_7.3.zip -DestinationPath c:\\"
-    ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
-    ${HOME}/new-pi/client_log.sh "Antidetect is installed"
-else
-    ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
-fi
+# HAS_ANTIDETECT="`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Antidetect_7.3.zip' | grep Antidetect`"
+# if [ "$HAS_ANTIDETECT" == "" ]; then
+#     ${HOME}/new-pi/client_log.sh "Antidetect is not downloaded..."
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell iwr -outf C:\\Antidetect_7.3.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.zip"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "taskkill /IM firefox.exe /F"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "taskkill /IM browser.exe /F"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "taskkill /IM adcracked.exe /F"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Remove-Item -path 'C:\\Antidetect' -recurse"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Expand-Archive -force c:\\Antidetect_7.3.zip -DestinationPath c:\\"
+#     ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q"
+#     ${HOME}/new-pi/client_log.sh "Antidetect is installed"
+# else
+#     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
+# fi
