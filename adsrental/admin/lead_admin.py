@@ -83,6 +83,7 @@ class LeadAdmin(admin.ModelAdmin):
         BundlerListFilter,
         'pi_delivered',
         LeadAccountSecurityCheckpointListFilter,
+        'lead_account__charge_back',
     )
     inlines = (
         LeadAccountInline,

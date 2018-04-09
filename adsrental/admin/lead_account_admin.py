@@ -46,6 +46,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         StatusListFilter,
         WrongPasswordListFilter,
         QualifiedDateListFilter,
+        'charge_back',
     )
     search_fields = ('lead__leadid', 'username', )
     actions = (
