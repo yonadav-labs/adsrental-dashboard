@@ -529,8 +529,8 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
-                # lead_account.charge_back = True
-                # lead_account.save()
+                lead_account.charge_back = True
+                lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
@@ -545,8 +545,8 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
-                # lead_account.charge_back = True
-                # lead_account.save()
+                lead_account.charge_back = True
+                lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
@@ -561,8 +561,8 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_CHECKPOINT)
-                # lead_account.charge_back = True
-                # lead_account.save()
+                lead_account.charge_back = True
+                lead_account.save()
 
         return JsonResponse({
             'execute': execute,

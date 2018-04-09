@@ -84,6 +84,7 @@ class LeadAdmin(admin.ModelAdmin):
         'pi_delivered',
         LeadAccountSecurityCheckpointListFilter,
         'lead_account__charge_back',
+        'lead_account__charge_back_billed',
     )
     inlines = (
         LeadAccountInline,
