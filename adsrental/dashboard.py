@@ -102,6 +102,13 @@ class CustomIndexDashboard(Dashboard):
                         shipped_date='current_month',
                     )),
                 )],
+                [_('Charge back leads'), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urlencode(dict(
+                        lead_account__charge_back__exact='1',
+                        lead_account__charge_back_billed__exact='0',
+                    )),
+                )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urlencode(dict(
