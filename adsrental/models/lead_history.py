@@ -1,9 +1,12 @@
 'LeadHistory class'
 import datetime
+import decimal
 from dateutil.relativedelta import relativedelta
 
 from django.db import models
+from django.utils import timezone
 from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 
 
 class LeadHistory(models.Model):
@@ -13,6 +16,11 @@ class LeadHistory(models.Model):
     '''
     ONLINE_CHECKS_MIN = 12
     WRONG_PASSWORD_CHECKS_MIN = 1
+
+    MAX_PAYMENT = 25.
+    NEW_MAX_PAYMENT = 15.
+    NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
+    NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
     class Meta:
         verbose_name = 'Lead History'
@@ -72,3 +80,37 @@ class LeadHistory(models.Model):
         if lead_ids:
             result = result.filter(lead_id__in=lead_ids)
         return result
+
+    def get_last_day(self):
+        next_month = self.date.replace(day=28) + datetime.timedelta(days=4)
+        return next_month - datetime.timedelta(days=next_month.day)
+
+    def get_first_day(self):
+        return self.date.replace(day=1)
+
+    def get_amount(self):
+        result = 0.
+        if not self.is_online() or self.is_wrong_password():
+            return result
+
+        monthly_amount = self.get_monthly_amount()
+        days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
+        return round(monthly_amount / days_in_month, 2)
+
+    def get_monthly_amount(self):
+        for lead_account in self.lead.lead_accounts.all():
+            if not lead_account.active:
+                continue
+
+            created_date = lead_account.created
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
+                    return self.NEW_MAX_PAYMENT
+                return self.MAX_PAYMENT
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
+                    return self.NEW_MAX_PAYMENT
+                
+                return self.MAX_PAYMENT
+
+        return 0.0

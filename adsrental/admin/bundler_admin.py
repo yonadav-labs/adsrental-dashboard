@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
+from django.urls import reverse
 from django.db.models import Count
+from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
@@ -19,6 +20,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'phone',
         'is_active',
         'leads_count',
+        'links',
     )
     actions = (
         'assign_leads_for_this_bundler',
@@ -72,7 +74,13 @@ class BundlerAdmin(admin.ModelAdmin):
                     bundler, leads.count(),
                 ))
 
-    def leads_count(self, inst):
-        return inst.leads_count
+    def leads_count(self, obj):
+        return obj.leads_count
+
+    def links(self, obj):
+        result = []
+        result.append('<a target="_blank" href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
+        result.append('<a target="_blank" href="{report_url}">Stats</a>'.format(report_url=reverse('bundler_report', kwargs={'bundler_id': obj.id})))
+        return mark_safe(', '.join(result))
 
     leads_count.short_description = 'Leads'

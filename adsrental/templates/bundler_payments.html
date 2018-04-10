@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler Payments{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h3>Bundler {{ bundler }} ({{ bundler.utm_source }}) paid report {{ end_date }}</h3>
+    {% if allow_change %}
+        <form action="{% url 'bundler_payments' bundler_id=bundler.id %}" method="POST">
+            {% csrf_token %}
+            <button class="btn btn-primary">Mark as bundler paid</button>
+        </form>
+    {% endif %}
+    {% if facebook_entries %}
+        <h4>Facebook accounts</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Lead</th>
+                    <th>Start date</th>
+                    <th>Chargeback</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in facebook_entries %}
+                <tr>
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.lead }}</td>
+                    <td>{{ entry.start_date }}</td>
+                    <td>
+                        {% if entry.chargeback %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                        {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                        {% endif %}
+                    </td>
+                    <td>${{ entry.amount|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th></th>
+                    <th></th>
+                    <th>${{ facebook_chargeback_total|floatformat:2 }}</th>
+                    <th>${{ facebook_total|floatformat:2 }}</th>
+                </tr>
+                <tr>
+                    <th>Final total</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>${{ facebook_final_total|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    {% endif %}
+
+
+    {% if google_entries %}
+        <h4>Facebook accounts</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Lead</th>
+                    <th>Start date</th>
+                    <th>Chargeback</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in google_entries %}
+                <tr>
+                    <td>{{ entry.name }}</td>
+                    <td>{{ entry.lead }}</td>
+                    <td>{{ entry.start_date }}</td>
+                    <td>
+                        {% if entry.chargeback %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                        {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                        {% endif %}
+                    </td>
+                    <td>${{ entry.amount|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total</th>
+                    <th></th>
+                    <th></th>
+                    <th>${{ google_chargeback_total|floatformat:2 }}</th>
+                    <th>${{ google_total|floatformat:2 }}</th>
+                </tr>
+                <tr>
+                    <th>Final total</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>${{ google_final_total|floatformat:2 }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    {% endif %}
+
+    <h4>Total: ${{ total|floatformat:2 }}</h4>
+{% endblock %}
