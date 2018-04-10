@@ -69,6 +69,24 @@ class TouchCountListFilter(SimpleListFilter):
         return None
 
 
+class LeadAccountTouchCountListFilter(SimpleListFilter):
+    title = 'Touch Count'
+    parameter_name = 'touch_count'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('less5', 'Less than 5 only'),
+            ('more5', '5 or more'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'less5':
+            return queryset.filter(lead_account__touch_count__lt=5)
+        if self.value() == 'more5':
+            return queryset.filter(lead_account__touch_count__gte=5)
+        return None
+
+
 class RaspberryPiFirstSeenListFilter(SimpleListFilter):
     title = 'Delivered Date'
     parameter_name = 'delivered_date'

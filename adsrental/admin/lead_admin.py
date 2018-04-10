@@ -19,7 +19,7 @@ from adsrental.admin.list_filters import \
     AccountTypeListFilter, \
     LeadAccountWrongPasswordListFilter, \
     RaspberryPiFirstSeenListFilter, \
-    TouchCountListFilter, \
+    LeadAccountTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
     QualifiedDateListFilter, \
@@ -57,6 +57,7 @@ class LeadAdmin(admin.ModelAdmin):
         'accounts_field',
         'tested_field',
         'last_touch',
+        'touch_count_field',
         'first_seen',
         'last_seen',
         'ec2_instance_link',
@@ -74,7 +75,7 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
-        TouchCountListFilter,
+        LeadAccountTouchCountListFilter,
         'company',
         'lead_account__bundler_paid',
         ShipDateListFilter,
@@ -189,10 +190,18 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.get_phone_formatted()
 
     def last_touch(self, obj):
-        return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
-            'Last touched {}'.format(naturaltime(obj.last_touch_date)) if obj.last_touch_date else 'Never touched',
-            obj.touch_count,
-        ))
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return naturaltime(lead_account.last_touch_date) if lead_account.last_touch_date else 'Never'
+
+        return None
+
+    def touch_count_field(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return lead_account.touch_count
+
+        return None
 
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
@@ -602,8 +611,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def touch(self, request, queryset):
         for lead in queryset:
-            lead.touch()
-            messages.info(request, 'Lead {} has been touched for {} time.'.format(lead.email, lead.touch_count))
+            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
+                lead_account.touch()
+                messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
     def sync_to_adsdb(self, request, queryset):
         for lead in queryset:
@@ -625,8 +635,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     tested_field.short_description = 'Tested'
 
-    last_touch.admin_order_field = 'touch_count'
-    last_touch.short_description = 'Touch count'
+    last_touch.admin_order_field = 'lead_account__last_touch_date'
+    touch_count_field.short_description = 'Touch count'
+    touch_count_field.admin_order_field = 'lead_account__touch_count'
 
     id_field.short_description = 'ID'
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
@@ -683,6 +694,7 @@ class ReportLeadAdmin(LeadAdmin):
         'accounts_field',
         'tested_field',
         'last_touch',
+        'touch_count_field',
         'first_seen',
         'last_seen',
         'ec2_instance_link',
@@ -729,6 +741,7 @@ class ReadOnlyLeadAdmin(LeadAdmin):
         'accounts_field',
         'links',
         'last_touch',
+        'touch_count_field',
         'first_seen',
         'last_seen',
         'ec2_hostname',
