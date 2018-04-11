@@ -272,6 +272,37 @@ class BotoResource(object):
         except ClientError:
             pass
 
+    def create_r53_entry(self, ec2_instance):
+        ec2_resource = self.get_resource('ec2')
+        route53_client = boto3.client('route53')
+        hostname = ec2_instance.get_r53_hostname()
+        elastic_ip = ec2_resource.allocate_address(Domain='vpc')
+        ec2_resource.associate_address(
+            InstanceId = ec2_instance.instance_id,
+            AllocationId = elastic_ip["AllocationId"],
+        )
+        route53_client.change_resource_record_sets(
+            HostedZoneId = settings.AWS_R53_ZONE_ID,
+            ChangeBatch= {
+            'Comment': 'Add {} instance to Route53'.format(self.rpid),
+            'Changes': [
+                {
+                    'Action': 'CREATE',
+                    'ResourceRecordSet': {
+                        'Name': hostname,
+                        'Type': 'A',
+                        'TTL': 60,
+                        'ResourceRecords': [
+                        {
+                            'Value': elastic_ip["PublicIp"],
+                        },
+                        ],
+                    }
+                },
+            ]
+        })
+
+
     def launch_instance(self, rpid, email):
         'Start otr create AWS EC2 instance for given RPID'
         instance = self.get_first_rpid_instance(rpid)

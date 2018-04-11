@@ -64,6 +64,9 @@ class EC2Instance(models.Model):
 
     TUNNEL_UP_TTL_SECONDS = 20 * 60
 
+    R53_HOST = 'adsrentalswarm.click'
+    R53_ZONE_ID = settings.AWS_R53_ZONE_ID
+
     STATUS_RUNNING = 'running'
     STATUS_STOPPED = 'stopped'
     STATUS_TERMINATED = 'terminated'
@@ -482,3 +485,6 @@ class EC2Instance(models.Model):
     def clear_ping_cache(self):
         'Delete cache for this instance RPID.'
         PingCacheHelper().delete(self.rpid)
+
+    def get_r53_hostname(self):
+        return '{}.{}'.format(self.rpid, self.R53_HOST)
