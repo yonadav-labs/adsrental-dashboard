@@ -529,8 +529,9 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
-                lead_account.charge_back = True
-                lead_account.save()
+                if lead.account.lead.raspberry_pi and lead.account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
+                    lead_account.charge_back = True
+                    lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
@@ -538,6 +539,7 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
+                bundler_paid=True,
         ):
             banned_offline.append({
                 'account': str(lead_account),
@@ -545,8 +547,9 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
-                lead_account.charge_back = True
-                lead_account.save()
+                if lead.account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
+                    lead_account.charge_back = True
+                    lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
@@ -554,6 +557,7 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
+                bundler_paid=True,
         ):
             banned_security_checkpoint.append({
                 'account': str(lead_account),
