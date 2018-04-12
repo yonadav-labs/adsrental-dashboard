@@ -10,8 +10,8 @@ fi
 
 ${HOME}/new-pi/client_log.sh "Hourly script for ${EC2_INSTANCE}"
 
-# ssh Administrator@${EC2_INSTANCE} -p 40594 "Taskkill /IM ruby.exe /F"
-# ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Rename-Item -Path C:\\Users\\Administrator\\Desktop\\auto -newName C:\\Users\\Administrator\\Desktop\\auto_backup"
+ssh Administrator@${EC2_INSTANCE} -p 40594 "Taskkill /IM ruby.exe /F"
+ssh Administrator@${EC2_INSTANCE} -p 40594 "powershell Rename-Item -Path C:\\Users\\Administrator\\Desktop\\auto -newName C:\\Users\\Administrator\\Desktop\\auto_backup"
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Restart Tunnel.url"'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Administrator\Desktop\Firefox.lnk"'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del "C:\Users\Public\Desktop\Firefox.lnk"'
@@ -23,8 +23,9 @@ if [ "$DIR_OUTPUT" == "" ]; then
     ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/firefox_wp.png -OutFile C:\\Users\\Administrator\\firefox_wp.png'
     ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
 fi
-# ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Administrator\Desktop\Browser.exe'
-# ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\Browser.exe'
+ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Administrator\Desktop\Browser.exe'
+ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\Browser.exe'
+ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\variables.conf'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\Firefox.lnk'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d C:\Users\Administrator\firefox_wp.png /f'
 # ssh Administrator@${EC2_INSTANCE} -p 40594 'RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters'
@@ -56,6 +57,8 @@ if [ "$HAS_ANTIDETECT" == "" ]; then
 else
     ${HOME}/new-pi/client_log.sh "Antidetect is already installed"
 fi
+
+
 
 
 LAST_TROUBLESHOOT_FILE="${HOME}/.last_troubleshoot"
