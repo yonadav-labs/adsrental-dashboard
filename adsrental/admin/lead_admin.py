@@ -544,9 +544,7 @@ class LeadAdmin(admin.ModelAdmin):
             form = AdminLeadAccountPasswordForm(request.POST)
             if form.is_valid():
                 new_password = form.cleaned_data['new_password']
-                lead_account.password = new_password
-                lead_account.wrong_password_date = None
-                lead_account.save()
+                lead_account.set_correct_password(new_password, request.user)
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
@@ -600,9 +598,7 @@ class LeadAdmin(admin.ModelAdmin):
             form = AdminLeadAccountPasswordForm(request.POST)
             if form.is_valid():
                 new_password = form.cleaned_data['new_password']
-                lead_account.password = new_password
-                lead_account.wrong_password_date = None
-                lead_account.save()
+                lead_account.set_correct_password(new_password, request.user)
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
