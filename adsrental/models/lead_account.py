@@ -180,7 +180,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         response_json = response.json()
         return response_json
 
-    def set_correct_password(self, password, edited_by):
+    def set_correct_password(self, new_password, edited_by):
+        'Change password, marks as correct, create LeadChange instance.'
         old_value = self.password
         self.password = new_password
         self.wrong_password_date = None
@@ -188,7 +189,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         LeadChange(lead=self.lead, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
 
     def set_status(self, value, edited_by):
-        'Change status, create LeadChangeinstance.'
+        'Change status, create LeadChange instance.'
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
         if value == self.status:
