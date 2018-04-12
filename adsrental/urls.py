@@ -20,9 +20,11 @@ from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, S
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
+from adsrental.views.admin_helpers import AdminActionView
 
 
 urlpatterns = [  # pylint: disable=C0103
+    url(r'^admin_helpers/action/(?P<model_name>[A-Za-z]+)/(?P<action_name>[a-z_]+)/(?P<object_id>.+)/',AdminActionView.as_view(), name='admin_helpers_action'),
     url(r'^$', LandingView.as_view(), name='home'),
     url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),

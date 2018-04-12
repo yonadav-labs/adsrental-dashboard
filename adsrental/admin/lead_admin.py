@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
+from django.template.loader import render_to_string
 
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
@@ -69,6 +70,7 @@ class LeadAdmin(admin.ModelAdmin):
         'security_checkpoint_field',
         'pi_delivered',
         'bundler_paid_field',
+        'row_actions',
     )
     list_filter = (
         StatusListFilter,
@@ -130,6 +132,10 @@ class LeadAdmin(admin.ModelAdmin):
     exclude = ('tracking_info', )
     raw_id_fields = ('raspberry_pi', )
 
+    def get_list_display(self, request):
+        self._request = request
+        list_display = super(LeadAdmin, self).get_list_display(request)
+        return list_display
 
     def get_queryset(self, request):
         queryset = super(LeadAdmin, self).get_queryset(request)
@@ -517,12 +523,14 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.save()
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
-    def report_correct_google_password(self, request, queryset):
+    @classmethod
+    def report_correct_google_password(cls, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None
 
         lead = queryset.first()
+
         lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, active=True).first()
         if not lead_account:
             messages.error(request, 'Lead has no active google account.')
@@ -571,12 +579,14 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.save()
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
-    def report_correct_facebook_password(self, request, queryset):
+    @classmethod
+    def report_correct_facebook_password(cls, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None
 
         lead = queryset.first()
+
         lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
         if not lead_account:
             messages.error(request, 'Lead has no active facebook account.')
@@ -609,7 +619,8 @@ class LeadAdmin(admin.ModelAdmin):
             'form': form,
         })
 
-    def touch(self, request, queryset):
+    @classmethod
+    def touch(cls, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 lead_account.touch()
@@ -623,6 +634,31 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
                 else:
                     messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+
+    def row_actions(self, obj):
+        row_actions = [
+            {
+                'label': 'Touch',
+                'action': 'touch',
+                'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
+            },
+            {
+                'label': 'Fix Facebook PW',
+                'action': 'report_correct_facebook_password',
+                'enabled': obj.is_wrong_password_facebook(),
+            },
+            {
+                'label': 'Fix Google PW',
+                'action': 'report_correct_google_password',
+                'enabled': obj.is_wrong_password_google(),
+            },
+        ]
+
+        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html',request=self._request, context=dict(
+            obj=obj,
+            items=row_actions,
+            model_name='LeadAdmin',
+        )))
 
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'

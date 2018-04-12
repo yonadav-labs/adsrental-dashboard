@@ -159,6 +159,22 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
+    def is_wrong_password_google(self):
+        'Is password reported as wrong now for google account'
+        for lead_account in self.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE and lead_account.wrong_password_date:
+                return True
+
+        return False
+
+    def is_wrong_password_facebook(self):
+        'Is password reported as wrong nowc'
+        for lead_account in self.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == lead_account.ACCOUNT_TYPE_FACEBOOK and lead_account.wrong_password_date:
+                return True
+
+        return False
+
     def is_security_checkpoint_reported(self):
         'Is password reported as wrong now'
         for lead_account in self.lead_accounts.all():
