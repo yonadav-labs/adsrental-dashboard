@@ -529,7 +529,7 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
-                if lead.account.lead.raspberry_pi and lead.account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
+                if lead_account.lead.raspberry_pi and lead_account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
                     lead_account.charge_back = True
                     lead_account.save()
 
@@ -547,7 +547,7 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
-                if lead.account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
+                if lead_account.lead.raspberry_pi.first_seen < now - datetime.timedelta(days=14):
                     lead_account.charge_back = True
                     lead_account.save()
 
