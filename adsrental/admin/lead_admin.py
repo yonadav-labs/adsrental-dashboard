@@ -740,6 +740,7 @@ class ReportLeadAdmin(LeadAdmin):
         'bundler_paid_field',
         'facebook_billed',
         'google_billed',
+        'row_actions',
     )
 
     def facebook_billed(self, obj):
