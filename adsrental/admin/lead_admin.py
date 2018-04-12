@@ -59,6 +59,7 @@ class LeadAdmin(admin.ModelAdmin):
         'tested_field',
         'last_touch',
         'touch_count_field',
+        'touch_button',
         'first_seen',
         'last_seen',
         'ec2_instance_link',
@@ -67,10 +68,10 @@ class LeadAdmin(admin.ModelAdmin):
         'usps_tracking_code',
         'online',
         'wrong_password_field',
+        'fix_button',
         'security_checkpoint_field',
         'pi_delivered',
         'bundler_paid_field',
-        'row_actions',
     )
     list_filter = (
         StatusListFilter,
@@ -631,13 +632,23 @@ class LeadAdmin(admin.ModelAdmin):
                 else:
                     messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
 
-    def row_actions(self, obj):
+    def touch_button(self, obj):
         row_actions = [
             {
                 'label': 'Touch',
                 'action': 'touch',
                 'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
             },
+        ]
+
+        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html',request=self._request, context=dict(
+            obj=obj,
+            items=row_actions,
+            model_name='LeadAdmin',
+        )))
+
+    def fix_button(self, obj):
+        row_actions = [
             {
                 'label': 'Fix Facebook PW',
                 'action': 'report_correct_facebook_password',
@@ -704,6 +715,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
 
+    touch_button.short_description = ' '
+    fix_button.short_description = ' '
+
 
 
 class ReportLeadAdmin(LeadAdmin):
@@ -713,7 +727,7 @@ class ReportLeadAdmin(LeadAdmin):
         }
 
     model = ReportProxyLead
-    admin_caching_enabled = True
+    # admin_caching_enabled = True
     list_per_page = 500
     list_display = (
         # 'id_field',
@@ -727,6 +741,7 @@ class ReportLeadAdmin(LeadAdmin):
         'tested_field',
         'last_touch',
         'touch_count_field',
+        'touch_button',
         'first_seen',
         'last_seen',
         'ec2_instance_link',
@@ -735,12 +750,12 @@ class ReportLeadAdmin(LeadAdmin):
         'usps_tracking_code',
         'online',
         'wrong_password_field',
+        'fix_button',
         'security_checkpoint_field',
         'pi_delivered',
         'bundler_paid_field',
         'facebook_billed',
         'google_billed',
-        'row_actions',
     )
 
     def facebook_billed(self, obj):
@@ -781,6 +796,7 @@ class ReadOnlyLeadAdmin(LeadAdmin):
         'raspberry_pi',
         'online',
         'wrong_password_field',
+        'fix_button',
     )
 
     editable_fields = (
