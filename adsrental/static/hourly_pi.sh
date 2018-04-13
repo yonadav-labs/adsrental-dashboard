@@ -22,7 +22,10 @@ DIR_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Administr
 if [ "$DIR_OUTPUT" == "" ]; then
     ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/firefox_wp.png -OutFile C:\\Users\\Administrator\\firefox_wp.png'
 fi
-ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
+DIR_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Administrator\\Desktop\\FireFox.lnk' | grep lnk`
+if [ "$DIR_OUTPUT" == "" ]; then
+    ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
+fi
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Administrator\Desktop\Browser.exe'
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\Browser.exe'
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\variables.conf'
