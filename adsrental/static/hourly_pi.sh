@@ -21,8 +21,8 @@ ssh Administrator@${EC2_INSTANCE} -p 40594 "C:\\Antidetect\\vc_redist.x86.exe /q
 DIR_OUTPUT=`ssh Administrator@${EC2_INSTANCE} -p 40594 'dir C:\\Users\\Administrator\\firefox_wp.png' | grep png`
 if [ "$DIR_OUTPUT" == "" ]; then
     ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/firefox_wp.png -OutFile C:\\Users\\Administrator\\firefox_wp.png'
-    ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
 fi
+ssh Administrator@${EC2_INSTANCE} -p 40594 'powershell iwr https://adsrental.com/static/images/Firefox.lnk -OutFile C:\\Users\\Administrator\\Desktop\\FireFox.lnk'
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Administrator\Desktop\Browser.exe'
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\Browser.exe'
 ssh Administrator@${EC2_INSTANCE} -p 40594 'del C:\Users\Public\Desktop\variables.conf'
