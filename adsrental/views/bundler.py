@@ -1,5 +1,6 @@
 import datetime
 import json
+from io import BytesIO
 
 from django.shortcuts import render, redirect
 from django.views import View
@@ -8,6 +9,9 @@ from django.utils.decorators import method_decorator
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 from django.utils import timezone, dateformat
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+import xhtml2pdf.pisa as pisa
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_history import LeadHistory
@@ -131,6 +135,30 @@ class BundlerPaymentsView(View):
         google_total = google_stats['total']
         google_final_total = google_stats['final_total']
         google_chargeback_total = google_stats['chargeback_total']
+
+        if request.GET.get('pdf'):
+            html = render_to_string(
+                'bundler_payments_pdf.html',
+                dict(
+                    user=request.user,
+                    bundler=bundler,
+                    facebook_entries=facebook_entries,
+                    facebook_total=facebook_total,
+                    facebook_chargeback_total=facebook_chargeback_total,
+                    facebook_final_total=facebook_final_total,
+                    google_entries=google_entries,
+                    google_total=google_total,
+                    google_chargeback_total=google_chargeback_total,
+                    google_final_total=google_final_total,
+                    total=google_final_total + facebook_final_total,
+                    end_date=yesterday,
+                    allow_change=request.user.is_superuser,
+                ),
+                request=request,
+            )
+            response = BytesIO()
+            pdf = pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
+            return HttpResponse(response.getvalue(), content_type='application/pdf')
 
         return render(request, 'bundler_payments.html', dict(
             user=request.user,

@@ -9,13 +9,16 @@
 {% block content %}
 
 <div class="container">
-    <h3>Bundler {{ bundler }} ({{ bundler.utm_source }}) paid report {{ end_date }}</h3>
-    {% if allow_change %}
-        <form action="{% url 'bundler_payments' bundler_id=bundler.id %}" method="POST">
-            {% csrf_token %}
-            <button class="btn btn-primary">Mark as bundler paid</button>
-        </form>
-    {% endif %}
+    <h3>Bundler {{ bundler }} (UTM source {{ bundler.utm_source }}) paid report {{ end_date }}</h3>
+    {% block actions_bunttons %}
+        {% if allow_change %}
+            <form action="{% url 'bundler_payments' bundler_id=bundler.id %}" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button class="btn btn-primary">Mark as bundler paid</button>
+            </form>
+            {% endif %}
+        <a href="{% url 'bundler_payments' bundler_id=bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
+    {% endblock actions_bunttons %}
     {% if facebook_entries %}
         <h4>Facebook accounts</h4>
         <table class="table table-striped">
@@ -33,7 +36,7 @@
                 <tr>
                     <td>{{ entry.name }}</td>
                     <td>{{ entry.lead }}</td>
-                    <td>{{ entry.start_date }}</td>
+                    <td>{{ entry.start_date|default:'-' }}</td>
                     <td>
                         {% if entry.chargeback %}
                         <span class="glyphicon glyphicon-ok"></span>
