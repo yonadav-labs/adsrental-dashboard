@@ -17,103 +17,17 @@
                 <button class="btn btn-primary">Mark as bundler paid</button>
             </form>
             {% endif %}
-        <a href="{% url 'bundler_payments' bundler_id=bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
+        <a target="_blank" href="{% url 'bundler_payments' bundler_id=bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
     {% endblock actions_bunttons %}
     {% if facebook_entries %}
         <h4>Facebook accounts</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Account</th>
-                    <th>Lead</th>
-                    <th>Start date</th>
-                    <th>Chargeback</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in facebook_entries %}
-                <tr>
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.lead }}</td>
-                    <td>{{ entry.start_date|default:'-' }}</td>
-                    <td>
-                        {% if entry.chargeback %}
-                        <span class="glyphicon glyphicon-ok"></span>
-                        {% else %}
-                        <span class="glyphicon glyphicon-remove"></span>
-                        {% endif %}
-                    </td>
-                    <td>${{ entry.amount|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>Total</th>
-                    <th></th>
-                    <th></th>
-                    <th>${{ facebook_chargeback_total|floatformat:2 }}</th>
-                    <th>${{ facebook_total|floatformat:2 }}</th>
-                </tr>
-                <tr>
-                    <th>Final total</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th>${{ facebook_final_total|floatformat:2 }}</th>
-                </tr>
-            </tfoot>
-        </table>
+        {% include 'include/bundler_payments_table.html' with entries=facebook_entries chargeback_total=facebook_chargeback_total total=facebook_total final_total=facebook_final_total %}
     {% endif %}
 
 
     {% if google_entries %}
-        <h4>Facebook accounts</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Account</th>
-                    <th>Lead</th>
-                    <th>Start date</th>
-                    <th>Chargeback</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in google_entries %}
-                <tr>
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.lead }}</td>
-                    <td>{{ entry.start_date }}</td>
-                    <td>
-                        {% if entry.chargeback %}
-                        <span class="glyphicon glyphicon-ok"></span>
-                        {% else %}
-                        <span class="glyphicon glyphicon-remove"></span>
-                        {% endif %}
-                    </td>
-                    <td>${{ entry.amount|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>Total</th>
-                    <th></th>
-                    <th></th>
-                    <th>${{ google_chargeback_total|floatformat:2 }}</th>
-                    <th>${{ google_total|floatformat:2 }}</th>
-                </tr>
-                <tr>
-                    <th>Final total</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th>${{ google_final_total|floatformat:2 }}</th>
-                </tr>
-            </tfoot>
-        </table>
+        <h4>Google accounts</h4>
+        {% include 'include/bundler_payments_table.html' with entries=google_entries chargeback_total=google_chargeback_total total=google_total final_total=google_final_total %}
     {% endif %}
 
     <h4>Total: ${{ total|floatformat:2 }}</h4>

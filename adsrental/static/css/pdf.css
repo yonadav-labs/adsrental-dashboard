@@ -1,0 +1,26 @@
+
+@page {
+    size: A4;
+    margin: 1cm;
+}
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 5px;
+    background-color: #fff;
+}
+.table th,
+.table td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    vertical-align: top;
+    border-top: 1px solid #000;
+    text-align: left;
+}
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #000;
+}
+.table tbody + tbody {
+    border-top: 2px solid #000;
+}
