@@ -9,26 +9,29 @@
 {% block content %}
 
 <div class="container">
-    <h3>Bundler {{ bundler }} (UTM source {{ bundler.utm_source }}) paid report {{ end_date }}</h3>
-    {% block actions_bunttons %}
-        {% if allow_change %}
-            <form action="{% url 'bundler_payments' bundler_id=bundler.id %}" method="POST" style="display: inline;">
-                {% csrf_token %}
-                <button class="btn btn-primary">Mark as bundler paid</button>
-            </form>
+    {% for data in bundlers_data %}
+        <h3>Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}</h3>
+        {% block actions_buttons %}
+            {% if allow_change %}
+                <form action="{% url 'bundler_payments' bundler_id=data.bundler.id %}" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="btn btn-primary">Mark as bundler paid</button>
+                </form>
             {% endif %}
-        <a target="_blank" href="{% url 'bundler_payments' bundler_id=bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
-    {% endblock actions_bunttons %}
-    {% if facebook_entries %}
-        <h4>Facebook accounts</h4>
-        {% include 'include/bundler_payments_table.html' with entries=facebook_entries chargeback_total=facebook_chargeback_total total=facebook_total final_total=facebook_final_total %}
-    {% endif %}
+            <a target="_blank" href="{% url 'bundler_payments' bundler_id=data.bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
+        {% endblock actions_buttons %}
+        {% if data.facebook_entries %}
+            <h4>Facebook accounts</h4>
+            {% include 'include/bundler_payments_table.html' with entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
+        {% endif %}
 
 
-    {% if google_entries %}
-        <h4>Google accounts</h4>
-        {% include 'include/bundler_payments_table.html' with entries=google_entries chargeback_total=google_chargeback_total total=google_total final_total=google_final_total %}
-    {% endif %}
+        {% if data.google_entries %}
+            <h4>Google accounts</h4>
+            {% include 'include/bundler_payments_table.html' with entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
+        {% endif %}
 
-    <h4>Total: ${{ total|floatformat:2 }}</h4>
+        <h4>Total: ${{ data.total|floatformat:2 }}</h4>
+    {% endfor %}
+    <h3>Total for all bundlers: ${{ total|floatformat:2 }}</h3>
 {% endblock %}

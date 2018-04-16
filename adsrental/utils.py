@@ -204,6 +204,9 @@ class BotoResource(object):
 
         return self.resources[service]
 
+    def get_client(self, service):
+        return self.session.client(service, region_name=settings.AWS_REGION)
+
     def get_first_rpid_instance(self, rpid):
         'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
@@ -278,29 +281,30 @@ class BotoResource(object):
         hostname = ec2_instance.get_r53_hostname()
         elastic_ip = ec2_resource.allocate_address(Domain='vpc')
         ec2_resource.associate_address(
-            InstanceId = ec2_instance.instance_id,
-            AllocationId = elastic_ip["AllocationId"],
+            InstanceId=ec2_instance.instance_id,
+            AllocationId=elastic_ip["AllocationId"],
         )
         route53_client.change_resource_record_sets(
-            HostedZoneId = settings.AWS_R53_ZONE_ID,
-            ChangeBatch= {
-            'Comment': 'Add {} instance to Route53'.format(self.rpid),
-            'Changes': [
-                {
-                    'Action': 'CREATE',
-                    'ResourceRecordSet': {
-                        'Name': hostname,
-                        'Type': 'A',
-                        'TTL': 60,
-                        'ResourceRecords': [
-                        {
-                            'Value': elastic_ip["PublicIp"],
-                        },
-                        ],
-                    }
-                },
-            ]
-        })
+            HostedZoneId=settings.AWS_R53_ZONE_ID,
+            ChangeBatch={
+                'Comment': 'Add {} instance to Route53'.format(ec2_instance.rpid),
+                'Changes': [
+                    {
+                        'Action': 'CREATE',
+                        'ResourceRecordSet': {
+                            'Name': hostname,
+                            'Type': 'A',
+                            'TTL': 60,
+                            'ResourceRecords': [
+                                {
+                                    'Value': elastic_ip["PublicIp"],
+                                },
+                            ],
+                        }
+                    },
+                ]
+            },
+        )
 
 
     def launch_instance(self, rpid, email):

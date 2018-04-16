@@ -24,7 +24,7 @@ from adsrental.views.admin_helpers import AdminActionView
 
 
 urlpatterns = [  # pylint: disable=C0103
-    url(r'^admin_helpers/action/(?P<model_name>[A-Za-z]+)/(?P<action_name>[a-z_]+)/(?P<object_id>.+)/',AdminActionView.as_view(), name='admin_helpers_action'),
+    url(r'^admin_helpers/action/(?P<model_name>[A-Za-z]+)/(?P<action_name>[a-z_]+)/(?P<object_id>.+)/', AdminActionView.as_view(), name='admin_helpers_action'),
     url(r'^$', LandingView.as_view(), name='home'),
     url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
@@ -62,4 +62,5 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^adsdb/lead/$', ADSDBLeadView.as_view(), name='adsdb_lead'),
     url(r'^bundler/(?P<bundler_id>\d+)/report/$', BundlerReportView.as_view(), name='bundler_report'),
     url(r'^bundler/(?P<bundler_id>\d+)/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments'),
+    url(r'^bundler/all/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments', kwargs=dict(bundler_id='all')),
 ]

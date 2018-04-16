@@ -525,7 +525,7 @@ class LeadAdmin(admin.ModelAdmin):
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
     @staticmethod
-    def report_correct_google_password(self, request, queryset):
+    def report_correct_google_password(instance, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None
@@ -579,7 +579,7 @@ class LeadAdmin(admin.ModelAdmin):
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
     @staticmethod
-    def report_correct_facebook_password(self, request, queryset):
+    def report_correct_facebook_password(instance, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None
@@ -641,7 +641,7 @@ class LeadAdmin(admin.ModelAdmin):
             },
         ]
 
-        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html',request=self._request, context=dict(
+        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html', request=self._request, context=dict(
             obj=obj,
             items=row_actions,
             model_name='LeadAdmin',
@@ -661,7 +661,7 @@ class LeadAdmin(admin.ModelAdmin):
             },
         ]
 
-        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html',request=self._request, context=dict(
+        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html', request=self._request, context=dict(
             obj=obj,
             items=row_actions,
             model_name='LeadAdmin',

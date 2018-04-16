@@ -81,7 +81,7 @@ class ADSDBLeadView(View):
             return False
 
         setattr(lead_account, field_name, value)
-        lead.save()
+        lead_account.save()
         LeadChange(lead=lead_account.lead, old_value=old_value, value=value, edited_by=edited_by).save()
         return True
 

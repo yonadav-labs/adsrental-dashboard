@@ -2,7 +2,7 @@ import datetime
 import json
 from io import BytesIO
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, Http404
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -24,7 +24,7 @@ class BundlerReportView(View):
         bundler = None
         if request.user.bundler:
             bundler = request.user.bundler
-        
+
         if request.user.is_superuser:
             bundler = Bundler.objects.filter(id=bundler_id).first()
 
@@ -97,6 +97,7 @@ class BundlerPaymentsView(View):
                 start_date=start_date,
             )
             entries.append(entry)
+            entries.sort(key= lambda x: x.get('amount'), reverse=True)
             total += entry['amount']
             if chargeback:
                 chargeback_total += entry['amount']
@@ -112,67 +113,70 @@ class BundlerPaymentsView(View):
 
     @method_decorator(login_required)
     def get(self, request, bundler_id):
-        bundler = None
+        bundlers = []
         if request.user.bundler:
-            bundler = request.user.bundler
-        
-        if request.user.is_superuser:
-            bundler = Bundler.objects.filter(id=bundler_id).first()
+            bundlers = [request.user.bundler]
 
-        if not bundler:
+        if request.user.is_superuser:
+            if bundler_id == 'all':
+                bundlers = Bundler.objects.filter(is_active=True)
+            else:
+                bundlers = Bundler.objects.filter(id=bundler_id)
+
+        if not bundlers:
             raise Http404
 
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        bundlers_data = []
+        total = 0.0
 
-        facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
-        facebook_entries = facebook_stats['entries']
-        facebook_total = facebook_stats['total']
-        facebook_final_total = facebook_stats['final_total']
-        facebook_chargeback_total = facebook_stats['chargeback_total']
+        for bundler in bundlers:
+            facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+            facebook_entries = facebook_stats['entries']
+            facebook_total = facebook_stats['total']
+            facebook_final_total = facebook_stats['final_total']
+            facebook_chargeback_total = facebook_stats['chargeback_total']
 
-        google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
-        google_entries = google_stats['entries']
-        google_total = google_stats['total']
-        google_final_total = google_stats['final_total']
-        google_chargeback_total = google_stats['chargeback_total']
+            google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            google_entries = google_stats['entries']
+            google_total = google_stats['total']
+            google_final_total = google_stats['final_total']
+            google_chargeback_total = google_stats['chargeback_total']
+            bundlers_data.append(dict(
+                bundler=bundler,
+                facebook_entries=facebook_entries,
+                facebook_total=facebook_total,
+                facebook_chargeback_total=facebook_chargeback_total,
+                facebook_final_total=facebook_final_total,
+                google_entries=google_entries,
+                google_total=google_total,
+                google_chargeback_total=google_chargeback_total,
+                google_final_total=google_final_total,
+                total=google_final_total + facebook_final_total,
+            ))
+            total += google_final_total + facebook_final_total
 
         if request.GET.get('pdf'):
             html = render_to_string(
                 'bundler_payments_pdf.html',
                 dict(
                     user=request.user,
-                    bundler=bundler,
-                    facebook_entries=facebook_entries,
-                    facebook_total=facebook_total,
-                    facebook_chargeback_total=facebook_chargeback_total,
-                    facebook_final_total=facebook_final_total,
-                    google_entries=google_entries,
-                    google_total=google_total,
-                    google_chargeback_total=google_chargeback_total,
-                    google_final_total=google_final_total,
-                    total=google_final_total + facebook_final_total,
+                    bundlers_data=bundlers_data,
                     end_date=yesterday,
+                    total=total,
                     allow_change=request.user.is_superuser,
                 ),
                 request=request,
             )
             response = BytesIO()
-            pdf = pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
+            pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
 
         return render(request, 'bundler_payments.html', dict(
             user=request.user,
-            bundler=bundler,
-            facebook_entries=facebook_entries,
-            facebook_total=facebook_total,
-            facebook_chargeback_total=facebook_chargeback_total,
-            facebook_final_total=facebook_final_total,
-            google_entries=google_entries,
-            google_total=google_total,
-            google_chargeback_total=google_chargeback_total,
-            google_final_total=google_final_total,
-            total=google_final_total + facebook_final_total,
+            bundlers_data=bundlers_data,
             end_date=yesterday,
+            total=total,
             allow_change=request.user.is_superuser,
         ))
 
@@ -181,7 +185,7 @@ class BundlerPaymentsView(View):
         bundler = None
         if request.user.bundler:
             bundler = request.user.bundler
-        
+
         if request.user.is_superuser:
             bundler = Bundler.objects.filter(id=bundler_id).first()
 
