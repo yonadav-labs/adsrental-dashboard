@@ -616,8 +616,8 @@ class LeadAdmin(admin.ModelAdmin):
             'form': form,
         })
 
-    @classmethod
-    def touch(cls, request, queryset):
+    @staticmethod
+    def touch(instance, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 lead_account.touch()
