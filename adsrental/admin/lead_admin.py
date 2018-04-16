@@ -524,8 +524,8 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.save()
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
-    @classmethod
-    def report_correct_google_password(cls, request, queryset):
+    @staticmethod
+    def report_correct_google_password(self, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None
@@ -578,8 +578,8 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.save()
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
-    @classmethod
-    def report_correct_facebook_password(cls, request, queryset):
+    @staticmethod
+    def report_correct_facebook_password(self, request, queryset):
         if queryset.count() != 1:
             messages.error(request, 'Only one lead can be selected.')
             return None

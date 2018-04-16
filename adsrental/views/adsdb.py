@@ -75,6 +75,17 @@ class ADSDBLeadView(View):
         return True
 
     @staticmethod
+    def _update_lead_account_field(lead_account, field_name, value, edited_by):
+        old_value = getattr(lead_account, field_name)
+        if old_value == value:
+            return False
+
+        setattr(lead_account, field_name, value)
+        lead.save()
+        LeadChange(lead=lead_account.lead, old_value=old_value, value=value, edited_by=edited_by).save()
+        return True
+
+    @staticmethod
     def _clean_phone(value):
         if value.startswith('+1'):
             value = value[2:]
@@ -88,13 +99,13 @@ class ADSDBLeadView(View):
         if 'last_name' in data:
             self._update_field(lead_account.lead, 'last_name', data.get('last_name'), user)
         if 'fb_username' in data:
-            self._update_field(lead_account, 'username', data.get('fb_username'), user)
+            self._update_lead_account_field(lead_account, 'username', data.get('fb_username'), user)
         if 'fb_password' in data:
-            self._update_field(lead_account, 'password', data.get('fb_password'), user)
+            self._update_lead_account_field(lead_account, 'password', data.get('fb_password'), user)
         if 'google_username' in data:
-            self._update_field(lead_account, 'username', data.get('google_username'), user)
+            self._update_lead_account_field(lead_account, 'username', data.get('google_username'), user)
         if 'google_password' in data:
-            self._update_field(lead_account, 'password', data.get('google_password'), user)
+            self._update_lead_account_field(lead_account, 'password', data.get('google_password'), user)
         if 'phone' in data:
             phone = self._clean_phone(data.get('phone'))
             self._update_field(lead_account.lead, 'phone', phone, user)

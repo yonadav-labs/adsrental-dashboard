@@ -19,7 +19,7 @@ class AdminActionView(View):
         admin_model_cls = admin_models[model_name]
         queryset = admin_model_cls.model.objects.filter(pk=object_id)
 
-        result = getattr(admin_model_cls, action_name)(request, queryset)
+        result = getattr(admin_model_cls, action_name)(admin_model_cls, request, queryset)
         if result:
             return result
 
@@ -34,7 +34,7 @@ class AdminActionView(View):
         admin_model_cls = admin_models[model_name]
         queryset = admin_model_cls.model.objects.filter(pk=object_id)
 
-        result = getattr(admin_model_cls, action_name)(request, queryset)
+        result = getattr(admin_model_cls, action_name)(admin_model_cls, request, queryset)
         if result:
             return result
 
