@@ -15,7 +15,7 @@ from adsrental.utils import CustomerIOClient
 class LeadAccount(models.Model, FulltextSearchMixin):
     LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL = 48
     BUNDLER_PAYMENT = round(150.00, 2)
-    BUNDLER_CHARGEBACK_PAYMENT = round(150.00, 2)
+    BUNDLER_CHARGEBACK_PAYMENT = round(50.00, 2)
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
