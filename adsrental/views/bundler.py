@@ -194,7 +194,12 @@ class BundlerPaymentsView(View):
             active=True,
         ).prefetch_related('lead')
 
-        for lead_account in lead_accounts:
+        entries = []
+        for entry in lead_accounts:
+            if entry.get_bundler_payment():
+                entries.append(entry)
+
+        for lead_account in entries:
             payment = lead_account.get_bundler_payment()
             if payment < 0:
                 chargeback_total += -payment
@@ -203,7 +208,7 @@ class BundlerPaymentsView(View):
             final_total += payment
 
         return dict(
-            entries=lead_accounts,
+            entries=entries,
             total=total,
             final_total=final_total,
             chargeback_total=chargeback_total,
