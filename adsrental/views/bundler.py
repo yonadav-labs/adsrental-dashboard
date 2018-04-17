@@ -199,7 +199,7 @@ class BundlerPaymentsView(View):
             if payment < 0:
                 chargeback_total += -payment
             if payment > 0:
-                total += -payment
+                total += payment
             final_total += payment
 
         return dict(
