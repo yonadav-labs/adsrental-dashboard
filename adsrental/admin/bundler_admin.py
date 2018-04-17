@@ -80,6 +80,7 @@ class BundlerAdmin(admin.ModelAdmin):
     def links(self, obj):
         result = []
         result.append('<a target="_blank" href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
+        result.append('<a target="_blank" href="{payments_url}">Lead Payments</a>'.format(payments_url=reverse('bundler_lead_payments', kwargs={'bundler_id': obj.id})))
         result.append('<a target="_blank" href="{report_url}">Stats</a>'.format(report_url=reverse('bundler_report', kwargs={'bundler_id': obj.id})))
         return mark_safe(', '.join(result))
 

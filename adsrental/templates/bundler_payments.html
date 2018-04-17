@@ -20,16 +20,10 @@
             {% endif %}
             <a target="_blank" href="{% url 'bundler_payments' bundler_id=data.bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
         {% endblock actions_buttons %}
-        {% if data.facebook_entries %}
-            <h4>Facebook accounts</h4>
-            {% include 'include/bundler_payments_table.html' with entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
-        {% endif %}
 
+        {% include 'include/bundler_payments_table.html' with title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
+        {% include 'include/bundler_payments_table.html' with title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
 
-        {% if data.google_entries %}
-            <h4>Google accounts</h4>
-            {% include 'include/bundler_payments_table.html' with entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
-        {% endif %}
 
         <h4>Total: ${{ data.total|floatformat:2 }}</h4>
     {% endfor %}

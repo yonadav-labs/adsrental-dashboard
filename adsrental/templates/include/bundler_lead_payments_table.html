@@ -1,0 +1,45 @@
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Account</th>
+            <th>Lead</th>
+            <th>Start date</th>
+            <th>Chargeback</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.lead }}</td>
+            <td>{{ entry.start_date|default:'-' }}</td>
+            <td>
+                {% if entry.chargeback %}
+                    <span class="glyphicon glyphicon-ok"><span class="pdf_only">Yes</span></span>
+                {% else %}
+                    <span class="glyphicon glyphicon-remove"><span class="pdf_only">No</span></span>
+                {% endif %}
+            </td>
+            <td>${{ entry.amount|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <th></th>
+            <th></th>
+            <th>${{ chargeback_total|floatformat:2 }}</th>
+            <th>${{ total|floatformat:2 }}</th>
+        </tr>
+        <tr>
+            <th>Final total</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>${{ final_total|floatformat:2 }}</th>
+        </tr>
+    </tfoot>
+</table>

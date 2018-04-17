@@ -1,45 +1,62 @@
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Account</th>
-            <th>Lead</th>
-            <th>Start date</th>
-            <th>Chargeback</th>
-            <th>Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for entry in entries %}
-        <tr>
-            <td>{{ entry.name }}</td>
-            <td>{{ entry.lead }}</td>
-            <td>{{ entry.start_date|default:'-' }}</td>
-            <td>
-                {% if entry.chargeback %}
-                    <span class="glyphicon glyphicon-ok"><span class="pdf_only">Yes</span></span>
-                {% else %}
-                    <span class="glyphicon glyphicon-remove"><span class="pdf_only">No</span></span>
-                {% endif %}
-            </td>
-            <td>${{ entry.amount|floatformat:2 }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-            <th>Total</th>
-            <th></th>
-            <th></th>
-            <th>${{ chargeback_total|floatformat:2 }}</th>
-            <th>${{ total|floatformat:2 }}</th>
-        </tr>
-        <tr>
-            <th>Final total</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>${{ final_total|floatformat:2 }}</th>
-        </tr>
-    </tfoot>
-</table>
+{% if entries %}
+    <h4>{{ title }}</h4> 
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Account</th>
+                <th>Lead</th>
+                <th>Status</th>
+                <th>Paid</th>
+                <th>Chargeback</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.username }}</td>
+                <td>{{ entry.lead.name }}</td>
+                <td>{{ entry.status }}</td>
+                <td>
+                    {% if entry.bundler_paid %}
+                        <span class="glyphicon glyphicon-ok"><span class="pdf_only">Yes</span></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"><span class="pdf_only">No</span></span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if entry.charge_back %}
+                        {% if entry.charge_back_billed %}
+                            Paid
+                        {% else %}
+                            Not paid
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>${{ entry.get_bundler_payment|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>${{ chargeback_total|floatformat:2 }}</th>
+                <th>${{ total|floatformat:2 }}</th>
+            </tr>
+            <tr>
+                <th>Final total</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>${{ final_total|floatformat:2 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+{% endif %}

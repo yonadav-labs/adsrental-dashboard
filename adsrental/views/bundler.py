@@ -14,6 +14,7 @@ from django.http import HttpResponse
 import xhtml2pdf.pisa as pisa
 
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.lead import Lead
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.bundler import Bundler
 
@@ -65,7 +66,7 @@ class BundlerReportView(View):
         ))
 
 
-class BundlerPaymentsView(View):
+class BundlerLeadPaymentsView(View):
     def get_account_type_stats(self, bundler, end_date, account_type):
         entries = []
         total = 0
@@ -97,7 +98,7 @@ class BundlerPaymentsView(View):
                 start_date=start_date,
             )
             entries.append(entry)
-            entries.sort(key= lambda x: x.get('amount'), reverse=True)
+            entries.sort(key=lambda x: x.get('amount'), reverse=True)
             total += entry['amount']
             if chargeback:
                 chargeback_total += entry['amount']
@@ -158,6 +159,97 @@ class BundlerPaymentsView(View):
 
         if request.GET.get('pdf'):
             html = render_to_string(
+                'bundler_lead_payments_pdf.html',
+                dict(
+                    user=request.user,
+                    bundlers_data=bundlers_data,
+                    end_date=yesterday,
+                    total=total,
+                    allow_change=request.user.is_superuser,
+                ),
+                request=request,
+            )
+            response = BytesIO()
+            pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
+            return HttpResponse(response.getvalue(), content_type='application/pdf')
+
+        return render(request, 'bundler_lead_payments.html', dict(
+            user=request.user,
+            bundlers_data=bundlers_data,
+            end_date=yesterday,
+            total=total,
+            allow_change=request.user.is_superuser,
+        ))
+
+
+class BundlerPaymentsView(View):
+    def get_account_type_stats(self, bundler, end_date, account_type):
+        total = 0
+        final_total = 0
+        chargeback_total = 0
+
+        lead_accounts = LeadAccount.objects.filter(
+            lead__bundler=bundler,
+            account_type=account_type,
+            active=True,
+        ).prefetch_related('lead')
+
+        for lead_account in lead_accounts:
+            payment = lead_account.get_bundler_payment()
+            if payment < 0:
+                chargeback_total += -payment
+            if payment > 0:
+                total += -payment
+            final_total += payment
+
+        return dict(
+            entries=lead_accounts,
+            total=total,
+            final_total=final_total,
+            chargeback_total=chargeback_total,
+        )
+
+    @method_decorator(login_required)
+    def get(self, request, bundler_id):
+        bundlers = []
+        if request.user.bundler:
+            bundlers = [request.user.bundler]
+
+        if request.user.is_superuser:
+            if bundler_id == 'all':
+                bundlers = Bundler.objects.filter(is_active=True)
+            else:
+                bundlers = Bundler.objects.filter(id=bundler_id)
+
+        if not bundlers:
+            raise Http404
+
+        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        bundlers_data = []
+        total = 0.0
+
+        for bundler in bundlers:
+            facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+            google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
+
+            bundlers_data.append(dict(
+                bundler=bundler,
+                facebook_entries=facebook_stats['entries'],
+                facebook_total=facebook_stats['total'],
+                facebook_chargeback_total=facebook_stats['chargeback_total'],
+                facebook_final_total=facebook_stats['final_total'],
+                google_entries=google_stats['entries'],
+                google_total=google_stats['total'],
+                google_chargeback_total=google_stats['chargeback_total'],
+                google_final_total=google_stats['final_total'],
+                total=facebook_stats['final_total'] + google_stats['final_total'],
+            ))
+
+        for data in bundlers_data:
+            total += data['total']
+
+        if request.GET.get('pdf'):
+            html = render_to_string(
                 'bundler_payments_pdf.html',
                 dict(
                     user=request.user,
@@ -192,9 +284,24 @@ class BundlerPaymentsView(View):
         if not bundler:
             raise Http404
 
+
+        lead_accounts = LeadAccount.objects.filter(
+            lead__status=Lead.STATUS_IN_PROGRESS,
+            lead__bundler=bundler,
+            active=True,
+            bundler_paid=False,
+        )
+
+        chargeback_lead_accounts = LeadAccount.objects.filter(
+            lead__bundler=bundler,
+            active=True,
+            bundler_paid=True,
+            charge_back=True,
+            charge_back_billed=False,
+        )
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
 
-        lead_accounts = LeadAccount.objects.filter(lead__bundler=bundler, active=True)
-        lead_accounts.update(bundler_paid_date=yesterday)
+        lead_accounts.update(bundler_paid_date=yesterday, bundler_paid=True)
+        chargeback_lead_accounts.update(charge_back_billed=True)
 
         return redirect('bundler_payments', kwargs=dict(bundler_id=bundler.id))
