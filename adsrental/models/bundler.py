@@ -7,6 +7,9 @@ class Bundler(models.Model):
     '''
     Stores a single bundler entry, used to get bundler info for lead by *utm_source*
     '''
+    PAYMENT = round(150.00, 2)
+    CHARGEBACK_PAYMENT = round(50.00, 2)
+
     name = models.CharField(max_length=255, unique=True, db_index=True)
     utm_source = models.CharField(max_length=50, db_index=True, null=True, blank=True)
     adsdb_id = models.IntegerField(null=True, blank=True, help_text='ID from adsdb database')
@@ -16,6 +19,7 @@ class Bundler(models.Model):
     address = models.TextField(null=True, blank=True)
     bank_info = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text='If inactive, landing/sugnup page will not be shown for this utm_source.')
+    enable_chargeback = models.BooleanField(default=True, help_text='If inactive, no chargeback will be calculated for lead accounts.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

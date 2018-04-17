@@ -127,7 +127,7 @@ class Lead(models.Model, FulltextSearchMixin):
     raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
     pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi deliveered to end user.')
-    billed = models.BooleanField(default=False, help_text='Does lead received his payment.')
+    billed = models.BooleanField(default=False, help_text='Account billed to Ads Inc.')
     tested = models.BooleanField(default=False, help_text='Obsolete field. Use first_tested instead.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was touched for the last time.')
     ship_date = models.DateField(blank=True, null=True, help_text='Date when order was shipped. Populated from shipstation sync.')
