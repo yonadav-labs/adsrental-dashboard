@@ -195,7 +195,7 @@ class BundlerPaymentsView(View):
 
         entries = []
         for lead_account in lead_accounts:
-            lead_account.payment = lead_account.get_bundler_payment()
+            lead_account.payment = lead_account.get_bundler_payment(bundler)
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
@@ -303,7 +303,7 @@ class BundlerPaymentsView(View):
 
         final_total = 0.0
         for lead_account in lead_accounts:
-            lead_account.payment = lead_account.get_bundler_payment()
+            lead_account.payment = lead_account.get_bundler_payment(bundler)
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
