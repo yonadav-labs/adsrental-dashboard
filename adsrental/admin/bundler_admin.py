@@ -20,12 +20,15 @@ class BundlerAdmin(admin.ModelAdmin):
         'phone',
         'is_active',
         'leads_count',
+        'enable_chargeback',
         'links',
     )
     actions = (
         'assign_leads_for_this_bundler',
         'pause',
         'activate',
+        'enable_chargeback',
+        'disable_chargeback',
     )
     search_fields = ('utm_source', 'email', )
 
@@ -54,6 +57,14 @@ class BundlerAdmin(admin.ModelAdmin):
                     bundler,
                     bundler.utm_source,
                 ))
+
+    def enable_chargeback(self, request, queryset):
+        'Enable chargeback for selected bundlers'
+        queryset.update(enable_chargeback=True)
+
+    def disable_chargeback(self, request, queryset):
+        'Disable chargeback for selected bundlers'
+        queryset.update(enable_chargeback=False)
 
     def assign_leads_for_this_bundler(self, request, queryset):
         for bundler in queryset:
