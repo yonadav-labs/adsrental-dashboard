@@ -297,6 +297,9 @@ class BundlerPaymentsView(View):
             bundler_paid=False,
         )
 
+        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        lead_accounts.update(bundler_paid_date=yesterday, bundler_paid=True)
+
         chargeback_lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
             active=True,
@@ -304,9 +307,10 @@ class BundlerPaymentsView(View):
             charge_back=True,
             charge_back_billed=False,
         )
-        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        for chargeback_lead_account in chargeback_lead_accounts:
+            if chargeback_lead_account.get_bundler_payment() > 0:
+                chargeback_lead_account.charge_back_billed = True
+                chargeback_lead_account.save()
 
-        lead_accounts.update(bundler_paid_date=yesterday, bundler_paid=True)
-        chargeback_lead_accounts.update(charge_back_billed=True)
 
         return redirect('bundler_payments', kwargs=dict(bundler_id=bundler.id))
