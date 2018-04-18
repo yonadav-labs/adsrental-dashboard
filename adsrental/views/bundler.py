@@ -14,7 +14,6 @@ from django.http import HttpResponse
 import xhtml2pdf.pisa as pisa
 
 from adsrental.models.lead_account import LeadAccount
-from adsrental.models.lead import Lead
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.bundler import Bundler
 

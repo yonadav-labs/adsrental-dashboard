@@ -19,7 +19,7 @@ from adsrental.admin.list_filters import \
     RaspberryPiOnlineListFilter, \
     AccountTypeListFilter, \
     LeadAccountWrongPasswordListFilter, \
-    RaspberryPiFirstSeenListFilter, \
+    DeliveryDateListFilter, \
     LeadAccountTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
@@ -83,7 +83,7 @@ class LeadAdmin(admin.ModelAdmin):
         'lead_account__bundler_paid',
         ShipDateListFilter,
         QualifiedDateListFilter,
-        RaspberryPiFirstSeenListFilter,
+        DeliveryDateListFilter,
         BundlerListFilter,
         'pi_delivered',
         LeadAccountSecurityCheckpointListFilter,

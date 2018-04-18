@@ -1,5 +1,6 @@
 'Lead model'
 import datetime
+import re
 
 from xml.etree import ElementTree
 import requests
@@ -126,7 +127,8 @@ class Lead(models.Model, FulltextSearchMixin):
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
     raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
-    pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi deliveered to end user.')
+    pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi delivered to end user.')
+    delivery_date = models.DateField(default=None, null=True, blank=True, help_text='When RaspberryPi delivered to end user.')
     billed = models.BooleanField(default=False, help_text='Account billed to Ads Inc.')
     tested = models.BooleanField(default=False, help_text='Obsolete field. Use first_tested instead.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was touched for the last time.')
@@ -371,6 +373,13 @@ class Lead(models.Model, FulltextSearchMixin):
 
         self.tracking_info = tracking_info_xml
         self.pi_delivered = pi_delivered
+
+        dates = re.findall(r'\S+ \d{1,2}, \d{4}', tracking_info_xml)
+        if dates:
+            try:
+                self.delivery_date = datetime.datetime.strptime(dates[0], '%B %d, %Y').date()
+            except ValueError:
+                pass
 
     def get_shippingapis_tracking_info(self):
         'Get tracking info as XML string from secure.shippingapis.com'
