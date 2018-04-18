@@ -91,7 +91,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_bundler_payment(self):
         result = 0.0
-        if self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
+        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             result += self.BUNDLER_PAYMENT
 
         if self.charge_back and not self.charge_back_billed:

@@ -192,7 +192,7 @@ class BundlerPaymentsView(View):
             lead__bundler=bundler,
             account_type=account_type,
             active=True,
-        ).filter(LeadAccount.get_online_filter()).order_by('created').prefetch_related('lead')
+        ).order_by('created').prefetch_related('lead', 'lead__raspberry_pi')
 
         entries = []
         for lead_account in lead_accounts:
@@ -300,7 +300,7 @@ class BundlerPaymentsView(View):
             lead__bundler=bundler,
             account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             active=True,
-        ).filter(LeadAccount.get_online_filter()).order_by('created').prefetch_related('lead')
+        ).order_by('created').prefetch_related('lead', 'lead__raspberry_pi')
 
         final_total = 0.0
         for lead_account in lead_accounts:
