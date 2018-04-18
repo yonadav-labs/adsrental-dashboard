@@ -8,6 +8,7 @@ from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.lead import Lead
+from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.utils import CustomerIOClient
 
@@ -287,6 +288,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.sync_to_adsdb()
         self.save()
 
+
+    @classmethod
+    def get_online_filter(cls):
+        '''
+        Get online condition ty use as a filter like
+
+        Lead.objects.filter(Lead.get_online_filter())
+        '''
+        return cls.get_timedelta_filter('lead__raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
 class ReadOnlyLeadAccount(LeadAccount):
     'Read only LeadAccount model'
