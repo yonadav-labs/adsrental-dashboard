@@ -192,20 +192,25 @@ class BundlerPaymentsView(View):
             lead__bundler=bundler,
             account_type=account_type,
             active=True,
-        ).prefetch_related('lead')
+        ).order_by('created').prefetch_related('lead')
 
         entries = []
-        for entry in lead_accounts:
-            if entry.get_bundler_payment():
-                entries.append(entry)
+        for lead_account in lead_accounts:
+            lead_account.payment = lead_account.get_bundler_payment()
 
-        for lead_account in entries:
-            payment = lead_account.get_bundler_payment()
-            if payment < 0:
-                chargeback_total += -payment
+        for lead_account in lead_accounts:
+            payment = lead_account.payment
             if payment > 0:
                 total += payment
-            final_total += payment
+                final_total += payment
+                entries.append(lead_account)
+
+        for lead_account in lead_accounts:
+            payment = lead_account.payment
+            if payment < 0 and final_total + payment >= 0:
+                chargeback_total += -payment
+                final_total += payment
+                entries.append(lead_account)
 
         return dict(
             entries=entries,
@@ -289,28 +294,28 @@ class BundlerPaymentsView(View):
         if not bundler:
             raise Http404
 
-
-        lead_accounts = LeadAccount.objects.filter(
-            lead__status=Lead.STATUS_IN_PROGRESS,
-            lead__bundler=bundler,
-            active=True,
-            bundler_paid=False,
-        )
-
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
-        lead_accounts.update(bundler_paid_date=yesterday, bundler_paid=True)
-
-        chargeback_lead_accounts = LeadAccount.objects.filter(
+        lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
             active=True,
-            bundler_paid=True,
-            charge_back=True,
-            charge_back_billed=False,
-        )
-        for chargeback_lead_account in chargeback_lead_accounts:
-            if chargeback_lead_account.get_bundler_payment() > 0:
-                chargeback_lead_account.charge_back_billed = True
-                chargeback_lead_account.save()
+        ).order_by('created').prefetch_related('lead')
 
+        final_total = 0.0
+        for lead_account in lead_accounts:
+            lead_account.payment = lead_account.get_bundler_payment()
+
+        for lead_account in lead_accounts:
+            payment = lead_account.payment
+            if payment > 0:
+                final_total += payment
+                lead_account.bundler_paid_date = yesterday
+                lead_account.bundler_paid = True
+                lead_account.save()
+
+        for lead_account in lead_accounts:
+            payment = lead_account.payment
+            if payment < 0 and final_total + payment >= 0:
+                lead_account.charge_back_billed = True
+                lead_account.save()
 
         return redirect('bundler_payments', kwargs=dict(bundler_id=bundler.id))

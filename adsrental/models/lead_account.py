@@ -96,7 +96,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if self.charge_back and not self.charge_back_billed:
             result -= self.BUNDLER_CHARGEBACK_PAYMENT
 
-        return round(max(result, 0.0), 2)
+        return round(result, 2)
 
     class Meta:
         permissions = (
