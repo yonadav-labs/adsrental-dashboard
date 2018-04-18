@@ -240,7 +240,7 @@ class BundlerPaymentsView(View):
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
-            google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            # google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
             bundlers_data.append(dict(
                 bundler=bundler,
@@ -248,11 +248,12 @@ class BundlerPaymentsView(View):
                 facebook_total=facebook_stats['total'],
                 facebook_chargeback_total=facebook_stats['chargeback_total'],
                 facebook_final_total=facebook_stats['final_total'],
-                google_entries=google_stats['entries'],
-                google_total=google_stats['total'],
-                google_chargeback_total=google_stats['chargeback_total'],
-                google_final_total=google_stats['final_total'],
-                total=facebook_stats['final_total'] + google_stats['final_total'],
+                total=facebook_stats['final_total'],
+                # google_entries=google_stats['entries'],
+                # google_total=google_stats['total'],
+                # google_chargeback_total=google_stats['chargeback_total'],
+                # google_final_total=google_stats['final_total'],
+                # total=facebook_stats['final_total'] + google_stats['final_total'],
             ))
 
         for data in bundlers_data:
@@ -297,6 +298,7 @@ class BundlerPaymentsView(View):
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
+            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             active=True,
         ).order_by('created').prefetch_related('lead')
 
