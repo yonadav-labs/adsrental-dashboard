@@ -274,6 +274,8 @@ class BundlerPaymentsView(View):
             pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
 
+        bundlers_data.sort(key=lambda x: x['total'], reverse=True)
+
         return render(request, 'bundler_payments.html', dict(
             user=request.user,
             bundlers_data=bundlers_data,
