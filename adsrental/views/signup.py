@@ -90,6 +90,7 @@ class SignupView(View):
             # fb_friends=data['fb_friends'],
             # fb_profile_url=data['facebook_profile_url'],
             street=data['street'],
+            company=Lead.COMPANY_FBM,
             city=data['city'],
             state=data['state'],
             postal_code=data['postal_code'],
