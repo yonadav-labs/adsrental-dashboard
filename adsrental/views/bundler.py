@@ -281,6 +281,8 @@ class BundlerPaymentsView(View):
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
             ).save()
 
+        bundlers_data.sort(key=lambda x: x['total'], reverse=True)
+
         if request.GET.get('pdf'):
             html = render_to_string(
                 'bundler_payments_pdf.html',
@@ -296,8 +298,6 @@ class BundlerPaymentsView(View):
             response = io.BytesIO()
             pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
-
-        bundlers_data.sort(key=lambda x: x['total'], reverse=True)
 
         response = render(request, 'bundler_payments.html', dict(
             user=request.user,
