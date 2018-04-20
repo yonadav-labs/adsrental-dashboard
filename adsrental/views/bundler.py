@@ -1,8 +1,8 @@
 import datetime
 import json
-from io import BytesIO
+import io
 
-from django.shortcuts import render, redirect, Http404
+from django.shortcuts import render, Http404
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -11,11 +11,13 @@ from django.db.models import Count
 from django.utils import timezone, dateformat
 from django.template.loader import render_to_string
 from django.http import HttpResponse
+from django.core.files.base import ContentFile
 import xhtml2pdf.pisa as pisa
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.bundler import Bundler
+from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
 
 class BundlerReportView(View):
@@ -168,8 +170,8 @@ class BundlerLeadPaymentsView(View):
                 ),
                 request=request,
             )
-            response = BytesIO()
-            pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
+            response = io.BytesIO()
+            pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
 
         return render(request, 'bundler_lead_payments.html', dict(
@@ -258,6 +260,27 @@ class BundlerPaymentsView(View):
         for data in bundlers_data:
             total += data['total']
 
+        if request.GET.get('save'):
+            html = render_to_string(
+                'bundler_payments_pdf.html',
+                dict(
+                    user=request.user,
+                    bundlers_data=bundlers_data,
+                    end_date=yesterday,
+                    total=total,
+                    allow_change=request.user.is_superuser,
+                ),
+                request=request,
+            )
+            pdf_stream = io.BytesIO()
+            pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), dest=pdf_stream)
+            pdf_stream.seek(0)
+            BundlerPaymentsReport(
+                date=yesterday,
+                html=html,
+                pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
+            ).save()
+
         if request.GET.get('pdf'):
             html = render_to_string(
                 'bundler_payments_pdf.html',
@@ -270,13 +293,13 @@ class BundlerPaymentsView(View):
                 ),
                 request=request,
             )
-            response = BytesIO()
-            pisa.pisaDocument(BytesIO(html.encode('UTF-8')), response)
+            response = io.BytesIO()
+            pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
 
         bundlers_data.sort(key=lambda x: x['total'], reverse=True)
 
-        return render(request, 'bundler_payments.html', dict(
+        response = render(request, 'bundler_payments.html', dict(
             user=request.user,
             bundlers_data=bundlers_data,
             end_date=yesterday,
@@ -284,41 +307,21 @@ class BundlerPaymentsView(View):
             allow_change=request.user.is_superuser,
         ))
 
-    @method_decorator(login_required)
-    def post(self, request, bundler_id):
-        bundler = None
-        if request.user.bundler:
-            bundler = request.user.bundler
+        if request.GET.get('mark', '') == 'true':
+            final_total = 0.0
+            for data in bundlers_data:
+                for lead_account in data['facebook_entries']:
+                    payment = lead_account.payment
+                    if payment > 0:
+                        final_total += payment
+                        lead_account.bundler_paid_date = yesterday
+                        lead_account.bundler_paid = True
+                        lead_account.save()
 
-        if request.user.is_superuser:
-            bundler = Bundler.objects.filter(id=bundler_id).first()
+                for lead_account in data['facebook_entries']:
+                    payment = lead_account.payment
+                    if payment < 0 and final_total + payment >= 0:
+                        lead_account.charge_back_billed = True
+                        lead_account.save()
 
-        if not bundler:
-            raise Http404
-
-        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
-        lead_accounts = LeadAccount.objects.filter(
-            lead__bundler=bundler,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
-            active=True,
-        ).order_by('created').prefetch_related('lead', 'lead__raspberry_pi')
-
-        final_total = 0.0
-        for lead_account in lead_accounts:
-            lead_account.payment = lead_account.get_bundler_payment(bundler)
-
-        for lead_account in lead_accounts:
-            payment = lead_account.payment
-            if payment > 0:
-                final_total += payment
-                lead_account.bundler_paid_date = yesterday
-                lead_account.bundler_paid = True
-                lead_account.save()
-
-        for lead_account in lead_accounts:
-            payment = lead_account.payment
-            if payment < 0 and final_total + payment >= 0:
-                lead_account.charge_back_billed = True
-                lead_account.save()
-
-        return redirect('bundler_payments', kwargs=dict(bundler_id=bundler.id))
+        return response
