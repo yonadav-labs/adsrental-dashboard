@@ -84,6 +84,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     auto_ban_enabled = models.BooleanField(default=True, help_text='If true, lead account is banned after two weeks of offline or wrong password.')
     charge_back = models.BooleanField(default=False, help_text='Set to true on auto-ban. True if charge back should be billed to lead.')
     charge_back_billed = models.BooleanField(default=False, help_text='If change back on auto ban billed.')
+    pay_check = models.BooleanField(default=True, help_text='User does not appear in check reports if turned off.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
