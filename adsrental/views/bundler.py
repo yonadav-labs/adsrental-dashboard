@@ -191,6 +191,7 @@ class BundlerPaymentsView(View):
 
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
+            pay_check=True,
             account_type=account_type,
             active=True,
         ).order_by('created').prefetch_related('lead', 'lead__raspberry_pi')
