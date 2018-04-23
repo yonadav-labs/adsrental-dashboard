@@ -230,9 +230,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         else:
             CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED)
         result = self.set_status(LeadAccount.STATUS_BANNED, edited_by)
-        if result:
-            if not LeadAccount.get_active_lead_accounts(self.lead):
-                self.lead.ban(edited_by, reason)
+        if not LeadAccount.get_active_lead_accounts(self.lead):
+            self.lead.ban(edited_by, reason)
         return result
 
     def unban(self, edited_by):
