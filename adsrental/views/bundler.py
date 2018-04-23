@@ -326,3 +326,9 @@ class BundlerPaymentsView(View):
                         lead_account.save()
 
         return response
+
+
+class AdminBundlerPaymentsHTMLView(View):
+    def get(self, request, report_id):
+        report = BundlerPaymentsReport.objects.get(id=report_id)
+        return HttpResponse(report.html)
