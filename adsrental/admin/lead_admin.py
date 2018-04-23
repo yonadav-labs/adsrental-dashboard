@@ -623,6 +623,13 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.touch()
                 messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
+    @staticmethod
+    def antidetect_touch(instance, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
+                lead_account.antidetect_touch()
+                messages.info(request, '{} has been antidetect touched for {} time.'.format(lead_account, lead_account.antidetect_touch_count))
+
     def sync_to_adsdb(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(active=True):
@@ -637,6 +644,11 @@ class LeadAdmin(admin.ModelAdmin):
             {
                 'label': 'Touch',
                 'action': 'touch',
+                'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
+            },
+            {
+                'label': 'Antidetect Touch',
+                'action': 'antidetect_touch',
                 'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
             },
         ]
