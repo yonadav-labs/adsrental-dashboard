@@ -10,3 +10,4 @@ class BundlerPaymentsReport(models.Model):
     date = models.DateField(db_index=True)
     pdf = models.FileField(upload_to='bundler_payments_reports')
     html = models.TextField()
+    paid = models.BooleanField(default=False)

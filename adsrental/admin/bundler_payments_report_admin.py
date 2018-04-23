@@ -12,9 +12,11 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'date',
+        'paid',
         'links',
     )
     search_fields = ('date', )
+    list_editable = ('paid', )
 
     def links(self, obj):
         result = []
