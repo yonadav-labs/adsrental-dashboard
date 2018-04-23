@@ -133,6 +133,10 @@ class LeadAdmin(admin.ModelAdmin):
     exclude = ('tracking_info', )
     raw_id_fields = ('raspberry_pi', )
 
+    def __init__(self, *args, **kwargs):
+        self._request = None
+        super(LeadAdmin, self).__init__(*args, **kwargs)
+
     def get_list_display(self, request):
         self._request = request
         list_display = super(LeadAdmin, self).get_list_display(request)
