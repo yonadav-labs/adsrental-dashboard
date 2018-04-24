@@ -23,6 +23,7 @@
                     <th>Online</th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__first_seen' %}">First Seen</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__last_seen' %}">Last Seen</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' '-qualified_date' %}">Qualified</a></th>
                     <th>Bundler Paid</th>
                     <th>Wrong Password</th>
                     <th>Security Checkpoint</th>
@@ -49,6 +50,9 @@
                         <td>
                             {% for lead_account in entry.lead_accounts.all %}
                                 {{ lead_account }}
+                                {% if lead_account.url %}
+                                    (<a href="{{ lead_account.url }}">URL</a>) 
+                                {% endif %}
                             {% endfor %}
                         </td>
                         <td>
@@ -58,8 +62,9 @@
                                 <span class="glyphicon glyphicon-remove" style="color: red;"></span>
                             {% endif %}
                         </td>
-                        <td>{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
-                        <td>{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.raspberry_pi.get_first_seen }}">{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.raspberry_pi.get_last_seen }}">{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.get_qualified_date }}">{{entry.get_qualified_date|naturaltime|default:"Never"}}</td>
                         <td>
                             {% if entry.is_bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
                         </td>

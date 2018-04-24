@@ -470,6 +470,12 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return result
 
+    def get_qualified_date(self):
+        for lead_account in self.lead_accounts.all():
+            return lead_account.qualified_date
+
+        return None
+
 class ReportProxyLead(Lead):
     'A proxy model to register Lead in admin UI twice for Reports'
     class Meta:
