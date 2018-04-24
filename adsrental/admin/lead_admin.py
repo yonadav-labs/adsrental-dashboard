@@ -122,7 +122,8 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
-        'sync_to_adsdb',
+        'sync_to_adsdb_facebook',
+        'sync_to_adsdb_google',
     )
     readonly_fields = (
         'created',
@@ -634,14 +635,23 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.antidetect_touch()
                 messages.info(request, '{} has been antidetect touched for {} time.'.format(lead_account, lead_account.antidetect_touch_count))
 
-    def sync_to_adsdb(self, request, queryset):
+    def sync_to_adsdb_facebook(self, request, queryset):
         for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(active=True):
+            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 result = lead_account.sync_to_adsdb()
                 if result:
-                    messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
+                    messages.info(request, '{} is synced: {}'.format(lead_account, result))
                 else:
-                    messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+                    messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
+
+    def sync_to_adsdb_google(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
+                result = lead_account.sync_to_adsdb()
+                if result:
+                    messages.info(request, '{} is synced: {}'.format(lead_account, result))
+                else:
+                    messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
 
     def touch_button(self, obj):
         row_actions = [
@@ -728,8 +738,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     bundler_paid_field.short_description = 'Bundler paid'
     bundler_paid_field.boolean = True
-
-    sync_to_adsdb.short_description = 'DEBUG: Sync to ADSDB'
 
     touch_button.short_description = ' '
     fix_button.short_description = ' '
