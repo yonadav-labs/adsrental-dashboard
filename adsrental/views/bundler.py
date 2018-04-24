@@ -56,8 +56,6 @@ class BundlerReportView(View):
 
         entries.reverse()
 
-        # raise ValueError(entries)
-
         return render(request, 'bundler_dashboard.html', dict(
             user=request.user,
             bundler=bundler,
