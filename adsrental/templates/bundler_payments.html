@@ -13,7 +13,7 @@
         <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
     {% endblock actions_buttons %}
     {% for data in bundlers_data %}
-        <h3>Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}</h3>
+        <h3>Bundler {{ data.bundler.utm_source }} paid report {{ end_date }}</h3>
 
         {% include 'include/bundler_payments_table.html' with title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
         {% comment %}
