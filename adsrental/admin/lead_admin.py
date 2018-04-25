@@ -525,8 +525,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} was already marked as wrong, skipping.'.format(lead_account))
                 continue
 
-            lead_account.wrong_password_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_wrong_password(request.user)
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
     @staticmethod
@@ -579,8 +578,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} was already marked as wrong, skipping.'.format(lead_account))
                 continue
 
-            lead_account.wrong_password_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_wrong_password(request.user)
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
     @staticmethod
