@@ -75,6 +75,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     bundler_paid_date = models.DateTimeField(blank=True, null=True, help_text='Date when bundler got his payment for this lead for the last time.')
     bundler_paid = models.BooleanField(default=False, help_text='Is revenue paid to bundler.')
     adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
+    sync_with_adsdb = models.BooleanField(default=False)
     active = models.BooleanField(default=True, help_text='If false, entry considered as deleted')
     billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')

@@ -259,6 +259,8 @@ class BundlerPaymentsView(View):
         for data in bundlers_data:
             total += data['total']
 
+        bundlers_data.sort(key=lambda x: x['total'], reverse=True)
+
         if request.GET.get('save'):
             html = render_to_string(
                 'bundler_payments_pdf.html',
@@ -280,7 +282,6 @@ class BundlerPaymentsView(View):
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
             ).save()
 
-        bundlers_data.sort(key=lambda x: x['total'], reverse=True)
 
         if request.GET.get('pdf'):
             html = render_to_string(
