@@ -96,7 +96,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def get_bundler_payment(self, bundler):
         result = 0.0
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
-            result += bundler.PAYMENT
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                result += bundler.facebook_payment
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                result += bundler.google_payment
 
         if bundler.enable_chargeback and self.charge_back and not self.charge_back_billed:
             result -= bundler.CHARGEBACK_PAYMENT

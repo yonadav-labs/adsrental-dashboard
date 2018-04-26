@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import decimal
+
 from django.db import models
 
 
@@ -20,6 +22,8 @@ class Bundler(models.Model):
     bank_info = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text='If inactive, landing/sugnup page will not be shown for this utm_source.')
     enable_chargeback = models.BooleanField(default=True, help_text='If inactive, no chargeback will be calculated for lead accounts.')
+    facebook_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for facebook accounts')
+    google_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for google accounts')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
