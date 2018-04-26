@@ -184,10 +184,10 @@ class BundlerLeadPaymentsView(View):
 
 class BundlerPaymentsView(View):
     def get_account_type_stats(self, bundler, end_date, account_type):
-        total = 0
-        final_total = 0
-        chargeback_total = 0
-        split_total = 0
+        total = decimal.Decimal('0.00')
+        final_total = decimal.Decimal('0.00')
+        chargeback_total = decimal.Decimal('0.00')
+        split_total = decimal.Decimal('0.00')
 
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
@@ -203,19 +203,20 @@ class BundlerPaymentsView(View):
         for lead_account in lead_accounts:
             payment = lead_account.payment
             if payment > 0:
-                total += payment
-                final_total += payment
+                if bundler.pay_split:
+                    final_total += payment - bundler.pay_split
+                    total += payment - bundler.pay_split
+                    split_total += bundler.pay_split
+                else:
+                    final_total += payment
+                    total += payment
                 entries.append(lead_account)
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
             if payment < 0 and final_total + payment >= 0:
+                final_total += payment
                 chargeback_total += -payment
-                if bundler.pay_split:
-                    final_total += payment - bundler.pay_split
-                    split_total += bundler.pay_split
-                else:
-                    final_total += payment
                 entries.append(lead_account)
 
         return dict(
