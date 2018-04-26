@@ -186,6 +186,7 @@ class BundlerPaymentsView(View):
         total = 0
         final_total = 0
         chargeback_total = 0
+        split_total = 0
 
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
@@ -209,13 +210,18 @@ class BundlerPaymentsView(View):
             payment = lead_account.payment
             if payment < 0 and final_total + payment >= 0:
                 chargeback_total += -payment
-                final_total += payment
+                if bundler.split_payment:
+                    final_total += payment - bundler.split_payment
+                    split_total += bundler.split_payment
+                else:
+                    final_total += payment
                 entries.append(lead_account)
 
         return dict(
             entries=entries,
             total=total,
             final_total=final_total,
+            split_total=split_total,
             chargeback_total=chargeback_total,
         )
 
@@ -240,7 +246,7 @@ class BundlerPaymentsView(View):
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
-            # google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
             bundlers_data.append(dict(
                 bundler=bundler,
@@ -248,12 +254,13 @@ class BundlerPaymentsView(View):
                 facebook_total=facebook_stats['total'],
                 facebook_chargeback_total=facebook_stats['chargeback_total'],
                 facebook_final_total=facebook_stats['final_total'],
-                total=facebook_stats['final_total'],
-                # google_entries=google_stats['entries'],
-                # google_total=google_stats['total'],
-                # google_chargeback_total=google_stats['chargeback_total'],
-                # google_final_total=google_stats['final_total'],
-                # total=facebook_stats['final_total'] + google_stats['final_total'],
+                facebook_split_total=facebook_stats['split_total'],
+                google_entries=google_stats['entries'],
+                google_total=google_stats['total'],
+                google_chargeback_total=google_stats['chargeback_total'],
+                google_final_total=google_stats['final_total'],
+                google_split_total=google_stats['split_total'],
+                total=facebook_stats['final_total'] + google_stats['final_total'],
             ))
 
         for data in bundlers_data:

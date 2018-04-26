@@ -57,6 +57,16 @@
                 <th></th>
                 <th>${{ final_total|floatformat:2 }}</th>
             </tr>
+            {% if split_total %}
+            <tr>
+                <th>Split total</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>${{ split_total|floatformat:2 }}</th>
+            </tr>
+            {% endif %}
         </tfoot>
     </table>
 {% endif %}

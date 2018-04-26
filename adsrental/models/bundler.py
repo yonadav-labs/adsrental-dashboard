@@ -24,6 +24,7 @@ class Bundler(models.Model):
     enable_chargeback = models.BooleanField(default=True, help_text='If inactive, no chargeback will be calculated for lead accounts.')
     facebook_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for facebook accounts')
     google_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for google accounts')
+    pay_split = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to bundler admin.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
