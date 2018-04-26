@@ -1,6 +1,7 @@
 import datetime
 import json
 import io
+import decimal
 
 from django.shortcuts import render, Http404
 from django.views import View
@@ -210,9 +211,9 @@ class BundlerPaymentsView(View):
             payment = lead_account.payment
             if payment < 0 and final_total + payment >= 0:
                 chargeback_total += -payment
-                if bundler.split_payment:
-                    final_total += payment - bundler.split_payment
-                    split_total += bundler.split_payment
+                if bundler.pay_split:
+                    final_total += payment - bundler.pay_split
+                    split_total += bundler.pay_split
                 else:
                     final_total += payment
                 entries.append(lead_account)
@@ -242,7 +243,7 @@ class BundlerPaymentsView(View):
 
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
         bundlers_data = []
-        total = 0.0
+        total = decimal.Decimal(0.0)
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
