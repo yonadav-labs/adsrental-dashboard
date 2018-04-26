@@ -199,17 +199,14 @@ class BundlerPaymentsView(View):
         entries = []
         for lead_account in lead_accounts:
             lead_account.payment = lead_account.get_bundler_payment(bundler)
+            lead_account.split_payment = lead_account.get_bundler_split_payment(bundler)
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
             if payment > 0:
-                if bundler.pay_split:
-                    final_total += payment - bundler.pay_split
-                    total += payment - bundler.pay_split
-                    split_total += bundler.pay_split
-                else:
-                    final_total += payment
-                    total += payment
+                final_total += payment
+                total += payment
+                split_total += lead_account.split_payment
                 entries.append(lead_account)
 
         for lead_account in lead_accounts:

@@ -36,7 +36,12 @@
                         -
                     {% endif %}
                 </td>
-                <td>${{ entry.payment|floatformat:2 }}</td>
+                <td>
+                    ${{ entry.payment|floatformat:2 }}
+                    {% if entry.split_payment %}
+                        / ${{ entry.split_payment|floatformat:2 }}
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
