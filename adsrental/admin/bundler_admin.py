@@ -21,6 +21,8 @@ class BundlerAdmin(admin.ModelAdmin):
         'is_active',
         'leads_count',
         'enable_chargeback',
+        'facebook_payment',
+        'google_payment',
         'links',
     )
     actions = (
