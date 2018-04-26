@@ -1,4 +1,6 @@
 'LeadAccount model'
+import decimal
+
 import requests
 from django.utils import timezone
 from django.db import models
@@ -15,8 +17,6 @@ from adsrental.utils import CustomerIOClient
 
 class LeadAccount(models.Model, FulltextSearchMixin):
     LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL = 48
-    BUNDLER_PAYMENT = round(150.00, 2)
-    BUNDLER_CHARGEBACK_PAYMENT = round(50.00, 2)
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
@@ -94,7 +94,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     objects = BulkUpdateManager()
 
     def get_bundler_payment(self, bundler):
-        result = 0.0
+        result = decimal.Decimal(0.0)
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_payment

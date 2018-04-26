@@ -9,8 +9,8 @@ class Bundler(models.Model):
     '''
     Stores a single bundler entry, used to get bundler info for lead by *utm_source*
     '''
-    PAYMENT = round(150.00, 2)
-    CHARGEBACK_PAYMENT = round(50.00, 2)
+    PAYMENT = decimal.Decimal(150.00)
+    CHARGEBACK_PAYMENT = decimal.Decimal(50.00)
 
     name = models.CharField(max_length=255, unique=True, db_index=True)
     utm_source = models.CharField(max_length=50, db_index=True, null=True, blank=True)
