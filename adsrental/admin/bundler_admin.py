@@ -21,8 +21,8 @@ class BundlerAdmin(admin.ModelAdmin):
         'is_active',
         'leads_count',
         'enable_chargeback',
-        'facebook_payment',
-        'google_payment',
+        'facebook_payment_field',
+        'google_payment_field',
         'links',
     )
     actions = (
@@ -97,4 +97,22 @@ class BundlerAdmin(admin.ModelAdmin):
         result.append('<a target="_blank" href="{report_url}">Stats</a>'.format(report_url=reverse('bundler_report', kwargs={'bundler_id': obj.id})))
         return mark_safe(', '.join(result))
 
+    def facebook_payment_field(self, obj):
+        if obj.facebook_pay_split:
+            return '${} / ${}'.format(obj.facebook_payment, obj.facebook_pay_split)
+
+        return '${}'.format(obj.facebook_payment)
+
+    def google_payment_field(self, obj):
+        if obj.google_pay_split:
+            return '${} / ${}'.format(obj.google_payment, obj.google_pay_split)
+
+        return '${}'.format(obj.google_payment)
+
     leads_count.short_description = 'Leads'
+
+    facebook_payment_field.short_description = 'Facebook payment'
+    facebook_payment_field.admin_order_field = 'facebook_payment'
+
+    google_payment_field.short_description = 'Google payment'
+    google_payment_field.admin_order_field = 'google_payment'
