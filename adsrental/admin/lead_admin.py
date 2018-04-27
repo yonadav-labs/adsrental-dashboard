@@ -765,6 +765,7 @@ class ReportLeadAdmin(LeadAdmin):
         'last_seen',
         'online',
         'ec2_instance_link',
+        'last_touch',
         'touch_count_field',
         'touch_button',
         'ip_address',
