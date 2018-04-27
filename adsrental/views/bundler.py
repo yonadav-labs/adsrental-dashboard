@@ -314,8 +314,8 @@ class BundlerPaymentsView(View):
         ))
 
         if request.GET.get('mark', '') == 'true':
-            final_total = decimal.Decimal('0.00')
             for data in bundlers_data:
+                final_total = decimal.Decimal('0.00')
                 for lead_account in data['facebook_entries']:
                     payment = lead_account.payment
                     if payment > 0:
@@ -325,6 +325,21 @@ class BundlerPaymentsView(View):
                         lead_account.save()
 
                 for lead_account in data['facebook_entries']:
+                    payment = lead_account.payment
+                    if payment < 0 and final_total + payment >= 0:
+                        lead_account.charge_back_billed = True
+                        lead_account.save()
+
+                final_total = decimal.Decimal('0.00')
+                for lead_account in data['google_entries']:
+                    payment = lead_account.payment
+                    if payment > 0:
+                        final_total += payment
+                        lead_account.bundler_paid_date = yesterday
+                        lead_account.bundler_paid = True
+                        lead_account.save()
+
+                for lead_account in data['google_entries']:
                     payment = lead_account.payment
                     if payment < 0 and final_total + payment >= 0:
                         lead_account.charge_back_billed = True
