@@ -47,8 +47,8 @@ class LeadAdmin(admin.ModelAdmin):
         }
 
     model = Lead
+
     list_display = (
-        # 'id_field',
         'name',
         'status_field',
         'links',
@@ -56,22 +56,21 @@ class LeadAdmin(admin.ModelAdmin):
         'phone_field',
         'bundler_field',
         'accounts_field',
+        'raspberry_pi_link',
         'tested_field',
-        'last_touch',
-        'touch_count_field',
-        'touch_button',
+        'usps_tracking_code',
         'first_seen',
         'last_seen',
-        'ec2_instance_link',
-        'raspberry_pi_link',
-        'ip_address',
-        'usps_tracking_code',
         'online',
-        'wrong_password_field',
+        'ec2_instance_link',
+        'touch_count_field',
+        'touch_button',
+        'ip_address',
         'fix_button',
+        'wrong_password_field',
         'security_checkpoint_field',
-        'pi_delivered',
-        'bundler_paid_field',
+        'sync_with_adsdb_field',
+        'billed',
     )
     list_filter = (
         StatusListFilter,
@@ -303,14 +302,14 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<a href="{}?q={}">{}</a>'.format(
                 reverse('admin:adsrental_leadaccount_changelist'),
                 lead_account.username,
-                lead_account,
+                lead_account.account_type,
             ))
 
         return mark_safe(', '.join(result))
 
-    def bundler_paid_field(self, obj):
+    def sync_with_adsdb_field(self, obj):
         for lead_account in obj.lead_accounts.all():
-            if lead_account.active and lead_account.bundler_paid:
+            if lead_account.active and lead_account.sync_with_adsdb:
                 return True
 
         return False
@@ -734,8 +733,8 @@ class LeadAdmin(admin.ModelAdmin):
     phone_field.short_description = 'Phone'
     phone_field.admin_order_field = 'phone'
 
-    bundler_paid_field.short_description = 'Bundler paid'
-    bundler_paid_field.boolean = True
+    sync_with_adsdb_field.short_description = 'Sunc with adsdb'
+    sync_with_adsdb_field.boolean = True
 
     touch_button.short_description = ' '
     fix_button.short_description = ' '
@@ -752,7 +751,6 @@ class ReportLeadAdmin(LeadAdmin):
     # admin_caching_enabled = True
     list_per_page = 500
     list_display = (
-        # 'id_field',
         'name',
         'status_field',
         'links',
@@ -760,24 +758,21 @@ class ReportLeadAdmin(LeadAdmin):
         'phone_field',
         'bundler_field',
         'accounts_field',
+        'raspberry_pi_link',
         'tested_field',
-        'last_touch',
-        'touch_count_field',
-        'touch_button',
+        'usps_tracking_code',
         'first_seen',
         'last_seen',
-        'ec2_instance_link',
-        'raspberry_pi_link',
-        'ip_address',
-        'usps_tracking_code',
         'online',
-        'wrong_password_field',
+        'ec2_instance_link',
+        'touch_count_field',
+        'touch_button',
+        'ip_address',
         'fix_button',
+        'wrong_password_field',
         'security_checkpoint_field',
-        'pi_delivered',
-        'bundler_paid_field',
-        'facebook_billed',
-        'google_billed',
+        'sync_with_adsdb_field',
+        'billed',
     )
 
     def facebook_billed(self, obj):
