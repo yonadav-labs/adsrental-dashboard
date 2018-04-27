@@ -314,7 +314,7 @@ class BundlerPaymentsView(View):
         ))
 
         if request.GET.get('mark', '') == 'true':
-            final_total = 0.0
+            final_total = decimal.Decimal('0.00')
             for data in bundlers_data:
                 for lead_account in data['facebook_entries']:
                     payment = lead_account.payment
