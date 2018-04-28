@@ -275,7 +275,7 @@ class BundlerPaymentsView(View):
                     bundlers_data=bundlers_data,
                     end_date=yesterday,
                     total=total,
-                    allow_change=request.user.is_superuser,
+                    show_bundler_name=request.user.is_superuser,
                 ),
                 request=request,
             )
