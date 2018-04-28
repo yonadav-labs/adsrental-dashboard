@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -33,4 +33,12 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def rollback(self, request, queryset):
         for report in queryset:
+            if report.paid:
+                messages.warning(request, 'Report {} was already paid.'.format(report.id))
+                continue
+            if report.cancelled:
+                messages.warning(request, 'Report {} was already cancelled.'.format(report.id))
+                continue
+
             report.rollback()
+            messages.success(request, 'Report {} was rolled back successfully.'.format(report.id))
