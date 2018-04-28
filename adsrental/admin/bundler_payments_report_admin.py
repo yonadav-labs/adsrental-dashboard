@@ -13,11 +13,13 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         'id',
         'date',
         'paid',
+        'cancelled',
         'links',
     )
     search_fields = ('date', )
     actions = (
         'mark_as_paid',
+        'rollback',
     )
 
     def links(self, obj):
@@ -28,3 +30,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def mark_as_paid(self, request, queryset):
         queryset.update(paid=True)
+
+    def rollback(self, request, queryset):
+        for report in queryset:
+            report.rollback()
