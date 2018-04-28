@@ -95,7 +95,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_bundler_payment(self, bundler):
         result = decimal.Decimal('0.00')
-        if self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
+        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_payment - bundler.facebook_pay_split
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
@@ -108,7 +108,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_bundler_split_payment(self, bundler):
         result = decimal.Decimal('0.00')
-        if self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
+        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_pay_split
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
