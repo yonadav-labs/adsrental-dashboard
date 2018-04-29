@@ -276,6 +276,7 @@ class BundlerPaymentsView(View):
                     end_date=yesterday,
                     total=total,
                     show_bundler_name=request.user.is_superuser,
+                    pdf=True,
                 ),
                 request=request,
             )
@@ -298,6 +299,7 @@ class BundlerPaymentsView(View):
                     end_date=yesterday,
                     total=total,
                     show_bundler_name=request.user.is_superuser,
+                    pdf=True,
                 ),
                 request=request,
             )

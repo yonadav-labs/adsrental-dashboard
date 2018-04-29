@@ -16,7 +16,13 @@
         <tbody>
             {% for entry in entries %}
             <tr>
-                <td>{{ entry.lead.name }}</td>
+                <td>
+                    {% if show_bundler_name and not pdf %}
+                        <a href="{% url 'admin:adsrental_lead_changelist' %}?q={{ entry.lead.email }}"><{{ entry.lead.name }}/a>
+                    {% else %}
+                        {{ entry.lead.name }}
+                    {% else %}
+                </td>
                 <td>{{ entry.username }}</td>
                 <td>{{ entry.lead.raspberry_pi.first_seen.date }}</td>
                 <td>{{ entry.status }}</td>

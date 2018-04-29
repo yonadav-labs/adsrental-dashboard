@@ -19,8 +19,8 @@
             <h3>UTM source {{ data.bundler.utm_source }} paid report {{ end_date }}</h3>
         {% endif %}
 
-        {% include 'include/bundler_payments_table.html' with title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total split_total=data.facebook_split_total %}
-        {% include 'include/bundler_payments_table.html' with title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total split_total=data.google_split_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total split_total=data.facebook_split_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total split_total=data.google_split_total %}
 
         <h4>Total: ${{ data.total|floatformat:2 }}</h4>
     {% endfor %}
