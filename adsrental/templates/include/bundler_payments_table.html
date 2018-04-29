@@ -4,8 +4,9 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Account</th>
                 <th>Lead</th>
+                <th>Account</th>
+                <th>First seen</th>
                 <th>Status</th>
                 <th>Paid</th>
                 <th>Chargeback</th>
@@ -15,8 +16,9 @@
         <tbody>
             {% for entry in entries %}
             <tr>
-                <td>{{ entry.username }}</td>
                 <td>{{ entry.lead.name }}</td>
+                <td>{{ entry.username }}</td>
+                <td>{{ entry.lead.raspberry_pi.first_seen.date }}</td>
                 <td>{{ entry.status }}</td>
                 <td>
                     {% if entry.bundler_paid %}
@@ -51,6 +53,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
+                <th></th>
                 <th>${{ chargeback_total|floatformat:2 }}</th>
                 <th>${{ total|floatformat:2 }}</th>
             </tr>
@@ -60,11 +63,13 @@
                 <th></th>
                 <th></th>
                 <th></th>
+                <th></th>
                 <th>${{ final_total|floatformat:2 }}</th>
             </tr>
             {% if split_total %}
             <tr>
                 <th>Split total</th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
