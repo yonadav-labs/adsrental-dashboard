@@ -19,8 +19,20 @@
             <h3>UTM source {{ data.bundler.utm_source }} paid report {{ end_date }}</h3>
         {% endif %}
 
-        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total split_total=data.facebook_split_total %}
-        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total split_total=data.google_split_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
+        {% for child_stats in data.facebook_children_stats %}
+            {% if child_stats.entries %}  
+                <h4>Child bundler Facebook accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}</h3>
+                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
+            {% endif %}
+        {% endfor %}
+        {% for child_stats in data.google_children_stats %}
+            {% if child_stats.entries %}
+                <h4>Child bundler Google accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}</h3>
+                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
+            {% endif %}
+        {% endfor %}
 
         <h4>Total: ${{ data.total|floatformat:2 }}</h4>
     {% endfor %}

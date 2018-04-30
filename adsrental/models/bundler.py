@@ -24,8 +24,9 @@ class Bundler(models.Model):
     enable_chargeback = models.BooleanField(default=True, help_text='If inactive, no chargeback will be calculated for lead accounts.')
     facebook_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for facebook accounts')
     google_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for google accounts')
-    facebook_pay_split = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to bundler admin.')
-    google_pay_split = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to bundler admin.')
+    facebook_parent_payment = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to parent bundler.')
+    google_parent_payment = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to parent bundler.')
+    parent_bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that gets part of the payment')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

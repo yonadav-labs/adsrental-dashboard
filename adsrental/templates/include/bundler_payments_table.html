@@ -1,6 +1,8 @@
 
 {% if entries %}
-    <h4>{{ title }}</h4> 
+    {% if title %}
+        <h4>{{ title }}</h4> 
+    {% endif %}
     <table class="table table-striped">
         <thead>
             <tr>

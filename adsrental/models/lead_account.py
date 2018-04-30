@@ -97,22 +97,24 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         result = decimal.Decimal('0.00')
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                result += bundler.facebook_payment - bundler.facebook_pay_split
+                result += bundler.facebook_payment
+                result -= self.get_parent_bundler_payment(bundler)
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                result += bundler.google_payment - bundler.google_pay_split
+                result += bundler.google_payment
+                result -= self.get_parent_bundler_payment(bundler)
 
         if bundler.enable_chargeback and self.charge_back and not self.charge_back_billed:
             result -= bundler.CHARGEBACK_PAYMENT
 
         return result
 
-    def get_bundler_split_payment(self, bundler):
+    def get_parent_bundler_payment(self, bundler):
         result = decimal.Decimal('0.00')
-        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
+        if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                result += bundler.facebook_pay_split
+                result += bundler.facebook_parent_payment
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                result += bundler.google_pay_split
+                result += bundler.google_parent_payment
 
         return result
 

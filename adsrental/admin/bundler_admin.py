@@ -23,6 +23,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'enable_chargeback',
         'facebook_payment_field',
         'google_payment_field',
+        'parent_bundler',
         'links',
     )
     actions = (
@@ -98,14 +99,14 @@ class BundlerAdmin(admin.ModelAdmin):
         return mark_safe(', '.join(result))
 
     def facebook_payment_field(self, obj):
-        if obj.facebook_pay_split:
-            return '${} / ${}'.format(obj.facebook_payment, obj.facebook_pay_split)
+        if obj.parent_bundler:
+            return '${} / ${}'.format(obj.facebook_payment - obj.facebook_parent_payment, obj.facebook_parent_payment)
 
         return '${}'.format(obj.facebook_payment)
 
     def google_payment_field(self, obj):
-        if obj.google_pay_split:
-            return '${} / ${}'.format(obj.google_payment, obj.google_pay_split)
+        if obj.parent_bundler:
+            return '${} / ${}'.format(obj.google_payment - obj.google_parent_payment, obj.google_parent_payment)
 
         return '${}'.format(obj.google_payment)
 

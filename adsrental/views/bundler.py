@@ -183,11 +183,10 @@ class BundlerLeadPaymentsView(View):
 
 
 class BundlerPaymentsView(View):
-    def get_account_type_stats(self, bundler, end_date, account_type):
+    def get_account_type_stats(self, bundler, end_date, account_type, child=False):
         total = decimal.Decimal('0.00')
         final_total = decimal.Decimal('0.00')
         chargeback_total = decimal.Decimal('0.00')
-        split_total = decimal.Decimal('0.00')
 
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
@@ -198,29 +197,40 @@ class BundlerPaymentsView(View):
 
         entries = []
         for lead_account in lead_accounts:
-            lead_account.payment = lead_account.get_bundler_payment(bundler)
-            lead_account.split_payment = lead_account.get_bundler_split_payment(bundler)
+            if child:
+                lead_account.payment = lead_account.get_parent_bundler_payment(bundler)
+            else:
+                lead_account.payment = lead_account.get_bundler_payment(bundler)
+
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
             if payment > 0:
                 final_total += payment
                 total += payment
-                split_total += lead_account.split_payment
                 entries.append(lead_account)
 
-        for lead_account in lead_accounts:
-            payment = lead_account.payment
-            if payment < 0 and final_total + payment >= 0:
-                final_total += payment
-                chargeback_total += -payment
-                entries.append(lead_account)
+        if not child:
+            for lead_account in lead_accounts:
+                payment = lead_account.payment
+                if payment < 0 and final_total + payment >= 0:
+                    final_total += payment
+                    chargeback_total += -payment
+                    entries.append(lead_account)
+
+        children_stats = []
+        for child_bundler in Bundler.objects.filter(parent_bundler=bundler, is_active=True):
+            child_stats = self.get_account_type_stats(child_bundler, end_date, account_type, child=True)
+            children_stats.append(child_stats)
+
+        children_stats.sort(key=lambda x: x['total'], reverse=True)
 
         return dict(
+            bundler=bundler,
             entries=entries,
+            children_stats=children_stats,
             total=total,
             final_total=final_total,
-            split_total=split_total,
             chargeback_total=chargeback_total,
         )
 
@@ -234,7 +244,7 @@ class BundlerPaymentsView(View):
             if bundler_id == 'all':
                 bundlers = Bundler.objects.filter(is_active=True)
             else:
-                bundlers = Bundler.objects.filter(id=bundler_id)
+                bundlers = Bundler.objects.filter(is_active=True, id=bundler_id)
 
         if not bundlers:
             raise Http404
@@ -246,6 +256,12 @@ class BundlerPaymentsView(View):
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
             google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            bundler_total = facebook_stats['final_total'] + google_stats['final_total']
+            for child_stats in facebook_stats['children_stats']:
+                bundler_total += child_stats['total']
+            for child_stats in google_stats['children_stats']:
+                bundler_total += child_stats['total']
+
 
             bundlers_data.append(dict(
                 bundler=bundler,
@@ -253,13 +269,13 @@ class BundlerPaymentsView(View):
                 facebook_total=facebook_stats['total'],
                 facebook_chargeback_total=facebook_stats['chargeback_total'],
                 facebook_final_total=facebook_stats['final_total'],
-                facebook_split_total=facebook_stats['split_total'],
+                facebook_children_stats=facebook_stats['children_stats'],
                 google_entries=google_stats['entries'],
                 google_total=google_stats['total'],
                 google_chargeback_total=google_stats['chargeback_total'],
                 google_final_total=google_stats['final_total'],
-                google_split_total=google_stats['split_total'],
-                total=facebook_stats['final_total'] + google_stats['final_total'],
+                google_children_stats=google_stats['children_stats'],
+                total=bundler_total,
             ))
 
         for data in bundlers_data:
