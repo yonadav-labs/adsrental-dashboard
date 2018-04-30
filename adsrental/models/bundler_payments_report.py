@@ -21,11 +21,15 @@ class BundlerPaymentsReport(models.Model):
 
         regexp = r'<td>([^<]+@[^<]+)</td>'
         emails = re.findall(regexp, self.html)
-        lead_accounts = LeadAccount.objects.filter(username__in=emails, active=True, bundler_paid=True, bundler_paid_date=self.date)
+
+        regexp = r'<td>(\d{8,40})</td>'
+        phones = re.findall(regexp, self.html)
+        usernames = phones + emails
+        lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
         for lead_account in lead_accounts:
             lead_account.bundler_paid = False
             lead_account.save()
-        lead_accounts = LeadAccount.objects.filter(username__in=emails, active=True, charge_back_billed=True)
+        lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, charge_back_billed=True)
         for lead_account in lead_accounts:
             lead_account.charge_back_billed = False
             lead_account.save()
