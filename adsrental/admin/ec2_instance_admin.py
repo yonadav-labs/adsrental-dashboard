@@ -54,6 +54,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'clear_ping_cache',
         'terminate',
+        'update_password',
     )
     raw_id_fields = ('lead', )
 
@@ -177,6 +178,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def terminate(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.terminate()
+
+    def update_password(self, request, queryset):
+        for ec2_instance in queryset:
+            ec2_instance.change_password()
 
     lead_link.short_description = 'Lead'
 

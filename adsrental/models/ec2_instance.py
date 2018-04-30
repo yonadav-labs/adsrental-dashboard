@@ -464,8 +464,6 @@ class EC2Instance(models.Model):
 
     def change_password(self):
         'Obsolete method. Was used to update all old non-human-friendly passwords.'
-        if self.password == settings.EC2_ADMIN_PASSWORD:
-            return
         self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
         self.password = settings.EC2_ADMIN_PASSWORD
         self.save()
