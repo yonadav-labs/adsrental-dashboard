@@ -15,13 +15,17 @@ class BundlerPaymentsReport(models.Model):
     paid = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
 
-    def get_lead_accounts(self):
+    def get_usernames(self):
         regexp = r'<td>([^<]+@[^<]+)</td>'
         emails = re.findall(regexp, self.html)
 
         regexp = r'<td>(\d{8,40})</td>'
         phones = re.findall(regexp, self.html)
         usernames = phones + emails
+        return usernames
+
+    def get_lead_accounts(self):
+        usernames = self.get_usernames()
         lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
         return lead_accounts
 
