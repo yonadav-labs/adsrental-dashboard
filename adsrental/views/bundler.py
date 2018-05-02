@@ -197,10 +197,13 @@ class BundlerPaymentsView(View):
 
         entries = []
         for lead_account in lead_accounts:
+            payment = lead_account.get_bundler_payment(bundler)
+            parent_payment = lead_account.get_parent_bundler_payment(bundler)
+            lead_account.parent_payment = parent_payment
             if child:
-                lead_account.payment = lead_account.get_parent_bundler_payment(bundler)
+                lead_account.payment = parent_payment
             else:
-                lead_account.payment = lead_account.get_bundler_payment(bundler)
+                lead_account.payment = payment
 
 
         for lead_account in lead_accounts:
@@ -336,7 +339,7 @@ class BundlerPaymentsView(View):
                 final_total = decimal.Decimal('0.00')
                 for lead_account in data['facebook_entries']:
                     payment = lead_account.payment
-                    if payment > 0:
+                    if payment > 0 or lead_account.parent_payment > 0:
                         final_total += payment
                         lead_account.bundler_paid_date = yesterday
                         lead_account.bundler_paid = True
