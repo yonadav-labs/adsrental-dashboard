@@ -40,7 +40,7 @@ class BundlerPaymentsReport(models.Model):
             if utm_source_string in part_header:
                 result.append('<h3>(UTM source {})</h3>{}'.format(bundler.utm_source, part_no_header))
 
-        result.append('<h3>' + html_parts[-1])
+        # result.append('<h3>' + html_parts[-1])
         return ''.join(result)
 
     def rollback(self):
