@@ -32,7 +32,7 @@
                 <a class="navbar-brand" href="{% url "home" %}">RentYourSocialMedia</a>
                 {% endif %}
             </div>
-              <div id="navbar" class="navbar-collapse collapse">
+              <div id="navbar">
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.bundler %}
                       <li><a href="{% url "bundler_report_payments_list" %}">Bundler reports</a></li>
