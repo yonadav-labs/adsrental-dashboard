@@ -5,7 +5,7 @@ from django.conf.urls import url
 
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
-from adsrental.views.bundler import BundlerReportView, BundlerPaymentsView, BundlerLeadPaymentsView, AdminBundlerPaymentsHTMLView
+from adsrental.views.bundler import BundlerReportView, BundlerPaymentsView, BundlerLeadPaymentsView, BundlerPaymentsHTMLView, AdminBundlerPaymentsHTMLView, BundlerPaymentsListView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
@@ -65,5 +65,7 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^bundler/all/lead_payments/$', BundlerLeadPaymentsView.as_view(), name='bundler_lead_payments', kwargs=dict(bundler_id='all')),
     url(r'^bundler/(?P<bundler_id>\d+)/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments'),
     url(r'^bundler/all/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments', kwargs=dict(bundler_id='all')),
-    url(r'^bundler/report/payments/(?P<report_id>\d+)/$', AdminBundlerPaymentsHTMLView.as_view(), name='bundler_report_payments'),
+    url(r'^bundler/report/payments/(?P<report_id>\d+)/$', AdminBundlerPaymentsHTMLView.as_view(), name='admin_bundler_report_payments'),
+    url(r'^bundler/report/payments/(?P<report_id>\d+)/(?P<bundler_id>\d+)/$', BundlerPaymentsHTMLView.as_view(), name='bundler_report_payments'),
+    url(r'^bundler/report/payments/list/$', BundlerPaymentsListView.as_view(), name='bundler_report_payments_list'),
 ]

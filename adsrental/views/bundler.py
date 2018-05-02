@@ -373,4 +373,30 @@ class BundlerPaymentsView(View):
 class AdminBundlerPaymentsHTMLView(View):
     def get(self, request, report_id):
         report = BundlerPaymentsReport.objects.get(id=report_id)
+        if not request.user.is_superuser:
+            raise Http404
+
         return HttpResponse(report.html)
+
+
+
+class BundlerPaymentsHTMLView(View):
+    def get(self, request, report_id, bundler_id):
+        report = BundlerPaymentsReport.objects.get(id=int(report_id))
+        bundler = Bundler.objects.get(id=int(bundler_id))
+        if request.user.is_superuser:
+            return HttpResponse(report.get_html_for_bundler(bundler))
+            
+        if request.user.bundler == bundler:
+            return HttpResponse(report.get_html_for_bundler(bundler))
+
+        raise Http404
+
+
+
+class BundlerPaymentsListView(View):
+    def get(self, request):
+        return render(request, 'bundler_reports_list.html', context=dict(
+            reports=BundlerPaymentsReport.objects.filter(cancelled=False),
+            bundler=request.user.bundler,
+        ))

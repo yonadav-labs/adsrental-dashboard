@@ -29,6 +29,20 @@ class BundlerPaymentsReport(models.Model):
         lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
         return lead_accounts
 
+    def get_html_for_bundler(self, bundler):
+        html = self.html
+        html_parts = html.split('<h3>')
+        result = []
+        result.append(html[0])
+        utm_source_string = '(UTM source {})'.format(bundler.utm_source)
+        for part in html_parts[1:-1]:
+            if utm_source_string in part:
+                part_no_header = part.split('</h3>', 1)[-1]
+                result.append('<h3>(UTM source {})</h3>{}'.format(bundler.utm_source, part_no_header))
+
+        result.append('<h3>' + html_parts[-1])
+        return ''.join(result)
+
     def rollback(self):
         if self.cancelled:
             return False
