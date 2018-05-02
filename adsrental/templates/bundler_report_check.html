@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler Check Report{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3>Check report for UTM source {{ bundler.utm_source }} for {{ date }}</h3>
+    <ul>
+        {% for lead_history in lead_histories %}
+            <li>{{ lead_history.lead.name }} - ${{ lead_history.get_remaining_amount }}</li>
+        {% endfor %}
+    </ul>
+
+    <h4>Total: ${{ total }}</h4>
+{% endblock %}

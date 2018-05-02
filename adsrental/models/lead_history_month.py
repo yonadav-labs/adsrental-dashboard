@@ -107,3 +107,6 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
         return max_payment * days_online_valid / days_in_month
+
+    def get_remaining_amount(self):
+        return self.amount - self.amount_paid

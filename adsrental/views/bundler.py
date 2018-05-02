@@ -13,10 +13,12 @@ from django.utils import timezone, dateformat
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
+from dateutil.relativedelta import relativedelta
 import xhtml2pdf.pisa as pisa
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_history import LeadHistory
+from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.bundler import Bundler
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
@@ -383,8 +385,14 @@ class AdminBundlerPaymentsHTMLView(View):
 class BundlerPaymentsHTMLView(View):
     @method_decorator(login_required)
     def get(self, request, report_id, bundler_id):
+        bundler = Bundler.objects.filter(id=int(bundler_id)).first()
+        if not bundler:
+            raise Http404
+
+        if not request.user.is_superuser and request.user.bundler != bundler:
+            raise Http404
+
         report = BundlerPaymentsReport.objects.get(id=int(report_id))
-        bundler = Bundler.objects.get(id=int(bundler_id))
         if request.user.is_superuser:
             return HttpResponse(report.get_html_for_bundler(bundler))
             
@@ -398,7 +406,36 @@ class BundlerPaymentsHTMLView(View):
 class BundlerPaymentsListView(View):
     @method_decorator(login_required)
     def get(self, request):
-        return render(request, 'bundler_reports_list.html', context=dict(
+        return render(request, 'bundler_payments_list.html', context=dict(
             reports=BundlerPaymentsReport.objects.filter(cancelled=False),
             bundler=request.user.bundler,
+        ))
+
+
+
+class BundlerCheckView(View):
+    @method_decorator(login_required)
+    def get(self, request, bundler_id):
+        bundler = Bundler.objects.filter(id=int(bundler_id)).first()
+        if not bundler:
+            raise Http404
+
+        if not request.user.is_superuser and request.user.bundler != bundler:
+            raise Http404
+
+        today = timezone.now().date()
+        first_day_of_last_month = today.replace(day=1) - relativedelta(months=1)
+        lead_histories = LeadHistoryMonth.objects.filter(
+            lead__bundler=bundler,
+            date=first_day_of_last_month,
+        )
+        total = decimal.Decimal('0.00')
+        for lead_history in lead_histories:
+            total += lead_history.get_remaining_amount()
+
+        return render(request, 'bundler_report_check.html', context=dict(
+            lead_histories=lead_histories,
+            bundler=request.user.bundler,
+            date=first_day_of_last_month.strftime('%B %Y'),
+            total=total,
         ))
