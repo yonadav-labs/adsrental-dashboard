@@ -355,7 +355,7 @@ class BundlerPaymentsView(View):
                 final_total = decimal.Decimal('0.00')
                 for lead_account in data['google_entries']:
                     payment = lead_account.payment
-                    if payment > 0:
+                    if payment > 0 or lead_account.parent_payment > 0:
                         final_total += payment
                         lead_account.bundler_paid_date = yesterday
                         lead_account.bundler_paid = True
