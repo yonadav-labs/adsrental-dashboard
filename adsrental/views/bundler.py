@@ -208,7 +208,8 @@ class BundlerPaymentsView(View):
 
         for lead_account in lead_accounts:
             payment = lead_account.payment
-            if payment > 0:
+            parent_payment = lead_account.parent_payment
+            if payment > 0 or parent_payment > 0:
                 final_total += payment
                 total += payment
                 entries.append(lead_account)
