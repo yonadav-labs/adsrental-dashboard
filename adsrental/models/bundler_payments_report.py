@@ -36,8 +36,8 @@ class BundlerPaymentsReport(models.Model):
         result.append(html[0])
         utm_source_string = '(UTM source {})'.format(bundler.utm_source)
         for part in html_parts[1:-1]:
-            if utm_source_string in part:
-                part_no_header = part.split('</h3>', 1)[-1]
+            part_header, part_no_header = part.split('</h3>', 1)
+            if utm_source_string in part_header:
                 result.append('<h3>(UTM source {})</h3>{}'.format(bundler.utm_source, part_no_header))
 
         result.append('<h3>' + html_parts[-1])

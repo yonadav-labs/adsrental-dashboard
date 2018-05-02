@@ -381,6 +381,7 @@ class AdminBundlerPaymentsHTMLView(View):
 
 
 class BundlerPaymentsHTMLView(View):
+    @method_decorator(login_required)
     def get(self, request, report_id, bundler_id):
         report = BundlerPaymentsReport.objects.get(id=int(report_id))
         bundler = Bundler.objects.get(id=int(bundler_id))
@@ -395,6 +396,7 @@ class BundlerPaymentsHTMLView(View):
 
 
 class BundlerPaymentsListView(View):
+    @method_decorator(login_required)
     def get(self, request):
         return render(request, 'bundler_reports_list.html', context=dict(
             reports=BundlerPaymentsReport.objects.filter(cancelled=False),
