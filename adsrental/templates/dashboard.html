@@ -87,15 +87,10 @@
                             {% if entry.pi_delivered %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}           
                         </td>
                         <td>
-                            {% if entry.get_pi_sent_this_month %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.pi_sent|naturaltime|default:"Never"}}"></span>
+                            {% if entry.ship_date %}
+                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.ship_date|default:"Never"}}"></span>
                             {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: red;" title="{{entry.pi_sent|naturaltime|default:"Never"}}"</span>
-                                <form action="{% url "dashboard_check_sent" %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="leadid" value="{{entry.leadid}}">
-                                    <button class="btn btn-default">Check sent</button>
-                                </form>
+                                <span class="glyphicon glyphicon-remove" style="color: red;"</span>
                             {% endif %}
                         </td>
                     </tr>
