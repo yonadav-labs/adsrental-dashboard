@@ -579,7 +579,7 @@ class AutoBanView(View):
                 status=Lead.STATUS_QUALIFIED,
                 delivery_date__lte=now - datetime.timedelta(days=days_delivered),
         ):
-            for lead_account in lead.lead_accounts.all():
+            for lead_account in lead.lead_accounts.filter(status=Lead.STATUS_QUALIFIED):
                 banned_not_used.append({
                     'account': str(lead_account),
                     'delivery_date': lead.delivery_date,
