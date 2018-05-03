@@ -5,7 +5,6 @@ import decimal
 from django.db import models
 
 from adsrental.models.lead_account import LeadAccount
-from adsrental.models.bundler import Bundler
 
 
 class BundlerPaymentsReport(models.Model):
