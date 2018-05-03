@@ -56,6 +56,7 @@ class BundlerPaymentsReport(models.Model):
         lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
         for lead_account in lead_accounts:
             lead_account.bundler_paid = False
+            lead_account.bundler_paid_date = None
             lead_account.save()
         lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, charge_back_billed=True)
         for lead_account in lead_accounts:
