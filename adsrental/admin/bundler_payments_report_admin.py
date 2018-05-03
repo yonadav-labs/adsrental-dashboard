@@ -19,7 +19,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     search_fields = ('date', )
     actions = (
         'mark_as_paid',
-        'rollback',
+        # 'rollback',
         'mark',
         'unmark',
     )
