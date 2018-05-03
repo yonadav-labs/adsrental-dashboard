@@ -575,17 +575,19 @@ class AutoBanView(View):
                 # lead_account.charge_back = True
                 # lead_account.save()
 
-        for lead in Lead.objects.filter(
+        for lead_account in LeadAccount.objects.filter(
                 status=Lead.STATUS_QUALIFIED,
-                delivery_date__lte=now - datetime.timedelta(days=days_delivered),
-        ):
-            for lead_account in lead.lead_accounts.filter(status=LeadAccount.STATUS_QUALIFIED):
-                banned_not_used.append({
-                    'account': str(lead_account),
-                    'delivery_date': lead.delivery_date,
-                })
-                if execute:
-                    lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_NOT_USED)
+                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
+                active=True,
+                auto_ban_enabled=True,
+        ).select_related('lead'):
+            banned_not_used.append({
+                'account': str(lead_account),
+                'delivery_date': lead_account.lead.delivery_date,
+            })
+            if execute:
+                lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_NOT_USED)
 
         return JsonResponse({
             'execute': execute,
