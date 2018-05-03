@@ -20,6 +20,8 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_paid',
         'rollback',
+        'mark',
+        'unmark',
     )
 
     def links(self, obj):
@@ -42,3 +44,19 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
             report.rollback()
             messages.success(request, 'Report {} was rolled back successfully.'.format(report.id))
+
+    def mark(self, request, queryset):
+        for report in queryset:
+            result = report.mark()
+            messages.success(request, 'Report {} was marked successfully: {}'.format(report.id, result))
+
+    def unmark(self, request, queryset):
+        for report in queryset:
+            result = report.unmark()
+            messages.success(request, 'Report {} was unmarked successfully: {}'.format(report.id, result))
+
+    rollback.short_description = 'DEBUG: Rollback old reports'
+
+    mark.short_description = 'DEBUG: Mark all affected lead accounts'
+
+    unmark.short_description = 'DEBUG: Unmark all affected lead accounts'

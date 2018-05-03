@@ -195,7 +195,7 @@ class BundlerPaymentsView(View):
             pay_check=True,
             account_type=account_type,
             active=True,
-        ).order_by('created').prefetch_related('lead', 'lead__raspberry_pi')
+        ).order_by('created').select_related('lead__bundler', 'lead', 'lead__raspberry_pi')
 
         entries = []
         for lead_account in lead_accounts:
@@ -305,12 +305,32 @@ class BundlerPaymentsView(View):
             pdf_stream = io.BytesIO()
             pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), dest=pdf_stream)
             pdf_stream.seek(0)
-            BundlerPaymentsReport(
+
+            report_data = []
+            for data in bundlers_data:
+                report_data.append(dict(
+                    bundler=data['bundler'].id,
+                    facebook_entries=[{
+                        'id': i.id,
+                        'payment': str(i.payment),
+                        'parent_payment': str(i.parent_payment),
+                    } for i in data['facebook_entries']],
+                    google_entries=[{
+                        'id': i.id,
+                        'payment': str(i.payment),
+                        'parent_payment': str(i.parent_payment),
+                    } for i in data['google_entries']],
+                ))
+
+            report = BundlerPaymentsReport(
                 date=yesterday,
+                data=json.dumps(report_data),
                 html=html,
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
             ).save()
 
+            if request.GET.get('mark', '') == 'true':
+                report.mark()
 
         if request.GET.get('pdf'):
             html = render_to_string(
@@ -336,38 +356,6 @@ class BundlerPaymentsView(View):
             total=total,
             show_bundler_name=request.user.is_superuser,
         ))
-
-        if request.GET.get('mark', '') == 'true':
-            for data in bundlers_data:
-                final_total = decimal.Decimal('0.00')
-                for lead_account in data['facebook_entries']:
-                    payment = lead_account.payment
-                    if payment > 0 or lead_account.parent_payment > 0:
-                        final_total += payment
-                        lead_account.bundler_paid_date = yesterday
-                        lead_account.bundler_paid = True
-                        lead_account.save()
-
-                for lead_account in data['facebook_entries']:
-                    payment = lead_account.payment
-                    if payment < 0 and final_total + payment >= 0:
-                        lead_account.charge_back_billed = True
-                        lead_account.save()
-
-                final_total = decimal.Decimal('0.00')
-                for lead_account in data['google_entries']:
-                    payment = lead_account.payment
-                    if payment > 0 or lead_account.parent_payment > 0:
-                        final_total += payment
-                        lead_account.bundler_paid_date = yesterday
-                        lead_account.bundler_paid = True
-                        lead_account.save()
-
-                for lead_account in data['google_entries']:
-                    payment = lead_account.payment
-                    if payment < 0 and final_total + payment >= 0:
-                        lead_account.charge_back_billed = True
-                        lead_account.save()
 
         return response
 

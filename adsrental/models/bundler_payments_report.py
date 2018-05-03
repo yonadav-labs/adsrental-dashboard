@@ -1,8 +1,11 @@
 import re
+import json
+import decimal
 
 from django.db import models
 
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.bundler import Bundler
 
 
 class BundlerPaymentsReport(models.Model):
@@ -13,6 +16,7 @@ class BundlerPaymentsReport(models.Model):
     pdf = models.FileField(upload_to='bundler_payments_reports')
     html = models.TextField()
     paid = models.BooleanField(default=False)
+    data = models.TextField(default='')
     cancelled = models.BooleanField(default=False)
 
     def get_usernames(self):
@@ -65,3 +69,77 @@ class BundlerPaymentsReport(models.Model):
 
         self.cancelled = True
         self.save()
+
+    def mark(self):
+        result = {
+            'facebook_entries_ids': 0,
+            'chargeback_facebook_entries_ids': 0,
+            'google_entries_ids': 0,
+            'chargeback_google_entries_ids': 0,
+        }
+        for data in json.loads(self.data):
+            facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
+            google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
+
+            result['facebook_entries_ids'] += len(facebook_entries_ids)
+            result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
+            result['google_entries_ids'] += len(google_entries_ids)
+            result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
+
+            LeadAccount.objects.filter(id__in=facebook_entries_ids).update(
+                bundler_paid_date=self.date,
+                bundler_paid=True,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids).update(
+                charge_back_billed=True,
+            )
+            LeadAccount.objects.filter(id__in=google_entries_ids).update(
+                bundler_paid_date=self.date,
+                bundler_paid=True,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_google_entries_ids).update(
+                charge_back_billed=True,
+            )
+
+        self.cancelled = False
+        self.save()
+
+        return result
+
+    def unmark(self):
+        result = {
+            'facebook_entries_ids': 0,
+            'chargeback_facebook_entries_ids': 0,
+            'google_entries_ids': 0,
+            'chargeback_google_entries_ids': 0,
+        }
+        for data in json.loads(self.data):
+            facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
+            google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
+
+            result['facebook_entries_ids'] += len(facebook_entries_ids)
+            result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
+            result['google_entries_ids'] += len(google_entries_ids)
+            result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
+
+            LeadAccount.objects.filter(id__in=facebook_entries_ids).update(
+                bundler_paid_date=None,
+                bundler_paid=False,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids).update(
+                charge_back_billed=False,
+            )
+            LeadAccount.objects.filter(id__in=google_entries_ids).update(
+                bundler_paid_date=None,
+                bundler_paid=False,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_google_entries_ids).update(
+                charge_back_billed=False,
+            )
+        self.cancelled = True
+        self.save()
+        return result
