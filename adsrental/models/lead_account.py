@@ -43,6 +43,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_AUTO_OFFLINE = 'auto_offline'
     BAN_REASON_AUTO_WRONG_PASSWORD = 'auto_wrong_password'
     BAN_REASON_AUTO_CHECKPOINT = 'auto_checkpoint'
+    BAN_REASON_AUTO_NOT_USED = 'auto_not_used'
 
     BAN_REASON_CHOICES = (
         ('Google - Policy', 'Google - Policy', ),
@@ -57,6 +58,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (BAN_REASON_AUTO_OFFLINE, 'Auto: offline for 2 weeks', ),
         (BAN_REASON_AUTO_WRONG_PASSWORD, 'Auto: wrong password for 2 weeks', ),
         (BAN_REASON_AUTO_CHECKPOINT, 'Auto: reported security checkpoint for 2 weeks', ),
+        (BAN_REASON_AUTO_NOT_USED, 'Auto: not used for 2 weeks after delivery', ),
         ('Other', 'Other', ),
     )
 

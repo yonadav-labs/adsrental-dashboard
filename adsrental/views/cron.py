@@ -507,17 +507,21 @@ class AutoBanView(View):
     * execute - ban accounts, dry run otherwise
     * days_wrong_password - set  days wrong password after which account is banned, 14 by default
     * days_offline - set days offline after which account is banned, 14 by default
+    * days_offline - set days security_checkpoint reported after which account is banned, 14 by default
+    * days_delivered - set days delivered after which account is banned if not used, 14 by default
     '''
     def get(self, request):
         admin_user = User.objects.get(email=settings.ADMIN_USER_EMAIL)
         banned_wrong_password = []
         banned_offline = []
         banned_security_checkpoint = []
+        banned_not_used = []
         now = timezone.now()
         execute = request.GET.get('execute', '') == 'true'
         days_wrong_password = int(request.GET.get('days_wrong_password', 14))
         days_offline = int(request.GET.get('days_offline', 14))
         days_checkpoint = int(request.GET.get('days_checkpoint', 14))
+        days_delivered = int(request.GET.get('days_delivered', 14))
         for lead_account in LeadAccount.objects.filter(
                 wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
                 account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
@@ -571,10 +575,23 @@ class AutoBanView(View):
                 # lead_account.charge_back = True
                 # lead_account.save()
 
+        for lead in Lead.objects.filter(
+                status=Lead.STATUS_QUALIFIED,
+                delivery_date__lte=now - datetime.timedelta(days=days_delivered),
+        ):
+            for lead_account in lead.lead_accounts.all():
+                banned_not_used.append({
+                    'account': str(lead_account),
+                    'delivery_date': lead.delivery_date,
+                })
+                if execute:
+                    lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_NOT_USED)
+
         return JsonResponse({
             'execute': execute,
             'result': True,
             'banned_wrong_password': banned_wrong_password,
             'banned_offline': banned_offline,
             'banned_security_checkpoint': banned_security_checkpoint,
+            'banned_not_used': banned_not_used,
         })
