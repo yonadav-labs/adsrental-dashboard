@@ -577,7 +577,7 @@ class AutoBanView(View):
 
         for lead_account in LeadAccount.objects.filter(
                 status=Lead.STATUS_QUALIFIED,
-                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                # account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                 lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
                 active=True,
                 auto_ban_enabled=True,
