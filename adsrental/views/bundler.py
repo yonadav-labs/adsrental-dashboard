@@ -409,6 +409,7 @@ class BundlerPaymentsListView(View):
         return render(request, 'bundler_payments_list.html', context=dict(
             reports=BundlerPaymentsReport.objects.filter(cancelled=False),
             bundler=request.user.bundler,
+            date__gte=datetime.date(2018, 5, 2),
         ))
 
 
