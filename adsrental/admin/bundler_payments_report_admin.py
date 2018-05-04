@@ -20,6 +20,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_paid',
         # 'rollback',
+        'send_by_email',
         'mark',
         'unmark',
     )
@@ -54,6 +55,11 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         for report in queryset:
             result = report.unmark()
             messages.success(request, 'Report {} was unmarked successfully: {}'.format(report.id, result))
+
+    def send_by_email(self, request, queryset):
+        for report in queryset:
+            report.send_by_email()
+
 
     rollback.short_description = 'DEBUG: Rollback old reports'
 

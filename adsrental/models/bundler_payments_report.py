@@ -3,6 +3,8 @@ import json
 import decimal
 
 from django.db import models
+from django.conf import settings
+from django.core.mail import EmailMessage
 
 from adsrental.models.lead_account import LeadAccount
 
@@ -142,3 +144,13 @@ class BundlerPaymentsReport(models.Model):
         self.cancelled = True
         self.save()
         return result
+
+    def send_by_email(self):
+        email = EmailMessage(
+            'Payments report for {}'.format(self.date.strftime(settings.HUMAN_DATE_FORMAT)),
+            'Payments report for {}'.format(self.date.strftime(settings.HUMAN_DATE_FORMAT)),
+            'Adsrental Reporting <reporting@adsrental.com>',
+            settings.REPORT_RECIPIENTS,
+        )
+        email.attach('report_{}.pdf'.format(self.date), content=self.pdf.read(), mimetype='text/pdf')
+        email.send()
