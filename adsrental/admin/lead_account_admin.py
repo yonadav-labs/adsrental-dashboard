@@ -120,16 +120,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
             return None
 
-        if obj.antidetect_last_touch_date:
-            return naturaltime(obj.antidetect_last_touch_date) if obj.antidetect_last_touch_date else 'Never'
-
-        return naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never'
+        return naturaltime(obj.antidetect_last_touch_date) if obj.antidetect_last_touch_date else 'Never'
 
     def touch_count_field(self, obj):
-        if obj.antidetect_touch_count:
-            return obj.antidetect_touch_count
-
-        return obj.touch_count
+        return obj.antidetect_touch_count
 
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:

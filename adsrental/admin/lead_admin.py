@@ -20,7 +20,6 @@ from adsrental.admin.list_filters import \
     AccountTypeListFilter, \
     LeadAccountWrongPasswordListFilter, \
     DeliveryDateListFilter, \
-    LeadAccountTouchCountListFilter, \
     LeadAccountAntidetectTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
@@ -78,7 +77,6 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
-        LeadAccountTouchCountListFilter,
         LeadAccountAntidetectTouchCountListFilter,
         'company',
         'lead_account__bundler_paid',
@@ -205,18 +203,14 @@ class LeadAdmin(admin.ModelAdmin):
     def last_touch(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                if lead_account.antidetect_last_touch_date:
-                    return naturaltime(lead_account.antidetect_last_touch_date) if lead_account.antidetect_last_touch_date else 'Never'
-                return naturaltime(lead_account.last_touch_date) if lead_account.last_touch_date else 'Never'
+                return naturaltime(lead_account.antidetect_last_touch_date) if lead_account.antidetect_last_touch_date else 'Never'
 
         return None
 
     def touch_count_field(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                if lead_account.antidetect_touch_count:
-                    return lead_account.antidetect_touch_count
-                return lead_account.touch_count
+                return lead_account.antidetect_touch_count
 
         return None
 
