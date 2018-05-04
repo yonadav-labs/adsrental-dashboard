@@ -327,7 +327,8 @@ class BundlerPaymentsView(View):
                 data=json.dumps(report_data),
                 html=html,
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
-            ).save()
+            )
+            report.save()
 
             if request.GET.get('mark', '') == 'true':
                 report.mark()
