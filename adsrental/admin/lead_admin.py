@@ -305,10 +305,11 @@ class LeadAdmin(admin.ModelAdmin):
     def accounts_field(self, obj):
         result = []
         for lead_account in obj.lead_accounts.all():
-            result.append('<a href="{}?q={}">{}</a>'.format(
+            result.append('<a href="{}?q={}">{} ({})</a>'.format(
                 reverse('admin:adsrental_leadaccount_changelist'),
                 lead_account.username,
                 lead_account.account_type,
+                lead_account.status,
             ))
 
         return mark_safe(', '.join(result))
