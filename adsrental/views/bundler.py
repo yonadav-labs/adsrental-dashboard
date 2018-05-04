@@ -384,7 +384,7 @@ class BundlerPaymentsHTMLView(View):
         report = BundlerPaymentsReport.objects.get(id=int(report_id))
         if request.user.is_superuser:
             return HttpResponse(report.get_html_for_bundler(bundler))
-            
+
         if request.user.bundler == bundler:
             return HttpResponse(report.get_html_for_bundler(bundler))
 
