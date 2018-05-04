@@ -17,6 +17,7 @@ class BundlerPaymentsReport(models.Model):
     pdf = models.FileField(upload_to='bundler_payments_reports')
     html = models.TextField()
     paid = models.BooleanField(default=False)
+    email_sent = models.BooleanField(default=False)
     data = models.TextField(default='')
     cancelled = models.BooleanField(default=False)
 
@@ -154,3 +155,5 @@ class BundlerPaymentsReport(models.Model):
         )
         email.attach('report_{}.pdf'.format(self.date), content=self.pdf.read(), mimetype='text/pdf')
         email.send()
+        self.email_sent = True
+        self.save()

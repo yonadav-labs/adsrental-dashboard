@@ -14,6 +14,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         'date',
         'paid',
         'cancelled',
+        'email_sent',
         'links',
     )
     search_fields = ('date', )
