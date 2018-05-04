@@ -21,6 +21,7 @@ from adsrental.admin.list_filters import \
     LeadAccountWrongPasswordListFilter, \
     DeliveryDateListFilter, \
     LeadAccountTouchCountListFilter, \
+    LeadAccountAntidetectTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
     QualifiedDateListFilter, \
@@ -78,6 +79,7 @@ class LeadAdmin(admin.ModelAdmin):
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
         LeadAccountTouchCountListFilter,
+        LeadAccountAntidetectTouchCountListFilter,
         'company',
         'lead_account__bundler_paid',
         ShipDateListFilter,
@@ -203,6 +205,8 @@ class LeadAdmin(admin.ModelAdmin):
     def last_touch(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if lead_account.antidetect_last_touch_date:
+                    return naturaltime(lead_account.antidetect_last_touch_date) if lead_account.antidetect_last_touch_date else 'Never'
                 return naturaltime(lead_account.last_touch_date) if lead_account.last_touch_date else 'Never'
 
         return None
@@ -210,6 +214,8 @@ class LeadAdmin(admin.ModelAdmin):
     def touch_count_field(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if lead_account.antidetect_touch_count:
+                    return lead_account.antidetect_touch_count
                 return lead_account.touch_count
 
         return None
@@ -703,7 +709,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     last_touch.admin_order_field = 'lead_account__last_touch_date'
     touch_count_field.short_description = 'Touch count'
-    touch_count_field.admin_order_field = 'lead_account__touch_count'
+    touch_count_field.admin_order_field = 'lead_account__antidetect_touch_count'
 
     id_field.short_description = 'ID'
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'

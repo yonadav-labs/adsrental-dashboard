@@ -33,7 +33,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'friends',
         'bundler_paid',
         'last_touch',
-        'touch_count',
+        'touch_count_field',
         'adsdb_account_id',
         'wrong_password_date_field',
         'security_checkpoint_date_field',
@@ -120,7 +120,16 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
             return None
 
+        if obj.antidetect_last_touch_date:
+            return naturaltime(obj.antidetect_last_touch_date) if obj.antidetect_last_touch_date else 'Never'
+
         return naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never'
+
+    def touch_count_field(self, obj):
+        if obj.antidetect_touch_count:
+            return obj.antidetect_touch_count
+
+        return obj.touch_count
 
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:
@@ -265,9 +274,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
 
-    last_touch.admin_order_field = 'last_touch_date'
+    last_touch.admin_order_field = 'antidetect_last_touch_date'
 
-
+    touch_count_field.short_description = 'Touch count'
+    touch_count_field.admin_order_field = 'antidetect_touch_count'
 
 
 class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
@@ -284,7 +294,7 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         'friends',
         'bundler_paid',
         'last_touch',
-        'touch_count',
+        'touch_count_field',
         'adsdb_account_id',
         'wrong_password_date_field',
         'billed',
