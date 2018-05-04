@@ -9,16 +9,42 @@
 {% block content %}
 <div class="container">
     <h3>Check report for UTM source {{ bundler.utm_source }} for {{ date }}</h3>
-    <ul>
-        {% for lead_history in lead_histories %}
-            <li>
-                {{ lead_history.lead.name }} - ${{ lead_history.get_remaining_amount }}
-                {% if lead_history.amount_paid %}
-                    (paid ${{lead_history.amount_paid}})
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
-    <h4>Total: ${{ total }}</h4>
+    <table id="results" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>RPID</th>
+                <th>Address</th>
+                <th>Days online</th>
+                <th>Days offline</th>
+                <th>Days wrong password</th>
+                <th>Max payment</th>
+                <th>Amount</th>
+                <th>Amount paid</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead_history in lead_histories %}
+                <tr>
+                    <td>{{ lead_history.lead.name }}</td>
+                    <td>{{ lead_history.lead.status }}</td>
+                    <td>{{ lead_history.lead.raspberry_pi.rpid }}</td>
+                    <td>{{ lead_history.lead.get_address }}</td>
+                    <td>{{ lead_history.days_online }}</td>
+                    <td>{{ lead_history.days_offline }}</td>
+                    <td>{{ lead_history.days_wrong_password }}</td>
+                    <td>${{ lead_history.max_payment }}</td>
+                    <td>${{ lead_history.amount }}</td>
+                    <td>${{ lead_history.amount_paid }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th colspan="100" style="text-align: right;">${{ total }}</th>
+            </tr>
+        </tfoot>
+    </table>
 {% endblock %}
