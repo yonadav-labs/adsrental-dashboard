@@ -1,6 +1,5 @@
 'LeadHistory class'
 import datetime
-import decimal
 from dateutil.relativedelta import relativedelta
 
 from django.db import models
@@ -110,7 +109,7 @@ class LeadHistory(models.Model):
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
                     return self.NEW_MAX_PAYMENT
-                
+
                 return self.MAX_PAYMENT
 
         return 0.0
