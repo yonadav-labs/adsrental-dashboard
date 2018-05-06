@@ -32,9 +32,11 @@ class RDPDownloadView(View):
 class RDPConnectView(View):
     def get(self, request):
         rpid = request.GET.get('rpid', '')
+        force = request.GET.get('force', '') == 'true'
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if ec2_instance:
-            ec2_instance.update_from_boto()
+            if not ec2_instance.is_running() or force:
+                ec2_instance.update_from_boto()
             if not ec2_instance.is_stopped():
                 ec2_instance.start()
 
