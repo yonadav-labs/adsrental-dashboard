@@ -15,16 +15,37 @@
         </h1>
 
         {% if ec2_instance %}
-            {% if ec2_instance.is_running %}
-                <h3>EC2 instance is {{ ec2_instance.status }} now!</h3>
-                <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-primary btn-lg">Open RDP Client now.</a>
+            {% if not ec2_instance.is_running %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        EC2 instance is {{ ec2_instance.status }} now!
+                    </div>
+                    <div class="panel-body">
+                        <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-primary btn-lg">View in Windows RDP Client</a>
+                    </div>
+                </div>
             {% else %}
-                <h3>EC2 instance is {{ ec2_instance.status }} now. Please wait...</h3>
-                <script>
-                    setTimeout(function(){
-                        document.location.reload();
-                    }, 20000)
-                </script>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                        Preapairing EC2 instance. Please wait...
+                </div>
+                <div class="panel-body">
+                    <h3>Waiting for {{ rpid}} to come online. It is {{ ec2_instance.status }} now.</h3>
+                    <h3>This page will autoreload in <span class="countdown">20</span> seconds.</h3>
+                    <script>
+                        var reloadInSeconds = 20;
+                        setTimeout(function(){
+                            document.location.reload();
+                        }, 20000)
+                        setInterval(function(){
+                            if (reloadInSeconds > 0) {
+                                reloadInSeconds -= 1;
+                            }
+                            $('.countdown').text(reloadInSeconds);
+                        }, 1000);
+                    </script>
+                </div>
+            </div>
             {% endif %}
         {% endif %}
         
