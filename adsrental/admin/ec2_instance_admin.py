@@ -115,7 +115,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         links = []
         if obj.hostname:
             links.append('<a target="_blank" href="{url}">RDP URI</a>'.format(
-                url='rdp://full%20address=s:{hostname}:{port}&s:username={username}&password=s:{password}'.format(
+                url='rdp://{hostname}:{port}:{username}:{password}'.format(
                     hostname=obj.hostname,
                     port=23255,
                     username='Administrator',
