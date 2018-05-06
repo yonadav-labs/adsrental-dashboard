@@ -43,3 +43,9 @@ services:
     image: redis:latest
     expose:
       - "6379"
+  # rdpclient:
+  #   build: rdpclient
+  #   command: ./run.sh
+  #   ports:
+  #     - "9999:8000"
+  #     - "8000:8000"

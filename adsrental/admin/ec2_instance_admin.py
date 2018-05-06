@@ -113,6 +113,15 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
+        if obj.hostname:
+            links.append('<a target="_blank" href="{url}">RDP URI</a>'.format(
+                url='rdp://full%20address=s:{hostname}:{port}&s:username={username}&password=s:{password}'.format(
+                    hostname=obj.hostname,
+                    port=23255,
+                    username='Administrator',
+                    password=obj.password,
+                ),
+            ))
         if obj.lead and obj.lead.raspberry_pi:
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
