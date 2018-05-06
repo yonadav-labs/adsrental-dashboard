@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% load static %}
 {% load bootstrap %}
 
 {% block title_extra %}| RDP connection to {{ rpid }}{% endblock %}
@@ -15,13 +16,20 @@
         </h1>
 
         {% if ec2_instance %}
-            {% if not ec2_instance.is_running %}
+            {% if ec2_instance.is_running %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         EC2 instance is {{ ec2_instance.status }} now!
                     </div>
                     <div class="panel-body">
-                        <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-primary btn-lg">View in Windows RDP Client</a>
+                        <p>
+                            <a href="{{ ec2_instance.get_windows_rdp_uri|safe }}" class="btn btn-primary btn-lg">View in Windows RDP Client</a>
+                        </p>
+                        <p>If button above does not work, download and launch BAT script <a href="{% static 'scripts/install_rdp.bat' %}">from here</a></p>
+                        <p>
+                            <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-default">View in Mac/Android RDP Client</a>
+                            <a href="{% url 'rdp' rpid=rpid %}" class="btn btn-default">Download RDP config file</a>
+                        </p>
                     </div>
                 </div>
             {% else %}
@@ -54,7 +62,7 @@
             <div class="panel-body">
                 <form action="">
                     <input style="width: 100px;" type="text" name="rpid" value="{{ rpid }}" />
-                    <button class="btn btn-secondary">Go</button>
+                    <button class="btn btn-default">Go</button>
                 </form>
             </div>
         </div>
