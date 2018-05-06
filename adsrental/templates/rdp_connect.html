@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block title_extra %}| RDP connection to {{ rpid }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>
+            {% if ec2_instance %}
+                Connect to EC2 instance {{ rpid }}
+            {% else %}
+                Instance {{ rpid }} not found.
+            {% endif %}
+        </h1>
+
+        {% if ec2_instance %}
+            {% if ec2_instance.is_running %}
+                <h3>EC2 instance is {{ ec2_instance.status }} now!</h3>
+                <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-primary btn-lg">Open RDP Client now.</a>
+            {% else %}
+                <h3>EC2 instance is {{ ec2_instance.status }} now. Please wait...</h3>
+                <script>
+                    setTimeout(function(){
+                        document.location.reload();
+                    }, 20000)
+                </script>
+            {% endif %}
+        {% endif %}
+        
+        <div class="panel panel-default">
+            <div class="panel-heading">Select another RPID</div>
+            <div class="panel-body">
+                <form action="">
+                    <input style="width: 100px;" type="text" name="rpid" value="{{ rpid }}" />
+                    <button class="btn btn-secondary">Go</button>
+                </form>
+            </div>
+        </div>
+        <div>
+            <a href="{% url 'home' %}">
+                <button class="btn btn-lg btn-primary">Back to main page</button>
+            </a>
+        </div>
+    </div>
+{% endblock %}

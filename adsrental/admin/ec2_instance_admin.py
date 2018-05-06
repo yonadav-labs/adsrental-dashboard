@@ -113,17 +113,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
-        if obj.hostname:
-            links.append('<a target="_blank" href="{url}">RDP URI</a>'.format(
-                url='rdp://{hostname}:{port}:{username}:{password}'.format(
-                    hostname=obj.hostname,
-                    port=23255,
-                    username='Administrator',
-                    password=obj.password,
-                ),
+        if obj.rpid:
+            links.append('<a target="_blank" href="{url}?rpid={rpid}">Connect to RDP</a>'.format(
+                url=reverse('rdp_connect'),
+                rpid=obj.rpid,
             ))
         if obj.lead and obj.lead.raspberry_pi:
-            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            links.append('<a target="_blank" href="{url}">Old RDP</a>'.format(
                 url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
             ))
             today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))

@@ -489,3 +489,6 @@ class EC2Instance(models.Model):
 
     def get_r53_hostname(self):
         return '{}.{}'.format(self.rpid, self.R53_HOST)
+
+    def get_rdp_uri(self):
+        return 'rdp://{}:{}:{}:{}'.format(self.hostname, 23255, 'Administrator', self.password)

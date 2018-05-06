@@ -10,7 +10,7 @@ from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
 from adsrental.views.report import ReportView
-from adsrental.views.rdp import RDPDownloadView
+from adsrental.views.rdp import RDPDownloadView, RDPConnectView
 from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
@@ -27,6 +27,7 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^admin_helpers/action/(?P<model_name>[A-Za-z]+)/(?P<action_name>[a-z_]+)/(?P<object_id>.+)/', AdminActionView.as_view(), name='admin_helpers_action'),
     url(r'^$', LandingView.as_view(), name='home'),
     url(r'^terms/$', TermsView.as_view(), name='terms'),
+    url(r'^rdp/connect/$', RDPConnectView.as_view(), name='rdp_connect'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
     url(r'^cron/sync_from_shipstation/$', SyncFromShipStationView.as_view(), name='cron_sync_from_shipstation'),
     url(r'^cron/sync_delivered/$', SyncDeliveredView.as_view(), name='cron_sync_delivered'),
