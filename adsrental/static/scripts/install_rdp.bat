@@ -1,3 +1,31 @@
+
+Save New Duplicate & Edit Just Text Twitter
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
 @echo off
 
 if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin & exit)
@@ -10,8 +38,9 @@ echo RDP:// HyperLink uninstalled successfully
 pause
 exit)
 
-echo $hostname, $port = $args.split(':') > %HOMEPATH%\hyperlink-rdp.ps1
-echo cmdkey /generic:$hostname /user:"Administrator" /pass:"AdsInc18" >> %HOMEPATH%\hyperlink-rdp.ps1
+echo $params = $args.split('/')[2] > %HOMEPATH%\hyperlink-rdp.ps1
+echo $hostname, $port, $username, $password = $params.split(':') >> %HOMEPATH%\hyperlink-rdp.ps1
+echo cmdkey /generic:${hostname} /user:"${username}" /pass:"${password}" >> %HOMEPATH%\hyperlink-rdp.ps1
 echo Start-Process -FilePath "$env:windir\system32\mstsc.exe" -ArgumentList "/v:${hostname}:${port}" >> %HOMEPATH%\hyperlink-rdp.ps1
 
 reg add "HKCR\rdp" /f /v "" /t REG_SZ /d "URL:Remote Desktop Connection"
