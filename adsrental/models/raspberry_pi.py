@@ -117,10 +117,12 @@ class RaspberryPi(models.Model):
             RaspberryPiSession.start(self)
 
         lead = self.get_lead()
-        if lead and lead.status == lead.STATUS_QUALIFIED:
-            lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
+        if lead:
+            if lead.status == lead.STATUS_QUALIFIED:
+                lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
             for lead_account in lead.lead_accounts.all():
-                lead_account.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
+                if lead_account.status == lead_account.STATUS_QUALIFIED:
+                    lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
             lead.sync_to_adsdb()
 
         if not self.first_seen:
