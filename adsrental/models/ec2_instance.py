@@ -497,10 +497,11 @@ class EC2Instance(models.Model):
         return 'rdp://full%20address=s:{}:{}&username=s:{}'.format(self.hostname, 23255, 'Administrator')
 
     def get_web_rdp_link(self):
-        return 'http://{host}:{rdp_client_port}/#host={hostname}&user={user}&password={password}&connect=true'.format(
+        return 'http://{host}:{rdp_client_port}/#host={hostname}&user={user}&password={password}&rpid={rpid}&connect=true'.format(
             host=settings.HOSTNAME,
             rdp_client_port=9999,
             hostname=self.hostname,
             user='Administrator',
             password=self.password,
+            rpid=self.rpid,
         )

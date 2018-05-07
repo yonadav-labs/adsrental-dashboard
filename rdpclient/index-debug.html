@@ -4,7 +4,7 @@
         <link href='//fonts.googleapis.com/css?family=Quicksand' rel='stylesheet' type='text/css'>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <title>FreeRDP WebConnect: offline</title>
+        <title>Adsrental WebConnect: offline</title>
         <meta name="robots" content="nofollow" />
         <meta name="description" content="A HTML5 based RDP client">
         <meta name="viewport" content="width=device-width height=device-height user-scalable=no">
@@ -58,6 +58,9 @@
                     }
                     if (key == 'pass') {
                         $('rdppass').set('value', value);
+                    }
+                    if (key == 'rpid') {
+                        $('rpid').set('value', value);
                     }
                     if (key == 'connect') {
                         document.location.hash = '#'
@@ -163,7 +166,7 @@
                     uri = wsBase;
                 }
                 if(title === undefined){
-                    title = "FreeRDP WebConnect: connected to " + $('rdphost').value.trim();
+                    title = "Adsrental WebConnect: connected to " + $('rpid').value.trim();
                 }
                 if(!embedded){
                     $('dvLoading').setStyles({'visibility':'visible'});
@@ -520,6 +523,7 @@
         </script>
     </head>
     <body id="wrapper" onload="initBody()">
+        <input type="hidden" name="rpid" id="rpid" value="Unknown" />
         <div id="extracommands" style="height:28px; background-color:#f1f1f1; padding-left:25px; cursor:default; visibility:hidden;">
             Send keys:
             <ul>
@@ -649,7 +653,7 @@
                         </div>
                         <h4 title="Show version info">About</h4>
                         <div class="about">
-                            <h2>FreeRDP WebConnect</h2>
+                            <h2>Adsrental WebConnect</h2>
                             Version %VERSION%
                         </div>
                     </div>
