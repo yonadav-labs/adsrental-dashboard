@@ -60,6 +60,7 @@
                         $('rdppass').set('value', value);
                     }
                     if (key == 'connect') {
+                        document.location.hash = '#'
                         if (value == 'true') {
                             setTimeout(function(){
                                 console.log('connect');
