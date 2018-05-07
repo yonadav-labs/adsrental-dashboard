@@ -35,6 +35,7 @@
               <div id="navbar">
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.bundler %}
+                      <li><a href="{% url "bundler_leaderboard" bundler_id=user.bundler.id %}">Leaderboard</a></li>
                       <li><a href="{% url "bundler_report_payments_list" %}">Reports</a></li>
                       <li><a href="{% url "bundler_report_check" bundler_id=user.bundler.id %}">Check Report</a></li>
                     {% endif %}

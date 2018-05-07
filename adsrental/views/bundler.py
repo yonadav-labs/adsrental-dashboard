@@ -23,7 +23,7 @@ from adsrental.models.bundler import Bundler
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
 
-class BundlerReportView(View):
+class BundlerLeaderboardView(View):
     @method_decorator(login_required)
     def get(self, request, bundler_id):
         bundler = None
