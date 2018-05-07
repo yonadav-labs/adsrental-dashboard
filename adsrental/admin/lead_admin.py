@@ -104,7 +104,8 @@ class LeadAdmin(admin.ModelAdmin):
     )
     actions = (
         # 'update_from_shipstation',
-        'mark_as_qualified',
+        'mark_facebook_as_qualified',
+        'mark_google_as_qualified',
         'mark_as_disqualified',
         'ban_google_account',
         'unban_google_account',
@@ -319,10 +320,29 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             lead.update_from_shipstation()
 
-
-    def mark_as_qualified(self, request, queryset):
+    def mark_google_as_qualified(self, request, queryset):
         for lead in queryset:
-            for lead_account in lead.lead_accounts.all():
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
+                if lead_account.is_banned():
+                    messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
+                    continue
+
+                lead_account.qualify(request.user)
+                if lead_account.lead.assign_raspberry_pi():
+                    messages.success(
+                        request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
+
+                EC2Instance.launch_for_lead(lead_account.lead)
+                if lead_account.lead.add_shipstation_order():
+                    messages.success(
+                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+                else:
+                    messages.info(
+                        request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+
+    def mark_facebook_as_qualified(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 if lead_account.is_banned():
                     messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
                     continue
@@ -707,7 +727,10 @@ class LeadAdmin(admin.ModelAdmin):
     touch_count_field.admin_order_field = 'lead_account__antidetect_touch_count'
 
     id_field.short_description = 'ID'
-    mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
+
+    mark_facebook_as_qualified.short_description = 'Mark Facebook account as Qualified'
+    mark_google_as_qualified.short_description = 'Mark Google account as Qualified'
+
     ec2_instance_link.short_description = 'EC2 instance'
 
     email_field.short_description = 'Email'
@@ -824,7 +847,8 @@ class ReadOnlyLeadAdmin(LeadAdmin):
 
     actions = (
         # 'update_from_shipstation',
-        # 'mark_as_qualified',
+        # 'mark_facebook_as_qualified',
+        # 'mark_google_as_qualified',
         # 'mark_as_disqualified',
         # 'ban_google_account',
         # 'unban_google_account',
