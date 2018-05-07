@@ -10,7 +10,10 @@
 
 <div class="container">
     {% block actions_buttons %}
-        <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
+        <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
+        {% if allow_change %}
+            <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
+        {% endif %}
     {% endblock actions_buttons %}
     {% for data in bundlers_data %}
         {% if show_bundler_name %}

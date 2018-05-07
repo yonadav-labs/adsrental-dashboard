@@ -3,7 +3,7 @@ import json
 import io
 import decimal
 
-from django.shortcuts import render, Http404
+from django.shortcuts import render, Http404, redirect
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -333,6 +333,8 @@ class BundlerPaymentsView(View):
             if request.GET.get('mark', '') == 'true':
                 report.mark()
 
+            return redirect('admin:adsrental_bundlerpaymentsreport_changelist')
+
         if request.GET.get('pdf'):
             html = render_to_string(
                 'bundler_payments_pdf.html',
@@ -356,6 +358,7 @@ class BundlerPaymentsView(View):
             end_date=yesterday,
             total=total,
             show_bundler_name=request.user.is_superuser,
+            allow_change=request.user.is_superuser,
         ))
 
         return response
