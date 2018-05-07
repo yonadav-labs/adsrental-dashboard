@@ -109,6 +109,9 @@ class CustomIndexDashboard(Dashboard):
                         lead_account__charge_back_billed__exact='0',
                     )),
                 )],
+                [_('Bundler payments report preview'), '{}'.format(
+                    reverse('bundler_lead_payments'),
+                )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urlencode(dict(
