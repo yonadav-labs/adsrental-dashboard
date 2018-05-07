@@ -23,7 +23,10 @@
                     </div>
                     <div class="panel-body">
                         <p>
-                            <a href="{{ ec2_instance.get_windows_rdp_uri|safe }}" class="btn btn-primary btn-lg">View in Windows RDP Client</a>
+                            <a target="_blank" href="{{ ec2_instance.get_web_rdp_link|safe }}" class="btn btn-primary btn-lg">View in Web RDP Client</a>
+                        </p>
+                        <p>
+                            <a href="{{ ec2_instance.get_windows_rdp_uri|safe }}" class="btn btn-default btn-lg">View in Windows RDP Client</a>
                         </p>
                         <p>If button above does not work, download and launch BAT script <a href="{% static 'scripts/install_rdp.bat' %}">from here</a></p>
                         <p>

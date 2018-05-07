@@ -21,6 +21,7 @@ RUN ./setup.sh -f
 
 WORKDIR /app/FreeRDP-WebConnect/wsgate/build
 ADD wsgate.ini ./wsgate.ini
+ADD index-debug.html ../webroot/index-debug.html
 ADD run.sh ./run.sh
 
 CMD ["./run.sh"]
