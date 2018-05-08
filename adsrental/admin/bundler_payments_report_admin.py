@@ -26,6 +26,12 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         'unmark',
     )
 
+    def get_actions(self, request):
+        actions = super(BundlerPaymentsReportAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
     def links(self, obj):
         result = []
         result.append('<a target="_blank" href="{url}">View</a>'.format(url=reverse('admin_bundler_report_payments', kwargs=dict(report_id=obj.id))))
