@@ -45,7 +45,7 @@ class CustomIndexDashboard(Dashboard):
                     urlencode(dict(
                         account_type='facebook',
                         status='Active',
-                        company__exact='FBM',
+                        # company__exact='FBM',
                     )),
                 )],
                 [_('Master Report for Google Accounts'), '{}?{}'.format(

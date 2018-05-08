@@ -47,6 +47,7 @@ services:
     build: rdpclient
     command: ./run.sh
     volumes:
-      - ./rdpclient/index-debug.html:/app/FreeRDP-WebConnect/wsgate/webroot/index-debug.html
+      - ./rdpclient/webconnect.html:/app/FreeRDP-WebConnect/wsgate/webroot/index-debug.html
+      - ./rdpclient/clipboard.js:/app/FreeRDP-WebConnect/wsgate/webroot/js/clipboard.js
     ports:
       - "9999:8000"

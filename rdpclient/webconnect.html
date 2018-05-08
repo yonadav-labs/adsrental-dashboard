@@ -18,6 +18,7 @@
         <script src="js/simpletabs%JSDEBUG%.js"></script>
         <script src="js/wsgate%JSDEBUG%.js"></script>
         <script src="js/vkb%JSDEBUG%.js"></script>
+        <script src="js/clipboard.js"></script>
         <!--<script language="javascript" type="text/javascript" src="js/rdpevents%JSDEBUG%.js"></script>-->
         <script language="javascript" type="text/javascript">
             var wsBase = "%WSURI%";
@@ -46,7 +47,6 @@
                 paramPairs.forEach(function(pair){
                     var key = pair.split('=')[0];
                     var value = pair.split('=')[1];
-                    console.log(key, value);
                     if (key == 'host') {
                         $('rdphost').set('value', value);
                     }
@@ -63,7 +63,7 @@
                         $('rpid').set('value', value);
                     }
                     if (key == 'connect') {
-                        document.location.hash = '#'
+                        // document.location.hash = '#';
                         if (value == 'true') {
                             setTimeout(function(){
                                 console.log('connect');
@@ -514,6 +514,7 @@
                             sizeswitch:false,
                             numpadtoggle:false
                         });
+                        initializeClipboard();
                     } else {
                         alert('Sorry!\nYour Browser (' + Browser.name + ' ' + Browser.version
                                 + ') does not yet\nprovide the required HTML5 features '
@@ -534,10 +535,12 @@
                 <li id="alttab">
                     Alt+Tab
                 </li>
-                <li id="keyboardlanguage">
+                <li id="keyboardlanguage" class="invisible" style="display: none;">
                     Multilanguage keyboard
                 </li>
             </ul>
+            <input type="text" id="clipboard_content" style="float:right;" >
+            <button id="clipboard_paste" style="float:right;">Paste</button>
             <button id="disconnect" type="button" style="float:right; margin-right:40px; margin-top:2px">Disconnect</button>
         </div>
         <div id="IMEhelper" style="z-index:1111;visibility:hidden;height:auto;width:auto;display:inline;position:absolute;background-color:#ffffff;"></div>
