@@ -15,6 +15,43 @@
             <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
         {% endif %}
     {% endblock actions_buttons %}
+
+    {% if allow_change %}
+        <h3>Summary</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in bundlers_data %}
+                    <tr>
+                        <td>Bundler {{ data.bundler }}</td>
+                        <td>${{ data.total }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>Total Google pay </td>
+                    <td>${{ total_google }}</td>
+                </tr>
+                <tr>
+                    <td>Total Facebook pay </td>
+                    <td>${{ total_facebook }}</td>
+                </tr>
+                <tr>
+                    <td>Total Chargebacks </td>
+                    <td>${{ total_chargeback }}</td>
+                </tr>
+                <tr>
+                    <td>Total pay for all accounts </td>
+                    <td>${{ total }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+
     {% for data in bundlers_data %}
         {% if show_bundler_name %}
             <h3>Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}</h3>

@@ -257,7 +257,10 @@ class BundlerPaymentsView(View):
 
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
         bundlers_data = []
-        total = decimal.Decimal(0.0)
+        total = decimal.Decimal('0.00')
+        total_google = decimal.Decimal('0.00')
+        total_facebook = decimal.Decimal('0.00')
+        total_chargeback = decimal.Decimal('0.00')
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
@@ -286,6 +289,9 @@ class BundlerPaymentsView(View):
 
         for data in bundlers_data:
             total += data['total']
+            total_google += data['google_total']
+            total_facebook += data['facebook_total'] 
+            total_chargeback += data['facebook_chargeback_total'] + data['google_chargeback_total']
 
         bundlers_data.sort(key=lambda x: x['total'], reverse=True)
 
@@ -298,7 +304,11 @@ class BundlerPaymentsView(View):
                     end_date=yesterday,
                     total=total,
                     show_bundler_name=request.user.is_superuser,
+                    allow_change=request.user.is_superuser,
                     pdf=True,
+                    total_google=total_google,
+                    total_facebook=total_facebook,
+                    total_chargeback=total_chargeback,
                 ),
                 request=request,
             )
@@ -345,6 +355,10 @@ class BundlerPaymentsView(View):
                     total=total,
                     show_bundler_name=request.user.is_superuser,
                     pdf=True,
+                    allow_change=request.user.is_superuser,
+                    total_google=total_google,
+                    total_facebook=total_facebook,
+                    total_chargeback=total_chargeback,
                 ),
                 request=request,
             )
@@ -359,6 +373,9 @@ class BundlerPaymentsView(View):
             total=total,
             show_bundler_name=request.user.is_superuser,
             allow_change=request.user.is_superuser,
+            total_google=total_google,
+            total_facebook=total_facebook,
+            total_chargeback=total_chargeback,
         ))
 
         return response
