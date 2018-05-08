@@ -416,7 +416,7 @@ class BundlerPaymentsListView(View):
     @method_decorator(login_required)
     def get(self, request):
         return render(request, 'bundler_payments_list.html', context=dict(
-            reports=BundlerPaymentsReport.objects.filter(cancelled=False),
+            reports=BundlerPaymentsReport.objects.filter(cancelled=False).order_by('-date'),
             bundler=request.user.bundler,
             date__gte=datetime.date(2018, 5, 2),
         ))
