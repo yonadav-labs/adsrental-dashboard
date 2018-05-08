@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="container">
-    <h3>Check report for UTM source {{ bundler.utm_source }} for {{ date }}</h3>
+    <h3>Check report for UTM source {{ bundler.utm_source }} for {{ date_formatted }}</h3>
     <table id="results" class="table table-striped">
         <thead>
             <tr>
@@ -22,6 +22,7 @@
                 <th>Max payment</th>
                 <th>Amount</th>
                 <th>Amount paid</th>
+                <th>Links</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +38,7 @@
                     <td>${{ lead_history.max_payment }}</td>
                     <td>${{ lead_history.amount }}</td>
                     <td>${{ lead_history.amount_paid }}</td>
+                    <td><a target="_blank" href="{% url 'bundler_report_check_days' bundler_id=bundler.id lead_id=lead_history.lead.leadid %}?date={{ date|date:"Y-m-d" }}">Timestamps</a></td>
                 </tr>
             {% endfor %}
         </tbody>

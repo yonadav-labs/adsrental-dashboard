@@ -5,7 +5,7 @@ from django.conf.urls import url
 
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
-from adsrental.views.bundler import BundlerLeaderboardView, BundlerPaymentsView, BundlerLeadPaymentsView, BundlerPaymentsHTMLView, AdminBundlerPaymentsHTMLView, BundlerPaymentsListView, BundlerCheckView
+from adsrental.views.bundler import BundlerLeaderboardView, BundlerPaymentsView, BundlerLeadPaymentsView, BundlerPaymentsHTMLView, AdminBundlerPaymentsHTMLView, BundlerPaymentsListView, BundlerCheckView, BundlerCheckDaysView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
@@ -70,4 +70,5 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^bundler/report/payments/(?P<report_id>\d+)/(?P<bundler_id>\d+)/$', BundlerPaymentsHTMLView.as_view(), name='bundler_report_payments'),
     url(r'^bundler/report/payments/list/$', BundlerPaymentsListView.as_view(), name='bundler_report_payments_list'),
     url(r'^bundler/report/check/(?P<bundler_id>\d+)/$', BundlerCheckView.as_view(), name='bundler_report_check'),
+    url(r'^bundler/report/check/(?P<bundler_id>\d+)/days/(?P<lead_id>\S*)/$', BundlerCheckDaysView.as_view(), name='bundler_report_check_days'),
 ]
