@@ -8,7 +8,7 @@ from django.views import View
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.db.models.functions import TruncDay
+from django.db.models.functions import TruncDay, TruncHour
 from django.db.models import Count
 from django.utils import timezone, dateformat
 from django.template.loader import render_to_string
@@ -38,6 +38,7 @@ class BundlerLeaderboardView(View):
         if not bundler:
             raise Http404
 
+        now = timezone.now()
         lead_accounts = LeadAccount.objects.filter(qualified_date__isnull=False)
         lead_accounts = lead_accounts.filter(lead__bundler=bundler)
 
@@ -52,21 +53,32 @@ class BundlerLeaderboardView(View):
         for qualified_date, value in lead_accounts_by_date:
             lead_accounts_by_date_dict[qualified_date.date()] = value
 
-        entries = []
+        lead_accounts_by_time = (
+            lead_accounts
+            .filter(qualified_date__gte=now - datetime.timedelta(days=1))
+            .order_by('qualified_date')
+            .annotate(hour=TruncHour('qualified_date'))
+            .values('hour')
+            .annotate(count=Count('id'))
+            .values_list('hour', 'count')
+        )
+
+        month_entries = []
         now = timezone.now()
         for i in range(30):
             date = (now - datetime.timedelta(days=i)).date()
             value = lead_accounts_by_date_dict.get(date, 0)
-            entries.append([dateformat.format(date, 'jS F'), value])
+            month_entries.append([dateformat.format(date, 'jS F'), value])
 
-        entries.reverse()
+        month_entries.reverse()
 
-        return render(request, 'bundler_dashboard.html', dict(
+        return render(request, 'bundler_leaderboard.html', dict(
             user=request.user,
             bundler=bundler,
-            entries=entries,
-            entries_keys_json=json.dumps([k for k, v in entries]),
-            entries_values_json=json.dumps([v for k, v in entries]),
+            month_entries_keys_json=json.dumps([k for k, v in month_entries]),
+            month_entries_values_json=json.dumps([v for k, v in month_entries]),
+            day_entries_keys_json=json.dumps([k for k, v in lead_accounts_by_time]),
+            day_entries_values_json=json.dumps([v for k, v in lead_accounts_by_time]),
         ))
 
 
