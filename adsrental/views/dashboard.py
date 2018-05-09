@@ -4,6 +4,7 @@ import datetime
 from urllib.parse import urlencode
 
 from django.views import View
+from django.db.models import Q
 from django.urls import reverse
 from django.shortcuts import render, redirect, Http404
 from django.http import HttpResponseRedirect
@@ -86,27 +87,40 @@ class DashboardView(View):
     @method_decorator(login_required)
     def get(self, request):
         form = DashboardForm(request.GET)
+        now = timezone.now()
         entries = []
         if form.is_valid():
             entries = self.get_entries(request.user)
-            if form.cleaned_data['ec2_state']:
-                value = form.cleaned_data['ec2_state']
+            if form.cleaned_data['raspberry_pi_status']:
+                value = form.cleaned_data['raspberry_pi_status']
                 entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)
                 if value == 'online':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__gte=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                        raspberry_pi__last_seen__gte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
                     )
                 if value == 'offline':
+                    entries = entries.filter(Q(
+                        raspberry_pi__last_seen__lte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                    ) | Q(
+                        raspberry_pi__last_seen__isnull=True,
+                    ))
+                if value == 'offline_0_2days':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                        raspberry_pi__last_seen__lte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                        raspberry_pi__last_seen__gte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
                     )
-                if value == 'offline_2days':
+                if value == 'offline_3_5days':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
+                        raspberry_pi__last_seen__lte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 24 * 60),
+                        raspberry_pi__last_seen__gte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
                     )
                 if value == 'offline_5days':
                     entries = entries.filter(
-                        raspberry_pi__last_seen__lt=timezone.now() - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
+                        raspberry_pi__last_seen__lte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 5 * 24 * 60),
+                    )
+                if value == 'never':
+                    entries = entries.filter(
+                        raspberry_pi__last_seen__isnull=True,
                     )
 
             if form.cleaned_data['wrong_password']:

@@ -292,7 +292,7 @@ class BundlerPaymentsView(View):
         for data in bundlers_data:
             total += data['total']
             total_google += data['google_total']
-            total_facebook += data['facebook_total'] 
+            total_facebook += data['facebook_total']
             total_chargeback += data['facebook_chargeback_total'] + data['google_chargeback_total']
 
         bundlers_data.sort(key=lambda x: x['total'], reverse=True)
@@ -430,7 +430,7 @@ class BundlerCheckView(View):
     def get(self, request, bundler_id):
         date_str = request.GET.get('date', timezone.now().strftime(settings.SYSTEM_DATE_FORMAT))
         date = datetime.datetime.strptime(date_str, settings.SYSTEM_DATE_FORMAT).date()
-        
+
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         if not bundler:
             raise Http404
