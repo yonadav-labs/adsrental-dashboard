@@ -151,15 +151,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def sync_to_adsdb(self):
         'Send lead account info to ADSDB'
-        if not settings.ADSDB_SYNC_ENABLED:
-            return False
+        # if not settings.ADSDB_SYNC_ENABLED:
+        #     return False
 
         lead = self.lead
-        if lead.company != lead.COMPANY_FBM:
+        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
             return False
+        # if lead.company != lead.COMPANY_FBM:
+        #     return False
         if lead.status != lead.STATUS_IN_PROGRESS:
-            return False
-        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK and self.touch_count < 5:
             return False
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
