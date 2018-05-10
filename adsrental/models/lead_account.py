@@ -192,7 +192,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 json=[data],
                 auth=auth,
             )
-            response_json = response.json()
+            try:
+                response_json = response.json()
+            except:
+                return {'error': True}
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
@@ -210,8 +213,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             },
             auth=auth,
         )
+        try:
+            response_json = response.json()
+        except:
+            return {'error': True}
 
-        response_json = response.json()
         return response_json
 
     def set_correct_password(self, new_password, edited_by):
