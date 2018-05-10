@@ -95,7 +95,7 @@
                     console.log('check', netstatURL);
                     var reRDP = new RegExp("TCP\\s+\\d+.\\d+.\\d+.\\d+:23255\\s+\\S+\\s+ESTABLISHED");
                     if (reRDP.test(data)) {
-                        $('#client_message_container').html('<div class="alert alert-info check_instance_state" role="alert">Somewone is using RDP now. WIll check again in 10 seconds.</div>');
+                        $('#client_message_container').html('<div class="alert alert-danger check_instance_state" role="alert">Someone is using RDP now. I will check again in 10 seconds.</div>');
                         setTimeout(checkEC2State, 10000);
                     } else {
                         $('#client_message_container').html('<div class="alert alert-success check_instance_state" role="alert">No one is using RDP now, feel free to connect!</div>');
