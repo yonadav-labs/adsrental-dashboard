@@ -440,7 +440,13 @@ class BundlerPaymentsListView(View):
 class BundlerCheckView(View):
     @method_decorator(login_required)
     def get(self, request, bundler_id):
-        date_str = request.GET.get('date', timezone.now().strftime(settings.SYSTEM_DATE_FORMAT))
+        now = timezone.now()
+
+        select_dates = []
+        for months_ago in range(3, 0, -1):
+            select_dates.append((now.replace(day=1) - relativedelta(months=months_ago)).date())
+
+        date_str = request.GET.get('date', select_dates[-1].strftime(settings.SYSTEM_DATE_FORMAT))
         date = datetime.datetime.strptime(date_str, settings.SYSTEM_DATE_FORMAT).date()
 
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
@@ -450,11 +456,9 @@ class BundlerCheckView(View):
         if not request.user.is_superuser and request.user.bundler != bundler:
             raise Http404
 
-        first_day_of_last_month = date.replace(day=1) - relativedelta(months=1)
-
         lead_histories = LeadHistoryMonth.objects.filter(
             lead__bundler=bundler,
-            date=first_day_of_last_month,
+            date=date,
         ).select_related('lead', 'lead__raspberry_pi')
         total = decimal.Decimal('0.00')
         for lead_history in lead_histories:
@@ -463,8 +467,9 @@ class BundlerCheckView(View):
         return render(request, 'bundler_report_check.html', context=dict(
             lead_histories=lead_histories,
             bundler=bundler,
-            date_formatted=first_day_of_last_month.strftime('%B %Y'),
-            date=first_day_of_last_month,
+            date_formatted=date.strftime('%B %Y'),
+            date=date,
+            select_dates=select_dates,
             total=total,
         ))
 
