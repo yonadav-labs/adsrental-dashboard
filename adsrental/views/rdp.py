@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.views import View
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
@@ -31,7 +32,7 @@ class RDPDownloadView(View):
 
 class RDPConnectView(View):
     def get(self, request):
-        rpid = request.GET.get('rpid', '')
+        rpid = request.GET.get('rpid', 'none')
         force = request.GET.get('force', '') == 'true'
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if ec2_instance:
@@ -43,4 +44,5 @@ class RDPConnectView(View):
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
             ec2_instance=ec2_instance,
+            netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
         ))

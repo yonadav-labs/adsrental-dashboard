@@ -15,7 +15,12 @@
             {% endif %}
         </h1>
 
+
         {% if ec2_instance %}
+            <div id="client_message_container">
+                <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
+            </div>
+
             {% if ec2_instance.is_running %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -36,27 +41,15 @@
                     </div>
                 </div>
             {% else %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                        Preapairing EC2 instance. Please wait...
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            Preapairing EC2 instance. Please wait...
+                    </div>
+                    <div class="panel-body">
+                        <h3>Waiting for {{ rpid}} to come online. It is {{ ec2_instance.status }} now.</h3>
+                        <h3>This page will autoreload in <span class="countdown reload_enabled">20</span> seconds.</h3>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <h3>Waiting for {{ rpid}} to come online. It is {{ ec2_instance.status }} now.</h3>
-                    <h3>This page will autoreload in <span class="countdown">20</span> seconds.</h3>
-                    <script>
-                        var reloadInSeconds = 20;
-                        setTimeout(function(){
-                            document.location.reload();
-                        }, 20000)
-                        setInterval(function(){
-                            if (reloadInSeconds > 0) {
-                                reloadInSeconds -= 1;
-                            }
-                            $('.countdown').text(reloadInSeconds);
-                        }, 1000);
-                    </script>
-                </div>
-            </div>
             {% endif %}
         {% endif %}
         
@@ -75,4 +68,42 @@
             </a>
         </div>
     </div>
+
 {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        if ($('.reload_enabled').length){
+            var reloadInSeconds = 20;
+            setTimeout(function(){
+                document.location.reload();
+            }, 20000)
+            setInterval(function(){
+                if (reloadInSeconds > 0) {
+                    reloadInSeconds -= 1;
+                }
+                $('.countdown').text(reloadInSeconds);
+            }, 1000);
+        }
+
+        if ($('.check_instance_state').length) {
+            var netstatURL = "{{ netstat_url }}";
+            var checkEC2State = function(){
+                $.get(netstatURL).done(function( data ) {
+                    console.log( "Data Loaded: " + data );
+                    console.log('check', netstatURL);
+                    var reRDP = new RegExp("TCP\s+\d+.\d+.\d+.\d+:23255\s+\S+\s+ESTABLISHED");
+                    if (reRDP.test(data)) {
+                        $('#client_message_container').html('<div class="alert alert-info check_instance_state" role="alert">Somewone is using RDP now. WIll check again in 10 seconds.</div>');
+                        setTimeout(checkEC2State, 10000);
+                    } else {
+                        $('#client_message_container').html('<div class="alert alert-success check_instance_state" role="alert">No one is using RDP now, feel free to connect!</div>');
+                    }
+                });
+            };
+
+            checkEC2State();
+        }
+    </script>
+{% endblock scripts %}
