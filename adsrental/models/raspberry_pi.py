@@ -123,7 +123,7 @@ class RaspberryPi(models.Model):
             for lead_account in lead.lead_accounts.all():
                 if lead_account.status == lead_account.STATUS_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
-            lead.sync_to_adsdb()
+            # lead.sync_to_adsdb()
 
         if not self.first_seen:
             self.first_seen = now
