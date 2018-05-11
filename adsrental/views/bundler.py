@@ -62,6 +62,9 @@ class BundlerLeaderboardView(View):
             .annotate(count=Count('id'))
             .values_list('hour', 'count')
         )
+        lead_accounts_by_time_list = []
+        for k, v in lead_accounts_by_time:
+            lead_accounts_by_time_list.append([k.strftime('%H:00'), v])
 
         month_entries = []
         now = timezone.now()
@@ -77,8 +80,8 @@ class BundlerLeaderboardView(View):
             bundler=bundler,
             month_entries_keys_json=json.dumps([k for k, v in month_entries]),
             month_entries_values_json=json.dumps([v for k, v in month_entries]),
-            day_entries_keys_json=json.dumps([k for k, v in lead_accounts_by_time]),
-            day_entries_values_json=json.dumps([v for k, v in lead_accounts_by_time]),
+            day_entries_keys_json=json.dumps([k for k, v in lead_accounts_by_time_list]),
+            day_entries_values_json=json.dumps([v for k, v in lead_accounts_by_time_list]),
         ))
 
 
