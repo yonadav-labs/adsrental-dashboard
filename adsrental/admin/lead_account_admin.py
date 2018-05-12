@@ -155,13 +155,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.success(
                     request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-            EC2Instance.launch_for_lead(lead_account.lead)
             if lead_account.lead.add_shipstation_order():
                 messages.success(
                     request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
             else:
                 messages.info(
                     request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+
+            EC2Instance.launch_for_lead(lead_account.lead)
 
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
