@@ -471,9 +471,9 @@ class SyncOfflineView(View):
 
             customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
             lead.raspberry_pi.report_offline()
-            # ec2_instance = lead.get_ec2_instance()
-            # if ec2_instance:
-            #     ec2_instance.stop()
+            ec2_instance = lead.get_ec2_instance()
+            if ec2_instance:
+                ec2_instance.stop()
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__isnull=False,
