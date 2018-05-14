@@ -346,6 +346,9 @@ class BotoResource(object):
             if not instance:
                 raise ValueError('Boto did not create isntance. Try again.')
 
+            # instance.password = generate_password(length=8)
+            # instance.save()
+
         ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
         instance = ec2_instance_model.upsert_from_boto(instance)
         return instance

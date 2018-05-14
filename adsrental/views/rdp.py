@@ -38,7 +38,7 @@ class RDPConnectView(View):
         if ec2_instance:
             if not ec2_instance.is_running() or force:
                 ec2_instance.update_from_boto()
-            if not ec2_instance.is_stopped():
+            if ec2_instance.is_stopped():
                 ec2_instance.start()
 
         return render(request, 'rdp_connect.html', dict(
