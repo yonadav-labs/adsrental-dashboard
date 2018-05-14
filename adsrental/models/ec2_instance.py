@@ -469,13 +469,15 @@ class EC2Instance(models.Model):
         'Obsolete method. Was used to update all old non-human-friendly passwords.'
         if password is None:
             password = self.password
-        else:
-            self.password = password
-            self.save()
+
 
         output = self.ssh_execute('net user Administrator {password}'.format(password=password))
         if 'successfully' not in output:
             raise ValueError(output)
+
+        self.password = password
+        self.save()
+
 
     def set_ec2_tags(self):
         'Update RPID and email in EC2 metadata on AWS.'
