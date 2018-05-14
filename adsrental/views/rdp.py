@@ -44,10 +44,12 @@ class RDPConnectView(View):
         if ec2_instance:
             if not ec2_instance.is_running() or force:
                 ec2_instance.update_from_boto()
-                if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
-                    ec2_instance.change_password(generate_password(length=12))
             if ec2_instance.is_stopped():
                 ec2_instance.start()
+
+            if ec2_instance.is_running():
+                if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
+                    ec2_instance.change_password(generate_password(length=12))
 
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
