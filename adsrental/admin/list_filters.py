@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
 
@@ -320,6 +320,7 @@ class AccountTypeListFilter(SimpleListFilter):
         return (
             ('facebook', 'Facebook'),
             ('google', 'Google'),
+            ('google_facebook', 'Google and Facebook'),
         )
 
     def queryset(self, request, queryset):
@@ -327,6 +328,8 @@ class AccountTypeListFilter(SimpleListFilter):
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
         if self.value() == 'google':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
+        if self.value() == 'google_facebook':
+            return queryset.annotate(lead_accounts_count=Count('lead_account')).filter(lead_accounts_count__gt=1)
         return None
 
 
