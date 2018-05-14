@@ -4,6 +4,7 @@ import time
 import uuid
 import secrets
 import string
+import random
 
 import requests
 import boto3
@@ -346,7 +347,7 @@ class BotoResource(object):
             if not instance:
                 raise ValueError('Boto did not create isntance. Try again.')
 
-            # instance.password = generate_password(length=12, check_digits=True)
+            # instance.password = generate_password(length=12)
             # instance.save()
 
         ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
@@ -524,14 +525,14 @@ class PingCacheHelper(object):
         return ping_data
 
 
-def generate_password(length=12, check_digits=False):
-    alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for i in range(length))
-    if check_digits:
-        for digit in string.digits:
-            if digit in password:
-                break
-        else:
-            password = '{}{}'.format(password[:-1], secrets.choice(string.digits))
+def generate_password(length=12):
+    result = []
+    for i in range(2):
+        result.append(secrets.choice(string.digits))
+    for i in range(2):
+        result.append(secrets.choice(string.ascii_uppercase))
+    for i in range(length - 4):
+        result.append(secrets.choice(string.ascii_lowercase))
 
-    return password
+    random.shuffle(result)
+    return ''.join(result)
