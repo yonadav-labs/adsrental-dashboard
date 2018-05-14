@@ -179,9 +179,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
             data['fb_username'] = self.username
             data['fb_password'] = self.password
+            data['category_id'] = 2
+            data['ad_manager_type_2'] = 3
         if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
             data['google_username'] = self.username
             data['google_password'] = self.password
+            data['category_id'] = 1
+            data['ad_manager_type_2'] = 7
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
 
