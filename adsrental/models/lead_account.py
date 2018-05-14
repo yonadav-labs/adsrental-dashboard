@@ -198,7 +198,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             )
             try:
                 response_json = response.json()
-            except:
+            except ValueError:
                 return {'error': True}
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
@@ -219,7 +219,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         )
         try:
             response_json = response.json()
-        except:
+        except ValueError:
             return {'error': True}
 
         return response_json
