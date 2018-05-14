@@ -527,11 +527,11 @@ class PingCacheHelper(object):
 
 def generate_password(length=12):
     result = []
-    for i in range(2):
+    for _ in range(2):
         result.append(secrets.choice(string.digits))
-    for i in range(2):
+    for _ in range(2):
         result.append(secrets.choice(string.ascii_uppercase))
-    for i in range(length - 4):
+    for _ in range(length - 4):
         result.append(secrets.choice(string.ascii_lowercase))
 
     random.shuffle(result)
