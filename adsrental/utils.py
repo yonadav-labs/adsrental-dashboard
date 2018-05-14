@@ -346,7 +346,7 @@ class BotoResource(object):
             if not instance:
                 raise ValueError('Boto did not create isntance. Try again.')
 
-            # instance.password = generate_password(length=8)
+            # instance.password = generate_password(length=12)
             # instance.save()
 
         ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
@@ -524,7 +524,7 @@ class PingCacheHelper(object):
         return ping_data
 
 
-def generate_password(length=8):
+def generate_password(length=12):
     alphabet = string.ascii_letters + string.digits
     password = ''.join(secrets.choice(alphabet) for i in range(length))
     return password

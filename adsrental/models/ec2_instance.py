@@ -473,7 +473,9 @@ class EC2Instance(models.Model):
             self.password = password
             self.save()
 
-        self.ssh_execute('net user Administrator {password}'.format(password=password))
+        output = self.ssh_execute('net user Administrator {password}'.format(password=password))
+        if 'successfully' not in output:
+            raise ValueError(output)
 
     def set_ec2_tags(self):
         'Update RPID and email in EC2 metadata on AWS.'
