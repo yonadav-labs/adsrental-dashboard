@@ -4,12 +4,15 @@ from django.views import View
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 
 
 class RDPDownloadView(View):
+    @method_decorator(login_required)
     def get(self, request, rpid):
         raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
         ec2_instance = raspberry_pi.get_ec2_instance()
@@ -31,6 +34,7 @@ class RDPDownloadView(View):
 
 
 class RDPConnectView(View):
+    @method_decorator(login_required)
     def get(self, request):
         rpid = request.GET.get('rpid', 'none')
         force = request.GET.get('force', '') == 'true'
