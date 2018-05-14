@@ -318,16 +318,16 @@ class AccountTypeListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('facebook', 'Facebook'),
-            ('google', 'Google'),
+            ('facebook', 'Facebook only'),
+            ('google', 'Google only'),
             ('google_facebook', 'Google and Facebook'),
         )
 
     def queryset(self, request, queryset):
         if self.value() == 'facebook':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'google':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
         if self.value() == 'google_facebook':
             return queryset.annotate(lead_accounts_count=Count('lead_account')).filter(lead_accounts_count__gt=1)
         return None
