@@ -465,11 +465,15 @@ class EC2Instance(models.Model):
             self.ssh_execute(cmd_to_execute)
             raspberry_pi.save()
 
-    def change_password(self):
+    def change_password(self, password=None):
         'Obsolete method. Was used to update all old non-human-friendly passwords.'
-        self.ssh_execute('net user Administrator {password}'.format(password=settings.EC2_ADMIN_PASSWORD))
-        self.password = settings.EC2_ADMIN_PASSWORD
-        self.save()
+        if password is None:
+            password = self.password
+        else:
+            self.password = password
+            self.save()
+
+        self.ssh_execute('net user Administrator {password}'.format(password=password))
 
     def set_ec2_tags(self):
         'Update RPID and email in EC2 metadata on AWS.'

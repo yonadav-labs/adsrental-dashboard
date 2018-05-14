@@ -2,6 +2,8 @@
 import json
 import time
 import uuid
+import secrets
+import string
 
 import requests
 import boto3
@@ -517,3 +519,9 @@ class PingCacheHelper(object):
             ping_data['last_troubleshoot'] = now
 
         return ping_data
+
+
+def generate_password(length=8):
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for i in range(length))
+    return password
