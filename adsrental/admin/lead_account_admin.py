@@ -301,7 +301,10 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         'note',
     )
 
-    actions = None
+    actions = (
+        'report_wrong_password',
+        'report_correct_password',
+    )
 
     # We cannot call super().get_fields(request, obj) because that method calls
     # get_readonly_fields(request, obj), causing infinite recursion. Ditto for
