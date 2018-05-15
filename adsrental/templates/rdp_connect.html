@@ -17,11 +17,11 @@
 
 
         {% if ec2_instance %}
-            <div id="client_message_container">
-                <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
-            </div>
-
             {% if is_ready %}
+                <div id="client_message_container">
+                    <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
+                </div>
+
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         EC2 instance is {{ ec2_instance.status }} now!
