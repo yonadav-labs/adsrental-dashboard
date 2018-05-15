@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.views import View
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -50,6 +51,9 @@ class RDPConnectView(View):
             if ec2_instance.is_running():
                 if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
                     ec2_instance.change_password(generate_password(length=12))
+
+            ec2_instance.last_rdp_start = timezone.now()
+            ec2_instance.save()
 
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,

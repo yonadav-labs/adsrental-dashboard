@@ -1,6 +1,7 @@
 import socket
 import datetime
 import time
+import re
 
 from django.db import models
 from django.conf import settings
@@ -64,6 +65,7 @@ class EC2Instance(models.Model):
 
     TUNNEL_UP_TTL_SECONDS = 20 * 60
 
+    RDP_RE = re.compile(r'TCP\s+\d+\.\d+\.\d+\.\d+:23255\s+\S+\s+ESTABLISHED')
     R53_HOST = 'adsrentalswarm.click'
     R53_ZONE_ID = settings.AWS_R53_ZONE_ID
 
@@ -98,6 +100,7 @@ class EC2Instance(models.Model):
     tunnel_up_date = models.DateTimeField(blank=True, null=True, help_text='Last time both tunnel and reverse tunnels were online. Chcecked every 10 minutes.')
     password = models.CharField(max_length=255, default=settings.EC2_ADMIN_PASSWORD, help_text='Password for RDP session')
     last_synced = models.DateTimeField(default=timezone.now, help_text='Last time when instance state was synced back from AWS')
+    last_rdp_start = models.DateTimeField(default=timezone.now, help_text='Last time when RDP connect page was accessed for this instance')
     last_troubleshoot = models.DateTimeField(blank=True, null=True, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
     version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
     created = models.DateTimeField(auto_now_add=True)
@@ -513,3 +516,15 @@ class EC2Instance(models.Model):
             password=self.password,
             rpid=self.rpid,
         )
+
+    def is_rdp_session_active(self):
+        output = ''
+        try:
+            output = self.ssh_execute('netstat -an')
+        except SSHConnectException:
+            pass
+
+        if self.RDP_RE.search(output):
+            return True
+
+        return False

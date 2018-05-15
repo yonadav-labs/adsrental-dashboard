@@ -476,11 +476,12 @@ class SyncOfflineView(View):
                 ec2_instance.stop()
 
 
-        for ec2_instance in EC2Instance.objects.filter(
-                lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=15),
-                status=EC2Instance.STATUS_RUNNING,
-        ):
-            ec2_instance.stop()
+        # for ec2_instance in EC2Instance.objects.filter(
+        #         last_rdp_start__lt=now - datetime.timedelta(minutes=15),
+        #         status=EC2Instance.STATUS_RUNNING,
+        # ):
+        #     if not ec2_instance.is_rdp_session_active():
+        #         ec2_instance.stop()
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__isnull=False,
