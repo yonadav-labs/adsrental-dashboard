@@ -52,8 +52,8 @@ class GetNetstatView(View):
         try:
             output = ec2_instance.ssh_execute('netstat -an')
         except SSHConnectException:
-            self.add_log(request, rpid, 'Stopping dead EC2')
-            ec2_instance.stop()
+            # self.add_log(request, rpid, 'Stopping dead EC2')
+            # ec2_instance.stop()
             return HttpResponse('', content_type='text/plain')
 
         return HttpResponse(output, content_type='text/plain')
