@@ -2,7 +2,9 @@
 import os
 import argparse
 from pathlib import Path
+import base64
 
+from Crypto.Cipher import DES3
 import boto3
 
 
@@ -16,7 +18,7 @@ ssh_privatekey=
 console=0
 resolution=
 group=
-password=AlS+TjAugTD6El8ST/5Aeg==
+password={password}
 name={rpid}
 ssh_loopback=0
 shareprinter=0
@@ -44,7 +46,19 @@ sharesmartcard=0
 parser = argparse.ArgumentParser(description='Connect to RDP by RPID or email.')
 parser.add_argument('--rpid', help='RPID for Raspberry Pi')
 parser.add_argument('--email', help='Lead email')
+parser.add_argument('-p', '--password', help='Passowrd', default='AdsInc18')
 args = parser.parse_args()
+
+secret = base64.b64decode('tCViJQOwkdqG88Ww9WpsVwc7CXBiwo89+5c0Y1awrgo=')
+password = args.password.encode('ascii')
+while len(password) < 16:
+    password = password + b'\x00'
+
+password_enc = base64.b64encode(DES3.new(secret[:24], DES3.MODE_CBC, secret[24:]).encrypt(password)).decode('ascii')
+
+#  password=AlS+TjAugTD6El8ST/5Aeg==
+# print(password_enc)
+# exit()
 
 rpid = None
 if args.rpid:
@@ -98,6 +112,7 @@ with open(fname, 'w') as f:
     f.write(remmina_template.format(
         hostname=hostname,
         rpid=rpid,
+        password=password_enc,
     ))
     f.flush()
 
