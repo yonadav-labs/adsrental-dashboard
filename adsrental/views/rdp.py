@@ -41,6 +41,7 @@ class RDPConnectView(View):
     def get(self, request):
         rpid = request.GET.get('rpid', 'none')
         force = request.GET.get('force', '') == 'true'
+        is_ready = False
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if ec2_instance:
             ec2_instance.update_from_boto()
@@ -48,6 +49,13 @@ class RDPConnectView(View):
                 ec2_instance.last_rdp_start = timezone.now()
                 ec2_instance.save()
                 ec2_instance.start()
+
+            try:
+                ec2_instance.ssh_execute('netstat -an')
+            except:
+                pass
+            else:
+                is_ready = True
 
             if ec2_instance.is_running():
                 if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
@@ -57,5 +65,6 @@ class RDPConnectView(View):
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
             ec2_instance=ec2_instance,
+            is_ready=is_ready,
             netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
         ))

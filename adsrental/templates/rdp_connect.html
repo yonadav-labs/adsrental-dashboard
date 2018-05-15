@@ -21,7 +21,7 @@
                 <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
             </div>
 
-            {% if ec2_instance.is_running %}
+            {% if is_ready %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         EC2 instance is {{ ec2_instance.status }} now!
@@ -37,6 +37,10 @@
                         <p>
                             <a href="{{ ec2_instance.get_rdp_uri|safe }}" class="btn btn-default">View in Mac/Android RDP Client</a>
                             <a href="{% url 'rdp' rpid=rpid %}" class="btn btn-default">Download RDP config file</a>
+                        </p>
+                        <p>
+                            Username: <strong>Administrator</strong><br>
+                            Password: <strong>{{ ec2_instance.password }}</strong>
                         </p>
                     </div>
                 </div>
