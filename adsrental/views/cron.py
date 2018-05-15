@@ -475,6 +475,13 @@ class SyncOfflineView(View):
             if ec2_instance:
                 ec2_instance.stop()
 
+
+        for ec2_instance in EC2Instance.objects.filter(
+                lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=15),
+                status=EC2Instance.STATUS_RUNNING,
+        ):
+            ec2_instance.stop()
+
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__isnull=False,
                 status__in=LeadAccount.STATUSES_ACTIVE,
