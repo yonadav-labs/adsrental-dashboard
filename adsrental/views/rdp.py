@@ -43,17 +43,16 @@ class RDPConnectView(View):
         force = request.GET.get('force', '') == 'true'
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if ec2_instance:
+            ec2_instance.update_from_boto()
             if not ec2_instance.is_running() or force:
-                ec2_instance.update_from_boto()
-            if ec2_instance.is_stopped():
+                ec2_instance.last_rdp_start = timezone.now()
+                ec2_instance.save()
                 ec2_instance.start()
 
             if ec2_instance.is_running():
                 if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
                     ec2_instance.change_password(generate_password(length=12))
 
-            ec2_instance.last_rdp_start = timezone.now()
-            ec2_instance.save()
 
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
