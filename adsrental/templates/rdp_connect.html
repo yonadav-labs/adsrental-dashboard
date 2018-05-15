@@ -51,7 +51,7 @@
                     </div>
                     <div class="panel-body">
                         <h3>Waiting for {{ rpid}} to come online. It is {{ ec2_instance.status }} now.</h3>
-                        <h3>This page will autoreload in <span class="countdown reload_enabled">20</span> seconds.</h3>
+                        <h3>This page will autoreload in <span class="countdown reload_enabled">30</span> seconds.</h3>
                     </div>
                 </div>
             {% endif %}
@@ -79,10 +79,10 @@
     {{ block.super }}
     <script>
         if ($('.reload_enabled').length){
-            var reloadInSeconds = 20;
+            var reloadInSeconds = 30;
             setTimeout(function(){
                 document.location.reload();
-            }, 20000)
+            }, reloadInSeconds * 1000)
             setInterval(function(){
                 if (reloadInSeconds > 0) {
                     reloadInSeconds -= 1;
