@@ -432,6 +432,10 @@ class EC2Instance(models.Model):
             if not self.lead.is_active():
                 # self.stop()
                 return
+        if self.status == self.STATUS_STOPPED:
+            if self.lead and self.lead.is_active():
+                self.start()
+                return
 
     def troubleshoot_proxy(self):
         'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'

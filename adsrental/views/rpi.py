@@ -23,6 +23,7 @@ class EC2DataView(View):
             raise Http404
 
         if not ec2_instance.is_running():
+            ec2_instance.start()
             if not ec2_instance.is_running():
                 raise Http404
 
