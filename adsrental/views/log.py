@@ -71,8 +71,8 @@ class LogView(View):
                     lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
                     EC2Instance.launch_for_lead(lead)
                     return True
-                self.add_log(request, rpid, 'Starting stopped EC2')
-                ec2_instance.start()
+                # self.add_log(request, rpid, 'Starting stopped EC2')
+                # ec2_instance.start()
                 return True
         if not Lead.is_status_active(lead_status) and EC2Instance.is_status_running(ec2_instance_status):
             self.add_log(request, rpid, 'Stopping EC2')
