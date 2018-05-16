@@ -45,9 +45,10 @@
                             Username: <strong>Administrator</strong><br>
                             Password: <strong>{{ ec2_instance.password }}</strong>
                         </p>
+                        <h4>Actions</h4>
                         <p>
-                            <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=update_antidetect"><button>Update Antidetect</button></a>
-                            <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=fix_performance"><button>Fix performance</button></a>
+                            <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=update_antidetect"><button class="btn btn-default">Update Antidetect</button></a>
+                            <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=fix_performance"><button class="btn btn-default">Fix performance</button></a>
                         </p>
                     </div>
                 </div>
