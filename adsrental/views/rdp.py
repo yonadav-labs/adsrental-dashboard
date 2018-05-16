@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib import messages
 
 from adsrental.utils import generate_password
 from adsrental.models.raspberry_pi import RaspberryPi
@@ -37,13 +38,24 @@ class RDPDownloadView(View):
 
 
 class RDPConnectView(View):
+    def handle_action(self, request, ec2_instance, action):
+        if action == 'update_antidetect':
+            ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/browser.exe -outf C:\\Users\\Administrator\\Desktop\\Browser.exe')
+            messages.success(request, 'Antidetect script updated successfully')
+        if action == 'fix_performance':
+            ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
+            messages.success(request, 'Performance fixed applied successfully')
+
     @method_decorator(login_required)
     def get(self, request):
         rpid = request.GET.get('rpid', 'none')
         force = request.GET.get('force', '') == 'true'
+        action = request.GET.get('action', '')
         is_ready = False
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if ec2_instance:
+            if action:
+                self.handle_action(request, ec2_instance, action)
             ec2_instance.update_from_boto()
             if not ec2_instance.is_running() or force:
                 ec2_instance.last_rdp_start = timezone.now()
