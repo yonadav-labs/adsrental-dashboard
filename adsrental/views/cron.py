@@ -489,17 +489,16 @@ class SyncOfflineView(View):
             lead_account.last_security_checkpoint_reported = now
             lead_account.save()
 
-
-        # for ec2_instance in EC2Instance.objects.filter(
-        #         last_rdp_start__lt=now - datetime.timedelta(minutes=20),
-        #         status=EC2Instance.STATUS_RUNNING,
-        # ):
-        #     if ec2_instance.is_rdp_session_active():
-        #         ec2_instance.last_rdp_start = now
-        #         ec2_instance.save()
-        #     else:
-        #         ec2_instance.stop()
-        #         stopped_ec2s.append(ec2_instance.rpid)
+        for ec2_instance in EC2Instance.objects.filter(
+                last_rdp_start__lt=timezone.now() - datetime.timedelta(minutes=60),
+                status=EC2Instance.STATUS_RUNNING,
+        ):
+            if ec2_instance.is_rdp_session_active():
+                ec2_instance.last_rdp_start = now
+                ec2_instance.save()
+            else:
+                ec2_instance.stop()
+                stopped_ec2s.append(ec2_instance.rpid)
 
         return JsonResponse({
             'test': test,
