@@ -44,7 +44,8 @@ class RDPConnectView(View):
             messages.success(request, 'Antidetect script updated successfully')
         if action == 'fix_performance':
             ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
-            messages.success(request, 'Performance fixed applied successfully')
+            messages.success(request, 'Performance fixed applied successfully, instance is rebooting.')
+            ec2_instance.stop()
 
     @method_decorator(login_required)
     def get(self, request):
