@@ -509,6 +509,33 @@ class SyncOfflineView(View):
         })
 
 
+class CheckEC2View(View):
+    '''
+    Check :model:`adsrental.EC2Instance` if they have action RDP session, stops them otherwise.
+    '''
+    def get(self, request):
+        online_ec2s = []
+        stopped_ec2s = []
+        now = timezone.now()
+        for ec2_instance in EC2Instance.objects.filter(
+                last_rdp_start__lt=now - datetime.timedelta(minutes=15),
+                status=EC2Instance.STATUS_RUNNING,
+        ):
+            if ec2_instance.is_rdp_session_active():
+                ec2_instance.last_rdp_start = now
+                ec2_instance.save()
+                online_ec2s.append(ec2_instance.rpid)
+            else:
+                ec2_instance.stop()
+                stopped_ec2s.append(ec2_instance.rpid)
+
+        return JsonResponse({
+            'result': True,
+            'online_ec2s': online_ec2s,
+            'stopped_ec2s': stopped_ec2s,
+        })
+
+
 
 class AutoBanView(View):
     '''
