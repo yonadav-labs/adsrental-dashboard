@@ -23,6 +23,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'hostname',
+        'instance_type',
         'lead_link',
         'lead_status',
         'raspberry_pi_link',
