@@ -274,7 +274,10 @@ class EC2Instance(models.Model):
         Safe execute SSH command on EC2 and get output.
         '''
         if not ssh:
-            ssh = self.get_ssh()
+            try:
+                ssh = self.get_ssh()
+            except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
+                raise SSHConnectException('Cannot connect, EC2 SSH is down')
 
         try:
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
