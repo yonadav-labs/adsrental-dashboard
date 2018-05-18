@@ -30,6 +30,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'version',
         'raspberry_pi_version',
         'status',
+        'last_rdp_session',
         'last_seen',
         'last_troubleshoot_field',
         'tunnel_up_date_field',
@@ -95,6 +96,13 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             return None
 
         date = obj.lead.raspberry_pi.last_seen
+        return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
+
+    def last_rdp_session(self, obj):
+        if not obj.last_rdp_start:
+            return None
+
+        date = obj.lead.raspberry_pi.last_rdp_start
         return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
 
     def last_troubleshoot_field(self, obj):
