@@ -59,8 +59,8 @@ class RDPConnectView(View):
                 self.handle_action(request, ec2_instance, action)
             ec2_instance.update_from_boto()
             if not ec2_instance.is_running() or force:
-                ec2_instance.update_from_boto()
-            if ec2_instance.is_stopped():
+                ec2_instance.last_rdp_start = timezone.now()
+                ec2_instance.save()
                 ec2_instance.start()
 
             try:
@@ -74,8 +74,6 @@ class RDPConnectView(View):
                 if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
                     ec2_instance.change_password(generate_password(length=12))
 
-            ec2_instance.last_rdp_start = timezone.now()
-            ec2_instance.save()
 
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
