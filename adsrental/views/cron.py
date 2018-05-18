@@ -490,11 +490,11 @@ class SyncOfflineView(View):
             lead_account.save()
 
         for ec2_instance in EC2Instance.objects.filter(
-                last_rdp_start__lt=timezone.now() - datetime.timedelta(minutes=60),
+                last_rdp_start__lt=timezone.now() - datetime.timedelta(minutes=15),
                 status=EC2Instance.STATUS_RUNNING,
         ):
             if ec2_instance.is_rdp_session_active():
-                ec2_instance.last_rdp_start = now
+                ec2_instance.last_rdp_start = timezone.now()
                 ec2_instance.save()
             else:
                 ec2_instance.stop()
