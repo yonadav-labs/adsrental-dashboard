@@ -126,14 +126,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def links(self, obj):
         links = []
         if obj.rpid:
-            links.append('<a target="_blank" href="{url}?rpid={rpid}">Connect to RDP</a>'.format(
+            links.append('<a target="_blank" href="{url}?rpid={rpid}">RDP</a>'.format(
                 url=reverse('rdp_connect'),
                 rpid=obj.rpid,
             ))
         if obj.lead and obj.lead.raspberry_pi:
-            links.append('<a target="_blank" href="{url}">Old RDP</a>'.format(
-                url=reverse('rdp', kwargs=dict(rpid=obj.rpid)),
-            ))
             today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
             links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
                 log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
@@ -146,9 +143,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             ))
 
         links.append('<a href="#" title="ssh -o StrictHostKeyChecking=no -i ~/.ssh/farmbot Administrator@{hostname} -p 40594">Copy SSH</a>'.format(
-            hostname=obj.hostname,
-        ))
-        links.append('<a target="_blank" href="http://{hostname}:13608">Web</a>'.format(
             hostname=obj.hostname,
         ))
         return mark_safe(', '.join(links))
