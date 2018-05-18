@@ -102,7 +102,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         if not obj.last_rdp_start:
             return None
 
-        date = obj.lead.raspberry_pi.last_rdp_start
+        date = obj.last_rdp_start
         return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
 
     def last_troubleshoot_field(self, obj):
