@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils import timezone
 from django.conf import settings
@@ -57,6 +57,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'clear_ping_cache',
         'terminate',
         'update_password',
+        'upgrade_to_medium',
     )
     raw_id_fields = ('lead', )
 
@@ -193,6 +194,22 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def update_password(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.change_password()
+
+    def upgrade_to_medium(self, request, queryset):
+        client = BotoResource().get_client('ec2')
+        for ec2_instance in queryset:
+            if ec2_instance.instance_type == 't2.medium':
+                messages.warning(request, 'EC2 was already upgraded')
+                continue
+            ec2_instance.update_from_boto()
+            if ec2_instance.status != EC2Instance.STATUS_STOPPED:
+                messages.success(request, 'EC2 should be stopped first')
+                continue
+
+            client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value='t2.medium')
+            ec2_instance.instance_type = 't2.medium'
+            ec2_instance.save()
+            messages.success(request, 'EC2 is upgraded successfully')
 
     lead_link.short_description = 'Lead'
 
