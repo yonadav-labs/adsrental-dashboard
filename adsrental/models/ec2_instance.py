@@ -264,7 +264,7 @@ class EC2Instance(models.Model):
 
         try:
             ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=20)
-        except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError):
+        except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
             raise SSHConnectException('Cannot connect, EC2 SSH is down')
 
         return ssh
@@ -278,7 +278,7 @@ class EC2Instance(models.Model):
 
         try:
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
-        except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError):
+        except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
             raise SSHConnectException('Cannot connect, EC2 SSH is down')
         if input_list:
             for line in input_list:
