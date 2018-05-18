@@ -77,6 +77,7 @@ class SyncEC2View(View):
         })
 
     def _handler_pending(self, execute):
+        updated_rpids = []
         boto_resource = BotoResource()
         for ec2_boto in boto_resource.get_resource('ec2').instances.all():
             ec2 = EC2Instance.objects.filter(instance_id=ec2_boto.id).first()
