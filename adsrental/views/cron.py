@@ -77,17 +77,16 @@ class SyncEC2View(View):
         })
 
     def _handler_pending(self, execute):
-        boto_resource = BotoResource().get_resource()
-        updated_rpids = []
-        instances = EC2Instance.objects.filter(status__in=[EC2Instance.STATUS_PENDING, EC2Instance.STATUS_STOPPING]).order_by('created')
-        for instance in instances:
-            if execute:
-                boto_instance = instance.get_boto_instance(boto_resource)
-                instance.update_from_boto(boto_instance)
-            updated_rpids.append((instance.rpid, instance.status))
+        boto_resource = BotoResource()
+        for ec2_boto in boto_resource.get_resource('ec2').instances.all():
+            ec2 = EC2Instance.objects.filter(instance_id=ec2_boto.id).first()
+            if ec2:
+                if execute:
+                    ec2.update_from_boto(ec2_boto)
+                updated_rpids.append(ec2.rpid)
 
         return JsonResponse({
-            'updated_rpids': updated_rpids,
+            'updated_rpids': sorted(updated_rpids),
             'result': True,
         })
 

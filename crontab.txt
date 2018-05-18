@@ -1,6 +1,6 @@
 @reboot /root/pull.sh restart
 
-# 0 * * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/cron/sync_ec2/?pending=true\&execute=true >> /root/logs/cron_sync_ec2.log
+0 * * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/cron/sync_ec2/?pending=true\&execute=true >> /root/logs/cron_sync_ec2.log
 0 * * * * bash /root/dashboard/scripts/revive_rpis.sh
 0 0 * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/app/cron/auto_ban/?execute=true >> /root/logs/cron_auto_ban.log
 0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
