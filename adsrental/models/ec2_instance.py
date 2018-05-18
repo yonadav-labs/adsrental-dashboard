@@ -254,7 +254,7 @@ class EC2Instance(models.Model):
     def __str__(self):
         return self.instance_id
 
-    def get_ssh(self):
+    def get_ssh(self, timeout=20):
         '''
         Create SSH connection to EC2
         '''
@@ -263,21 +263,21 @@ class EC2Instance(models.Model):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         try:
-            ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=20)
+            ssh.connect(self.ip_address, username='Administrator', port=40594, pkey=private_key, timeout=timeout)
         except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
             raise SSHConnectException('Cannot connect, EC2 SSH is down')
 
         return ssh
 
-    def ssh_execute(self, cmd, input_list=None, ssh=None, blocking=True):
+    def ssh_execute(self, cmd, input_list=None, ssh=None, blocking=True, timeout=20):
         '''
         Safe execute SSH command on EC2 and get output.
         '''
         if not ssh:
-            ssh = self.get_ssh()
+            ssh = self.get_ssh(timeout)
 
         try:
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=20)
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=timeout)
         except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
             raise SSHConnectException('Cannot connect, EC2 SSH is down')
         if input_list:
