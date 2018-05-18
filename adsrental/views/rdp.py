@@ -12,7 +12,7 @@ from django.contrib import messages
 
 from adsrental.utils import generate_password
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.ec2_instance import EC2Instance
+from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 
 
 class RDPDownloadView(View):
@@ -40,10 +40,18 @@ class RDPDownloadView(View):
 class RDPConnectView(View):
     def handle_action(self, request, ec2_instance, action):
         if action == 'update_antidetect':
-            ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/browser.exe -outf C:\\Users\\Administrator\\Desktop\\Browser.exe')
+            try:
+                ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/browser.exe -outf C:\\Users\\Administrator\\Desktop\\Browser.exe')
+            except SSHConnectException:
+                messages.warning(request, 'Antidetect script update failed.')
+                return
             messages.success(request, 'Antidetect script updated successfully')
         if action == 'fix_performance':
-            ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
+            try:
+                ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
+            except SSHConnectException:
+                messages.warning(request, 'Performance fixed failed.')
+                return
             messages.success(request, 'Performance fixed applied successfully, instance is rebooting.')
             ec2_instance.stop()
 
@@ -65,7 +73,7 @@ class RDPConnectView(View):
 
             try:
                 ec2_instance.ssh_execute('netstat -an')
-            except:
+            except SSHConnectException:
                 pass
             else:
                 is_ready = True
