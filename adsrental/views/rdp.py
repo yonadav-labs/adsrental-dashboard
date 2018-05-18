@@ -80,7 +80,10 @@ class RDPConnectView(View):
 
             if ec2_instance.is_running():
                 if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
-                    ec2_instance.change_password(generate_password(length=12))
+                    try:
+                        ec2_instance.change_password(generate_password(length=12))
+                    except SSHConnectException:
+                        pass
 
 
         return render(request, 'rdp_connect.html', dict(
