@@ -38,6 +38,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'status',
+        'instance_type',
         TunnelUpListFilter,
         LeadStatusListFilter,
         LeadRaspberryPiOnlineListFilter,
@@ -198,7 +199,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def upgrade_to_medium(self, request, queryset):
         client = BotoResource().get_client('ec2')
         for ec2_instance in queryset:
-            if ec2_instance.instance_type == 't2.medium':
+            if ec2_instance.instance_type == EC2Instance.INSTANCE_TYPE_MEDIUM:
                 messages.warning(request, 'EC2 was already upgraded')
                 continue
             ec2_instance.update_from_boto()
@@ -206,8 +207,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 messages.success(request, 'EC2 should be stopped first')
                 continue
 
-            client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value='t2.medium')
-            ec2_instance.instance_type = 't2.medium'
+            client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_MEDIUM)
+            ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_MEDIUM
             ec2_instance.save()
             messages.success(request, 'EC2 is upgraded successfully')
 

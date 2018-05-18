@@ -87,8 +87,17 @@ class EC2Instance(models.Model):
     )
     STATUSES_ACTIVE = [STATUS_RUNNING, STATUS_STOPPED, STATUS_PENDING, STATUS_STOPPING]
 
+    INSTANCE_TYPE_MICRO = 't2.micro'
+    INSTANCE_TYPE_MEDIUM = 't2.medium'
+    INSTANCE_TYPE_LARGE = 't2.large'
+    INSTANCE_TYPE_CHOICES = (
+        (INSTANCE_TYPE_MICRO, 'Micro', ),
+        (INSTANCE_TYPE_MEDIUM, 'Medium', ),
+        (INSTANCE_TYPE_LARGE, 'Large', ),
+    )
+
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
-    instance_type = models.CharField(max_length=50, default='t2.medium', help_text='Size of AWS EC2')
+    instance_type = models.CharField(max_length=50, default=INSTANCE_TYPE_MEDIUM, choices=INSTANCE_TYPE_CHOICES, help_text='Size of AWS EC2')
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='RPID that was inserted to EC2 metadata')
     email = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Lead email')
     lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL)
