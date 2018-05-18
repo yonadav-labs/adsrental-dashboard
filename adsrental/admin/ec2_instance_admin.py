@@ -57,7 +57,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'clear_ping_cache',
         'terminate',
         'update_password',
-        'update_all_from_boto',
     )
     raw_id_fields = ('lead', )
 
@@ -150,7 +149,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def get_currect_state(self, request, queryset):
         if queryset.count() > 10:
-            queryset = EC2Instance.objects.all()
+            boto_resource = BotoResource()
+            for ec2_boto in boto_resource.get_resource('ec2').instances.all():
+                ec2 = EC2Instance.objects.filter(instance_id=ec2_boto.id).first()
+                if ec2:
+                    ec2.update_from_boto(ec2_boto)
 
         for ec2_instance in queryset:
             ec2_instance.update_from_boto()
@@ -190,13 +193,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def update_password(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.change_password()
-
-    def update_all_from_boto(self, request, queryset):
-        boto_resource = BotoResource()
-        for ec2_boto in boto_resource.get_resource('ec2').instances.all():
-            ec2 = EC2Instance.objects.filter(instance_id=ec2_boto.id).first()
-            if ec2:
-                ec2.update_from_boto(ec2_boto)
 
     lead_link.short_description = 'Lead'
 
