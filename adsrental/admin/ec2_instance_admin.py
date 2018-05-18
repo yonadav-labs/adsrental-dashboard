@@ -231,3 +231,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     clear_ping_cache.short_description = 'DEBUG: Clear ping cache'
 
     terminate.short_description = 'DEBUG: Terminate'
+    
+    upgrade_to_medium.short_description = 'DEBUG: Upgrade to medium instance'
