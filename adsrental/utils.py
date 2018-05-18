@@ -319,7 +319,7 @@ class BotoResource(object):
                 MinCount=1,
                 MaxCount=1,
                 KeyName='AI Farming Key',
-                InstanceType='t2.micro',
+                InstanceType='t2.medium',
                 SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
                 UserData=rpid,
                 TagSpecifications=[
