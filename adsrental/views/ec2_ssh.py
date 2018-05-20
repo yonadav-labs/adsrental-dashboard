@@ -56,4 +56,19 @@ class GetNetstatView(View):
             # ec2_instance.stop()
             return HttpResponse('', content_type='text/plain')
 
-        return HttpResponse(output, content_type='text/plain')
+        result = []
+        if ec2_instance.TUNNEL_RE.search(output):
+            result.append('SSH tunnel is UP')
+        else:
+            result.append('SSH tunnel is DOWN')
+
+        if ec2_instance.REVERSE_TUNNEL_RE.search(output):
+            result.append('Reverse tunnel is UP')
+        else:
+            result.append('Reverse tunnel is DOWN')
+
+        if ec2_instance.RDP_RE.search(output):
+            result.append('RDP session is active')
+        result.append(output)
+
+        return HttpResponse('\n'.join(result), content_type='text/plain')

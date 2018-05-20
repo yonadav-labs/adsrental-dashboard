@@ -66,6 +66,8 @@ class EC2Instance(models.Model):
     TUNNEL_UP_TTL_SECONDS = 20 * 60
 
     RDP_RE = re.compile(r'TCP\s+\d+\.\d+\.\d+\.\d+:23255\s+\S+\s+ESTABLISHED')
+    TUNNEL_RE = re.compile(r'TCP\s+\d+\.\d+\.\d+\.\d+:2046\s+\S+\s+LISTENING')
+    REVERSE_TUNNEL_RE = re.compile(r'TCP\s+\d+\.\d+\.\d+\.\d+:3808\s+\S+\s+LISTENING')
     R53_HOST = 'adsrentalswarm.click'
     R53_ZONE_ID = settings.AWS_R53_ZONE_ID
 
