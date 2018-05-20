@@ -62,33 +62,58 @@ class RDPConnectView(View):
         action = request.GET.get('action', '')
         is_ready = False
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
-        if ec2_instance:
-            if action:
-                self.handle_action(request, ec2_instance, action)
-            ec2_instance.update_from_boto()
-            if not ec2_instance.is_running() or force:
-                ec2_instance.last_rdp_start = timezone.now()
-                ec2_instance.save()
-                ec2_instance.start()
+        if not ec2_instance:
+            return render(request, 'rdp_connect.html', dict(
+                rpid=rpid,
+                ec2_instance=ec2_instance,
+                check_connection=False,
+                is_ready=is_ready,
+                netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
+            ))
 
-            try:
-                ec2_instance.ssh_execute('netstat -an')
-            except SSHConnectException:
-                pass
-            else:
-                is_ready = True
 
-            if ec2_instance.is_running():
-                if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
-                    try:
-                        ec2_instance.change_password(generate_password(length=12))
-                    except SSHConnectException:
-                        pass
+        raspberry_pi = ec2_instance.get_raspberry_pi()
+        if not raspberry_pi or not raspberry_pi.online():
+            messages.warning(request, 'Assigned RaspberryPi device is offline, please ping support')
+            return render(request, 'rdp_connect.html', dict(
+                rpid=rpid,
+                ec2_instance=ec2_instance,
+                check_connection=False,
+                is_ready=is_ready,
+                netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
+            ))
 
+        if action:
+            self.handle_action(request, ec2_instance, action)
+        ec2_instance.update_from_boto()
+        if not ec2_instance.is_running() or force:
+            ec2_instance.last_rdp_start = timezone.now()
+            ec2_instance.save()
+            ec2_instance.start()
+
+        netstat_output = ''
+        try:
+            netstat_output = ec2_instance.ssh_execute('netstat -an')
+        except SSHConnectException:
+            messages.error(request, 'SSH is down, instance is not usable now')
+        else:
+            is_ready = True
+            if not ec2_instance.TUNNEL_RE.search(netstat_output):
+                messages.error(request, 'SSH Tunnel is down, instance has no internet connection yet')
+            if not ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
+                messages.error(request, 'Reverse Tunnel is down, instance has no internet connection yet')
+
+        if ec2_instance.is_running():
+            if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
+                try:
+                    ec2_instance.change_password(generate_password(length=12))
+                except SSHConnectException:
+                    pass
 
         return render(request, 'rdp_connect.html', dict(
             rpid=rpid,
             ec2_instance=ec2_instance,
+            check_connection=True,
             is_ready=is_ready,
             netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
         ))

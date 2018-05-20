@@ -157,6 +157,9 @@ class EC2Instance(models.Model):
 
         return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
+    def get_raspberry_pi(self):
+        return self.lead and self.lead.raspberry_pi
+
     def get_boto_instance(self, boto_resource=None):
         '''
         Get dict with data from AWS about current instance.
