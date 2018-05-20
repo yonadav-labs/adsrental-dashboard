@@ -21,11 +21,9 @@
 
         {% if ec2_instance %}
             {% if is_ready %}
-                {% if check_connection %}
-                    <div id="client_message_container">
-                        <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
-                    </div>
-                {% endif %}
+                <div id="client_message_container">
+                    <div class="alert alert-info check_instance_state" role="alert">Checking if RDP is in use...</div>
+                </div>
 
                 <div class="panel panel-default">
                     <div class="panel-heading">

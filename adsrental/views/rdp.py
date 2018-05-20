@@ -75,13 +75,6 @@ class RDPConnectView(View):
         raspberry_pi = ec2_instance.get_raspberry_pi()
         if not raspberry_pi or not raspberry_pi.online():
             messages.warning(request, 'Assigned RaspberryPi device is offline, please ping support')
-            return render(request, 'rdp_connect.html', dict(
-                rpid=rpid,
-                ec2_instance=ec2_instance,
-                check_connection=False,
-                is_ready=is_ready,
-                netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
-            ))
 
         if action:
             self.handle_action(request, ec2_instance, action)
