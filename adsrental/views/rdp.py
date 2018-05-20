@@ -93,7 +93,7 @@ class RDPConnectView(View):
 
         netstat_output = ''
         try:
-            netstat_output = ec2_instance.ssh_execute('netstat -an')
+            netstat_output = ec2_instance.ssh_execute('netstat -an', timeout=5)
         except SSHConnectException:
             messages.warning(request, 'SSH is down, instance is not usable now')
         else:
