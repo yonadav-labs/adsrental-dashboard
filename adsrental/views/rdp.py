@@ -95,13 +95,13 @@ class RDPConnectView(View):
         try:
             netstat_output = ec2_instance.ssh_execute('netstat -an')
         except SSHConnectException:
-            messages.error(request, 'SSH is down, instance is not usable now')
+            messages.warning(request, 'SSH is down, instance is not usable now')
         else:
             is_ready = True
             if not ec2_instance.TUNNEL_RE.search(netstat_output):
-                messages.error(request, 'SSH Tunnel is down, instance has no internet connection yet')
+                messages.warning(request, 'SSH Tunnel is down, instance has no internet connection yet')
             if not ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
-                messages.error(request, 'Reverse Tunnel is down, instance has no internet connection yet')
+                messages.warning(request, 'Reverse Tunnel is down, instance has no internet connection yet')
 
         if ec2_instance.is_running():
             if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
