@@ -80,9 +80,10 @@ class RDPConnectView(View):
             self.handle_action(request, ec2_instance, action)
         ec2_instance.update_from_boto()
         if not ec2_instance.is_running() or force:
-            ec2_instance.last_rdp_start = timezone.now()
-            ec2_instance.save()
             ec2_instance.start()
+
+        ec2_instance.last_rdp_start = timezone.now()
+        ec2_instance.save()
 
         netstat_output = ''
         try:
