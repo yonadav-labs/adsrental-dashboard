@@ -533,7 +533,7 @@ class EC2Instance(models.Model):
         try:
             output = self.ssh_execute('netstat -an', timeout=5)
         except SSHConnectException:
-            pass
+            return True
 
         if self.RDP_RE.search(output):
             return True

@@ -451,7 +451,6 @@ class SyncOfflineView(View):
     def get(self, request):
         reported_offline_leads = []
         reported_checkpoint = []
-        stopped_ec2s = []
         now = timezone.now()
         test = request.GET.get('test')
         customerio_client = CustomerIOClient()
@@ -489,23 +488,11 @@ class SyncOfflineView(View):
             lead_account.last_security_checkpoint_reported = now
             lead_account.save()
 
-        for ec2_instance in EC2Instance.objects.filter(
-                last_rdp_start__lt=timezone.now() - datetime.timedelta(minutes=15),
-                status=EC2Instance.STATUS_RUNNING,
-        ):
-            if ec2_instance.is_rdp_session_active():
-                ec2_instance.last_rdp_start = timezone.now()
-                ec2_instance.save()
-            else:
-                ec2_instance.stop()
-                stopped_ec2s.append(ec2_instance.rpid)
-
         return JsonResponse({
             'test': test,
             'result': True,
             'reported_offline_leads': reported_offline_leads,
             'reported_checkpoint': reported_checkpoint,
-            'stopped_ec2s': stopped_ec2s,
         })
 
 
