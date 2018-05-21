@@ -285,6 +285,9 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<a href="{config_url}">pi.conf</a>'.format(config_url=reverse('farming_pi_config', kwargs={
                 'rpid': obj.raspberry_pi.rpid,
             })))
+        
+        if obj.photo_id:
+            result.append('<a href="{url}">Photo ID</a>'.format(url=obj.photo_id.url))
 
         return mark_safe(', '.join(result))
 
