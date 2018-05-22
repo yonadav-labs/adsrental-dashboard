@@ -59,7 +59,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'clear_ping_cache',
         'terminate',
         'update_password',
-        'upgrade_to_medium',
+        'upgrade_to_xlarge',
     )
     raw_id_fields = ('lead', )
 
@@ -197,10 +197,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         for ec2_instance in queryset:
             ec2_instance.change_password()
 
-    def upgrade_to_medium(self, request, queryset):
+    def upgrade_to_xlarge(self, request, queryset):
         client = BotoResource().get_client('ec2')
         for ec2_instance in queryset:
-            if ec2_instance.instance_type == EC2Instance.INSTANCE_TYPE_MEDIUM:
+            if ec2_instance.instance_type == EC2Instance.INSTANCE_TYPE_XLARGE:
                 messages.warning(request, 'EC2 was already upgraded')
                 continue
             ec2_instance.update_from_boto()
@@ -208,8 +208,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 messages.success(request, 'EC2 should be stopped first')
                 continue
 
-            client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_MEDIUM)
-            ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_MEDIUM
+            client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_XLARGE)
+            ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_XLARGE
             ec2_instance.save()
             messages.success(request, 'EC2 is upgraded successfully')
 
@@ -233,5 +233,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     clear_ping_cache.short_description = 'DEBUG: Clear ping cache'
 
     terminate.short_description = 'DEBUG: Terminate'
-    
-    upgrade_to_medium.short_description = 'DEBUG: Upgrade to medium instance'
+
+    upgrade_to_xlarge.short_description = 'DEBUG: Upgrade to T2 Xlarge instance'

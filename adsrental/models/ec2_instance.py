@@ -91,11 +91,11 @@ class EC2Instance(models.Model):
 
     INSTANCE_TYPE_MICRO = 't2.micro'
     INSTANCE_TYPE_MEDIUM = 't2.medium'
-    INSTANCE_TYPE_LARGE = 't2.large'
+    INSTANCE_TYPE_XLARGE = 't2.xlarge'
     INSTANCE_TYPE_CHOICES = (
-        (INSTANCE_TYPE_MICRO, 'Micro', ),
-        (INSTANCE_TYPE_MEDIUM, 'Medium', ),
-        (INSTANCE_TYPE_LARGE, 'Large', ),
+        (INSTANCE_TYPE_MICRO, 'T2 Micro', ),
+        (INSTANCE_TYPE_MEDIUM, 'T2 Medium', ),
+        (INSTANCE_TYPE_XLARGE, 'T2 Xlarge', ),
     )
 
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
