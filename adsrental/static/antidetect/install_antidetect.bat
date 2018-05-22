@@ -9,12 +9,14 @@ if exist C:\Antidetect_7.3.1.zip (
     powershell iwr -outf C:\Antidetect_7.3.1.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.1.zip
 )
 
-echo [*] Installing Antidetect
 if exist C:\Antidetect\antidetect.conf (
     echo [*] Creating backup of existing config
     powershell Copy-Item C:\Antidetect\antidetect.conf -Destination C:\antidetect.conf.backup
 )
+
+echo [*] Installing Antidetect
 powershell Expand-Archive -force C:\Antidetect_7.3.1.zip -DestinationPath C:\
+
 if exist C:\antidetect.conf.backup (
     echo [*] Applying config backup
     powershell Copy-Item C:\antidetect.conf.backup -Destination C:\Antidetect\antidetect.conf
