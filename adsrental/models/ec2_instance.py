@@ -531,7 +531,7 @@ class EC2Instance(models.Model):
     def is_rdp_session_active(self):
         output = ''
         try:
-            output = self.ssh_execute('netstat -an', timeout=5)
+            output = self.ssh_execute('netstat -an', timeout=20)
         except SSHConnectException:
             return True
 

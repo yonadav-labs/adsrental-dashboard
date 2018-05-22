@@ -500,21 +500,32 @@ class CheckEC2View(View):
     '''
     Check :model:`adsrental.EC2Instance` if they have action RDP session, stops them otherwise.
     '''
+
     def get(self, request):
         online_ec2s = []
         stopped_ec2s = []
+        stopping_instances = []
         now = timezone.now()
-        for ec2_instance in EC2Instance.objects.filter(
-                last_rdp_start__lt=now - datetime.timedelta(minutes=15),
-                status=EC2Instance.STATUS_RUNNING,
-        ):
-            if ec2_instance.is_rdp_session_active():
+        ec2_client = BotoResource().get_client('ec2')
+        pool = ThreadPool(processes=10)
+        ec2_instances = EC2Instance.objects.filter(
+            last_rdp_start__lt=now - datetime.timedelta(minutes=15),
+            status=EC2Instance.STATUS_RUNNING,
+        )
+        results = pool.map(lambda x: [x, x.is_rdp_session_active()], ec2_instances)
+        for ec2_instance, is_rdp_session_active in results:
+            if is_rdp_session_active:
                 ec2_instance.last_rdp_start = now
                 ec2_instance.save()
                 online_ec2s.append(ec2_instance.rpid)
             else:
-                ec2_instance.stop()
                 stopped_ec2s.append(ec2_instance.rpid)
+                stopping_instances.append(ec2_instance)
+
+        ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])
+        for ec2 in stopping_instances:
+            ec2.status = EC2Instance.STATUS_STOPPED
+            ec2.save()
 
         return JsonResponse({
             'result': True,
