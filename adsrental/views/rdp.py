@@ -39,13 +39,13 @@ class RDPDownloadView(View):
 
 class RDPConnectView(View):
     def handle_action(self, request, ec2_instance, action):
-        if action == 'update_antidetect':
+        if action == 'install_antidetect_script':
             try:
-                ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/browser.exe -outf C:\\Users\\Administrator\\Desktop\\Browser.exe')
+                ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/antidetect/install_antidetect.bat -outf C:\\install_antidetect.bat')
             except SSHConnectException:
                 messages.warning(request, 'Antidetect script update failed.')
                 return
-            messages.success(request, 'Antidetect script updated successfully')
+            messages.success(request, 'Antidetect script updated successfully. Now run it from C:\\install_antidetect.bat')
         if action == 'fix_performance':
             try:
                 ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
