@@ -522,10 +522,11 @@ class CheckEC2View(View):
                 stopped_ec2s.append(ec2_instance.rpid)
                 stopping_instances.append(ec2_instance)
 
-        ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])
-        for ec2 in stopping_instances:
-            ec2.status = EC2Instance.STATUS_STOPPED
-            ec2.save()
+        if stopping_instances:
+            ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])
+            for ec2 in stopping_instances:
+                ec2.status = EC2Instance.STATUS_STOPPED
+                ec2.save()
 
         return JsonResponse({
             'result': True,
