@@ -9,8 +9,6 @@ if exist C:\Antidetect_7.3.1.zip (
     powershell iwr -outf C:\Antidetect_7.3.1.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.1.zip
 )
 
-echo "[2] Overwriting old Antidetect"
-
 if exist C:\Antidetect (
     echo "[!] Antidetect is already installed. Delete C:\Antidetect to reinstall"
     echo "[!] This will also regenerate antidetect config"
