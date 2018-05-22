@@ -10,9 +10,9 @@ if exist C:\Antidetect_7.3.1.zip (
 )
 
 echo "[*] Installing Antidetect"
-powershell Copy-Item C:\Antidetect\antidetect.conf -Destination C:\antidetect.conf
+powershell Copy-Item C:\Antidetect\antidetect.conf -Destination C:\antidetect.conf.backup
 powershell Expand-Archive -force C:\Antidetect_7.3.1.zip -DestinationPath C:\
-powershell Copy-Item C:\antidetect.conf -Destination C:\Antidetect\antidetect.conf
+powershell Copy-Item C:\antidetect.conf.backup -Destination C:\Antidetect\antidetect.conf
 
 echo "[*] Adding shortcuts to desktop"
 powershell iwr https://adsrental.com/static/antidetect/browser.exe -outf C:\Users\Administrator\Desktop\Browser.exe
