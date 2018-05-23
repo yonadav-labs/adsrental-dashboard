@@ -320,7 +320,8 @@ class AccountTypeListFilter(SimpleListFilter):
         return (
             ('facebook', 'Facebook only'),
             ('google', 'Google only'),
-            ('google_facebook', 'Google and Facebook'),
+            ('amazon', 'Amazon'),
+            ('many', 'Several accounts'),
         )
 
     def queryset(self, request, queryset):
@@ -328,7 +329,9 @@ class AccountTypeListFilter(SimpleListFilter):
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'google':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
-        if self.value() == 'google_facebook':
+        if self.value() == 'amazon':
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
+        if self.value() == 'many':
             return queryset.annotate(lead_accounts_count=Count('lead_account')).filter(lead_accounts_count__gt=1)
         return None
 

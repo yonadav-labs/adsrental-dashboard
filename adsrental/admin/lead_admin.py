@@ -70,7 +70,8 @@ class LeadAdmin(admin.ModelAdmin):
         'wrong_password_field',
         'security_checkpoint_field',
         'sync_with_adsdb_field',
-        'billed',
+        'facebook_billed',
+        'google_billed',
     )
     list_filter = (
         StatusListFilter,
@@ -200,6 +201,20 @@ class LeadAdmin(admin.ModelAdmin):
 
     def phone_field(self, obj):
         return obj.get_phone_formatted()
+
+    def facebook_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                return lead_account.billed
+
+        return False
+
+    def google_billed(self, obj):
+        for lead_account in obj.lead_accounts.all():
+            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                return lead_account.billed
+
+        return False
 
     def last_touch(self, obj):
         for lead_account in obj.lead_accounts.all():
@@ -717,6 +732,12 @@ class LeadAdmin(admin.ModelAdmin):
             model_name='LeadAdmin',
         )))
 
+    google_billed.boolean = True
+    google_billed.admin_order_field = 'lead_account__billed'
+
+    facebook_billed.boolean = True
+    facebook_billed.admin_order_field = 'lead_account__billed'
+
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
 
@@ -803,28 +824,9 @@ class ReportLeadAdmin(LeadAdmin):
         'wrong_password_field',
         'security_checkpoint_field',
         'sync_with_adsdb_field',
-        'billed',
+        'facebook_billed',
+        'google_billed',
     )
-
-    def facebook_billed(self, obj):
-        for lead_account in obj.lead_accounts.all():
-            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                return lead_account.billed
-
-        return False
-
-    def google_billed(self, obj):
-        for lead_account in obj.lead_accounts.all():
-            if lead_account.active and lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                return lead_account.billed
-
-        return False
-
-    google_billed.boolean = True
-    google_billed.admin_order_field = 'lead_account__billed'
-
-    facebook_billed.boolean = True
-    facebook_billed.admin_order_field = 'lead_account__billed'
 
 
 class ReadOnlyLeadAdmin(LeadAdmin):

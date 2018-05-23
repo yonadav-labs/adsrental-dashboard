@@ -35,9 +35,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     ACCOUNT_TYPE_FACEBOOK = 'Facebook'
     ACCOUNT_TYPE_GOOGLE = 'Google'
+    ACCOUNT_TYPE_AMAZON = 'AMazon'
     ACCOUNT_TYPE_CHOICES = [
         (ACCOUNT_TYPE_FACEBOOK, 'Facebook', ),
         (ACCOUNT_TYPE_GOOGLE, 'Google', ),
+        (ACCOUNT_TYPE_AMAZON, 'Amazon', ),
     ]
 
     BAN_REASON_AUTO_OFFLINE = 'auto_offline'
@@ -156,6 +158,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         lead = self.lead
         if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
+            return False
+        if self.account_type == self.ACCOUNT_TYPE_AMAZON:
             return False
         # if lead.company != lead.COMPANY_FBM:
         #     return False
