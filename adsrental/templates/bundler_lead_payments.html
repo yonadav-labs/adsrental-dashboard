@@ -10,7 +10,10 @@
 
 <div class="container">
     {% for data in bundlers_data %}
-        <h3>Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}</h3>
+        <h3>
+            Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}
+            {% if not data.bundler.is_active %}(disabled){% endif %}
+        </h3>
         {% block actions_buttons %}
             <a target="_blank" href="{% url 'bundler_payments' bundler_id=data.bundler.id %}?pdf=true"><button class="btn btn-secondary">Download PDF</button></a>
         {% endblock actions_buttons %}
