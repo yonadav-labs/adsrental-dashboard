@@ -242,7 +242,7 @@ class BundlerPaymentsView(View):
                     entries.append(lead_account)
 
         children_stats = []
-        for child_bundler in Bundler.objects.filter(parent_bundler=bundler, is_active=True):
+        for child_bundler in Bundler.objects.filter(parent_bundler=bundler):
             child_stats = self.get_account_type_stats(child_bundler, end_date, account_type, child=True)
             children_stats.append(child_stats)
 
@@ -265,9 +265,9 @@ class BundlerPaymentsView(View):
 
         if request.user.is_superuser:
             if bundler_id == 'all':
-                bundlers = Bundler.objects.filter(is_active=True)
+                bundlers = Bundler.objects.all()
             else:
-                bundlers = Bundler.objects.filter(is_active=True, id=bundler_id)
+                bundlers = Bundler.objects.filter(id=bundler_id)
 
         if not bundlers:
             raise Http404
