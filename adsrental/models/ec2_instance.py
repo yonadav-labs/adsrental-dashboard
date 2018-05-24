@@ -91,10 +91,12 @@ class EC2Instance(models.Model):
 
     INSTANCE_TYPE_MICRO = 't2.micro'
     INSTANCE_TYPE_MEDIUM = 't2.medium'
+    INSTANCE_TYPE_M5_LARGE = 'm5.large'
     INSTANCE_TYPE_XLARGE = 't2.xlarge'
     INSTANCE_TYPE_CHOICES = (
         (INSTANCE_TYPE_MICRO, 'T2 Micro', ),
         (INSTANCE_TYPE_MEDIUM, 'T2 Medium', ),
+        (INSTANCE_TYPE_MEDIUM, 'M5 Large', ),
         (INSTANCE_TYPE_XLARGE, 'T2 Xlarge', ),
     )
 
