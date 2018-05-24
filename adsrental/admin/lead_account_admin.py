@@ -69,6 +69,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'bundler_paid',
     )
 
+    def get_actions(self, request):
+        actions = super(LeadAccountAdmin, self).get_actions(request)
+        keys = list(actions.keys())
+        for key in keys:
+            if key not in self.actions:
+                del actions[key]
+        return actions
 
     def get_queryset(self, request):
         queryset = super(LeadAccountAdmin, self).get_queryset(request)
