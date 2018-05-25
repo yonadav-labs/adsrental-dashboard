@@ -50,6 +50,7 @@
                             <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=install_antidetect_script"><button class="btn btn-default">Install Antidetect script</button></a>
                             <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=fix_performance"><button class="btn btn-default">Fix performance</button></a>
                         </p>
+                        <h4>This page will autoreload in <span class="countdown reload_enabled" data-timeout="120">120</span> seconds.</h4>
                     </div>
                 </div>
             {% else %}
@@ -59,7 +60,7 @@
                     </div>
                     <div class="panel-body">
                         <h3>Waiting for {{ rpid }} to come online. It is {{ ec2_instance.status }} now.</h3>
-                        <h3>This page will autoreload in <span class="countdown reload_enabled">30</span> seconds.</h3>
+                        <h3>This page will autoreload in <span class="countdown reload_enabled" data-timeout="30">30</span> seconds.</h3>
                     </div>
                 </div>
             {% endif %}
@@ -87,7 +88,8 @@
     {{ block.super }}
     <script>
         if ($('.reload_enabled').length){
-            var reloadInSeconds = 30;
+            var reloadInSeconds = parseInt($(reload_enabled).data('timeout'), 10);
+            $('.reload_enabled.countdown').text(reloadInSeconds);
             setTimeout(function(){
                 document.location.reload();
             }, reloadInSeconds * 1000)
@@ -95,7 +97,7 @@
                 if (reloadInSeconds > 0) {
                     reloadInSeconds -= 1;
                 }
-                $('.countdown').text(reloadInSeconds);
+                $('.reload_enabled.countdown').text(reloadInSeconds);
             }, 1000);
         }
 
