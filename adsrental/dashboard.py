@@ -113,7 +113,7 @@ class CustomIndexDashboard(Dashboard):
                     reverse('bundler_lead_payments'),
                 )],
                 [_('Banned lead accounts last 30 days'), '{}?{}'.format(
-                    reverse('admin:adsrental_leaaccount_changelist'),
+                    reverse('admin:adsrental_leadaccount_changelist'),
                     urlencode(dict(
                         banned_date='last_30_days',
                     )),
