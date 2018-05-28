@@ -2,6 +2,11 @@
 
 if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin & exit)
 
+echo [*] Installing Antidetect wallpaper
+powershell iwr https://adsrental.com/static/images/antidetect_wp.png -OutFile C:\Users\Administrator\antidetect_wp.png
+reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d C:\Users\Administrator\antidetect_wp.png /f
+RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+
 if exist C:\Antidetect_7.3.1.zip (
     echo [!] Latest Antidetect is already downloaded. To download again, please delete C:\Antidetect_7.3.1.zip file
 ) else (
