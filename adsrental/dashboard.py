@@ -112,6 +112,12 @@ class CustomIndexDashboard(Dashboard):
                 [_('Bundler payments report preview'), '{}'.format(
                     reverse('bundler_lead_payments'),
                 )],
+                [_('Banned lead accounts last 30 days'), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urlencode(dict(
+                        banned_date='last_30_days',
+                    )),
+                )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urlencode(dict(
