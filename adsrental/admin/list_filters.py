@@ -312,6 +312,49 @@ class QualifiedDateListFilter(SimpleListFilter):
         return None
 
 
+class BannedDateListFilter(SimpleListFilter):
+    title = 'Banned date'
+    parameter_name = 'banned_date'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('current_week', 'Current week', ),
+            ('previus_week', 'Previous week', ),
+            ('current_month', 'Current month', ),
+            ('last_30_days', 'Last 30 days', ),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'current_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            return queryset.filter(
+                banned_date__gte=current_week_start,
+            )
+        if self.value() == 'previous_week':
+            now = timezone.now()
+            current_week_start = now - datetime.timedelta(days=now.weekday())
+            prev_week_end = current_week_start - datetime.timedelta(days=1)
+            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+            return queryset.filter(
+                banned_date__gte=prev_week_start,
+                banned_date__lte=prev_week_end,
+            )
+        if self.value() == 'current_month':
+            now = timezone.now()
+            current_month_start = now - datetime.timedelta(days=now.day - 1)
+            return queryset.filter(
+                banned_date__gte=current_month_start,
+            )
+        if self.value() == 'last_30_days':
+            now = timezone.now()
+            date_30_days_ago = now - datetime.timedelta(days=30)
+            return queryset.filter(
+                banned_date__gte=date_30_days_ago,
+            )
+        return None
+
+
 class AccountTypeListFilter(SimpleListFilter):
     title = 'Account type'
     parameter_name = 'account_type'

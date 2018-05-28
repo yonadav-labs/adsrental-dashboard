@@ -76,6 +76,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     url = models.CharField(max_length=255, blank=True, null=True)
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
     qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
+    banned_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
     bundler_paid_date = models.DateField(blank=True, null=True, help_text='Date when bundler got his payment for this lead for the last time.')
     bundler_paid = models.BooleanField(default=False, help_text='Is revenue paid to bundler.')
     adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
@@ -265,6 +266,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def ban(self, edited_by, reason=None):
         'Mark lead account as banned, send cutomer.io event.'
         self.ban_reason = reason
+        self.banned_date = timezone.now()
         self.save()
         if self.status == LeadAccount.STATUS_AVAILABLE:
             CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_AVAILABLE_BANNED)
