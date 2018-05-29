@@ -158,12 +158,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         #     return False
 
         lead = self.lead
-        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
+        if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
             return False
         if self.account_type == self.ACCOUNT_TYPE_AMAZON:
             return False
-        # if lead.company != lead.COMPANY_FBM:
-        #     return False
         if lead.status != lead.STATUS_IN_PROGRESS:
             return False
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
