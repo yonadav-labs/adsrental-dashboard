@@ -71,19 +71,18 @@ class RDPConnectView(View):
                 netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
             ))
 
-
         raspberry_pi = ec2_instance.get_raspberry_pi()
         if not raspberry_pi or not raspberry_pi.online():
             messages.warning(request, 'Assigned RaspberryPi device is offline, please ping support')
 
-        # if ec2_instance.is_stopped() and ec2_instance.instance_type != EC2Instance.INSTANCE_TYPE_M5_LARGE:
-        #     client = BotoResource().get_client('ec2')
-        #     try:
-        #         client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_M5_LARGE)
-        #         ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_M5_LARGE
-        #         ec2_instance.save()
-        #     except:
-        #         pass
+        if ec2_instance.is_stopped() and ec2_instance.instance_type != EC2Instance.INSTANCE_TYPE_M5_LARGE:
+            client = BotoResource().get_client('ec2')
+            try:
+                client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_M5_LARGE)
+                ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_M5_LARGE
+                ec2_instance.save()
+            except:
+                pass
 
         if action:
             self.handle_action(request, ec2_instance, action)
