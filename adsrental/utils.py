@@ -27,6 +27,7 @@ class CustomerIOClient(object):
     EVENT_APPROVED = 'lead_approved'
     EVENT_BANNED = 'banned'
     EVENT_AVAILABLE_BANNED = 'available_banned'
+    EVENT_BANNED_HAS_ACCOUNTS = 'banned_has_accounts'
     EVENT_SECURITY_CHECKPOINT = 'security_checkpoint'
 
     def __init__(self):

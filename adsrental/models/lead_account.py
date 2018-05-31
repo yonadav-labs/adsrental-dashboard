@@ -35,7 +35,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     ACCOUNT_TYPE_FACEBOOK = 'Facebook'
     ACCOUNT_TYPE_GOOGLE = 'Google'
-    ACCOUNT_TYPE_AMAZON = 'AMazon'
+    ACCOUNT_TYPE_AMAZON = 'Amazon'
     ACCOUNT_TYPE_CHOICES = [
         (ACCOUNT_TYPE_FACEBOOK, 'Facebook', ),
         (ACCOUNT_TYPE_GOOGLE, 'Google', ),
@@ -266,12 +266,22 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.ban_reason = reason
         self.banned_date = timezone.now()
         self.save()
-        if self.status == LeadAccount.STATUS_AVAILABLE:
-            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_AVAILABLE_BANNED)
-        else:
-            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED)
+
         result = self.set_status(LeadAccount.STATUS_BANNED, edited_by)
-        if not LeadAccount.get_active_lead_accounts(self.lead):
+        active_accounts = LeadAccount.get_active_lead_accounts(self.lead)
+
+        if self.status == LeadAccount.STATUS_AVAILABLE:
+            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_AVAILABLE_BANNED, account_type=self.account_type)
+        elif active_accounts:
+            active_accounts_str = '{} account{}'.format(
+                ' and '.join([i.account_type for i in active_accounts]),
+                's' if len(active_accounts) > 1 else '',
+            )
+            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED_HAS_ACCOUNTS, account_type=self.account_type, active_accounts=active_accounts_str)
+        else:
+            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED, account_type=self.account_type)
+
+        if not active_accounts:
             self.lead.ban(edited_by, reason)
         return result
 

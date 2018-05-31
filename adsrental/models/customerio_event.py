@@ -15,6 +15,7 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
     NAME_APPROVED = 'lead_approved'
     NAME_BANNED = 'banned'
     NAME_AVAILABLE_BANNED = 'available_banned'
+    NAME_BANNED_HAS_ACCOUNTS = 'banned_has_accounts'
     NAME_SECURITY_CHECKPOINT = 'security_checkpoint'
     NAME_CHOICES = [
         (NAME_SHIPPED, 'Shipped'),
@@ -23,6 +24,7 @@ class CustomerIOEvent(models.Model, FulltextSearchMixin):
         (NAME_APPROVED, 'Approved'),
         (NAME_BANNED, 'Banned'),
         (NAME_AVAILABLE_BANNED, 'Banned from available status'),
+        (NAME_BANNED_HAS_ACCOUNTS, 'Banned but has other active accounts'),
         (NAME_SECURITY_CHECKPOINT, 'Security checkpoint reported'),
     ]
 
