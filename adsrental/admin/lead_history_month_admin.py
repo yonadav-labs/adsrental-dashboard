@@ -66,6 +66,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'start_ec2',
         'prepare_for_testing',
         'touch',
+        'aggregate',
     )
     # list_editable = ('amount_paid', )
 
@@ -213,4 +214,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             'form': form,
         })
 
+    def aggregate(self, request, queryset):
+        for obj in queryset:
+            obj.aggregate()
+
     lead_link.short_description = 'Lead'
+    aggregate.short_description = 'DEBUG: Aggregate'
