@@ -29,3 +29,5 @@ php/uploads/photo_ids/*
 
 media/*
 !media/placeholder.txt
+
+dump_*

@@ -72,8 +72,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
-        if 'date' not in request.GET:
-            queryset = queryset.filter(date=datetime.date.today().replace(day=1))
+            # if 'date' not in request.GET:
+            #     queryset = queryset.filter(date=datetime.date.today().replace(day=1))
 
         queryset = queryset.prefetch_related(
             'lead',
@@ -217,6 +217,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def aggregate(self, request, queryset):
         for obj in queryset:
             obj.aggregate()
+            obj.save()
 
     lead_link.short_description = 'Lead'
     aggregate.short_description = 'DEBUG: Aggregate'
