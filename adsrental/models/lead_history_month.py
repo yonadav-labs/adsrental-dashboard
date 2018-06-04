@@ -77,8 +77,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             if not lead_account.active:
                 continue
 
-            # created_date = max(raspberry_pi.first_seen, lead_account.created)
-            created_date = raspberry_pi.first_seen
+            created_date = lead_account.created
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
                     result += self.NEW_MAX_PAYMENT

@@ -97,6 +97,7 @@ class LeadHistory(models.Model):
         return round(monthly_amount / days_in_month, 2)
 
     def get_monthly_amount(self):
+        result = 0.0
         for lead_account in self.lead.lead_accounts.all():
             if not lead_account.active:
                 continue
@@ -104,12 +105,13 @@ class LeadHistory(models.Model):
             created_date = lead_account.created
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
-                    return self.NEW_MAX_PAYMENT
-                return self.MAX_PAYMENT
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
-                    return self.NEW_MAX_PAYMENT
+                    result += self.NEW_MAX_PAYMENT
+                else:
+                    result += self.MAX_PAYMENT
 
-                return self.MAX_PAYMENT
-
-        return 0.0
+        return result
