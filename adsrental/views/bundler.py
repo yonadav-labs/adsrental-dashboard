@@ -63,8 +63,8 @@ class BundlerLeaderboardView(View):
             .values_list('hour', 'count')
         )
         lead_accounts_by_time_list = []
-        for k, v in lead_accounts_by_time:
-            lead_accounts_by_time_list.append([k.strftime('%H:00'), v])
+        for k, value in lead_accounts_by_time:
+            lead_accounts_by_time_list.append([k.strftime('%H:00'), value])
 
         month_entries = []
         now = timezone.now()
