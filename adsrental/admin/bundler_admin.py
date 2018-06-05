@@ -105,8 +105,8 @@ class BundlerAdmin(admin.ModelAdmin):
         else:
             result.append('${}'.format(obj.facebook_payment))
 
-        if obj.enable_chargeback:
-            result.append('(${} chargeback)'.format(obj.facebook_chargeback))
+        if obj.enable_chargeback and obj.facebook_chargeback:
+            result.append('(CB ${})'.format(obj.facebook_chargeback))
 
         return ' '.join(result)
 
@@ -117,8 +117,8 @@ class BundlerAdmin(admin.ModelAdmin):
         else:
             result.append('${}'.format(obj.google_payment))
 
-        if obj.enable_chargeback:
-            result.append('(${} chargeback)'.format(obj.google_chargeback))
+        if obj.enable_chargeback and obj.google_chargeback:
+            result.append('(CB ${})'.format(obj.google_chargeback))
 
         return ' '.join(result)
 
