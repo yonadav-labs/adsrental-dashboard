@@ -16,7 +16,7 @@ from django.utils.safestring import mark_safe
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.lead import Lead
-from adsrental.admin.list_filters import HistoryStatusListFilter, DateMonthListFilter, LeadStatusListFilter
+from adsrental.admin.list_filters import AmountListFilter, DateMonthListFilter, LeadStatusListFilter
 from adsrental.forms import AdminPrepareForReshipmentForm
 
 
@@ -57,7 +57,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (
         DateMonthListFilter,
-        HistoryStatusListFilter,
+        AmountListFilter,
         LeadStatusListFilter,
     )
     actions = (

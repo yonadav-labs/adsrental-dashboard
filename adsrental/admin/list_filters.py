@@ -531,9 +531,9 @@ class DateMonthListFilter(SimpleListFilter):
         return None
 
 
-class HistoryStatusListFilter(SimpleListFilter):
-    title = 'Status'
-    parameter_name = 'status'
+class AmountListFilter(SimpleListFilter):
+    title = 'Amount'
+    parameter_name = 'amount'
 
     def lookups(self, request, model_admin):
         return (
