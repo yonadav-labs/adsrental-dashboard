@@ -34,8 +34,8 @@ class ReportView(View):
         if form.is_valid():
             year, month = [int(i) for i in form.cleaned_data['month'].split('-')]
             entries = self.get_entries(request.user, year, month, form.cleaned_data['search'])
-            if form.cleaned_data['hide_zeroes']:
-                entries = entries.filter(days_online__gt=0)
+            if form.cleaned_data['amount']:
+                entries = entries.filter(amount__gte=float(form.cleaned_data['amount']))
 
         page = request.GET.get('page', 1)
         paginator = Paginator(entries, self.items_per_page)

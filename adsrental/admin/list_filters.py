@@ -537,12 +537,15 @@ class HistoryStatusListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('hide_zeroes', 'Hide zeroes', ),
+            ('hide_zeroes', 'Hide $0', ),
+            ('hide_less_2', 'Hide less than $2', ),
         )
 
     def queryset(self, request, queryset):
         if self.value() == 'hide_zeroes':
-            return queryset.filter(days_online__gt=0)
+            return queryset.filter(amount__gt=0)
+        if self.value() == 'hide_less_2':
+            return queryset.filter(amount__gte=2)
         return None
 
 

@@ -202,10 +202,15 @@ class ReportForm(forms.Form):
         ('2018-01', 'Jan 2018', ),
         ('2018-02', 'Feb 2018', ),
     )
+    AMOUNT_CHOICES = (
+        ('', 'All', ),
+        ('0.01', 'More than $0', ),
+        ('2', 'More than $2', ),
+    )
 
     search = forms.CharField(label='Search', required=False)
     month = forms.ChoiceField(choices=MONTH_CHOICES, required=False)
-    hide_zeroes = forms.BooleanField(required=False)
+    amount = forms.ChoiceField(choices=AMOUNT_CHOICES, required=False)
 
     def clean_month(self):
         value = self.cleaned_data['month'].lower()

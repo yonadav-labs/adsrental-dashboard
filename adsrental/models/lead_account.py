@@ -109,7 +109,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result -= self.get_parent_bundler_payment(bundler)
 
         if bundler.enable_chargeback and self.charge_back and not self.charge_back_billed:
-            result -= bundler.CHARGEBACK_PAYMENT
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                result -= bundler.facebook_chargeback
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                result -= bundler.google_changeback
 
         return result
 
