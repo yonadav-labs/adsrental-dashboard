@@ -111,6 +111,7 @@ class BundlerAdmin(admin.ModelAdmin):
         return ' '.join(result)
 
     def google_payment_field(self, obj):
+        result = []
         if obj.parent_bundler:
             result.append('${} / ${}'.format(obj.google_payment - obj.google_parent_payment, obj.google_parent_payment))
         else:
