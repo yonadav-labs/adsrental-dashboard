@@ -99,16 +99,27 @@ class BundlerAdmin(admin.ModelAdmin):
         return mark_safe(', '.join(result))
 
     def facebook_payment_field(self, obj):
+        result = []
         if obj.parent_bundler:
-            return '${} / ${}'.format(obj.facebook_payment - obj.facebook_parent_payment, obj.facebook_parent_payment)
+            result.append('${} / ${}'.format(obj.facebook_payment - obj.facebook_parent_payment, obj.facebook_parent_payment))
+        else:
+            result.append('${}'.format(obj.facebook_payment))
 
-        return '${}'.format(obj.facebook_payment)
+        if obj.enable_chargeback:
+            result.append('(${} chargeback)'.format(obj.facebook_chargeback))
+
+        return ' '.join(result)
 
     def google_payment_field(self, obj):
         if obj.parent_bundler:
-            return '${} / ${}'.format(obj.google_payment - obj.google_parent_payment, obj.google_parent_payment)
+            result.append('${} / ${}'.format(obj.google_payment - obj.google_parent_payment, obj.google_parent_payment))
+        else:
+            result.append('${}'.format(obj.google_payment))
 
-        return '${}'.format(obj.google_payment)
+        if obj.enable_chargeback:
+            result.append('(${} chargeback)'.format(obj.google_chargeback))
+
+        return ' '.join(result)
 
     leads_count.short_description = 'Leads'
 
