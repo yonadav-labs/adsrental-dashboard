@@ -27,7 +27,7 @@ class Bundler(models.Model):
     facebook_parent_payment = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to parent bundler.')
     google_parent_payment = models.DecimalField(default=decimal.Decimal(0.00), max_digits=8, decimal_places=2, help_text='Amount to withdraw from lead payment to be paid to parent bundler.')
     facebook_chargeback = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Facebook accounts.')
-    google_changeback = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Google accounts.')
+    google_chargeback = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Google accounts.')
     parent_bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that gets part of the payment')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
