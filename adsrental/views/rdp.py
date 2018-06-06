@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.views import View
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import timezone
 from django.urls import reverse
@@ -46,6 +46,7 @@ class RDPConnectView(View):
                 messages.warning(request, 'Antidetect script update failed.')
                 return
             messages.success(request, 'Antidetect script updated successfully. Now run it from C:\\install_antidetect.bat')
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'fix_performance':
             try:
                 ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
@@ -53,7 +54,9 @@ class RDPConnectView(View):
                 messages.warning(request, 'Performance fixed failed.')
                 return
             messages.success(request, 'Performance fixed applied successfully, instance is rebooting.')
-            ec2_instance.stop()
+            # ec2_instance.stop()
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+
 
     @method_decorator(login_required)
     def get(self, request):
