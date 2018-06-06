@@ -91,7 +91,7 @@
             var reloadInSeconds = parseInt($('.reload_enabled').data('timeout'), 10);
             $('.reload_enabled.countdown').text(reloadInSeconds);
             setTimeout(function(){
-                document.location.reload();
+                window.location = window.location.pathname;
             }, reloadInSeconds * 1000)
             setInterval(function(){
                 if (reloadInSeconds > 0) {
