@@ -43,13 +43,13 @@ class Command(BaseCommand):
         return True
 
     def handle(
-        self,
-        facebook,
-        google,
-        force,
-        threads,
-        test,
-        **kwargs
+            self,
+            facebook,
+            google,
+            force,
+            threads,
+            test,
+            **kwargs
     ):
         logging.raiseExceptions = False
         self.force = force

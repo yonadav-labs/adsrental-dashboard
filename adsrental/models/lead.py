@@ -7,7 +7,6 @@ import requests
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
-from django.apps import apps
 from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi import RaspberryPi
