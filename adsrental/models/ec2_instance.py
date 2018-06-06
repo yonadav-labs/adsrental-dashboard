@@ -437,18 +437,10 @@ class EC2Instance(models.Model):
         if not self.rpid or not self.rpid.startswith('RP'):
             return False
 
-        self.troubleshoot_status()
         self.troubleshoot_proxy()
 
         self.save()
         return True
-
-    def troubleshoot_status(self):
-        'Check and fix if instance is running for active lead and stopped for banned lead'
-        if self.status == self.STATUS_RUNNING:
-            if not self.lead.is_active():
-                # self.stop()
-                return
 
     def troubleshoot_proxy(self):
         'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'

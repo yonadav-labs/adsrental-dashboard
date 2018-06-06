@@ -32,8 +32,6 @@ class Command(BaseCommand):
         )
         netstat_out = ec2_instance.ssh_execute('netstat -an')
         if not netstat_out:
-            print(info_str + '\t' + 'SSH down, stopping')
-            ec2_instance.stop()
             return False
         if '1:2046' not in netstat_out and not self.force:
             print(info_str + '\t' + 'Tunnel down')

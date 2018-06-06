@@ -423,21 +423,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def check_ec2_status(self):
-        'Check if EC is stopped for active lead and stopped for banned.'
-        ec2_instance = self.get_ec2_instance()
-        if not ec2_instance:
-            return
-
-        ec2_instance.update_from_boto()
-        ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
-        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance:
-            ec2_instance_model.launch_for_lead(self)
-        if self.status in self.STATUSES_ACTIVE and self.raspberry_pi and not ec2_instance.is_running():
-            ec2_instance_model.launch_for_lead(self)
-        if self.status not in self.STATUSES_ACTIVE and ec2_instance and ec2_instance.is_running():
-            ec2_instance.stop()
-
     def get_ec2_instance(self):
         'Get corresponding EC2 object.'
         try:
