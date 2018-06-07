@@ -52,38 +52,38 @@ class BundlerLeadStat(models.Model):
                 if not raspberry_pi.online() or lead_account.is_wrong_password() or lead_account.is_security_checkpoint_reported():
                     obj.in_progress_total_issue += 1
 
-                if lead_account.ban_reason:
-                    if lead_account.ban_reason in [
-                            LeadAccount.BAN_REASON_AUTO_OFFLINE,
-                            LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-                            LeadAccount.BAN_REASON_AUTO_CHECKPOINT,
-                            LeadAccount.BAN_REASON_AUTO_NOT_USED,
-                    ]:
-                        obj.autobans_total += 1
-                        if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
-                            obj.autobans_last_30_days += 1
-
-                    obj.bans_total += 1
+            if lead_account.ban_reason:
+                if lead_account.ban_reason in (
+                        LeadAccount.BAN_REASON_AUTO_OFFLINE,
+                        LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+                        LeadAccount.BAN_REASON_AUTO_CHECKPOINT,
+                        LeadAccount.BAN_REASON_AUTO_NOT_USED,
+                ):
+                    obj.autobans_total += 1
                     if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
-                        obj.bans_last_30_days += 1
+                        obj.autobans_last_30_days += 1
 
-                if lead_account.qualified_date:
-                    obj.qualified_total += 1
-                    if lead_account.qualified_date > now.replace(hour=0, minute=0, second=0):
-                        obj.qualified_today += 1
-                    elif lead_account.qualified_date > now.replace(hour=0, minute=0, second=0) - datetime.timedelta(days=1):
-                        obj.qualified_yesterday += 1
-                    if lead_account.qualified_date >= last_30_days_start:
-                        obj.qualified_last_30_days += 1
-                        if lead_account.banned_date:
-                            obj.banned_from_qualified_last_30_days += 1
+                obj.bans_total += 1
+                if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
+                    obj.bans_last_30_days += 1
 
-                if lead.delivery_date and lead.delivery_date < (now - datetime.timedelta(days=2)).date():
+            if lead_account.qualified_date:
+                obj.qualified_total += 1
+                if lead_account.qualified_date > now.replace(hour=0, minute=0, second=0):
+                    obj.qualified_today += 1
+                elif lead_account.qualified_date > now.replace(hour=0, minute=0, second=0) - datetime.timedelta(days=1):
+                    obj.qualified_yesterday += 1
+                if lead_account.qualified_date >= last_30_days_start:
+                    obj.qualified_last_30_days += 1
+                    if lead_account.banned_date:
+                        obj.banned_from_qualified_last_30_days += 1
+
+            if lead.delivery_date and lead.delivery_date < (now - datetime.timedelta(days=2)).date():
+                if not raspberry_pi.first_seen:
+                    obj.delivered_not_connected += 1
+                if lead.delivery_date >= last_30_days_start.date():
+                    obj.delivered_last_30_days += 1
                     if not raspberry_pi.first_seen:
-                        obj.delivered_not_connected += 1
-                    if lead.delivery_date >= last_30_days_start.date():
-                        obj.delivered_last_30_days += 1
-                        if not raspberry_pi.first_seen:
-                            obj.delivered_not_connected_last_30_days += 1
+                        obj.delivered_not_connected_last_30_days += 1
 
         obj.save()
