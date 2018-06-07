@@ -1,0 +1,51 @@
+from django.contrib import admin
+
+from adsrental.models.bundler_lead_stat import BundlerLeadStat
+
+
+class BundlerLeadStatsAdmin(admin.ModelAdmin):
+    model = BundlerLeadStat
+    list_display = (
+        'id',
+        'bundler',
+        'in_progress_total',
+        'in_progress_offline',
+        'in_progress_wrong_pw',
+        'in_progress_security_checkpoint',
+        'in_progress_total_issue_percent',
+        'autobans_last_30_days',
+        'other_bans_last_30_days',
+        'qualified_today',
+        'qualified_yesterday',
+        'qualified_last_30_days',
+        'qualified_total',
+        'delivered_not_connected',
+        'banned_from_qualified_last_30_days',
+        'delivered_not_connected_last_30_days',
+        'delivered_connected_last_30_days_percent',
+    )
+    list_select_related = ('bundler', )
+    actions = (
+        'calculate',
+    )
+
+    def in_progress_total_issue_percent(self, obj):
+        return '%d%%' % (
+            obj.in_progress_total_issue * 100 / max(obj.in_progress_total, 1)
+        )
+
+    def other_bans_last_30_days(self, obj):
+        return obj.bans_last_30_days - obj.autobans_last_30_days
+
+    def delivered_connected_last_30_days_percent(self, obj):
+        return '%d%%' % (
+            (obj.delivered_last_30_days - obj.delivered_not_connected_last_30_days) * 100 / max(obj.delivered_last_30_days, 1),
+        )
+
+    def calculate(self, request, queryset):
+        for bundler_lead_stat in queryset:
+            BundlerLeadStat.calculate(bundler_lead_stat.bundler)
+
+    in_progress_total_issue_percent.short_description = 'Total issue In-Progress'
+    other_bans_last_30_days.short_description = 'Other bans (last 30 days)'
+    delivered_connected_last_30_days_percent.short_description = 'Delivered and connected (last 30 days)'
