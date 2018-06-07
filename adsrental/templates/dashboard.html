@@ -15,7 +15,7 @@
                     <th>#</th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'raspberry_pi__rpid' %}">RPID</a></th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' 'account_name' %}">ACT</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' '-account_name' %}">ACT</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'utm_source' %}">UTM</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
