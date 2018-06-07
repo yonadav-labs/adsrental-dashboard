@@ -51,22 +51,22 @@ class BundlerLeadStat(models.Model):
                     obj.in_progress_security_checkpoint += 1
                 if not raspberry_pi.online() or lead_account.is_wrong_password() or lead_account.is_security_checkpoint_reported():
                     obj.in_progress_total_issue += 1
-                
+
                 if lead_account.ban_reason:
                     if lead_account.ban_reason in [
-                        LeadAccount.BAN_REASON_AUTO_OFFLINE,
-                        LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-                        LeadAccount.BAN_REASON_AUTO_CHECKPOINT,
-                        LeadAccount.BAN_REASON_AUTO_NOT_USED,
+                            LeadAccount.BAN_REASON_AUTO_OFFLINE,
+                            LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+                            LeadAccount.BAN_REASON_AUTO_CHECKPOINT,
+                            LeadAccount.BAN_REASON_AUTO_NOT_USED,
                     ]:
                         obj.autobans_total += 1
                         if lead_account.banned_date > last_30_days_start:
                             obj.autobans_last_30_days += 1
-                    
+
                     obj.bans_total += 1
                     if lead_account.banned_date > last_30_days_start:
                         obj.bans_last_30_days += 1
-                
+
                 if lead_account.qualified_date:
                     obj.qualified_total += 1
                     if lead_account.qualified_date > now.replace(hour=0, minute=0, second=0):
