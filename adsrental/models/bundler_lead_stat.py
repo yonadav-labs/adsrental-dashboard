@@ -60,11 +60,11 @@ class BundlerLeadStat(models.Model):
                             LeadAccount.BAN_REASON_AUTO_NOT_USED,
                     ]:
                         obj.autobans_total += 1
-                        if lead_account.banned_date > last_30_days_start:
+                        if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
                             obj.autobans_last_30_days += 1
 
                     obj.bans_total += 1
-                    if lead_account.banned_date > last_30_days_start:
+                    if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
                         obj.bans_last_30_days += 1
 
                 if lead_account.qualified_date:
