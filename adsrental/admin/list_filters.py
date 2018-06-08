@@ -284,7 +284,7 @@ class QualifiedDateListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'today':
             now = timezone.now()
-            date_start = now - now.replace(hour=0, minute=0, second=0)
+            date_start = now.replace(hour=0, minute=0, second=0)
             return queryset.filter(
                 qualified_date__gte=date_start,
             )
