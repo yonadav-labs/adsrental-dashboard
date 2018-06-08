@@ -290,7 +290,7 @@ class QualifiedDateListFilter(SimpleListFilter):
             )
         if self.value() == 'yesterday':
             now = timezone.now()
-            date_end = now - now.replace(hour=0, minute=0, second=0)
+            date_end = now.replace(hour=0, minute=0, second=0)
             date_start = date_end - datetime.timedelta(days=1)
             return queryset.filter(
                 qualified_date__gte=date_start,
