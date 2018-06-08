@@ -53,12 +53,7 @@ class BundlerLeadStat(models.Model):
                     obj.in_progress_total_issue += 1
 
             if lead_account.ban_reason:
-                if lead_account.ban_reason in (
-                        LeadAccount.BAN_REASON_AUTO_OFFLINE,
-                        LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-                        LeadAccount.BAN_REASON_AUTO_CHECKPOINT,
-                        LeadAccount.BAN_REASON_AUTO_NOT_USED,
-                ):
+                if lead_account.ban_reason in LeadAccount.AUTO_BAN_REASONS:
                     obj.autobans_total += 1
                     if lead_account.banned_date and lead_account.banned_date > last_30_days_start:
                         obj.autobans_last_30_days += 1
