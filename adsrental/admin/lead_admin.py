@@ -29,7 +29,7 @@ from adsrental.admin.list_filters import \
 
 class LeadAccountInline(admin.StackedInline):
     model = LeadAccount
-    max_num = 2
+    max_num = 3
     readonly_fields = (
         'created',
         'updated',
