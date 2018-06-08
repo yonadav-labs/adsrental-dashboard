@@ -272,6 +272,9 @@ class QualifiedDateListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
+            ('today', 'Today', ),
+            ('yesterday', 'Yesterday', ),
+            ('last_30_days', 'Last 30 days', ),
             ('current_week', 'Current week', ),
             ('previus_week', 'Previous week', ),
             ('current_month', 'Current month', ),
@@ -279,6 +282,26 @@ class QualifiedDateListFilter(SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
+        if self.value() == 'today':
+            now = timezone.now()
+            date_start = now - now.replace(hour=0, minute=0, second=0)
+            return queryset.filter(
+                qualified_date__gte=date_start,
+            )
+        if self.value() == 'yesterday':
+            now = timezone.now()
+            date_end = now - now.replace(hour=0, minute=0, second=0)
+            date_start = date_end - datetime.timedelta(days=1)
+            return queryset.filter(
+                qualified_date__gte=date_start,
+                qualified_date__lte=date_end,
+            )
+        if self.value() == 'last_30_days':
+            now = timezone.now()
+            date_start = now - datetime.timedelta(days=30)
+            return queryset.filter(
+                qualified_date__gte=date_start,
+            )
         if self.value() == 'current_week':
             now = timezone.now()
             current_week_start = now - datetime.timedelta(days=now.weekday())
@@ -310,6 +333,29 @@ class QualifiedDateListFilter(SimpleListFilter):
                 qualified_date__lte=prev_month_end,
             )
         return None
+
+
+class AutoBanListFilter(SimpleListFilter):
+    title = 'Auto-ban'
+    parameter_name = 'auto_ban'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes', ),
+            ('no', 'No', ),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(
+                ban_reason__in=LeadAccount.AUTO_BAN_REASONS,
+            )
+        if self.value() == 'no':
+            return queryset.filter(
+                ban_reason__isnull=False,
+            ).exclude(
+                ban_reason__in=LeadAccount.AUTO_BAN_REASONS,
+            )
 
 
 class BannedDateListFilter(SimpleListFilter):
@@ -447,8 +493,42 @@ class LeadAccountWrongPasswordListFilter(SimpleListFilter):
         return None
 
 
+class SecurityCheckpointListFilter(SimpleListFilter):
+    title = 'Security Checkpoint reported'
+    parameter_name = 'security_checkpoint'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('no', 'No'),
+            ('yes', 'Reported'),
+            ('yes_0_2days', 'Reported for 0-2 days'),
+            ('yes_3_5days', 'Reported for 3-5 days'),
+            ('yes_5days', 'Reported for more than 5 days'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'no':
+            return queryset.filter(security_checkpoint_date__isnull=True)
+        if self.value() == 'yes':
+            return queryset.filter(security_checkpoint_date__isnull=False)
+        if self.value() == 'yes_0_2days':
+            return queryset.filter(
+                security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
+            )
+        if self.value() == 'yes_3_5days':
+            return queryset.filter(
+                security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=2 * 24),
+                security_checkpoint_date__gte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        if self.value() == 'yes_5days':
+            return queryset.filter(
+                security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
+            )
+        return None
+
+
 class LeadAccountSecurityCheckpointListFilter(SimpleListFilter):
-    title = 'Securty Checkpoint reported'
+    title = 'Security Checkpoint reported'
     parameter_name = 'security_checkpoint'
 
     def lookups(self, request, model_admin):
@@ -683,4 +763,65 @@ class BundlerListFilter(SimpleListFilter):
             return queryset.filter(bundler__isnull=True)
         if self.value():
             return queryset.filter(bundler_id__in=self.value())
+        return None
+
+
+class LeadBundlerListFilter(SimpleListFilter):
+    title = 'Bundler'
+    parameter_name = 'bundler'
+    template = 'admin/checkbox_filter.html'
+
+    def choices(self, changelist):
+        current_value = self.value()
+        values = current_value
+        yield {
+            'selected': self.value() is None,
+            'query_string': changelist.get_query_string({}, [self.parameter_name]),
+            'display': _('All'),
+        }
+        for lookup, title in self.lookup_choices:
+            lookup_value = []
+            if lookup not in values:
+                lookup_value.extend(current_value)
+                lookup_value.append(lookup)
+            else:
+                for value in current_value:
+                    if value != lookup:
+                        lookup_value.append(value)
+
+            lookup_value = ','.join([str(i) for i in lookup_value if i])
+            if lookup_value:
+                yield {
+                    'selected': lookup in current_value,
+                    'query_string': changelist.get_query_string({self.parameter_name: lookup_value}, []),
+                    'display': title,
+                }
+            else:
+                yield {
+                    'selected': lookup in current_value,
+                    'query_string': changelist.get_query_string({}, [self.parameter_name]),
+                    'display': title,
+                }
+        yield {
+            'selected': 0 in self.value(),
+            'query_string': changelist.get_query_string({self.parameter_name: '0'}, []),
+            'display': _('Not assigned'),
+        }
+
+    def value(self):
+        result = self.used_parameters.get(self.parameter_name)
+        if not result:
+            return []
+
+        return [int(i) for i in result.split(',') if i.isdigit()]
+
+    def lookups(self, request, model_admin):
+        choices = [(i[0], '%s (%s)' % i[1:]) for i in Bundler.objects.all().values_list('id', 'name', 'utm_source')]
+        return choices
+
+    def queryset(self, request, queryset):
+        if self.value() == [0]:
+            return queryset.filter(lead__bundler__isnull=True)
+        if self.value():
+            return queryset.filter(lead__bundler_id__in=self.value())
         return None

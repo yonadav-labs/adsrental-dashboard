@@ -11,7 +11,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, StatusListFilter, BannedDateListFilter
+from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
@@ -43,12 +43,16 @@ class LeadAccountAdmin(admin.ModelAdmin):
     list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
         'account_type',
+        LeadRaspberryPiOnlineListFilter,
         'bundler_paid',
         StatusListFilter,
         WrongPasswordListFilter,
+        SecurityCheckpointListFilter,
         QualifiedDateListFilter,
         BannedDateListFilter,
+        AutoBanListFilter,
         'charge_back',
+        LeadBundlerListFilter,
     )
     search_fields = ('lead__leadid', 'username', )
     actions = (

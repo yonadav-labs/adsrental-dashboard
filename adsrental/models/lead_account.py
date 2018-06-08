@@ -47,6 +47,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_AUTO_CHECKPOINT = 'auto_checkpoint'
     BAN_REASON_AUTO_NOT_USED = 'auto_not_used'
 
+    AUTO_BAN_REASONS = (
+        BAN_REASON_AUTO_OFFLINE,
+        BAN_REASON_AUTO_WRONG_PASSWORD,
+        BAN_REASON_AUTO_CHECKPOINT,
+        BAN_REASON_AUTO_NOT_USED,
+    )
+
     BAN_REASON_CHOICES = (
         ('Google - Policy', 'Google - Policy', ),
         ('Google - Billing', 'Google - Billing', ),
