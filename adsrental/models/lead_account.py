@@ -139,12 +139,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         )
 
     def __str__(self):
-        if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
-            return 'Facebook lead {}'.format(self.username)
-        if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
-            return 'Google lead {}'.format(self.username)
-
-        return 'Unknown lead {}'.format(self.username)
+        return '{} lead {}'.format(self.account_type, self.username)
 
     def is_security_checkpoint_reported(self):
         return self.security_checkpoint_date is not None

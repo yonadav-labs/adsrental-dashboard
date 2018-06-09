@@ -301,6 +301,11 @@ class LeadAdmin(admin.ModelAdmin):
                 'rpid': obj.raspberry_pi.rpid,
             })))
 
+        result.append('<a target="_blank" href="{url}?q={q}">History</a>'.format(
+            url=reverse('admin:adsrental_leadchange_changelist'),
+            q=obj.leadid,
+        ))
+
         if obj.photo_id:
             result.append('<a href="{url}">Photo ID</a>'.format(url=obj.photo_id.url))
 
