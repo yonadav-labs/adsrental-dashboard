@@ -117,6 +117,7 @@ class EC2Instance(models.Model):
     last_rdp_start = models.DateTimeField(default=timezone.now, help_text='Last time when RDP connect page was accessed for this instance')
     last_troubleshoot = models.DateTimeField(blank=True, null=True, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
     version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
+    is_essential = models.BooleanField(default=False, help_text='New global instance type, never stopped')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

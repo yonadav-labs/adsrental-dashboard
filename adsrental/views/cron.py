@@ -508,6 +508,7 @@ class CheckEC2View(View):
         ec2_instances = EC2Instance.objects.filter(
             last_rdp_start__lt=now - datetime.timedelta(minutes=15),
             status=EC2Instance.STATUS_RUNNING,
+            is_essential=False,
         )
         results = pool.map(lambda x: [x, x.is_rdp_session_active()], ec2_instances)
         for ec2_instance, is_rdp_session_active in results:
