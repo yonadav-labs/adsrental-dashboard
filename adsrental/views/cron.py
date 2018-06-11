@@ -502,6 +502,8 @@ class CheckEC2View(View):
         online_ec2s = []
         stopped_ec2s = []
         stopping_instances = []
+        online_essential_ec2s = []
+        unassigned_essential_ec2s = []
         now = timezone.now()
         ec2_client = BotoResource().get_client('ec2')
         pool = ThreadPool(processes=10)
@@ -520,6 +522,24 @@ class CheckEC2View(View):
                 stopped_ec2s.append(ec2_instance.rpid)
                 stopping_instances.append(ec2_instance)
 
+
+        ec2_instances = EC2Instance.objects.filter(
+            last_rdp_start__lt=now - datetime.timedelta(minutes=15),
+            rpid__isnull=False,
+            is_essential=True,
+        )
+        results = pool.map(lambda x: [x, x.is_rdp_session_active()], ec2_instances)
+        for ec2_instance, is_rdp_session_active in results:
+            if is_rdp_session_active:
+                ec2_instance.last_rdp_start = now
+                ec2_instance.save()
+                online_essential_ec2s.append(ec2_instance.rpid)
+            else:
+                unassigned_essential_ec2s.append(ec2_instance.rpid)
+                ec2_instance.rpid = None
+                ec2_instance.lead = None
+                ec2_instance.save()
+
         if stopping_instances:
             ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])
             for ec2 in stopping_instances:
@@ -530,6 +550,8 @@ class CheckEC2View(View):
             'result': True,
             'online_ec2s': online_ec2s,
             'stopped_ec2s': stopped_ec2s,
+            'online_essential_ec2s': online_essential_ec2s,
+            'unassigned_essential_ec2s': stopped_ec2s,
         })
 
 

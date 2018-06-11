@@ -12,6 +12,7 @@ from django.contrib import messages
 
 from adsrental.utils import generate_password, BotoResource
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 
 
@@ -65,6 +66,15 @@ class RDPConnectView(View):
         action = request.GET.get('action', '')
         is_ready = False
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
+        if not ec2_instance:
+            ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
+            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+            ec2_instance.rpid = rpid
+            ec2_instance.lead = lead
+            ec2_instance.save()
+
+        if ec2_instance.is_essential:
+            messages.success(request, 'Using essential EC2.')
         if not ec2_instance:
             return render(request, 'rdp_connect.html', dict(
                 rpid=rpid,
