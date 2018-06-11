@@ -18,6 +18,7 @@ class LeadHistory(models.Model):
 
     MAX_PAYMENT = 25.
     NEW_MAX_PAYMENT = 15.
+    AMAZON_MAX_PAYMENT = 10.
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
@@ -113,5 +114,7 @@ class LeadHistory(models.Model):
                     result += self.NEW_MAX_PAYMENT
                 else:
                     result += self.MAX_PAYMENT
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+                result += self.AMAZON_MAX_PAYMENT
 
         return result
