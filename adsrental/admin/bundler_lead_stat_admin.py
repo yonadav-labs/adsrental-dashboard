@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.contrib.admin.views.main import ChangeList
-from django.db.models import Sum
 
 from adsrental.models.bundler_lead_stat import BundlerLeadStat
 
