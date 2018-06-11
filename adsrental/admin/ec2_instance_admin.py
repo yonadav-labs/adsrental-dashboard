@@ -40,6 +40,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     list_filter = (
         'status',
         'instance_type',
+        'is_essential',
         TunnelUpListFilter,
         LeadStatusListFilter,
         LeadRaspberryPiOnlineListFilter,
