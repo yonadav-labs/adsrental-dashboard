@@ -69,9 +69,7 @@ class RDPConnectView(View):
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
             lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
-            ec2_instance.rpid = rpid
-            ec2_instance.lead = lead
-            ec2_instance.save()
+            ec2_instance.assign_essential(rpid, lead)
 
         if ec2_instance.is_essential:
             messages.success(request, 'Using essential EC2.')

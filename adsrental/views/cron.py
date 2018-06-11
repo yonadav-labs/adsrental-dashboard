@@ -536,9 +536,7 @@ class CheckEC2View(View):
                 online_essential_ec2s.append(ec2_instance.rpid)
             else:
                 unassigned_essential_ec2s.append(ec2_instance.rpid)
-                ec2_instance.rpid = None
-                ec2_instance.lead = None
-                ec2_instance.save()
+                ec2_instance.unassign_essential()
 
         if stopping_instances:
             ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])

@@ -506,8 +506,24 @@ class EC2Instance(models.Model):
             tags.append({'Key': 'Email', 'Value': self.email})
         if self.rpid:
             tags.append({'Key': 'Name', 'Value': self.rpid})
+        if self.is_essential:
+            tags.append({'Key': 'Essential', 'Value': 'true'})
         boto_resource = BotoResource().get_resource('ec2')
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
+
+    def assign_essential(self, rpid, lead):
+        self.rpid = rpid
+        self.lead = lead
+        self.email = lead.email
+        self.save()
+        self.set_ec2_tags()
+
+    def unassign_essential(self):
+        self.rpid = None
+        self.lead = None
+        self.email = None
+        self.save()
+        self.set_ec2_tags()
 
     def clear_ping_cache(self):
         'Delete cache for this instance RPID.'
