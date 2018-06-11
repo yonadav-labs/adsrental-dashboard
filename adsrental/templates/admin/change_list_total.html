@@ -1,0 +1,68 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'scripts/jquery.min.js' %}"></script>
+<script>
+    var getRowResults = function(row){
+        var results = [];
+        var cells = row.children();
+        for (var j=0; j < cells.length; j++){
+            var cell = $(cells[j]);
+            var text = cell.text();
+            if (parseInt(text, 10).toString() === text && cell.is('td')){
+                results.push(parseInt(text, 10))
+            } else {
+                results.push(0)
+            }
+        }
+        return results;
+    }
+
+    var combineResults = function(arr1, arr2){
+        if (!arr1.length) {
+            return arr2;
+        }
+        if (!arr2.length) {
+            return arr1;
+        }
+        var result = [];
+        for (var i=0; i< Math.max(arr1.length, arr2.length); i++) {
+            result.push(arr1[i] + arr2[i]);
+        }
+        return result;
+    }
+
+    var tableAddTotal = function(table){
+        var totalRow = $('<tr></tr>');
+        var rows = table.find('tbody').find('tr');
+        var sumResults = [];
+        for (var i=0; i< rows.length; i++){
+            var row = $(rows[i]);
+            var rowResults = getRowResults(row);
+            sumResults = combineResults(sumResults, rowResults);
+        }
+        for (var i=0; i< sumResults.length; i++){
+            var totalColumn = $('<td></td>');
+            var sumResult = sumResults[i];
+            if (sumResult) {
+                totalColumn.text(sumResult);
+            }
+            if (i === 0){
+                totalColumn.html('<b>Total</b>');
+            }
+            totalRow.append(totalColumn);
+        }
+        table.find('tbody').append(totalRow);
+
+    }
+
+    $(function(){
+        var resultList = $('#result_list');
+        if (resultList.length) {
+            tableAddTotal(resultList);
+        }
+    })
+</script>
+{% endblock %}

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.contrib.admin.views.main import ChangeList
+from django.db.models import Sum
 
 from adsrental.models.bundler_lead_stat import BundlerLeadStat
 
@@ -30,6 +32,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     actions = (
         'calculate',
     )
+    change_list_template = 'admin/change_list_total.html'
 
     def in_progress_total_field(self, obj):
         return mark_safe('<a href="{url}?status=In-Progress&bundler={bundler_id}">{value}</a>'.format(
