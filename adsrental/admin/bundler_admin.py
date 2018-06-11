@@ -23,6 +23,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'enable_chargeback',
         'facebook_payment_field',
         'google_payment_field',
+        'amazon_payment_field',
         'parent_bundler',
         'links',
     )
@@ -122,6 +123,18 @@ class BundlerAdmin(admin.ModelAdmin):
 
         return ' '.join(result)
 
+    def amazon_payment_field(self, obj):
+        result = []
+        if obj.parent_bundler:
+            result.append('${} / ${}'.format(obj.amazon_payment - obj.amazon_parent_payment, obj.amazon_parent_payment))
+        else:
+            result.append('${}'.format(obj.amazon_payment))
+
+        if obj.enable_chargeback and obj.amazon_chargeback:
+            result.append('(CB ${})'.format(obj.amazon_chargeback))
+
+        return ' '.join(result)
+
     leads_count.short_description = 'Leads'
 
     facebook_payment_field.short_description = 'Facebook payment'
@@ -129,3 +142,6 @@ class BundlerAdmin(admin.ModelAdmin):
 
     google_payment_field.short_description = 'Google payment'
     google_payment_field.admin_order_field = 'google_payment'
+
+    amazon_payment_field.short_description = 'Amazon payment'
+    amazon_payment_field.admin_order_field = 'amazon_payment'

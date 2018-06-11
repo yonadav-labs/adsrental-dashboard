@@ -114,12 +114,17 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_payment
                 result -= self.get_parent_bundler_payment(bundler)
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+                result += bundler.amazon_payment
+                result -= self.get_parent_bundler_payment(bundler)
 
         if bundler.enable_chargeback and self.charge_back and not self.charge_back_billed:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result -= bundler.facebook_chargeback
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result -= bundler.google_changeback
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+                result -= bundler.amazon_changeback
 
         return result
 
@@ -130,6 +135,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result += bundler.facebook_parent_payment
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_parent_payment
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+                result += bundler.amazon_parent_payment
 
         return result
 
