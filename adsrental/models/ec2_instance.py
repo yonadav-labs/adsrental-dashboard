@@ -439,12 +439,10 @@ class EC2Instance(models.Model):
         if not self.rpid or not self.rpid.startswith('RP'):
             return False
 
-        self.troubleshoot_proxy()
-
         self.save()
         return True
 
-    def troubleshoot_proxy(self):
+    def enable_proxy(self):
         'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'
         cmd_to_execute = 'reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable'
         output = self.ssh_execute(cmd_to_execute)
@@ -457,6 +455,16 @@ class EC2Instance(models.Model):
         cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'
         ssh.exec_command(cmd_to_execute)
         cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f'
+        ssh.exec_command(cmd_to_execute)
+        ssh.close()
+
+    def disable_proxy(self):
+        ssh = self.get_ssh()
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'
+        ssh.exec_command(cmd_to_execute)
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyOverride /t REG_SZ /d localhost;127.0.0.1;169.254.169.254; /f'
+        ssh.exec_command(cmd_to_execute)
+        cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable /t REG_DWORD /d 0 /f'
         ssh.exec_command(cmd_to_execute)
         ssh.close()
 
