@@ -117,16 +117,37 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
             BundlerLeadStat.calculate(bundler_lead_stat.bundler)
 
     in_progress_total_field.short_description = 'Total In-Progress'
+    in_progress_total_field.admin_order_field = 'in_progress_total'
+
     in_progress_offline_field.short_description = 'Offline In-Progress'
+    in_progress_offline_field.admin_order_field = 'in_progress_offline'
+
     in_progress_wrong_pw_field.short_description = 'Wrong PW In-Progress'
+    in_progress_wrong_pw_field.admin_order_field = 'in_progress_wrong_pw'
+
     in_progress_security_checkpoint_field.short_description = 'Sec Checkpoint In-Progress'
-    in_progress_total_issue_percent.short_description = 'Total issue In-Progress'
+    in_progress_security_checkpoint_field.admin_order_field = 'in_progress_security_checkpoint'
+
+    in_progress_total_field.short_description = 'Total issue In-Progress'
+    in_progress_total_field.admin_order_field = 'in_progress_total'
+
     autobans_last_30_days_field.short_description = 'Auto bans (last 30 days)'
+    autobans_last_30_days_field.admin_order_field = 'in_progress_total'
+
     other_bans_last_30_days_field.short_description = 'Other bans (last 30 days)'
+    other_bans_last_30_days_field.admin_order_field = 'bans_last_30_days'
 
     qualified_today_field.short_description = 'Qualified today'
+    qualified_today_field.admin_order_field = 'qualified_today'
+
     qualified_yesterday_field.short_description = 'Qualified yesterday'
+    qualified_yesterday_field.admin_order_field = 'qualified_yesterday'
+
     qualified_last_30_days_field.short_description = 'Qualified last 30 days'
+    qualified_last_30_days_field.admin_order_field = 'qualified_last_30_days'
+
     qualified_total_field.short_description = 'Qualified total'
+    qualified_total_field.admin_order_field = 'qualified_total'
 
     delivered_connected_last_30_days_percent.short_description = 'Delivered and connected (last 30 days)'
+    delivered_connected_last_30_days_percent.admin_order_field = 'delivered_last_30_days'
