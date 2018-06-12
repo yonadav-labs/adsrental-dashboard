@@ -26,7 +26,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     list_per_page = 5000
     list_display = (
         'id',
-        'date',
+        'date_field',
         'lead_link',
         # 'leadid',
         'lead_status',
@@ -80,6 +80,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         )
 
         return queryset
+
+    def date_field(self, obj):
+        return obj.date.strftime(settings.HUMAN_MONTH_DATE_FORMAT)
 
     def leadid(self, obj):
         return obj.lead and obj.lead.leadid
@@ -218,5 +221,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
             obj.aggregate()
             obj.save()
 
+    date_field.short_description = 'Date'
     lead_link.short_description = 'Lead'
     aggregate.short_description = 'DEBUG: Aggregate'
