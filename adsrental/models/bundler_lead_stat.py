@@ -35,7 +35,7 @@ class BundlerLeadStat(models.Model):
         cls.objects.filter(bundler=bundler).delete()
         obj = cls(bundler=bundler)
         LeadAccount = apps.get_model('adsrental', 'LeadAccount')
-        lead_accounts = LeadAccount.objects.filter(lead__bundler=obj.bundler).prefetch_related('lead', 'lead__raspberry_pi')
+        lead_accounts = LeadAccount.objects.filter(lead__bundler=obj.bundler, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).prefetch_related('lead', 'lead__raspberry_pi')
         now = timezone.now()
         last_30_days_start = now - datetime.timedelta(days=30)
         for lead_account in lead_accounts:
