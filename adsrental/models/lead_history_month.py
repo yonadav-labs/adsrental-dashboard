@@ -91,8 +91,9 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                     result += self.NEW_MAX_PAYMENT
                 else:
                     result += self.MAX_PAYMENT
-            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += self.AMAZON_MAX_PAYMENT
+
 
         return result
 
