@@ -1,5 +1,6 @@
 'LeadHistory class'
 import datetime
+import decimal
 from dateutil.relativedelta import relativedelta
 
 from django.db import models
@@ -14,11 +15,11 @@ class LeadHistory(models.Model):
     Used to calculate payments to leads.
     '''
     ONLINE_CHECKS_MIN = 12
-    WRONG_PASSWORD_CHECKS_MIN = 1
+    WRONG_PASSWORD_CHECKS_MIN = 12
 
-    MAX_PAYMENT = 25.
-    NEW_MAX_PAYMENT = 15.
-    AMAZON_MAX_PAYMENT = 10.
+    MAX_PAYMENT = decimal.Decimal('25.00')
+    NEW_MAX_PAYMENT = decimal.Decimal('15.00')
+    AMAZON_MAX_PAYMENT = decimal.Decimal('10.00')
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
@@ -98,7 +99,7 @@ class LeadHistory(models.Model):
         return round(monthly_amount / days_in_month, 2)
 
     def get_monthly_amount(self):
-        result = 0.0
+        result = decimal.Decimal('0.00')
         for lead_account in self.lead.lead_accounts.all():
             if not lead_account.active:
                 continue

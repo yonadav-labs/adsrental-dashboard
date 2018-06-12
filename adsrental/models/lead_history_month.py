@@ -19,9 +19,9 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         verbose_name = 'Lead History Month'
         verbose_name_plural = 'Lead Histories Month'
 
-    MAX_PAYMENT = 25.
-    NEW_MAX_PAYMENT = 15.
-    AMAZON_MAX_PAYMENT = 10.
+    MAX_PAYMENT = decimal.Decimal('25.00')
+    NEW_MAX_PAYMENT = decimal.Decimal('15.00')
+    AMAZON_MAX_PAYMENT = decimal.Decimal('10.00')
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
@@ -70,7 +70,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         return cls(lead=lead, date=date_month)
 
     def get_max_payment(self):
-        result = 0.
+        result = decimal.Decimal('0.00')
         raspberry_pi = self.lead.raspberry_pi
         if not raspberry_pi or not raspberry_pi.first_seen:
             return result
@@ -94,7 +94,6 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += self.AMAZON_MAX_PAYMENT
 
-
         return result
 
     def get_last_day(self):
@@ -106,12 +105,12 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
     def get_amount(self):
         if not self.days_online:
-            return 0
+            return decimal.Decimal('0.00')
 
         days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
-        return max_payment * days_online_valid / days_in_month
+        return round(max_payment * days_online_valid / days_in_month, 2)
 
     def get_remaining_amount(self):
         return self.amount - self.amount_paid
