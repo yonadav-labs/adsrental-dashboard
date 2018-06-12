@@ -12,7 +12,13 @@
 <div class="container">
     <h3>Leads by qualified date for UTM source {{ bundler.utm_source }}</h3>
 
+    <h4>Rank cross all bundlers: {{rank|ordinal}}</h4>
+    <h4>Total accounts in progress: {{bundler_lead_stat.in_progress_total}}</h4>
+
     <canvas id="month_chart" style="width: 900px; height: 300px;"></canvas>
+    <br>
+    <br>
+    <canvas id="week_chart" style="width: 900px; height: 300px;"></canvas>
     <br>
     <br>
     <canvas id="day_chart" style="width: 900px; height: 300px;"></canvas>
@@ -22,6 +28,8 @@
         var month_data = JSON.parse('{{ month_entries_values_json|escapejs }}');
         var day_labels = JSON.parse('{{ day_entries_keys_json|escapejs }}');
         var day_data = JSON.parse('{{ day_entries_values_json|escapejs }}');
+        var week_labels = JSON.parse('{{ week_entries_keys_json|escapejs }}');
+        var week_data = JSON.parse('{{ week_entries_values_json|escapejs }}');
         var monthChart = new Chart(document.getElementById("month_chart").getContext('2d'), {
             type: 'bar',
             data: {
@@ -29,6 +37,28 @@
                 datasets: [{
                     label: 'Qualified leads last month',
                     data: month_data,
+                    backgroundColor: 'rgba(44, 44, 255, 0.2)',
+                    borderColor: 'rgba(44, 44, 255, 0.8)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+        var weekChart = new Chart(document.getElementById("week_chart").getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: week_labels,
+                datasets: [{
+                    label: 'Qualified leads last 7 days',
+                    data: week_data,
                     backgroundColor: 'rgba(44, 44, 255, 0.2)',
                     borderColor: 'rgba(44, 44, 255, 0.8)',
                     borderWidth: 1

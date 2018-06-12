@@ -13,6 +13,8 @@ from django_bulk_update.helper import bulk_update
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead import Lead
+from adsrental.models.bundler import Bundler
+from adsrental.models.bundler_lead_stat import BundlerLeadStat
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.user import User
 from adsrental.models.raspberry_pi import RaspberryPi
@@ -653,4 +655,13 @@ class AutoBanView(View):
             'banned_offline': banned_offline,
             'banned_security_checkpoint': banned_security_checkpoint,
             'banned_not_used': banned_not_used,
+        })
+
+
+class BundlerLeadStatsCalculate(View):
+    def get(self, request):
+        for bundler in Bundler.objects.all():
+            BundlerLeadStat.calculate(bundler)
+        return JsonResponse({
+            'result': True,
         })

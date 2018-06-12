@@ -23,6 +23,7 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
+from adsrental.models.bundler_lead_stat import BundlerLeadStat
 
 
 class BundlerLeaderboardView(View):
@@ -37,6 +38,13 @@ class BundlerLeaderboardView(View):
 
         if not bundler:
             raise Http404
+
+        current_bundler_lead_stat = BundlerLeadStat.objects.filter(bundler=bundler).first()
+        bundler_lead_stats = BundlerLeadStat.objects.all().order_by('-in_progress_total')
+        for rank, bundler_lead_stat in enumerate(bundler_lead_stats):
+            if bundler_lead_stat.bundler_id == bundler.id:
+                current_rank = rank + 1
+
 
         now = timezone.now()
         lead_accounts = LeadAccount.objects.filter(qualified_date__isnull=False)
@@ -75,11 +83,24 @@ class BundlerLeaderboardView(View):
 
         month_entries.reverse()
 
+        week_entries = []
+        now = timezone.now()
+        for i in range(7):
+            date = (now - datetime.timedelta(days=i)).date()
+            value = lead_accounts_by_date_dict.get(date, 0)
+            week_entries.append([dateformat.format(date, 'jS F'), value])
+
+        week_entries.reverse()
+
         return render(request, 'bundler_leaderboard.html', dict(
             user=request.user,
             bundler=bundler,
+            bundler_lead_stat=current_bundler_lead_stat,
+            rank=current_rank,
             month_entries_keys_json=json.dumps([k for k, v in month_entries]),
             month_entries_values_json=json.dumps([v for k, v in month_entries]),
+            week_entries_keys_json=json.dumps([k for k, v in week_entries]),
+            week_entries_values_json=json.dumps([v for k, v in week_entries]),
             day_entries_keys_json=json.dumps([k for k, v in lead_accounts_by_time_list]),
             day_entries_values_json=json.dumps([v for k, v in lead_accounts_by_time_list]),
         ))
