@@ -79,7 +79,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                 continue
 
             created_date = lead_account.created
-            if created_date > self.get_last_day():
+            if created_date.date() > self.get_last_day():
                 continue
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
