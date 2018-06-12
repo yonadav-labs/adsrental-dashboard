@@ -26,6 +26,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     list_per_page = 5000
     list_display = (
         'id',
+        'date',
         'lead_link',
         # 'leadid',
         'lead_status',
