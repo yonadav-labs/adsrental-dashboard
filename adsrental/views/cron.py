@@ -505,6 +505,7 @@ class CheckEC2View(View):
         online_ec2s = []
         stopped_ec2s = []
         stopping_instances = []
+        stopping_essential_ec2s = []
         online_essential_ec2s = []
         unassigned_essential_ec2s = []
         now = timezone.now()
@@ -545,6 +546,7 @@ class CheckEC2View(View):
                 ec2_instance.unassign_essential()
                 if essential_running_counter > self.MAX_ESSENTIAL_RUNNING:
                     ec2_instance.stop()
+                    stopping_essential_ec2s.append(ec2_instance.rpid)
 
         if stopping_instances:
             ec2_client.stop_instances(InstanceIds=[ec2.instance_id for ec2 in stopping_instances])
@@ -556,6 +558,7 @@ class CheckEC2View(View):
             'result': True,
             'online_ec2s': online_ec2s,
             'stopped_ec2s': stopped_ec2s,
+            'stopping_essential_ec2s': stopping_essential_ec2s,
             'online_essential_ec2s': online_essential_ec2s,
             'unassigned_essential_ec2s': stopped_ec2s,
         })
