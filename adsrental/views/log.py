@@ -75,7 +75,7 @@ class LogView(View):
         if not Lead.is_status_active(lead_status) and EC2Instance.is_status_running(ec2_instance_status):
             self.add_log(request, rpid, 'Stopping EC2')
             ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
-            if not not ec2_instance.is_essential:
+            if not ec2_instance.is_essential:
                 ec2_instance.stop()
             return True
 
