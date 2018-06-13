@@ -494,7 +494,7 @@ class LeadAdmin(admin.ModelAdmin):
             form = AdminLeadAccountBanForm()
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban_facebook_account',
+            'action_name': 'ban_amazon_account',
             'title': 'Choose reason to ban Amazon account',
             'button': 'Ban',
             'objects': queryset,
@@ -799,7 +799,7 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'report_correct_facebook_password',
+            'action_name': 'report_correct_amazon_password',
             'title': 'Set new pasword for {}'.format(lead_account),
             'button': 'Save password',
             'objects': queryset,
