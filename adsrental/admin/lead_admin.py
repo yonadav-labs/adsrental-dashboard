@@ -495,7 +495,7 @@ class LeadAdmin(admin.ModelAdmin):
 
         return render(request, 'admin/action_with_form.html', {
             'action_name': 'ban_facebook_account',
-            'title': 'Choose reason to ban Facebook account',
+            'title': 'Choose reason to ban Amazon account',
             'button': 'Ban',
             'objects': queryset,
             'form': form,
