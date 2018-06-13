@@ -55,6 +55,13 @@ class CustomIndexDashboard(Dashboard):
                         status='Active',
                     )),
                 )],
+                [_('Master Report for Amazon Accounts'), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    urlencode(dict(
+                        account_type='amazon',
+                        status='Active',
+                    )),
+                )],
                 [_('Master Report for ACM Google Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxylead_changelist'),
                     urlencode(dict(
