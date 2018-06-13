@@ -560,7 +560,7 @@ class CheckEC2View(View):
             'stopped_ec2s': stopped_ec2s,
             'stopping_essential_ec2s': stopping_essential_ec2s,
             'online_essential_ec2s': online_essential_ec2s,
-            'unassigned_essential_ec2s': stopped_ec2s,
+            'unassigned_essential_ec2s': unassigned_essential_ec2s,
         })
 
 
