@@ -910,7 +910,7 @@ class LeadAdmin(admin.ModelAdmin):
     email_field.admin_order_field = 'email'
 
     online.boolean = True
-    online.admin_order_field = 'raspberry_pi__first_seen'
+    online.admin_order_field = 'raspberry_pi__last_seen'
 
     accounts_field.short_description = 'Accounts'
 

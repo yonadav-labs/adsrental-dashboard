@@ -33,6 +33,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'friends',
         'bundler_paid',
         'last_touch',
+        'first_seen',
+        'last_seen',
+        'online',
         'touch_count_field',
         'adsdb_account_id',
         'wrong_password_date_field',
@@ -128,6 +131,24 @@ class LeadAccountAdmin(admin.ModelAdmin):
             title=title,
             status=obj.status,
         ))
+
+    def online(self, obj):
+        return obj.lead.raspberry_pi.online() if obj.lead.raspberry_pi else False
+
+    def first_seen(self, obj):
+        if obj.lead.raspberry_pi is None or obj.lead.raspberry_pi.first_seen is None:
+            return None
+
+        first_seen = obj.lead.raspberry_pi.get_first_seen()
+        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
+
+    def last_seen(self, obj):
+        if obj.lead.raspberry_pi is None or obj.lead.raspberry_pi.last_seen is None:
+            return None
+
+        last_seen = obj.lead.raspberry_pi.get_last_seen()
+
+        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def last_touch(self, obj):
         if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
@@ -286,6 +307,15 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     touch_count_field.short_description = 'Touch count'
     touch_count_field.admin_order_field = 'antidetect_touch_count'
+
+    online.boolean = True
+    online.admin_order_field = 'lead__raspberry_pi__last_seen'
+
+    first_seen.empty_value_display = 'Never'
+    first_seen.admin_order_field = 'lead__raspberry_pi__first_seen'
+
+    last_seen.empty_value_display = 'Never'
+    last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
 
 
 class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
