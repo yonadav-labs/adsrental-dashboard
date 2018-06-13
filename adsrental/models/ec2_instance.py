@@ -118,6 +118,7 @@ class EC2Instance(models.Model):
     last_troubleshoot = models.DateTimeField(blank=True, null=True, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
     version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
     is_essential = models.BooleanField(default=False, help_text='New global instance type, never stopped')
+    essential_key = models.CharField(max_length=100, db_index=True, default='', help_text='Key to differentiate essential instances')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -159,6 +160,29 @@ class EC2Instance(models.Model):
             return instance
 
         return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
+
+
+    @classmethod
+    def launch_essential(cls):
+        '''
+        Launch essential EC2
+        '''
+        if not settings.MANAGE_EC2:
+            return False
+
+        boto_resource = BotoResource()
+
+        key = boto_resource.generate_key()
+
+        ec2_instance = cls(
+            is_essential=True,
+            essential_key=key,
+            instance_type=cls.INSTANCE_TYPE_M5_LARGE,
+        )
+        ec2_instance.save()
+
+        BotoResource().launch_essential_instance(ec2_instance)
+        return ec2_instance
 
     def get_raspberry_pi(self):
         return self.lead and self.lead.raspberry_pi

@@ -211,6 +211,20 @@ class BotoResource(object):
     def get_client(self, service):
         return self.session.client(service, region_name=settings.AWS_REGION)
 
+    def get_by_essential_key(self, key):
+        'Get first valid instnce for given RPID.'
+        instances = self.get_resource('ec2').instances.filter(
+            Filters=[
+                {
+                    'Name': 'tag:EssentialKey',
+                    'Values': [key],
+                },
+            ],
+        )
+        instances_list = [i for i in instances]
+        for instance in instances_list:
+            return instance
+
     def get_first_rpid_instance(self, rpid):
         'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
@@ -354,6 +368,55 @@ class BotoResource(object):
         ec2_instance_model = apps.get_app_config('adsrental').get_model('EC2Instance')
         instance = ec2_instance_model.upsert_from_boto(instance)
         return instance
+
+    @staticmethod
+    def generate_key():
+        return uuid.uuid4()
+
+    def launch_essential_instance(self, ec2_instance):
+        'Start otr create AWS EC2 instance for given RPID'
+        boto_instance = self.get_by_essential_key(ec2_instance.essential_key)
+        if boto_instance:
+            return ec2_instance
+
+        self.get_resource('ec2').create_instances(
+            ImageId=settings.AWS_IMAGE_AMI_ESSENTIAL,
+            MinCount=1,
+            MaxCount=1,
+            KeyName='AI Farming Key',
+            InstanceType=ec2_instance.instance_type,
+            SecurityGroupIds=settings.AWS_SECURITY_GROUP_IDS,
+            UserData='essential',
+            TagSpecifications=[
+                {
+                    'ResourceType': 'instance',
+                    'Tags': [
+                        {
+                            'Key': 'Essential',
+                            'Value': 'true',
+                        },
+                        {
+                            'Key': 'EssentialKey',
+                            'Value': ec2_instance.essential_key,
+                        },
+                        {
+                            'Key': 'Duplicate',
+                            'Value': 'false',
+                        },
+                    ]
+                },
+            ],
+        )
+        time.sleep(5)
+        boto_instance = self.get_by_essential_key(ec2_instance.essential_key)
+        if not boto_instance:
+            raise ValueError('Boto did not create isntance. Try again.')
+
+        ec2_instance.instance_id = boto_instance.id
+        ec2_instance.save()
+
+        ec2_instance.update_from_boto(boto_instance)
+        return boto_instance
 
 
 class PingCacheHelper(object):
