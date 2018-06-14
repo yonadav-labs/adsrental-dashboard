@@ -521,7 +521,7 @@ class BundlerCheckDaysView(View):
             date__lte=end_date,
             lead=lead,
         ).select_related('lead', 'lead__raspberry_pi')
-        total = 0.0
+        total = decimal.Decimal('0.00')
         for lead_history in lead_histories:
             total += lead_history.get_amount()
 
