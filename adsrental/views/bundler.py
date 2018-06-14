@@ -190,7 +190,6 @@ class BundlerLeadPaymentsView(View):
             amazon_final_total = amazon_stats['final_total']
             amazon_chargeback_total = amazon_stats['chargeback_total']
 
-
             bundlers_data.append(dict(
                 bundler=bundler,
                 facebook_entries=facebook_entries,
@@ -257,7 +256,6 @@ class BundlerPaymentsView(View):
             else:
                 lead_account.payment = payment
 
-
         for lead_account in lead_accounts:
             payment = lead_account.payment
             parent_payment = lead_account.parent_payment
@@ -280,12 +278,16 @@ class BundlerPaymentsView(View):
             children_stats.append(child_stats)
 
         children_stats.sort(key=lambda x: x['total'], reverse=True)
+        children_total = decimal.Decimal('0.00')
+        for child_stats in children_stats:
+            children_total += child_stats['total']
 
         return dict(
             bundler=bundler,
             entries=entries,
             children_stats=children_stats,
             total=total,
+            children_total=children_total,
             final_total=final_total,
             chargeback_total=chargeback_total,
         )
@@ -333,24 +335,27 @@ class BundlerPaymentsView(View):
                 facebook_chargeback_total=facebook_stats['chargeback_total'],
                 facebook_final_total=facebook_stats['final_total'],
                 facebook_children_stats=facebook_stats['children_stats'],
+                facebook_children_total=facebook_stats['children_total'],
                 google_entries=google_stats['entries'],
                 google_total=google_stats['total'],
                 google_chargeback_total=google_stats['chargeback_total'],
                 google_final_total=google_stats['final_total'],
                 google_children_stats=google_stats['children_stats'],
+                google_children_total=google_stats['children_total'],
                 amazon_entries=amazon_stats['entries'],
                 amazon_total=amazon_stats['total'],
                 amazon_chargeback_total=amazon_stats['chargeback_total'],
                 amazon_final_total=amazon_stats['final_total'],
                 amazon_children_stats=amazon_stats['children_stats'],
+                amazon_children_total=amazon_stats['children_total'],
                 total=bundler_total,
             ))
 
         for data in bundlers_data:
             total += data['total']
-            total_google += data['google_total']
-            total_facebook += data['facebook_total']
-            total_amazon += data['amazon_total']
+            total_google += data['google_total'] + data['google_children_total']
+            total_facebook += data['facebook_total'] + data['facebook_children_total']
+            total_amazon += data['amazon_total'] + data['amazon_children_total']
             total_chargeback += data['facebook_chargeback_total'] + data['google_chargeback_total'] + data['amazon_chargeback_total']
 
         bundlers_data.sort(key=lambda x: x['total'], reverse=True)
