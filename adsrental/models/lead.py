@@ -116,7 +116,7 @@ class Lead(models.Model, FulltextSearchMixin):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available', help_text='All statuses except for Banned are considered as Active')
-    email = models.CharField(max_length=255, blank=True, null=True, help_text='Should be unique')
+    email = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')

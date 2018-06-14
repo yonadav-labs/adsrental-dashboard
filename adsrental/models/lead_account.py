@@ -16,6 +16,14 @@ from adsrental.utils import CustomerIOClient
 
 
 class LeadAccount(models.Model, FulltextSearchMixin):
+    class Meta:
+        unique_together = (
+            ('username', 'account_type', 'lead', ),
+        )
+        permissions = (
+            ("view", "Can access lead account info"),
+        )
+
     LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL = 48
 
     STATUS_QUALIFIED = 'Qualified'
@@ -139,11 +147,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result += bundler.amazon_parent_payment
 
         return result
-
-    class Meta:
-        permissions = (
-            ("view", "Can access lead account info"),
-        )
 
     def __str__(self):
         return '{} lead {}'.format(self.account_type, self.username)
