@@ -19,6 +19,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     class Meta:
         unique_together = (
             ('username', 'account_type', 'lead', ),
+            ('account_type', 'lead', ),
         )
         permissions = (
             ("view", "Can access lead account info"),
