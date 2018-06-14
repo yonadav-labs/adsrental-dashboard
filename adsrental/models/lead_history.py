@@ -90,7 +90,7 @@ class LeadHistory(models.Model):
         return self.date.replace(day=1)
 
     def get_amount(self):
-        result = 0.
+        result = decimal.Decimal('0.00')
         if not self.is_online() or self.is_wrong_password():
             return result
 

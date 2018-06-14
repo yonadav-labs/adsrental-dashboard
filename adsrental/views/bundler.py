@@ -116,7 +116,7 @@ class BundlerLeadPaymentsView(View):
         lead_accounts = LeadAccount.objects.filter(lead__bundler=bundler, account_type=account_type, active=True).prefetch_related('lead')
         for lead_account in lead_accounts:
             chargeback = lead_account.charge_back
-            amount = 0.
+            amount = decimal.Decimal('0.00')
             start_date = lead_account.bundler_paid_date
             lead_histories = LeadHistory.objects.filter(lead=lead_account.lead, date__lte=end_date)
             if lead_account.bundler_paid_date:
@@ -169,7 +169,7 @@ class BundlerLeadPaymentsView(View):
 
         yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
         bundlers_data = []
-        total = 0.0
+        total = decimal.Decimal('0.00')
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
@@ -183,6 +183,14 @@ class BundlerLeadPaymentsView(View):
             google_total = google_stats['total']
             google_final_total = google_stats['final_total']
             google_chargeback_total = google_stats['chargeback_total']
+
+            amazon_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_AMAZON)
+            amazon_entries = amazon_stats['entries']
+            amazon_total = amazon_stats['total']
+            amazon_final_total = amazon_stats['final_total']
+            amazon_chargeback_total = amazon_stats['chargeback_total']
+
+
             bundlers_data.append(dict(
                 bundler=bundler,
                 facebook_entries=facebook_entries,
@@ -193,9 +201,13 @@ class BundlerLeadPaymentsView(View):
                 google_total=google_total,
                 google_chargeback_total=google_chargeback_total,
                 google_final_total=google_final_total,
-                total=google_final_total + facebook_final_total,
+                amazon_entries=amazon_entries,
+                amazon_total=amazon_total,
+                amazon_chargeback_total=amazon_chargeback_total,
+                amazon_final_total=amazon_final_total,
+                total=google_final_total + facebook_final_total + amazon_final_total,
             ))
-            total += google_final_total + facebook_final_total
+            total += google_final_total + facebook_final_total + amazon_final_total
 
         if request.GET.get('pdf'):
             html = render_to_string(
@@ -298,15 +310,19 @@ class BundlerPaymentsView(View):
         total = decimal.Decimal('0.00')
         total_google = decimal.Decimal('0.00')
         total_facebook = decimal.Decimal('0.00')
+        total_amazon = decimal.Decimal('0.00')
         total_chargeback = decimal.Decimal('0.00')
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
             google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
-            bundler_total = facebook_stats['final_total'] + google_stats['final_total']
+            amazon_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_AMAZON)
+            bundler_total = facebook_stats['final_total'] + google_stats['final_total'] + amazon_stats['final_total']
             for child_stats in facebook_stats['children_stats']:
                 bundler_total += child_stats['total']
             for child_stats in google_stats['children_stats']:
+                bundler_total += child_stats['total']
+            for child_stats in amazon_stats['children_stats']:
                 bundler_total += child_stats['total']
 
 
@@ -322,6 +338,11 @@ class BundlerPaymentsView(View):
                 google_chargeback_total=google_stats['chargeback_total'],
                 google_final_total=google_stats['final_total'],
                 google_children_stats=google_stats['children_stats'],
+                amazon_entries=amazon_stats['entries'],
+                amazon_total=amazon_stats['total'],
+                amazon_chargeback_total=amazon_stats['chargeback_total'],
+                amazon_final_total=amazon_stats['final_total'],
+                amazon_children_stats=amazon_stats['children_stats'],
                 total=bundler_total,
             ))
 
@@ -329,7 +350,8 @@ class BundlerPaymentsView(View):
             total += data['total']
             total_google += data['google_total']
             total_facebook += data['facebook_total']
-            total_chargeback += data['facebook_chargeback_total'] + data['google_chargeback_total']
+            total_amazon += data['amazon_total']
+            total_chargeback += data['facebook_chargeback_total'] + data['google_chargeback_total'] + data['amazon_chargeback_total']
 
         bundlers_data.sort(key=lambda x: x['total'], reverse=True)
 
@@ -346,6 +368,7 @@ class BundlerPaymentsView(View):
                     pdf=True,
                     total_google=total_google,
                     total_facebook=total_facebook,
+                    total_amazon=total_amazon,
                     total_chargeback=total_chargeback,
                 ),
                 request=request,
@@ -396,6 +419,7 @@ class BundlerPaymentsView(View):
                     allow_change=request.user.is_superuser,
                     total_google=total_google,
                     total_facebook=total_facebook,
+                    total_amazon=total_amazon,
                     total_chargeback=total_chargeback,
                 ),
                 request=request,
@@ -413,6 +437,7 @@ class BundlerPaymentsView(View):
             allow_change=request.user.is_superuser,
             total_google=total_google,
             total_facebook=total_facebook,
+            total_amazon=total_amazon,
             total_chargeback=total_chargeback,
         ))
 
