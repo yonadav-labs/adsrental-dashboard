@@ -22,5 +22,5 @@ def ordinal(value):
         return '{}nd'.format(value)
     if value % 10 == 3 and value != 13:
         return '{}rd'.format(value)
-    
+
     return '{}th'.format(value)
