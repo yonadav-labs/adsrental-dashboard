@@ -75,8 +75,6 @@ class RDPConnectView(View):
             ec2_instance.disable_proxy()
             messages.success(request, 'Proxy is successfully disabled')
 
-        return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
-
 
     @method_decorator(login_required)
     def get(self, request):
@@ -117,7 +115,8 @@ class RDPConnectView(View):
                 pass
 
         if action:
-            return self.handle_action(request, ec2_instance, action)
+            self.handle_action(request, ec2_instance, action)
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         ec2_instance.update_from_boto()
         if not ec2_instance.is_running() or force:
             ec2_instance.start()
