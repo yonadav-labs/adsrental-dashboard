@@ -100,6 +100,15 @@ class EC2Instance(models.Model):
         (INSTANCE_TYPE_XLARGE, 'T2 Xlarge', ),
     )
 
+    BROWSER_TYPE_UNKNOWN = 'Unknown'
+    BROWSER_TYPE_MLA = 'MLA'
+    BROWSER_TYPE_ANTIDETECT = 'Antidetect'
+    BROWSER_TYPE_CHOICES = (
+        (BROWSER_TYPE_UNKNOWN, 'Unknown', ),
+        (BROWSER_TYPE_MLA, 'Multilogin App 2.1.4', ),
+        (BROWSER_TYPE_ANTIDETECT, 'Antidetect 7.3.1', ),
+    )
+
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
     instance_type = models.CharField(max_length=50, default=INSTANCE_TYPE_MEDIUM, choices=INSTANCE_TYPE_CHOICES, help_text='Size of AWS EC2')
     rpid = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='RPID that was inserted to EC2 metadata')
@@ -117,6 +126,7 @@ class EC2Instance(models.Model):
     last_rdp_start = models.DateTimeField(default=timezone.now, help_text='Last time when RDP connect page was accessed for this instance')
     last_troubleshoot = models.DateTimeField(blank=True, null=True, help_text='Last time RaspberryPi tested tunnels. Should be updated every 10 minutes if device is online and up-to-date.')
     version = models.CharField(max_length=255, default=settings.EC2_VERSION, help_text='AWS EC2 Firmware version')
+    browser_type = models.CharField(max_length=20, default=BROWSER_TYPE_UNKNOWN, help_text='Browser used on EC2')
     is_essential = models.BooleanField(default=False, help_text='New global instance type, never stopped')
     essential_key = models.CharField(max_length=100, db_index=True, default='', help_text='Key to differentiate essential instances')
     created = models.DateTimeField(auto_now_add=True)

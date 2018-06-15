@@ -47,6 +47,8 @@ class RDPConnectView(View):
                 messages.warning(request, 'Antidetect script update failed.')
                 return
             messages.success(request, 'Antidetect script updated successfully. Now run it from C:\\install_antidetect.bat')
+            ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_ANTIDETECT
+            ec2_instance.save()
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'install_mla_script':
             try:
@@ -54,6 +56,9 @@ class RDPConnectView(View):
             except SSHConnectException:
                 messages.warning(request, 'MLA script update failed.')
                 return
+            
+            ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_MLA
+            ec2_instance.save()
             messages.success(request, 'MLA script updated successfully. Now run it from C:\\install_mla.bat')
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'fix_performance':
