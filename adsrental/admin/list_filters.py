@@ -269,6 +269,7 @@ class ShipDateListFilter(SimpleListFilter):
 class QualifiedDateListFilter(SimpleListFilter):
     title = 'Qualified date'
     parameter_name = 'qualified_date'
+    field_name = 'qualified_date'
 
     def lookups(self, request, model_admin):
         return (
@@ -285,53 +286,53 @@ class QualifiedDateListFilter(SimpleListFilter):
         if self.value() == 'today':
             now = timezone.now()
             date_start = now.replace(hour=0, minute=0, second=0)
-            return queryset.filter(
-                qualified_date__gte=date_start,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): date_start,
+            })
         if self.value() == 'yesterday':
             now = timezone.now()
             date_end = now.replace(hour=0, minute=0, second=0)
             date_start = date_end - datetime.timedelta(days=1)
-            return queryset.filter(
-                qualified_date__gte=date_start,
-                qualified_date__lte=date_end,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): date_start,
+                '{}__lte'.format(self.field_name): date_end,
+            })
         if self.value() == 'last_30_days':
             now = timezone.now()
             date_start = now - datetime.timedelta(days=30)
-            return queryset.filter(
-                qualified_date__gte=date_start,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): date_start,
+            })
         if self.value() == 'current_week':
             now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            return queryset.filter(
-                qualified_date__gte=current_week_start,
-            )
+            date_start = now - datetime.timedelta(days=now.weekday())
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): date_start,
+            })
         if self.value() == 'previous_week':
             now = timezone.now()
             current_week_start = now - datetime.timedelta(days=now.weekday())
             prev_week_end = current_week_start - datetime.timedelta(days=1)
             prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
-            return queryset.filter(
-                qualified_date__gte=prev_week_start,
-                qualified_date__lte=prev_week_end,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): prev_week_start,
+                '{}__lte'.format(self.field_name): prev_week_end,
+            })
         if self.value() == 'current_month':
             now = timezone.now()
             current_month_start = now - datetime.timedelta(days=now.day - 1)
-            return queryset.filter(
-                qualified_date__gte=current_month_start,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): current_month_start,
+            })
         if self.value() == 'previous_week':
             now = timezone.now()
             current_month_start = now - datetime.timedelta(days=now.day - 1)
             prev_month_end = current_month_start - datetime.timedelta(days=1)
             prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
-            return queryset.filter(
-                qualified_date__gte=prev_month_start,
-                qualified_date__lte=prev_month_end,
-            )
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): prev_month_start,
+                '{}__lte'.format(self.field_name): prev_month_end,
+            })
         return None
 
 

@@ -23,7 +23,6 @@ from adsrental.admin.list_filters import \
     LeadAccountAntidetectTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
-    QualifiedDateListFilter, \
     LeadAccountSecurityCheckpointListFilter
 
 
@@ -82,7 +81,6 @@ class LeadAdmin(admin.ModelAdmin):
         'company',
         'lead_account__bundler_paid',
         ShipDateListFilter,
-        QualifiedDateListFilter,
         DeliveryDateListFilter,
         BundlerListFilter,
         'pi_delivered',
