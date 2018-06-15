@@ -48,6 +48,14 @@ class RDPConnectView(View):
                 return
             messages.success(request, 'Antidetect script updated successfully. Now run it from C:\\install_antidetect.bat')
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+        if action == 'install_mla_script':
+            try:
+                ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/mla/install_mla.bat -outf C:\\install_mla.bat')
+            except SSHConnectException:
+                messages.warning(request, 'MLA script update failed.')
+                return
+            messages.success(request, 'MLA script updated successfully. Now run it from C:\\install_mla.bat')
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'fix_performance':
             try:
                 ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
