@@ -43,23 +43,25 @@ class RDPConnectView(View):
         if action == 'install_antidetect_script':
             try:
                 ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/antidetect/install_antidetect.bat -outf C:\\install_antidetect.bat')
+                ec2_instance.ssh_execute('start "" C:\\install_antidetect.bat')
             except SSHConnectException:
                 messages.warning(request, 'Antidetect script update failed.')
                 return
-            messages.success(request, 'Antidetect script updated successfully. Now run it from C:\\install_antidetect.bat')
+            messages.success(request, 'Antidetect script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
             ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_ANTIDETECT
             ec2_instance.save()
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'install_mla_script':
             try:
                 ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/mla/install_mla.bat -outf C:\\install_mla.bat')
+                ec2_instance.ssh_execute('start "" C:\\install_mla.bat')
             except SSHConnectException:
                 messages.warning(request, 'MLA script update failed.')
                 return
             
             ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_MLA
             ec2_instance.save()
-            messages.success(request, 'MLA script updated successfully. Now run it from C:\\install_mla.bat')
+            messages.success(request, 'MLA script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'fix_performance':
             try:
