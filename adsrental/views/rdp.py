@@ -93,8 +93,6 @@ class RDPConnectView(View):
 
         if ec2_instance.is_essential:
             messages.success(request, 'Using essential EC2.')
-            if ec2_instance.is_running():
-                ec2_instance.disable_proxy()
 
         raspberry_pi = ec2_instance.get_raspberry_pi()
         if not raspberry_pi or not raspberry_pi.online():
