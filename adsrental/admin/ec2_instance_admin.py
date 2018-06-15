@@ -24,6 +24,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'id',
         'hostname',
         'instance_type',
+        'browser_type',
         'lead_link',
         'lead_status',
         'raspberry_pi_link',
