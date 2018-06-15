@@ -50,7 +50,6 @@ class RDPConnectView(View):
             messages.success(request, 'Antidetect script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
             ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_ANTIDETECT
             ec2_instance.save()
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'install_mla_script':
             try:
                 ec2_instance.ssh_execute('powershell iwr https://adsrental.com/static/mla/install_mla.bat -outf C:\\install_mla.bat')
@@ -62,7 +61,6 @@ class RDPConnectView(View):
             ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_MLA
             ec2_instance.save()
             messages.success(request, 'MLA script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'fix_performance':
             try:
                 ec2_instance.ssh_execute('reg add "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f')
@@ -70,18 +68,14 @@ class RDPConnectView(View):
                 messages.warning(request, 'Performance fixed failed.')
                 return
             messages.success(request, 'Performance fixed applied successfully, instance is rebooting.')
-            # ec2_instance.stop()
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'enable_proxy':
             ec2_instance.enable_proxy()
             messages.success(request, 'Proxy is successfully enabled')
-
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
         if action == 'disable_proxy':
             ec2_instance.disable_proxy()
             messages.success(request, 'Proxy is successfully disabled')
 
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+        return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
 
 
     @method_decorator(login_required)
@@ -123,7 +117,7 @@ class RDPConnectView(View):
                 pass
 
         if action:
-            self.handle_action(request, ec2_instance, action)
+            return self.handle_action(request, ec2_instance, action)
         ec2_instance.update_from_boto()
         if not ec2_instance.is_running() or force:
             ec2_instance.start()
