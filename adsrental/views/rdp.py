@@ -68,11 +68,10 @@ class RDPConnectView(View):
         ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
-            lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
-            ec2_instance.assign_essential(rpid, lead)
+            if ec2_instance:
+                lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
+                ec2_instance.assign_essential(rpid, lead)
 
-        if ec2_instance.is_essential:
-            messages.success(request, 'Using essential EC2.')
         if not ec2_instance:
             return render(request, 'rdp_connect.html', dict(
                 rpid=rpid,
@@ -81,6 +80,9 @@ class RDPConnectView(View):
                 is_ready=is_ready,
                 netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
             ))
+
+        if ec2_instance.is_essential:
+            messages.success(request, 'Using essential EC2.')
 
         raspberry_pi = ec2_instance.get_raspberry_pi()
         if not raspberry_pi or not raspberry_pi.online():
