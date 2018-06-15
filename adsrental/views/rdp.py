@@ -57,6 +57,16 @@ class RDPConnectView(View):
             messages.success(request, 'Performance fixed applied successfully, instance is rebooting.')
             # ec2_instance.stop()
             return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+        if action == 'enable_proxy':
+            ec2_instance.enable_proxy()
+            messages.success(request, 'Proxy is successfully enabled')
+
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+        if action == 'disable_proxy':
+            ec2_instance.disable_proxy()
+            messages.success(request, 'Proxy is successfully disabled')
+
+            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
 
 
     @method_decorator(login_required)
