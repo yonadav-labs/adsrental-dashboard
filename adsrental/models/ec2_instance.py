@@ -171,7 +171,6 @@ class EC2Instance(models.Model):
 
         return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
-
     @classmethod
     def launch_essential(cls):
         '''
@@ -522,14 +521,12 @@ class EC2Instance(models.Model):
         if password is None:
             password = self.password
 
-
         output = self.ssh_execute('net user Administrator {password}'.format(password=password))
         if 'successfully' not in output:
             raise ValueError(output)
 
         self.password = password
         self.save()
-
 
     def set_ec2_tags(self):
         'Update RPID and email in EC2 metadata on AWS.'

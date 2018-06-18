@@ -506,7 +506,6 @@ class LeadAdmin(admin.ModelAdmin):
                     EC2Instance.launch_for_lead(lead_account.lead)
                     messages.info(request, '{} is unbanned.'.format(lead_account))
 
-
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
@@ -933,7 +932,6 @@ class LeadAdmin(admin.ModelAdmin):
 
     touch_button.short_description = ' '
     fix_button.short_description = ' '
-
 
 
 class ReportLeadAdmin(LeadAdmin):

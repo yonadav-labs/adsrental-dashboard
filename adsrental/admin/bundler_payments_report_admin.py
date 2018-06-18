@@ -67,7 +67,6 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         for report in queryset:
             report.send_by_email()
 
-
     rollback.short_description = 'DEBUG: Rollback old reports'
 
     mark.short_description = 'DEBUG: Mark all affected lead accounts'

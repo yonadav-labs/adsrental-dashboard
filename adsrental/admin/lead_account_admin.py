@@ -95,7 +95,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
         )
         return queryset
 
-
     def name(self, obj):
         if obj.note:
             return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
@@ -206,7 +205,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
             lead_account.disqualify(request.user)
             messages.info(request, 'Lead Account {} is disqualified.'.format(lead_account))
 
-
     def ban(self, request, queryset):
         if 'do_action' in request.POST:
             form = AdminLeadAccountBanForm(request.POST)
@@ -262,7 +260,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 new_password=lead_account.password,
             ))
 
-
         return render(request, 'admin/action_with_form.html', {
             'action_name': 'report_correct_password',
             'title': 'Set new pasword for {}'.format(lead_account),
@@ -278,7 +275,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
             else:
                 messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
-
 
     def touch(self, request, queryset):
         for lead_account in queryset:
@@ -374,7 +370,6 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
             lead=lead.leadid,
             q=lead.leadid,
         ))
-
 
     def raspberry_pi_field(self, obj):
         if not obj.lead.raspberry_pi:

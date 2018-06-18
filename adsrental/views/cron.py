@@ -526,7 +526,6 @@ class CheckEC2View(View):
                 stopped_ec2s.append(ec2_instance.rpid)
                 stopping_instances.append(ec2_instance)
 
-
         ec2_instances = EC2Instance.objects.filter(
             last_rdp_start__lt=now - datetime.timedelta(minutes=15),
             status=EC2Instance.STATUS_RUNNING,
@@ -562,7 +561,6 @@ class CheckEC2View(View):
             'online_essential_ec2s': online_essential_ec2s,
             'unassigned_essential_ec2s': unassigned_essential_ec2s,
         })
-
 
 
 class AutoBanView(View):

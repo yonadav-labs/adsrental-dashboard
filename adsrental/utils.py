@@ -324,7 +324,6 @@ class BotoResource(object):
             },
         )
 
-
     def launch_instance(self, rpid, email):
         'Start otr create AWS EC2 instance for given RPID'
         instance = self.get_first_rpid_instance(rpid)

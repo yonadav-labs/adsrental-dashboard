@@ -71,8 +71,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         queryset = super(LeadHistoryMonthAdmin, self).get_queryset(request)
-            # if 'date' not in request.GET:
-            #     queryset = queryset.filter(date=datetime.date.today().replace(day=1))
+        # if 'date' not in request.GET:
+        #     queryset = queryset.filter(date=datetime.date.today().replace(day=1))
 
         queryset = queryset.prefetch_related(
             'lead',

@@ -251,7 +251,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.save()
         LeadChange(lead=self.lead, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
 
-
     def mark_wrong_password(self, edited_by):
         self.wrong_password_date = timezone.now()
         self.save()
@@ -363,7 +362,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.antidetect_touch_count += 1
         self.save()
 
-
     @classmethod
     def get_online_filter(cls):
         '''
@@ -372,6 +370,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         Lead.objects.filter(Lead.get_online_filter())
         '''
         return cls.get_timedelta_filter('lead__raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
+
 
 class ReadOnlyLeadAccount(LeadAccount):
     'Read only LeadAccount model'

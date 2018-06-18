@@ -460,12 +460,14 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return None
 
+
 class ReportProxyLead(Lead):
     'A proxy model to register Lead in admin UI twice for Reports'
     class Meta:
         proxy = True
         verbose_name = 'Report Lead'
         verbose_name_plural = 'Report Leads'
+
 
 class ReadOnlyLead(Lead):
     'Read only Lead model'

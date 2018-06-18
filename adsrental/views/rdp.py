@@ -57,7 +57,7 @@ class RDPConnectView(View):
             except SSHConnectException:
                 messages.warning(request, 'MLA script update failed.')
                 return
-            
+
             ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_MLA
             ec2_instance.save()
             messages.success(request, 'MLA script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
@@ -74,7 +74,6 @@ class RDPConnectView(View):
         if action == 'disable_proxy':
             ec2_instance.disable_proxy()
             messages.success(request, 'Proxy is successfully disabled')
-
 
     @method_decorator(login_required)
     def get(self, request):
@@ -121,7 +120,7 @@ class RDPConnectView(View):
                 client.modify_instance_attribute(InstanceId=ec2_instance.instance_id, Attribute='instanceType', Value=EC2Instance.INSTANCE_TYPE_M5_LARGE)
                 ec2_instance.instance_type = EC2Instance.INSTANCE_TYPE_M5_LARGE
                 ec2_instance.save()
-            except:
+            except Exception:
                 pass
 
         if action:

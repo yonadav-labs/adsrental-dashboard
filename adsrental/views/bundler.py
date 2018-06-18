@@ -45,7 +45,6 @@ class BundlerLeaderboardView(View):
             if bundler_lead_stat.bundler_id == bundler.id:
                 current_rank = rank + 1
 
-
         now = timezone.now()
         lead_accounts = LeadAccount.objects.filter(qualified_date__isnull=False)
         lead_accounts = lead_accounts.filter(lead__bundler=bundler)
@@ -327,7 +326,6 @@ class BundlerPaymentsView(View):
             for child_stats in amazon_stats['children_stats']:
                 bundler_total += child_stats['total']
 
-
             bundlers_data.append(dict(
                 bundler=bundler,
                 facebook_entries=facebook_stats['entries'],
@@ -458,7 +456,6 @@ class AdminBundlerPaymentsHTMLView(View):
         return HttpResponse(report.html)
 
 
-
 class BundlerPaymentsHTMLView(View):
     @method_decorator(login_required)
     def get(self, request, report_id, bundler_id):
@@ -479,7 +476,6 @@ class BundlerPaymentsHTMLView(View):
         raise Http404
 
 
-
 class BundlerPaymentsListView(View):
     @method_decorator(login_required)
     def get(self, request):
@@ -488,7 +484,6 @@ class BundlerPaymentsListView(View):
             bundler=request.user.bundler,
             date__gte=datetime.date(2018, 5, 2),
         ))
-
 
 
 class BundlerCheckView(View):
