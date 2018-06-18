@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 
 services:
   db:
@@ -32,6 +32,7 @@ services:
       - "7443:443"
     depends_on:
       - db
+      - redis
     links:
       - db:db
       - redis:redis

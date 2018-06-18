@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 
 services:
   db:
@@ -33,6 +33,7 @@ services:
       - /mnt/volume-nyc3-01/media/:/app/media/
     depends_on:
       - db
+      - redis
     links:
       - db:db
       - redis:redis
