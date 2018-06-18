@@ -16,10 +16,12 @@ class CustomUserAdmin(UserAdmin):
             {
                 'fields': [
                     'bundler',
+                    'allowed_raspberry_pis',
                 ],
             },
         ),
     )
+    filter_horizontal = ["allowed_raspberry_pis", ]
     list_filter = UserAdmin.list_filter + (
         'bundler',
     )

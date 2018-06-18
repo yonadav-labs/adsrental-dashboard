@@ -79,10 +79,15 @@ class DashboardView(View):
     items_per_page = 100
 
     def get_entries(self, user):
-        if not user.bundler:
-            return Lead.objects.all().prefetch_related('raspberry_pi', 'lead_accounts')
+        queryset = Lead.objects.all()
+        if user.bundler:
+            queryset = queryset.filter(bundler=user.bundler)
 
-        return Lead.objects.filter(bundler=user.bundler).prefetch_related('raspberry_pi', 'lead_accounts')
+        if user.allowed_raspberry_pis:
+            raspberry_pis = user.allowed_raspberry_pis.all()
+            queryset = queryset.filter(raspberry_pi__in=raspberry_pis)
+
+        return queryset.prefetch_related('raspberry_pi', 'lead_accounts')
 
     @method_decorator(login_required)
     def get(self, request):

@@ -24,6 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     utm_source = models.CharField(max_length=255, default='', blank=True, help_text='Obsolete')
+    allowed_raspberry_pis = models.ManyToManyField('RaspberryPi')
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='If not NULL, leads in dashboard will be filtered by this bundler.utm_source.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
