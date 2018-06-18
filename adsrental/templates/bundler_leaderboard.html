@@ -3,11 +3,13 @@
 {% load bootstrap %}
 {% load humanize %}
 {% load helpers %}
+{% load static %}
 
 {% block title %}Adsrental | Bundler Dashboard{% endblock %}
 
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="{% static 'scripts/jquery.min.js' %}"></script>
 
 <div class="container">
     <h3>Leads by qualified date for UTM source {{ bundler.utm_source }}</h3>
@@ -15,32 +17,75 @@
     <h4>Rank cross all bundlers: {{rank|ordinal}}</h4>
     <h4>Total accounts in progress: {{bundler_lead_stat.in_progress_total}}</h4>
 
+    <h3>Qualified leads last month</h3>
     <canvas id="month_chart" style="width: 900px; height: 300px;"></canvas>
-    <br>
-    <br>
+
+    <h3>Qualified leads last week</h3>
     <canvas id="week_chart" style="width: 900px; height: 300px;"></canvas>
-    <br>
-    <br>
+
+    <h3>Qualified leads last 24 hours</h3>
     <canvas id="day_chart" style="width: 900px; height: 300px;"></canvas>
 
     <script>
+        function buildValues(data, labels){
+            var values = [];
+            var d = {};
+            $.each(data, function(_, value){
+                d[value[0]] = value[1];
+            })
+            $.each(labels, function(_, label){
+                values.push(d[label] || 0);
+            });
+            return values;
+        }
+        function buildDatasets(data, labels, currentKey) {
+            var datasets = [];
+            var keys = [];
+            keys.push(currentKey);
+            $.each(data, function(key, value){
+                if (currentKey !== key) {
+                    keys.push(key);
+                }
+            });
+            $.each(keys, function(_, key){
+                var value = data[key];
+                var color = 'rgb(54, 162, 235)';
+                if (currentKey === key) {
+                    color = 'rgb(255, 99, 132)';
+                }
+
+                var values = buildValues(value, labels);
+                datasets.push({
+                    label: key,
+                    data: values,
+                    backgroundColor: color,
+                    borderColor: color,
+                    fill: false
+                });
+            });
+
+            return datasets;
+        }
+
+        var current_utm_source = '{{ bundler.utm_source }}';
+
         var month_labels = JSON.parse('{{ month_entries_keys_json|escapejs }}');
         var month_data = JSON.parse('{{ month_entries_values_json|escapejs }}');
-        var day_labels = JSON.parse('{{ day_entries_keys_json|escapejs }}');
-        var day_data = JSON.parse('{{ day_entries_values_json|escapejs }}');
+        var month_datasets = buildDatasets(month_data, month_labels, current_utm_source);
+
         var week_labels = JSON.parse('{{ week_entries_keys_json|escapejs }}');
         var week_data = JSON.parse('{{ week_entries_values_json|escapejs }}');
+        var week_datasets = buildDatasets(week_data, week_labels, current_utm_source);
+
+        var day_labels = JSON.parse('{{ day_entries_keys_json|escapejs }}');
+        var day_data = JSON.parse('{{ day_entries_values_json|escapejs }}');
+        var day_datasets = buildDatasets(day_data, day_labels, current_utm_source);
+
         var monthChart = new Chart(document.getElementById("month_chart").getContext('2d'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: month_labels,
-                datasets: [{
-                    label: 'Qualified leads last month',
-                    data: month_data,
-                    backgroundColor: 'rgba(44, 44, 255, 0.2)',
-                    borderColor: 'rgba(44, 44, 255, 0.8)',
-                    borderWidth: 1
-                }]
+                datasets: month_datasets,
             },
             options: {
                 scales: {
@@ -52,17 +97,12 @@
                 }
             }
         });
+
         var weekChart = new Chart(document.getElementById("week_chart").getContext('2d'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: week_labels,
-                datasets: [{
-                    label: 'Qualified leads last 7 days',
-                    data: week_data,
-                    backgroundColor: 'rgba(44, 44, 255, 0.2)',
-                    borderColor: 'rgba(44, 44, 255, 0.8)',
-                    borderWidth: 1
-                }]
+                datasets: week_datasets,
             },
             options: {
                 scales: {
@@ -74,17 +114,12 @@
                 }
             }
         });
+
         var dayChart = new Chart(document.getElementById("day_chart").getContext('2d'), {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: day_labels,
-                datasets: [{
-                    label: 'Qualified leads lat 24 hours',
-                    data: day_data,
-                    backgroundColor: 'rgba(44, 44, 255, 0.2)',
-                    borderColor: 'rgba(44, 44, 255, 0.8)',
-                    borderWidth: 1
-                }]
+                datasets: day_datasets,
             },
             options: {
                 scales: {

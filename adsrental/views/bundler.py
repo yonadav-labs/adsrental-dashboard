@@ -46,19 +46,25 @@ class BundlerLeaderboardView(View):
                 current_rank = rank + 1
 
         now = timezone.now()
-        lead_accounts = LeadAccount.objects.filter(qualified_date__isnull=False)
-        lead_accounts = lead_accounts.filter(lead__bundler=bundler)
+        lead_accounts = LeadAccount.objects.filter(
+            qualified_date__isnull=False,
+            qualified_date__gt=timezone.now() - datetime.timedelta(days=31),
+            lead__bundler__utm_source__isnull=False,
+        )
+        # lead_accounts = lead_accounts.filter(lead__bundler=bundler)
 
         lead_accounts_by_date = (
             lead_accounts
             .annotate(date=TruncDay('qualified_date'))
             .values('date')
             .annotate(count=Count('id'))
-            .values_list('date', 'count')
+            .values_list('lead__bundler__utm_source', 'date', 'count')
         )
         lead_accounts_by_date_dict = {}
-        for qualified_date, value in lead_accounts_by_date:
-            lead_accounts_by_date_dict[qualified_date.date()] = value
+        for utm_source, qualified_date, value in lead_accounts_by_date:
+            if utm_source not in lead_accounts_by_date_dict:
+                lead_accounts_by_date_dict[utm_source] = {}
+            lead_accounts_by_date_dict[utm_source][dateformat.format(qualified_date.date(), 'jS F')] = value
 
         lead_accounts_by_time = (
             lead_accounts
@@ -67,41 +73,65 @@ class BundlerLeaderboardView(View):
             .annotate(hour=TruncHour('qualified_date'))
             .values('hour')
             .annotate(count=Count('id'))
-            .values_list('hour', 'count')
+            .values_list('lead__bundler__utm_source', 'hour', 'count')
         )
-        lead_accounts_by_time_list = []
-        for k, value in lead_accounts_by_time:
-            lead_accounts_by_time_list.append([k.strftime('%H:00'), value])
+        lead_accounts_by_time_dict = {}
+        for utm_source, qualified_hour, value in lead_accounts_by_time:
+            if utm_source not in lead_accounts_by_time_dict:
+                lead_accounts_by_time_dict[utm_source] = {}
+            lead_accounts_by_time_dict[utm_source][qualified_hour.strftime('%H:00')] = value
 
-        month_entries = []
-        now = timezone.now()
+        month_keys = []
         for i in range(30):
-            date = (now - datetime.timedelta(days=i)).date()
-            value = lead_accounts_by_date_dict.get(date, 0)
-            month_entries.append([dateformat.format(date, 'jS F'), value])
+            date = timezone.now() - datetime.timedelta(days=i)
+            month_keys.append(dateformat.format(date, 'jS F'))
+        month_keys.reverse()
 
-        month_entries.reverse()
-
-        week_entries = []
-        now = timezone.now()
+        week_keys = []
         for i in range(7):
-            date = (now - datetime.timedelta(days=i)).date()
-            value = lead_accounts_by_date_dict.get(date, 0)
-            week_entries.append([dateformat.format(date, 'jS F'), value])
+            date = timezone.now() - datetime.timedelta(days=i)
+            week_keys.append(dateformat.format(date, 'jS F'))
+        week_keys.reverse()
 
-        week_entries.reverse()
+        day_keys = []
+        for i in range(24):
+            date = timezone.now() - datetime.timedelta(hours=i)
+            day_keys.append(date.strftime('%H:00'))
+        day_keys.reverse()
+
+        month_entries = {}
+        now = timezone.now()
+        for utm_source in lead_accounts_by_date_dict:
+            month_entries[utm_source] = []
+            for month_key in month_keys:
+                value = lead_accounts_by_date_dict[utm_source].get(month_key, 0)
+                month_entries[utm_source].append([month_key, value])
+
+        week_entries = {}
+        for utm_source in lead_accounts_by_date_dict:
+            week_entries[utm_source] = []
+            for week_key in week_keys:
+                value = lead_accounts_by_date_dict[utm_source].get(week_key, 0)
+                week_entries[utm_source].append([week_key, value])
+
+        day_entries = {}
+        for utm_source in lead_accounts_by_time_dict:
+            day_entries[utm_source] = []
+            for day_key in day_keys:
+                value = lead_accounts_by_date_dict[utm_source].get(day_key, 0)
+                day_entries[utm_source].append([day_key, value])
 
         return render(request, 'bundler_leaderboard.html', dict(
             user=request.user,
             bundler=bundler,
             bundler_lead_stat=current_bundler_lead_stat,
             rank=current_rank,
-            month_entries_keys_json=json.dumps([k for k, v in month_entries]),
-            month_entries_values_json=json.dumps([v for k, v in month_entries]),
-            week_entries_keys_json=json.dumps([k for k, v in week_entries]),
-            week_entries_values_json=json.dumps([v for k, v in week_entries]),
-            day_entries_keys_json=json.dumps([k for k, v in lead_accounts_by_time_list]),
-            day_entries_values_json=json.dumps([v for k, v in lead_accounts_by_time_list]),
+            month_entries_keys_json=json.dumps(month_keys),
+            month_entries_values_json=json.dumps(month_entries),
+            week_entries_keys_json=json.dumps(week_keys),
+            week_entries_values_json=json.dumps(week_entries),
+            day_entries_keys_json=json.dumps(day_keys),
+            day_entries_values_json=json.dumps(day_entries),
         ))
 
 
