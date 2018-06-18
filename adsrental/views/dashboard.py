@@ -83,7 +83,7 @@ class DashboardView(View):
         if user.bundler:
             queryset = queryset.filter(bundler=user.bundler)
 
-        if user.allowed_raspberry_pis:
+        if user.allowed_raspberry_pis.count():
             raspberry_pis = user.allowed_raspberry_pis.all()
             queryset = queryset.filter(raspberry_pi__in=raspberry_pis)
 
