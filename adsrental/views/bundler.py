@@ -39,6 +39,11 @@ class BundlerLeaderboardView(View):
         if not bundler:
             raise Http404
 
+        top_bundlers_ids_list = BundlerLeadStat.objects.filter(bundler__is_active=True).exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')[:4]
+        bundler_ids = [bundler.id, ]
+        for bundler_id in top_bundlers_ids_list:
+            bundler_ids.append(bundler_id)
+
         current_bundler_lead_stat = BundlerLeadStat.objects.filter(bundler=bundler).first()
         bundler_lead_stats = BundlerLeadStat.objects.all().order_by('-in_progress_total')
         for rank, bundler_lead_stat in enumerate(bundler_lead_stats):
@@ -50,6 +55,7 @@ class BundlerLeaderboardView(View):
             qualified_date__isnull=False,
             qualified_date__gt=timezone.now() - datetime.timedelta(days=31),
             lead__bundler__utm_source__isnull=False,
+            lead__bundler_id__in=bundler_ids,
         )
         # lead_accounts = lead_accounts.filter(lead__bundler=bundler)
 
@@ -68,7 +74,7 @@ class BundlerLeaderboardView(View):
 
         lead_accounts_by_time = (
             lead_accounts
-            .filter(qualified_date__gte=now - datetime.timedelta(days=1))
+            .filter(qualified_date__gte=now - datetime.timedelta(days=2))
             .order_by('qualified_date')
             .annotate(hour=TruncHour('qualified_date'))
             .values('hour')
@@ -79,7 +85,7 @@ class BundlerLeaderboardView(View):
         for utm_source, qualified_hour, value in lead_accounts_by_time:
             if utm_source not in lead_accounts_by_time_dict:
                 lead_accounts_by_time_dict[utm_source] = {}
-            lead_accounts_by_time_dict[utm_source][qualified_hour.strftime('%H:00')] = value
+            lead_accounts_by_time_dict[utm_source][qualified_hour.strftime('%Y-%m-%d %H:00')] = value
 
         month_keys = []
         for i in range(30):
@@ -95,9 +101,7 @@ class BundlerLeaderboardView(View):
 
         day_keys = []
         for i in range(24):
-            date = timezone.now() - datetime.timedelta(hours=i)
-            day_keys.append(date.strftime('%H:00'))
-        day_keys.reverse()
+            day_keys.append('%02d:00' % i)
 
         month_entries = {}
         now = timezone.now()
@@ -114,12 +118,23 @@ class BundlerLeaderboardView(View):
                 value = lead_accounts_by_date_dict[utm_source].get(week_key, 0)
                 week_entries[utm_source].append([week_key, value])
 
-        day_entries = {}
+        today_entries = {}
+        today_str = timezone.now().strftime('%Y-%m-%d')
         for utm_source in lead_accounts_by_time_dict:
-            day_entries[utm_source] = []
+            today_entries[utm_source] = []
             for day_key in day_keys:
-                value = lead_accounts_by_date_dict[utm_source].get(day_key, 0)
-                day_entries[utm_source].append([day_key, value])
+                date_key = '{} {}'.format(today_str, day_key)
+                value = lead_accounts_by_time_dict[utm_source].get(date_key, 0)
+                today_entries[utm_source].append([day_key, value])
+
+        yesterday_entries = {}
+        yesterday_str = (timezone.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        for utm_source in lead_accounts_by_time_dict:
+            yesterday_entries[utm_source] = []
+            for day_key in day_keys:
+                date_key = '{} {}'.format(yesterday_str, day_key)
+                value = lead_accounts_by_time_dict[utm_source].get(date_key, 0)
+                yesterday_entries[utm_source].append([day_key, value])
 
         return render(request, 'bundler_leaderboard.html', dict(
             user=request.user,
@@ -130,8 +145,10 @@ class BundlerLeaderboardView(View):
             month_entries_values_json=json.dumps(month_entries),
             week_entries_keys_json=json.dumps(week_keys),
             week_entries_values_json=json.dumps(week_entries),
-            day_entries_keys_json=json.dumps(day_keys),
-            day_entries_values_json=json.dumps(day_entries),
+            today_entries_keys_json=json.dumps(day_keys),
+            today_entries_values_json=json.dumps(today_entries),
+            yesterday_entries_keys_json=json.dumps(day_keys),
+            yesterday_entries_values_json=json.dumps(yesterday_entries),
         ))
 
 

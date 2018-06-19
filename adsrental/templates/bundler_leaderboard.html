@@ -17,16 +17,29 @@
     <h4>Rank cross all bundlers: {{rank|ordinal}}</h4>
     <h4>Total accounts in progress: {{bundler_lead_stat.in_progress_total}}</h4>
 
-    <h3>Qualified leads last month</h3>
-    <canvas id="month_chart" style="width: 900px; height: 300px;"></canvas>
+    <h3>Qualified leads today</h3>
+    <canvas id="today_chart" style="width: 900px; height: 300px;"></canvas>
+
+    <h3>Qualified leads yesterday</h3>
+    <canvas id="yesterday_chart" style="width: 900px; height: 300px;"></canvas>
 
     <h3>Qualified leads last week</h3>
     <canvas id="week_chart" style="width: 900px; height: 300px;"></canvas>
 
-    <h3>Qualified leads last 24 hours</h3>
-    <canvas id="day_chart" style="width: 900px; height: 300px;"></canvas>
+    <h3>Qualified leads last month</h3>
+    <canvas id="month_chart" style="width: 900px; height: 300px;"></canvas>
 
     <script>
+        var chartColors = {
+            red: "rgb(255, 99, 132)",
+            orange: "rgb(255, 159, 64)",
+            yellow: "rgb(255, 205, 86)",
+            green: "rgb(75, 192, 192)",
+            blue: "rgb(54, 162, 235)",
+            purple: "rgb(153, 102, 255)",
+        }
+        var chartColorsList = ['orange', 'yallow', 'green', 'blue', 'purple'];
+
         function buildValues(data, labels){
             var values = [];
             var d = {};
@@ -47,11 +60,11 @@
                     keys.push(key);
                 }
             });
-            $.each(keys, function(_, key){
+            $.each(keys, function(index, key){
                 var value = data[key];
-                var color = 'rgb(54, 162, 235)';
+                var color = chartColorsList[index];
                 if (currentKey === key) {
-                    color = 'rgb(255, 99, 132)';
+                    color = chartColors.red;
                 }
 
                 var values = buildValues(value, labels);
@@ -77,12 +90,16 @@
         var week_data = JSON.parse('{{ week_entries_values_json|escapejs }}');
         var week_datasets = buildDatasets(week_data, week_labels, current_utm_source);
 
-        var day_labels = JSON.parse('{{ day_entries_keys_json|escapejs }}');
-        var day_data = JSON.parse('{{ day_entries_values_json|escapejs }}');
-        var day_datasets = buildDatasets(day_data, day_labels, current_utm_source);
+        var today_labels = JSON.parse('{{ today_entries_keys_json|escapejs }}');
+        var today_data = JSON.parse('{{ today_entries_values_json|escapejs }}');
+        var today_datasets = buildDatasets(today_data, today_labels, current_utm_source);
+
+        var yesterday_labels = JSON.parse('{{ yesterday_entries_keys_json|escapejs }}');
+        var yesterday_data = JSON.parse('{{ yesterday_entries_values_json|escapejs }}');
+        var yesterday_datasets = buildDatasets(yesterday_data, yesterday_labels, current_utm_source);
 
         var monthChart = new Chart(document.getElementById("month_chart").getContext('2d'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: month_labels,
                 datasets: month_datasets,
@@ -99,7 +116,7 @@
         });
 
         var weekChart = new Chart(document.getElementById("week_chart").getContext('2d'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: week_labels,
                 datasets: week_datasets,
@@ -115,11 +132,28 @@
             }
         });
 
-        var dayChart = new Chart(document.getElementById("day_chart").getContext('2d'), {
-            type: 'line',
+        var todayChart = new Chart(document.getElementById("today_chart").getContext('2d'), {
+            type: 'bar',
             data: {
-                labels: day_labels,
-                datasets: day_datasets,
+                labels: today_labels,
+                datasets: today_datasets,
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var yesterdayChart = new Chart(document.getElementById("yesterday_chart").getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: yesterday_labels,
+                datasets: yesterday_datasets,
             },
             options: {
                 scales: {
