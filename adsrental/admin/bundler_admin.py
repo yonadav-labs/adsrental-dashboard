@@ -34,7 +34,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'enable_chargeback',
         'disable_chargeback',
     )
-    search_fields = ('utm_source', 'email', )
+    search_fields = ('utm_source', 'email', 'name', )
 
     def get_queryset(self, request):
         queryset = super(BundlerAdmin, self).get_queryset(request)

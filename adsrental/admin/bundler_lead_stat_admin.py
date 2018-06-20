@@ -1,3 +1,5 @@
+import html
+
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -9,7 +11,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     model = BundlerLeadStat
     list_display = (
         'id',
-        'bundler',
+        'bundler_field',
         'in_progress_total_field',
         'in_progress_offline_field',
         'in_progress_wrong_pw_field',
@@ -31,6 +33,13 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         'calculate',
     )
     change_list_template = 'admin/change_list_total.html'
+
+    def bundler_field(self, obj):
+        return mark_safe('<a href="{url}?q={search}">{value}</a>'.format(
+            url=reverse('admin:adsrental_bundler_changelist'),
+            search=html.escape(obj.bundler.name),
+            value=obj.bundler,
+        ))
 
     def in_progress_total_field(self, obj):
         return mark_safe('<a href="{url}?account_type__exact=Facebook&status=In-Progress&bundler={bundler_id}">{value}</a>'.format(
@@ -115,6 +124,9 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     def calculate(self, request, queryset):
         for bundler_lead_stat in queryset:
             BundlerLeadStat.calculate(bundler_lead_stat.bundler)
+
+    bundler_field.short_description = 'Bundler'
+    bundler_field.admin_order_field = 'bundler__name'
 
     in_progress_total_field.short_description = 'Total In-Progress'
     in_progress_total_field.admin_order_field = 'in_progress_total'
