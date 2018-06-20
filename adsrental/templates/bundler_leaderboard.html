@@ -40,142 +40,112 @@
         }
         var chartColorsList = ['orange', 'yallow', 'green', 'blue', 'purple'];
 
+        function buildLabels(data, currentLabel){
+            var labels = [];
+            var d = {};
+            var currentPresent = false;
+            $.each(data, function(_, value){
+                var label = value[0];
+                if (label === currentLabel){
+                    currentPresent = true;
+                } else{
+                    labels.push(label);
+                }
+            });
+            if (currentPresent) {
+                labels.unshift(currentLabel);
+            }
+            return labels;
+        }
         function buildValues(data, labels){
             var values = [];
-            var d = {};
-            $.each(data, function(_, value){
-                d[value[0]] = value[1];
-            })
             $.each(labels, function(_, label){
-                values.push(d[label] || 0);
+                values.push(data[label] || 0);
             });
             return values;
         }
         function buildDatasets(data, labels, currentKey) {
             var datasets = [];
             var keys = [];
-            keys.push(currentKey);
-            $.each(data, function(key, value){
-                if (currentKey !== key) {
-                    keys.push(key);
-                }
-            });
-            $.each(keys, function(index, key){
-                var value = data[key];
-                var color = chartColorsList[index];
-                if (currentKey === key) {
-                    color = chartColors.red;
-                }
+            var dataDict = {};
+            $.each(data, function(_, value){
+                dataDict[value[0]] = value[1];
+            })
+            var values = buildValues(dataDict, labels);
+            return [{
+                label: '',
+                data: values,
+                fill: false,
+                backgroundColor: [
+                    chartColors.red,
+                    chartColors.orange,
+                    chartColors.yellow,
+                    chartColors.blue,
+                    chartColors.purple,
+                ],
+                borderColor: [
+                    chartColors.red,
+                    chartColors.orange,
+                    chartColors.yellow,
+                    chartColors.blue,
+                    chartColors.purple,
+                ],
+            }];
+        }
 
-                var values = buildValues(value, labels);
-                datasets.push({
-                    label: key,
-                    data: values,
-                    backgroundColor: color,
-                    borderColor: color,
-                    fill: false
+        var createChart = function(id, data, current_utm_source) {
+            var labels = buildLabels(data, current_utm_source);
+            var datasets = buildDatasets(data, labels, current_utm_source);
+            var maxValue = 0;
+            $.each(datasets, function(_, dataset){
+                $.each(dataset.data, function(_, value){
+                    maxValue = Math.max(value, maxValue);
                 });
             });
-
-            return datasets;
+            var ticks = {
+                beginAtZero:true,
+                suggestedMax: 5,
+                min: 0,
+                stepSize: 1,
+            }
+            if (maxValue > 10) {
+                ticks = {
+                    beginAtZero:true,
+                    min: 0
+                }
+            }
+            var chart = new Chart(document.getElementById(id).getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets,
+                },
+                options: {
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: ticks
+                        }]
+                    }
+                }
+            });
+            return chart;
         }
 
         var current_utm_source = '{{ bundler.utm_source }}';
 
-        var month_labels = JSON.parse('{{ month_entries_keys_json|escapejs }}');
-        var month_data = JSON.parse('{{ month_entries_values_json|escapejs }}');
-        var month_datasets = buildDatasets(month_data, month_labels, current_utm_source);
+        var month_data = JSON.parse('{{ month_entries_json|escapejs }}');
+        createChart("month_chart", month_data, current_utm_source);
 
-        var week_labels = JSON.parse('{{ week_entries_keys_json|escapejs }}');
-        var week_data = JSON.parse('{{ week_entries_values_json|escapejs }}');
-        var week_datasets = buildDatasets(week_data, week_labels, current_utm_source);
+        var week_data = JSON.parse('{{ week_entries_json|escapejs }}');
+        createChart("week_chart", week_data, current_utm_source);
 
-        var today_labels = JSON.parse('{{ today_entries_keys_json|escapejs }}');
-        var today_data = JSON.parse('{{ today_entries_values_json|escapejs }}');
-        var today_datasets = buildDatasets(today_data, today_labels, current_utm_source);
+        var today_data = JSON.parse('{{ today_entries_json|escapejs }}');
+        createChart("today_chart", today_data, current_utm_source);
 
-        var yesterday_labels = JSON.parse('{{ yesterday_entries_keys_json|escapejs }}');
-        var yesterday_data = JSON.parse('{{ yesterday_entries_values_json|escapejs }}');
-        var yesterday_datasets = buildDatasets(yesterday_data, yesterday_labels, current_utm_source);
-
-        var monthChart = new Chart(document.getElementById("month_chart").getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: month_labels,
-                datasets: month_datasets,
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true,
-                            suggestedMax: 5,
-                            min: 0,
-                            stepSize: 1
-                        }
-                    }]
-                }
-            }
-        });
-
-        var weekChart = new Chart(document.getElementById("week_chart").getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: week_labels,
-                datasets: week_datasets,
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true,
-                            suggestedMax: 5,
-                            min: 0,
-                            stepSize: 1
-                        }
-                    }]
-                }
-            }
-        });
-
-        var todayChart = new Chart(document.getElementById("today_chart").getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: today_labels,
-                datasets: today_datasets,
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true,
-                            suggestedMax: 5,
-                            min: 0,
-                            stepSize: 1
-                        }
-                    }]
-                }
-            }
-        });
-
-        var yesterdayChart = new Chart(document.getElementById("yesterday_chart").getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: yesterday_labels,
-                datasets: yesterday_datasets,
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true,
-                            suggestedMax: 5,
-                            min: 0,
-                            stepSize: 1
-                        }
-                    }]
-                }
-            }
-        });
+        var yesterday_data = JSON.parse('{{ yesterday_entries_json|escapejs }}');
+        createChart("yesterday_chart", yesterday_data, current_utm_source);
     </script>
 {% endblock %}
