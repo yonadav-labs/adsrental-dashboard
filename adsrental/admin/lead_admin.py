@@ -1,6 +1,8 @@
 
 from __future__ import unicode_literals
 
+import html
+
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import reverse
@@ -174,7 +176,7 @@ class LeadAdmin(admin.ModelAdmin):
     def name(self, obj):
         if obj.note:
             return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
-                obj.note,
+                html.escape(obj.note),
                 obj.name(),
             ))
         return obj.name()
