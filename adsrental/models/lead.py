@@ -140,6 +140,7 @@ class Lead(models.Model, FulltextSearchMixin):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     company = models.CharField(max_length=20, default=COMPANY_EMPTY, choices=COMPANY_CHOICES)
     customerio_enabled = models.BooleanField(default=True, help_text='If False, customer.io event will not be sent for this lead. However, they are created.')
+    is_reimbursed = models.BooleanField(default=False, help_text='Lead is active for more than 5 months and gets pay checks.')
     photo_id = models.FileField(blank=True, null=True, help_text='Photo uploaded by user on registration.')
     splashtop_id = models.CharField(max_length=255, blank=True, null=True, help_text='Splashtop ID reported by user.')
     tracking_info = models.TextField(blank=True, null=True, help_text='Raw response from secure.shippingapis.com')
