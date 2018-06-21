@@ -139,6 +139,8 @@ class LeadAdmin(admin.ModelAdmin):
         'updated',
         'status',
         'old_status',
+        'shipstation_order_number',
+        'raspberry_pi',
     )
     exclude = ('tracking_info', )
     raw_id_fields = ('raspberry_pi', )
@@ -373,7 +375,7 @@ class LeadAdmin(admin.ModelAdmin):
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
                 else:
                     messages.info(
-                        request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
 
     def mark_facebook_as_qualified(self, request, queryset):
         for lead in queryset:
@@ -393,7 +395,7 @@ class LeadAdmin(admin.ModelAdmin):
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
                 else:
                     messages.info(
-                        request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
 
     def mark_amazon_as_qualified(self, request, queryset):
         for lead in queryset:
@@ -413,7 +415,7 @@ class LeadAdmin(admin.ModelAdmin):
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
                 else:
                     messages.info(
-                        request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
 
     def mark_as_disqualified(self, request, queryset):
         for lead in queryset:
