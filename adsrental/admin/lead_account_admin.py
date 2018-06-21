@@ -56,6 +56,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         BannedDateListFilter,
         AutoBanListFilter,
         'charge_back',
+        'primary',
         LeadBundlerListFilter,
     )
     search_fields = ('lead__leadid', 'username', )
