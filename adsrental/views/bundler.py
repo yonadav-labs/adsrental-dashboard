@@ -44,10 +44,7 @@ class BundlerLeaderboardView(View):
             bundler_ids.append(bundler_id)
 
         current_bundler_lead_stat = BundlerLeadStat.objects.filter(bundler=bundler).first()
-        bundler_lead_stats = BundlerLeadStat.objects.all().order_by('-in_progress_total')
-        for rank, bundler_lead_stat in enumerate(bundler_lead_stats):
-            if bundler_lead_stat.bundler_id == bundler.id:
-                current_rank = rank + 1
+        current_rank = None
 
         now = timezone.localtime(timezone.now())
         lead_accounts = LeadAccount.objects.filter(
@@ -95,6 +92,11 @@ class BundlerLeaderboardView(View):
             .order_by('lead__bundler__utm_source')
             .values_list('lead__bundler__utm_source', 'count')
         )
+
+        lead_accounts_today_sorted = sorted(list(lead_accounts_today), key=lambda x: x[1], reverse=True)
+        for index, value in enumerate(lead_accounts_today_sorted):
+            if bundler.utm_source == value[0] and value[0]:
+                current_rank = index + 1
 
         return render(request, 'bundler_leaderboard.html', dict(
             user=request.user,
