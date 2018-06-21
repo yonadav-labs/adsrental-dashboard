@@ -40,6 +40,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'adsdb_account_id',
         'wrong_password_date_field',
         'security_checkpoint_date_field',
+        'primary',
         'billed',
         'created',
     )
@@ -75,6 +76,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'wrong_password_date',
         'qualified_date',
         'bundler_paid',
+        'primary',
     )
 
     def get_actions(self, request):

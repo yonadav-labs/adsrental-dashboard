@@ -39,6 +39,7 @@ class LeadAccountInline(admin.StackedInline):
         'wrong_password_date',
         'qualified_date',
         'bundler_paid',
+        'primary',
     )
 
 

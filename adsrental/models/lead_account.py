@@ -98,6 +98,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     adsdb_account_id = models.CharField(max_length=255, blank=True, null=True, help_text='Corresponding Account ID in Adsdb database. used for syncing between databases.')
     sync_with_adsdb = models.BooleanField(default=False)
     active = models.BooleanField(default=True, help_text='If false, entry considered as deleted')
+    primary = models.BooleanField(default=False, help_text='First added account for this lead')
     billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead account.')
