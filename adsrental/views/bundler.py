@@ -54,6 +54,7 @@ class BundlerLeaderboardView(View):
             qualified_date__isnull=False,
             account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             lead__bundler__utm_source__isnull=False,
+            primary=True,
         )
 
         lead_accounts_last_month = (
