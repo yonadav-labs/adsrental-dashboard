@@ -48,7 +48,7 @@ class RDPConnectView(View):
                 messages.warning(request, 'Antidetect script update failed.')
                 return
             messages.success(request, 'Antidetect script updated successfully. Shortcut on desktop Should appear in 5 minutes max.')
-            ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_ANTIDETECT
+            ec2_instance.browser_type = ec2_instance.BROWSER_TYPE_ANTIDETECT_7_3_2
             ec2_instance.save()
         if action == 'install_mla_script':
             try:
