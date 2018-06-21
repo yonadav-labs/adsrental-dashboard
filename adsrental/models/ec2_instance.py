@@ -261,7 +261,7 @@ class EC2Instance(models.Model):
         '''
         if not self.tunnel_up_date:
             return False
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         return self.tunnel_up_date > now - datetime.timedelta(seconds=self.TUNNEL_UP_TTL_SECONDS)
 
     def update_from_boto(self, boto_instance=None):

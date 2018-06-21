@@ -234,7 +234,7 @@ class Lead(models.Model, FulltextSearchMixin):
         'Obsolete.'
         if not self.pi_sent:
             return False
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         if now.year == self.pi_sent.year and now.month == self.pi_sent.month:
             return True
 
@@ -274,9 +274,10 @@ class Lead(models.Model, FulltextSearchMixin):
         old_value = self.pi_delivered
         self.shipstation_order_number = None
         self.pi_delivered = False
+        now = timezone.localtime(timezone.now())
         extra_note = 'Prepared for reshipment by {} on {}'.format(
             edited_by,
-            timezone.now().strftime('%Y-%m-%d'),
+            now.strftime('%Y-%m-%d'),
         )
         self.note = '{}\n{}'.format(self.note or '', extra_note)
         self.save()

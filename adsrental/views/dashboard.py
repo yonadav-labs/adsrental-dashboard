@@ -92,7 +92,7 @@ class DashboardView(View):
     @method_decorator(login_required)
     def get(self, request):
         form = DashboardForm(request.GET)
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         entries = []
         if form.is_valid():
             entries = self.get_entries(request.user)

@@ -453,7 +453,7 @@ class SyncOfflineView(View):
     def get(self, request):
         reported_offline_leads = []
         reported_checkpoint = []
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         test = request.GET.get('test')
         customerio_client = CustomerIOClient()
         for lead in Lead.objects.filter(
@@ -508,7 +508,7 @@ class CheckEC2View(View):
         stopping_essential_ec2s = []
         online_essential_ec2s = []
         unassigned_essential_ec2s = []
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         ec2_client = BotoResource().get_client('ec2')
         pool = ThreadPool(processes=10)
         ec2_instances = EC2Instance.objects.filter(
@@ -582,7 +582,7 @@ class AutoBanView(View):
         banned_offline = []
         banned_security_checkpoint = []
         banned_not_used = []
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         execute = request.GET.get('execute', '') == 'true'
         days_wrong_password = int(request.GET.get('days_wrong_password', 14))
         days_offline = int(request.GET.get('days_offline', 14))

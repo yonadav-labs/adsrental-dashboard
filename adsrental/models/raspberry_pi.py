@@ -99,7 +99,7 @@ class RaspberryPi(models.Model):
 
     def update_ping(self, now=None):
         if now is None:
-            now = timezone.now()
+            now = timezone.localtime(timezone.now())
 
         if not self.first_tested:
             self.first_tested = now

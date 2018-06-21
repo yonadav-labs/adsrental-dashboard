@@ -22,7 +22,7 @@ class FulltextSearchMixin(object):
 
     @classmethod
     def get_timedelta_filter(cls, field_name, **kwargs):
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         return Q(**{
             field_name: now + datetime.timedelta(**kwargs),
         })

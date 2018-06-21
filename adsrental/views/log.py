@@ -47,7 +47,7 @@ class LogView(View):
 
     def add_log(self, request, rpid, message):
         ip_address = request.META.get('REMOTE_ADDR')
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         log_path = os.path.join(
             settings.RASPBERRY_PI_LOG_PATH,
             rpid,

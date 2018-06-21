@@ -49,12 +49,11 @@ class BundlerLeaderboardView(View):
             if bundler_lead_stat.bundler_id == bundler.id:
                 current_rank = rank + 1
 
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         lead_accounts = LeadAccount.objects.filter(
             qualified_date__isnull=False,
             account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             lead__bundler__utm_source__isnull=False,
-            lead__bundler_id__in=bundler_ids,
         )
 
         lead_accounts_last_month = (
@@ -492,7 +491,7 @@ class BundlerPaymentsListView(View):
 class BundlerCheckView(View):
     @method_decorator(login_required)
     def get(self, request, bundler_id):
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
 
         select_dates = []
         for months_ago in range(3, 0, -1):

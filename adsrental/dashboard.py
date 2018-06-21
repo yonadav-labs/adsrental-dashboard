@@ -19,7 +19,7 @@ class CustomIndexDashboard(Dashboard):
     def init_with_context(self, context):
         # append a link list module for "quick links"
         request = context['request']
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         current_week_start = now - datetime.timedelta(days=now.weekday())
         prev_week_end = current_week_start - datetime.timedelta(days=1)
         prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
