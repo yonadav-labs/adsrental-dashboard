@@ -38,7 +38,7 @@ class BundlerLeaderboardView(View):
         if not bundler:
             raise Http404
 
-        top_bundlers_ids_list = BundlerLeadStat.objects.filter(bundler__is_active=True).exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')[:4]
+        top_bundlers_ids_list = BundlerLeadStat.objects.filter(bundler__is_active=True).exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')
         bundler_ids = [bundler.id, ]
         for bundler_id in top_bundlers_ids_list:
             bundler_ids.append(bundler_id)
