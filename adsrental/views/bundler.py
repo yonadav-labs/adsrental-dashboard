@@ -76,7 +76,7 @@ class BundlerLeaderboardView(View):
 
         lead_accounts_today = (
             lead_accounts
-            .filter(qualified_date__gt=timezone.now().replace(hour=0, minute=0, second=0))
+            .filter(qualified_date__gt=now.replace(hour=0, minute=0, second=0))
             .values('lead__bundler__utm_source')
             .annotate(count=Count('id'))
             .order_by('lead__bundler__utm_source')

@@ -133,7 +133,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 rpid=obj.rpid,
             ))
         if obj.lead and obj.lead.raspberry_pi:
-            today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
+            now = timezone.localtime(timezone.now())
+            today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
             links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
                 log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
             ))
