@@ -104,11 +104,13 @@ class EC2Instance(models.Model):
     BROWSER_TYPE_MLA = 'MLA'
     BROWSER_TYPE_ANTIDETECT = 'Antidetect'
     BROWSER_TYPE_ANTIDETECT_7_3_2 = 'Antidetect 7.3.2'
+    BROWSER_TYPE_ANTIDETECT_7_3_3 = 'Antidetect 7.3.3'
     BROWSER_TYPE_CHOICES = (
         (BROWSER_TYPE_UNKNOWN, 'Unknown', ),
         (BROWSER_TYPE_MLA, 'Multilogin App 2.1.4', ),
         (BROWSER_TYPE_ANTIDETECT, 'Antidetect 7.3.1', ),
         (BROWSER_TYPE_ANTIDETECT_7_3_2, 'Antidetect 7.3.2', ),
+        (BROWSER_TYPE_ANTIDETECT_7_3_3, 'Antidetect 7.3.3', ),
     )
 
     instance_id = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='AWS EC2 ID.')
