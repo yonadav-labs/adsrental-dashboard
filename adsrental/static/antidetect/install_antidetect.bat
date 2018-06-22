@@ -28,7 +28,8 @@ if exist C:\antidetect.conf.backup (
 )
 
 echo [*] Adding shortcuts to desktop
-powershell iwr https://adsrental.com/static/antidetect/browser.exe -outf C:\Users\Administrator\Desktop\Browser.exe
+REM powershell iwr https://adsrental.com/static/antidetect/browser.exe -outf C:\Users\Administrator\Desktop\Browser.exe
+powershell Copy-Item C:/Antidetect/browser.exe -Destination C:\Users\Administrator\Desktop\Browser.exe
 powershell Copy-Item C:/Antidetect/variables.conf -Destination C:\Users\Administrator\Desktop\variables.conf
 
 echo [*] Done. You can close this window now and use Browser.exe from desktop
