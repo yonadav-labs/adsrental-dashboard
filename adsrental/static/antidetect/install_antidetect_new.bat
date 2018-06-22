@@ -7,11 +7,11 @@ powershell iwr https://adsrental.com/static/images/antidetect_wp.png -OutFile C:
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d C:\Users\Administrator\antidetect_wp.png /f
 RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
 
-if exist C:\Antidetect_7.3.2.zip (
-    echo [!] Latest Antidetect is already downloaded. To download again, please delete C:\Antidetect_7.3.2.zip file
+if exist C:\Antidetect_7.3.3.zip (
+    echo [!] Latest Antidetect is already downloaded. To download again, please delete C:\Antidetect_7.3.3.zip file
 ) else (
     echo [*] Downloading latest Antidetect
-    powershell iwr -outf C:\Antidetect_7.3.2.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.2.zip
+    powershell iwr -outf C:\Antidetect_7.3.3.zip https://s3-us-west-2.amazonaws.com/mvp-store/Antidetect_7.3.3.zip
 )
 
 if exist C:\Antidetect\antidetect.conf (
@@ -20,7 +20,7 @@ if exist C:\Antidetect\antidetect.conf (
 )
 
 echo [*] Installing Antidetect
-powershell Expand-Archive -force C:\Antidetect_7.3.2.zip -DestinationPath C:\
+powershell Expand-Archive -force C:\Antidetect_7.3.3.zip -DestinationPath C:\
 
 if exist C:\antidetect.conf.backup (
     echo [*] Applying config backup
