@@ -102,8 +102,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     billed = models.BooleanField(default=False, help_text='Did lead receive his payment.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was touched for the last time.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead account.')
-    antidetect_last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead account was antidetect touched for the last time.')
-    antidetect_touch_count = models.IntegerField(default=0, help_text='Increased every time you do Antidetect Touch action for this lead account.')
     security_checkpoint_date = models.DateTimeField(blank=True, null=True, help_text='Date when security checkpoint has been reported.')
     last_security_checkpoint_reported = models.DateTimeField(blank=True, null=True, help_text='Date when security checkpoint notification was sent.')
     auto_ban_enabled = models.BooleanField(default=True, help_text='If true, lead account is banned after two weeks of offline or wrong password.')

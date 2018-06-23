@@ -22,7 +22,7 @@ from adsrental.admin.list_filters import \
     AccountTypeListFilter, \
     LeadAccountWrongPasswordListFilter, \
     DeliveryDateListFilter, \
-    LeadAccountAntidetectTouchCountListFilter, \
+    LeadAccountTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
     LeadAccountSecurityCheckpointListFilter
@@ -81,7 +81,7 @@ class LeadAdmin(admin.ModelAdmin):
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
-        LeadAccountAntidetectTouchCountListFilter,
+        LeadAccountTouchCountListFilter,
         'company',
         'lead_account__bundler_paid',
         ShipDateListFilter,
@@ -230,14 +230,14 @@ class LeadAdmin(admin.ModelAdmin):
     def last_touch(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                return naturaltime(lead_account.antidetect_last_touch_date) if lead_account.antidetect_last_touch_date else 'Never'
+                return naturaltime(lead_account.last_touch_date) if lead_account.last_touch_date else 'Never'
 
         return None
 
     def touch_count_field(self, obj):
         for lead_account in obj.lead_accounts.all():
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                return lead_account.antidetect_touch_count
+                return lead_account.touch_count
 
         return None
 
@@ -816,13 +816,6 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.touch()
                 messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
-    @staticmethod
-    def antidetect_touch(instance, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
-                lead_account.antidetect_touch()
-                messages.info(request, '{} has been antidetect touched for {} time.'.format(lead_account, lead_account.antidetect_touch_count))
-
     def sync_to_adsdb_facebook(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
@@ -846,11 +839,6 @@ class LeadAdmin(admin.ModelAdmin):
             {
                 'label': 'Touch',
                 'action': 'touch',
-                'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
-            },
-            {
-                'label': 'Antidetect Touch',
-                'action': 'antidetect_touch',
                 'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
             },
         ]
@@ -900,7 +888,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     last_touch.admin_order_field = 'lead_account__last_touch_date'
     touch_count_field.short_description = 'Touch count'
-    touch_count_field.admin_order_field = 'lead_account__antidetect_touch_count'
+    touch_count_field.admin_order_field = 'lead_account__touch_count'
 
     id_field.short_description = 'ID'
 

@@ -156,10 +156,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
             return None
 
-        return naturaltime(obj.antidetect_last_touch_date) if obj.antidetect_last_touch_date else 'Never'
+        return naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never'
 
     def touch_count_field(self, obj):
-        return obj.antidetect_touch_count
+        return obj.touch_count
 
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:
@@ -302,10 +302,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     mark_as_qualified.short_description = 'Mark as Qualified, Assign RPi, create Shipstation order'
 
-    last_touch.admin_order_field = 'antidetect_last_touch_date'
+    last_touch.admin_order_field = 'last_touch_date'
 
     touch_count_field.short_description = 'Touch count'
-    touch_count_field.admin_order_field = 'antidetect_touch_count'
+    touch_count_field.admin_order_field = 'touch_count'
 
     online.boolean = True
     online.admin_order_field = 'lead__raspberry_pi__last_seen'
