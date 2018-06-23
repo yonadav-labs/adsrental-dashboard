@@ -11,7 +11,8 @@ class LeadChangeAdmin(admin.ModelAdmin):
     model = LeadChange
     list_display = (
         'id',
-        'lead_link',
+        'lead_field',
+        'lead_account_field',
         'field',
         'value',
         'old_value',
@@ -24,12 +25,26 @@ class LeadChangeAdmin(admin.ModelAdmin):
     )
     search_fields = ('lead__leadid', )
 
-    def lead_link(self, obj):
+    def lead_field(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        if not lead:
+            return None
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{text}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
-            lead=lead.name(),
-            q=lead.leadid,
+            text=lead.name(),
+            q=lead.email,
         ))
 
-    lead_link.short_description = 'Lead'
+    def lead_account_field(self, obj):
+        lead_account = obj.lead_account
+        if not lead_account:
+            return None
+        return mark_safe('<a target="_blank" href="{url}?q={q}">{text}</a>'.format(
+            url=reverse('admin:adsrental_leadaccount_changelist'),
+            text=lead_account.username,
+            q=lead_account.username,
+        ))
+
+    lead_field.short_description = 'Lead'
+
+    lead_account_field.short_description = 'Lead Account'

@@ -8,6 +8,7 @@ class LeadChange(models.Model):
     Stores a single change for :model:`adsrental.Lead`, like status.
     '''
     lead = models.ForeignKey('adsrental.Lead', on_delete=models.CASCADE)
+    lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.CASCADE, default=None, blank=True, null=True)
     field = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
     old_value = models.CharField(max_length=255, null=True, blank=True)

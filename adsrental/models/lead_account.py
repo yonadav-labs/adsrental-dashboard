@@ -250,12 +250,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.password = new_password
         self.wrong_password_date = None
         self.save()
-        LeadChange(lead=self.lead, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
+        LeadChange(lead=self.lead, lead_account=self, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
 
     def mark_wrong_password(self, edited_by):
         self.wrong_password_date = timezone.now()
         self.save()
-        LeadChange(lead=self.lead, field='wrong_password', value=self.password, old_value=self.password, edited_by=edited_by).save()
+        LeadChange(lead=self.lead, lead_account=self, field='wrong_password', value=self.password, old_value=self.password, edited_by=edited_by).save()
 
     def set_status(self, value, edited_by):
         'Change status, create LeadChange instance.'
@@ -274,7 +274,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         self.status = value
         self.save()
-        LeadChange(lead=self.lead, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
+        LeadChange(lead=self.lead, lead_account=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
     def ban(self, edited_by, reason=None):
