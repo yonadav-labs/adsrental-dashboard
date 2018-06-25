@@ -27,10 +27,12 @@
             </thead>
             <tbody>
                 {% for data in bundlers_data %}
-                    <tr>
-                        <td>Bundler {{ data.bundler }}</td>
-                        <td>${{ data.total }}</td>
-                    </tr>
+                    {% if data.total %}
+                        <tr>
+                            <td>Bundler {{ data.bundler }}</td>
+                            <td>${{ data.total }}</td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
                 <tr>
                     <td>Total Google pay </td>
