@@ -96,6 +96,7 @@ class SignupView(View):
             postal_code=data['postal_code'],
             country='United States',
             photo_id=data['photo_id'],
+            extra_photo_id=data['extra_photo_id'],
         )
         lead.save()
 

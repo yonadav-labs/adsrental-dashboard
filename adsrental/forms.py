@@ -143,6 +143,7 @@ class SignupForm(forms.Form):
     postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40}))
     accept = forms.BooleanField(required=True)
     photo_id = forms.FileField(label='Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
+    extra_photo_id = forms.FileField(label='Second Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=False)
     captcha = ReCaptchaField(widget=ReCaptchaWidget(), required=False)
     utm_source = forms.CharField(widget=forms.HiddenInput())
 

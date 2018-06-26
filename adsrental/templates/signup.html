@@ -217,6 +217,13 @@
                                         {{ form.photo_id }}
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td class="form_label {% if form.extra_photo_id.field.required %}required{% endif %}">{{form.extra_photo_id.label}}</td>
+                                    <td>
+                                        {{ form.extra_photo_id }}
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td colspan="2" align="left">
                                         {{ form.accept }}
