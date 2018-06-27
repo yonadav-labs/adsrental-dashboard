@@ -128,6 +128,28 @@
                     </div>
                 {% endif %}
             {% endfor %}
+
+            <h3>Last paychecks</h3>
+
+            {% for lead_history_month in lead_histories_month %}
+                <div class="alert alert-info">
+                    <strong>{{ lead_history_month.date|date:"F Y" }}</strong> - ${{ lead_history_month.get_amount }}
+                </div>
+            {% endfor %}
+
+            <h3>Status last 30 days</h3>
+
+            {% for lead_history in lead_histories %}
+                {% if lead_history.is_active %}
+                    <div class="alert alert-success">
+                        <strong>{{ lead_history.date }}</strong> - Online
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <strong>{{ lead_history.date }}</strong> - {% if not lead_history.is_online %}Offline{% endif %} {% if lead_history.is_wrong_password %}Wrong PW{% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 {% endblock %}
