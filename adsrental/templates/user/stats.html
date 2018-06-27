@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+
+{% block title %}Adsrental | Lead {{ lead.email }} stats{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h1>Lead {{ lead.email }} stats</h1>
+            <p>
+                <form action="{% url 'user_logout'%}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-lg btn-primary">Logout</button>
+                </form>
+            </p>
+
+            <h3>General info</h3>
+
+            <p>Address: {{ lead.get_address }}</p>
+
+
+            
+            {% if raspberry_pi %}
+                <h3>RaspberryPi device {{ raspberry_pi.rpid }}</h3>
+                {% if lead.delivery_date %}
+                    <div class="alert alert-info">
+                        Your RaspberryPi was sucessfully <strong>delivered</strong> {{ lead.delivery_date|naturalday }}
+                    </div>
+                {% else %}
+                    {% if lead.ship_date %}
+                        <div class="alert alert-info">
+                            Your RaspberryPi was sucessfully <strong>shipped</strong> {{ lead.ship_date|naturalday }}
+                        </div>
+                    {% else %}
+                        {% if not raspberry_pi.first_seen %}
+                            <div class="alert alert-danger">
+                                Your RaspberryPi was not <strong>shipped</strong> yet
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                {% if raspberry_pi.online %}
+                    <div class="alert alert-success">
+                        Your RaspberryPi is <strong>online</strong>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        Your RaspberryPi went <strong>offline {{ raspberry_pi.last_seen|naturaltime }}</strong>
+                    </div>
+                {% endif %}
+            {% else %}
+                <h3>RaspberryPi device</h3>
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> RaspberryPi device not found
+                </div>
+            {% endif %}
+
+            <h3>Accounts</h3>
+
+            {% for lead_account in lead_accounts %}
+                <div class="alert alert-{% if lead_account.is_active %}info{% else %}warning{% endif %}">
+                    <p>
+                        Your {{ lead_account.account_type }} account {{ lead_account.username }} is <strong>{{lead_account.status}}</strong>
+                    </p>
+                    {% if not lead_account.is_wrong_password %}
+                        <p>
+                            Your password is correct
+                        </p>
+                    {% else %}
+                        <p>
+                            Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
+                        </p> 
+                        <p>
+                            <form class="form-inline" action="{% url 'user_fix_password' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="lead_account_id" value="{{ lead_account.id  }}">
+                                <div class="input-group mb-2 mr-sm-2">
+                                    <input type="text" name="new_password" class="form-control" placeholder="New password">
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2">Fix password</button>
+                            </form>
+                        </p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

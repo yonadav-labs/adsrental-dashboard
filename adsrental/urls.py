@@ -21,6 +21,10 @@ from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.admin_helpers import AdminActionView
+from adsrental.views.user.login import UserLoginView
+from adsrental.views.user.logout import UserLogoutView
+from adsrental.views.user.stats import UserStatsView
+from adsrental.views.user.password import UserFixPasswordView
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -73,4 +77,8 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^bundler/report/payments/list/$', BundlerPaymentsListView.as_view(), name='bundler_report_payments_list'),
     url(r'^bundler/report/check/(?P<bundler_id>\d+)/$', BundlerCheckView.as_view(), name='bundler_report_check'),
     url(r'^bundler/report/check/(?P<bundler_id>\d+)/days/(?P<lead_id>\S*)/$', BundlerCheckDaysView.as_view(), name='bundler_report_check_days'),
+    url(r'^user/login/$', UserLoginView.as_view(), name='user_login'),
+    url(r'^user/logout/$', UserLogoutView.as_view(), name='user_logout'),
+    url(r'^user/stats/$', UserStatsView.as_view(), name='user_stats'),
+    url(r'^user/fix_password/$', UserFixPasswordView.as_view(), name='user_fix_password'),
 ]

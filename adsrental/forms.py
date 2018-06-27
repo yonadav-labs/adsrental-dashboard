@@ -242,3 +242,35 @@ class AdminPrepareForReshipmentForm(forms.Form):
     def clean_rpids(self):
         value = self.cleaned_data['rpids']
         return re.findall(r'RP\d+', value)
+
+
+class UserLoginForm(forms.Form):
+    first_name = forms.CharField(label='First name', required=True)
+    last_name = forms.CharField(label='First name', required=True)
+    postal_code = forms.CharField(label='Zip code', required=True)
+
+    def get_lead(self, data):
+        return Lead.objects.filter(
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            postal_code=data.get('postal_code'),
+        ).first()
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        lead = self.get_lead(cleaned_data)
+
+        if not lead:
+            self.add_error('first_name', 'User not found')
+
+
+class UserFixPasswordForm(forms.Form):
+    lead_account_id = forms.CharField(widget=forms.HiddenInput())
+    new_password = forms.CharField(label='New password', required=True)
+
+    def get_lead_account(self, data, lead):
+        return LeadAccount.objects.filter(
+            id=data.get('lead_account_id'),
+            lead=lead,
+        ).first()

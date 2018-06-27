@@ -2,7 +2,7 @@
 
 {% load bootstrap %}
 
-{% block title %}Adsrental | Login{% endblock %}
+{% block title %}Adsrental | User Login{% endblock %}
 
 {% block styles %}
     {{block.super}}
@@ -90,7 +90,7 @@
 <div class="container">
         <div class="row">
             <div class="col-sm-6 col-md-4 col-md-offset-4">
-                <h1 class="text-center login-title">Sign in to continue to Adsrental</h1>
+                <h1 class="text-center login-title">User sign in</h1>
                 <div class="account-wall">
                     <img class="profile-img" src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120"
                         alt="">
@@ -98,12 +98,9 @@
                         {% csrf_token %}
                         {{ form|bootstrap }}
                         <button class="btn btn-lg btn-primary btn-block" type="submit">
-                            Sign in</button>
-                        <label class="checkbox pull-left">
-                            <input type="checkbox" value="remember-me">
-                            Remember me
-                        </label>
-                        <a href="{% url 'user_login' %}" class="pull-right need-help">Sign in using your name</a><span class="clearfix"></span>
+                            Sign in
+                        </button>
+                        <a href="{% url 'login' %}" class="pull-right need-help">Sign in using your email</a><span class="clearfix"></span>
                     </form>
                 </div>
             </div>

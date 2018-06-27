@@ -6,7 +6,6 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.shortcuts import Http404
 
 from adsrental.forms import LandingForm
 from adsrental.models.bundler import Bundler
@@ -46,11 +45,11 @@ class LandingView(View):
 
         utm_source = request.session.get('utm_source')
         if not utm_source:
-            raise Http404
+            return redirect('user_login')
 
         bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
         if not bundler:
-            raise Http404
+            return redirect('user_login')
 
         return render(request, 'landing.html', dict(
             user=request.user,
