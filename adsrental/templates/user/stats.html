@@ -76,11 +76,7 @@
                     <p>
                         Your {{ lead_account.account_type }} account {{ lead_account.username }} is <strong>{{lead_account.status}}</strong>
                     </p>
-                    {% if not lead_account.is_wrong_password %}
-                        <p>
-                            Your password is correct
-                        </p>
-                    {% else %}
+                    {% if lead_account.is_wrong_password %}
                         <p>
                             Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
                         </p> 
