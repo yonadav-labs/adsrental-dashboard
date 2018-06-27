@@ -20,35 +20,33 @@
 
             <p>Address: {{ lead.get_address }}</p>
 
-
-            
             {% if raspberry_pi %}
-                <h3>RaspberryPi device {{ raspberry_pi.rpid }}</h3>
+                <h3>Adbox device {{ raspberry_pi.rpid }}</h3>
                 {% if lead.delivery_date %}
                     <div class="alert alert-info">
-                        Your RaspberryPi was sucessfully <strong>delivered</strong> {{ lead.delivery_date|naturalday }}
+                        Your Adbox was sucessfully <strong>delivered</strong> {{ lead.delivery_date|naturalday }}
                     </div>
                 {% else %}
                     {% if lead.ship_date %}
                         <div class="alert alert-info">
-                            Your RaspberryPi was sucessfully <strong>shipped</strong> {{ lead.ship_date|naturalday }}
+                            Your Adbox was sucessfully <strong>shipped</strong> {{ lead.ship_date|naturalday }}
                         </div>
                     {% else %}
                         {% if not raspberry_pi.first_seen %}
                             <div class="alert alert-danger">
-                                Your RaspberryPi was not <strong>shipped</strong> yet
+                                Your Adbox was not <strong>shipped</strong> yet
                             </div>
                         {% endif %}
                     {% endif %}
                 {% endif %}
                 {% if raspberry_pi.online %}
                     <div class="alert alert-success">
-                        Your RaspberryPi is <strong>online</strong>
+                        Your Adbox is <strong>online</strong>
                     </div>
                 {% else %}
                     <div class="alert alert-warning">
                         <p>
-                            Your RaspberryPi went <strong>offline {{ raspberry_pi.last_seen|naturaltime }}</strong>
+                            Your Adbox went <strong>offline {{ raspberry_pi.last_seen|naturaltime }}</strong>
                         </p>
                         <p>
                             <strong>Use the following instructions:</strong>
@@ -63,9 +61,9 @@
                     </div>
                 {% endif %}
             {% else %}
-                <h3>RaspberryPi device</h3>
+                <h3>Adbox device</h3>
                 <div class="alert alert-danger">
-                    <strong>Error!</strong> RaspberryPi device not found. Please contact us.
+                    <strong>Error!</strong> Adbox device not found. Please contact us.
                 </div>
             {% endif %}
 
