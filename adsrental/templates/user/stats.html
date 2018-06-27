@@ -55,7 +55,7 @@
                 {% endif %}
                 {% if raspberry_pi.first_seen %}
                     <div class="alert alert-info">
-                        Device not appeared online <strong>{{ raspberry_pi.first_seen|naturaltime }}</strong> for the first time and <strong>{{ raspberry_pi.last_seen|naturaltime }}</strong> for the last time.
+                        Device not appeared online <strong>{{ raspberry_pi.first_seen|naturaltime }}</strong> for the first time.
                     </div>
                 {% else %}
                     <div class="alert alert-info">
@@ -93,26 +93,34 @@
             <h3>Accounts</h3>
 
             {% for lead_account in lead_accounts %}
-                <div class="alert alert-{% if lead_account.is_active %}info{% else %}warning{% endif %}">
-                    <p>
-                        Your {{ lead_account.account_type }} account {{ lead_account.username }} is <strong>{{lead_account.status}}</strong>
-                    </p>
-                    {% if lead_account.is_wrong_password %}
+                {% if lead_account.is_active %}
+                    <div class="alert alert-info">
                         <p>
-                            Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
-                        </p> 
-                        <p>
-                            <form class="form-inline" action="{% url 'user_fix_password' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="lead_account_id" value="{{ lead_account.id  }}">
-                                <div class="input-group mb-2 mr-sm-2">
-                                    <input type="text" name="new_password" class="form-control" placeholder="New password">
-                                </div>
-                                <button type="submit" class="btn btn-primary mb-2">Fix password</button>
-                            </form>
+                            Your {{ lead_account.account_type }} account {{ lead_account.username }} is <strong>{{lead_account.status}}</strong>
                         </p>
-                    {% endif %}
-                </div>
+                        {% if lead_account.is_wrong_password %}
+                            <p>
+                                Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
+                            </p> 
+                            <p>
+                                <form class="form-inline" action="{% url 'user_fix_password' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="lead_account_id" value="{{ lead_account.id  }}">
+                                    <div class="input-group mb-2 mr-sm-2">
+                                        <input type="text" name="new_password" class="form-control" placeholder="New password">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mb-2">Fix password</button>
+                                </form>
+                            </p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <p>
+                            Your {{ lead_account.account_type }} account {{ lead_account.username }} is <strong>not rented</strong>
+                        </p>
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>
