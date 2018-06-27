@@ -251,8 +251,8 @@ class UserLoginForm(forms.Form):
 
     def get_lead(self, data):
         return Lead.objects.filter(
-            first_name=data.get('first_name'),
-            last_name=data.get('last_name'),
+            first_name__iexact=data.get('first_name'),
+            last_name__iexact=data.get('last_name'),
             postal_code=data.get('postal_code'),
         ).first()
 
