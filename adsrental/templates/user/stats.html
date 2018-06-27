@@ -47,13 +47,25 @@
                     </div>
                 {% else %}
                     <div class="alert alert-warning">
-                        Your RaspberryPi went <strong>offline {{ raspberry_pi.last_seen|naturaltime }}</strong>
+                        <p>
+                            Your RaspberryPi went <strong>offline {{ raspberry_pi.last_seen|naturaltime }}</strong>
+                        </p>
+                        <p>
+                            <strong>Use the following instructions:</strong>
+                            <ol>
+                                <li>Disconnect device's power plug and connect again.</li>
+                                <li>Wait 30 seconds.</li>
+                                <li>Check that red LED is ON and green LED is blinking on the device. If it is not blinking - contact us.</li>
+                                <li>Check this page again in 2 minutes.</li>
+                                <li>If you still see this message - contact us.</li>
+                            </ol>
+                        </p>
                     </div>
                 {% endif %}
             {% else %}
                 <h3>RaspberryPi device</h3>
                 <div class="alert alert-danger">
-                    <strong>Error!</strong> RaspberryPi device not found
+                    <strong>Error!</strong> RaspberryPi device not found. Please contact us.
                 </div>
             {% endif %}
 
