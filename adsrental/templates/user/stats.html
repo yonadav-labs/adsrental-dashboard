@@ -53,6 +53,15 @@
                         {% endif %}
                     {% endif %}
                 {% endif %}
+                {% if raspberry_pi.first_seen %}
+                    <div class="alert alert-info">
+                        Device not appeared online <strong>{{ raspberry_pi.first_seen|naturaltime }}</strong> for the first time and <strong>{{ raspberry_pi.last_seen|naturaltime }}</strong> for the last time.
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                            Device has not appeared online yet.
+                    </div>
+                {% endif %}
                 {% if raspberry_pi.online %}
                     <div class="alert alert-success">
                         Your Adbox is <strong>online</strong>
