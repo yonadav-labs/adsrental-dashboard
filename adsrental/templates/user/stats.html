@@ -24,12 +24,26 @@
                 <h3>Adbox device {{ raspberry_pi.rpid }}</h3>
                 {% if lead.delivery_date %}
                     <div class="alert alert-info">
-                        Your Adbox was sucessfully <strong>delivered</strong> {{ lead.delivery_date|naturalday }}
+                        <p>
+                            Your Adbox was sucessfully <strong>delivered</strong> {{ lead.delivery_date|naturalday }}
+                        </p>
+                        {% if lead.usps_tracking_code %}
+                            <p>
+                                USPS tracking #: {{ lead.usps_tracking_code }}
+                            </p>
+                        {% endif %}
                     </div>
                 {% else %}
                     {% if lead.ship_date %}
                         <div class="alert alert-info">
-                            Your Adbox was sucessfully <strong>shipped</strong> {{ lead.ship_date|naturalday }}
+                            <p>
+                                Your Adbox was sucessfully <strong>shipped</strong> {{ lead.ship_date|naturalday }}
+                            </p>
+                            {% if lead.usps_tracking_code %}
+                                <p>
+                                    USPS tracking #: {{ lead.usps_tracking_code }}
+                                </p>
+                            {% endif %}
                         </div>
                     {% else %}
                         {% if not raspberry_pi.first_seen %}
