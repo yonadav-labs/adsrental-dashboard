@@ -352,15 +352,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.sync_to_adsdb()
         self.save()
 
-    def antidetect_touch(self):
-        'Update antidetect touch count and antidetect last touch date.'
-        if self.account_type != self.ACCOUNT_TYPE_FACEBOOK:
-            return
-
-        self.antidetect_last_touch_date = timezone.now()
-        self.antidetect_touch_count += 1
-        self.save()
-
     @classmethod
     def get_online_filter(cls):
         '''

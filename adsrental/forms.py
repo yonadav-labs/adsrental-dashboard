@@ -155,6 +155,10 @@ class SignupForm(forms.Form):
         digits = ''.join([i for i in value if i.isdigit()])
         if len(digits) != 10:
             raise forms.ValidationError("Phone number should have 10 digits excluding +1 code")
+
+        lead = Lead.objects.filter(phone=digits).first()
+        if lead:
+            raise forms.ValidationError("This phone number is already registered")
         return digits
 
     def clean_first_name(self):
