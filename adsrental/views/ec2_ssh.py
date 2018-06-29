@@ -13,8 +13,8 @@ class StartReverseTunnelView(View):
     'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
     def get(self, request, rpid):
         'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid.strip(), status=EC2Instance.STATUS_RUNNING).first()
-        if not ec2_instance:
+        ec2_instance = EC2Instance.get_by_rpid(rpid)
+        if not ec2_instance or not ec2_instance.is_running():
             return JsonResponse(dict(result=False))
 
         try:
@@ -45,9 +45,9 @@ class GetNetstatView(View):
     def get(self, request, rpid):
         'Get netstat output from EC2. Used as a fallback if RaspberryPi cannot get it by itself'
         rpid = rpid.strip()
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid, status=EC2Instance.STATUS_RUNNING).first()
-        if not ec2_instance:
-            return HttpResponse('')
+        ec2_instance = EC2Instance.get_by_rpid(rpid)
+        if not ec2_instance or not ec2_instance.is_running():
+            return HttpResponse('Not exists')
         try:
             output = ec2_instance.ssh_execute('netstat -an')
         except SSHConnectException:

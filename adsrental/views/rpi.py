@@ -12,7 +12,7 @@ class EC2DataView(View):
     Get data about EC2 by RPID. Should have been used by new python RaspberryPi firmware, but was not.
     '''
     def get(self, request, rpid):
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
+        ec2_instance = EC2Instance.get_by_rpid(rpid)
         if not ec2_instance:
             raise Http404
         if not ec2_instance.lead:

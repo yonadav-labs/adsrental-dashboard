@@ -197,6 +197,10 @@ class EC2Instance(models.Model):
         BotoResource().launch_essential_instance(ec2_instance)
         return ec2_instance
 
+    @classmethod
+    def get_by_rpid(cls, rpid):
+        return cls.objects.filter(rpid=rpid).exclude(status=cls.STATUS_MISSING).order_by('-created').first()
+
     def get_raspberry_pi(self):
         return self.lead and self.lead.raspberry_pi
 

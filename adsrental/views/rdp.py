@@ -81,7 +81,7 @@ class RDPConnectView(View):
         force = request.GET.get('force', '') == 'true'
         action = request.GET.get('action', '')
         is_ready = False
-        ec2_instance = EC2Instance.objects.filter(rpid=rpid).exclude(status=EC2Instance.STATUS_MISSING).first()
+        ec2_instance = EC2Instance.get_by_rpid(rpid)
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
             if ec2_instance:

@@ -65,7 +65,7 @@ class LogView(View):
     def fix_ec2_state(self, request, rpid, lead_status, ec2_instance_status):
         if Lead.is_status_active(lead_status):
             if not EC2Instance.is_status_running(ec2_instance_status):
-                ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
+                ec2_instance = EC2Instance.get_by_rpid(rpid)
                 if not ec2_instance:
                     self.add_log(request, rpid, 'Trying to launch missing EC2')
                     lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
@@ -74,7 +74,7 @@ class LogView(View):
                 return True
         if not Lead.is_status_active(lead_status) and EC2Instance.is_status_running(ec2_instance_status):
             self.add_log(request, rpid, 'Stopping EC2')
-            ec2_instance = EC2Instance.objects.filter(rpid=rpid).first()
+            ec2_instance = EC2Instance.get_by_rpid(rpid)
             if ec2_instance and not ec2_instance.is_essential:
                 ec2_instance.stop()
             return True
