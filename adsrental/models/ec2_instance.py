@@ -199,7 +199,7 @@ class EC2Instance(models.Model):
 
     @classmethod
     def get_by_rpid(cls, rpid):
-        return cls.objects.filter(rpid=rpid).exclude(status__in=[cls.STATUS_MISSING, cls.STATUS_TERMINATED]).order_by('-created').first()
+        return cls.objects.filter(rpid=rpid, status__in=cls.STATUSES_ACTIVE).order_by('-created').first()
 
     def get_raspberry_pi(self):
         return self.lead and self.lead.raspberry_pi
