@@ -25,6 +25,7 @@ from adsrental.views.user.login import UserLoginView
 from adsrental.views.user.logout import UserLogoutView
 from adsrental.views.user.stats import UserStatsView
 from adsrental.views.user.password import UserFixPasswordView
+from adsrental.views.user.timestamps import UserTimestampsView
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -80,5 +81,6 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^user/login/$', UserLoginView.as_view(), name='user_login'),
     url(r'^user/logout/$', UserLogoutView.as_view(), name='user_logout'),
     url(r'^user/stats/$', UserStatsView.as_view(), name='user_stats'),
+    url(r'^user/stats/timestamps/$', UserTimestampsView.as_view(), name='user_timestamps'),
     url(r'^user/fix_password/$', UserFixPasswordView.as_view(), name='user_fix_password'),
 ]

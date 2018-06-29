@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+
+{% block title %}Adsrental | Lead {{ lead.email }} daily stats for {{ date_start|date:"F Y" }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h1>Lead {{ lead.email }} daily stats for {{ date_start|date:"F Y" }}</h1>
+            <p>
+                <a href="{% url 'user_stats' %}" class="btn btn-lg btn-primary">&lt;&lt; Back to stats</a>
+            </p>
+
+            {% for lead_history in lead_histories %}
+                {% if lead_history.is_active %}
+                    <div class="alert alert-success">
+                        <strong>{{ lead_history.date }}</strong> - Online
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <strong>{{ lead_history.date }}</strong> - {% if not lead_history.is_online %}Offline{% endif %} {% if lead_history.is_wrong_password %}Wrong PW{% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
