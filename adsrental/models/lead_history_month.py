@@ -81,18 +81,25 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             created_date = lead_account.created
             if created_date.date() > self.get_last_day():
                 continue
+
+            coef = decimal.Decimal('1.00')
+            if created_date.date() > self.get_first_day():
+                days_in_month = (self.get_last_day() - self.get_first_day()).days
+                registered_days = (created_date.date() - self.get_first_day()).days + 1
+                coef = decimal.Decimal(registered_days / days_in_month)
+
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
-                    result += self.NEW_MAX_PAYMENT
+                    result += self.NEW_MAX_PAYMENT * coef
                 else:
-                    result += self.MAX_PAYMENT
+                    result += self.MAX_PAYMENT * coef
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
-                    result += self.NEW_MAX_PAYMENT
+                    result += self.NEW_MAX_PAYMENT * coef
                 else:
-                    result += self.MAX_PAYMENT
+                    result += self.MAX_PAYMENT * coef
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
-                result += self.AMAZON_MAX_PAYMENT
+                result += self.AMAZON_MAX_PAYMENT * coef
 
         return result
 
