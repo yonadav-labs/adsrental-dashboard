@@ -84,8 +84,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
             coef = decimal.Decimal('1.00')
             if created_date.date() > self.get_first_day():
-                days_in_month = (self.get_last_day() - self.get_first_day()).days
-                registered_days = (created_date.date() - self.get_first_day()).days + 1
+                days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
+                registered_days = (self.get_last_day() - created_date.date()).days + 1
                 coef = decimal.Decimal(registered_days / days_in_month)
 
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
@@ -114,10 +114,10 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         if not self.days_online:
             return decimal.Decimal('0.00')
 
-        days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
+        days_total = self.days_online + self.days_offline
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         max_payment = self.get_max_payment()
-        return round(max_payment * days_online_valid / days_in_month, 2)
+        return round(max_payment * days_online_valid / days_total, 2)
 
     def get_remaining_amount(self):
         return self.amount - self.amount_paid
