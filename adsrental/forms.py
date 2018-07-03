@@ -142,6 +142,7 @@ class SignupForm(forms.Form):
     state = forms.ChoiceField(label='Shipping State', choices=STATE_CHOICES, required=True)
     postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40}))
     accept = forms.BooleanField(required=True)
+    age_check = forms.BooleanField(label='I am at least 18 years old', required=True)
     photo_id = forms.FileField(label='Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
     extra_photo_id = forms.FileField(label='Second Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=False)
     captcha = ReCaptchaField(widget=ReCaptchaWidget(), required=False)
@@ -229,6 +230,7 @@ class LandingForm(forms.Form):
     email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'placeholder': 'Email', 'class': 'email', }))
     first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'name', }))
     last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'name', }))
+    age_check = forms.BooleanField(label='I am at least 18 years old', widget=forms.CheckboxInput(attrs={'class': 'age_checkbox', }), required=True)
 
 
 class AdminLeadAccountBanForm(forms.Form):

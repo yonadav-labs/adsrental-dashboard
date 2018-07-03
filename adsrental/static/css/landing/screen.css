@@ -507,6 +507,11 @@ header .logo {
   font-size: 26px;
   margin-top: 15px;
 }
+#form input[type=checkbox] {
+  width:30px;
+  height:30px;
+  margin:10px;
+}
 /* line 387, ../sass/screen.scss */
 #form button {
   background-color: #282828;

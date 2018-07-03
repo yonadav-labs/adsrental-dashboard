@@ -36,6 +36,7 @@ class SignupView(View):
 
         form_initial_data = {
             'utm_source': utm_source,
+            'age_check': True,
         }
         form_initial_data.update(landing_form_data)
 
