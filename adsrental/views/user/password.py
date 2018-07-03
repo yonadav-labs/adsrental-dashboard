@@ -18,6 +18,7 @@ class UserFixPasswordView(View):
             lead_account = form.get_lead_account(form.cleaned_data, lead)
             if lead_account:
                 lead_account.password = form.cleaned_data.get('new_password')
+                lead_account.wrong_password_date = None
                 lead_account.save()
 
         return redirect('user_stats')
