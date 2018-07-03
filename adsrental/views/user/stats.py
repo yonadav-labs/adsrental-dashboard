@@ -12,6 +12,11 @@ class UserStatsView(View):
         if not lead:
             return redirect('user_login')
 
+        if not lead.is_active():
+            return render(request, 'user/stats_banned.html', dict(
+                lead=lead,
+            ))
+
         return render(request, 'user/stats.html', dict(
             lead=lead,
             lead_accounts=lead.lead_accounts.all(),

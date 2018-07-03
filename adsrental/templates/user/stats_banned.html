@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+
+{% block title %}Adsrental | Lead {{ lead.email }} stats{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h1>Lead {{ lead.email }} stats</h1>
+            <div class="alert alert-danger">
+                <p>
+                    Your account is <strong>not currently rented</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
