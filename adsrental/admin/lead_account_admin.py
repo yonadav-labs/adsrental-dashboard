@@ -132,7 +132,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.lead.leadid,
             title=title,
-            status=obj.status,
+            status=obj.status if obj.status != LeadAccount.STATUS_BANNED else '{} ({})'.format(obj.status, obj.ban_reason),
         ))
 
     def online(self, obj):
