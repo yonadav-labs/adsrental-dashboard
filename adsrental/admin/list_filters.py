@@ -332,6 +332,7 @@ class BannedDateListFilter(SimpleListFilter):
             ('current_week', 'Current week', ),
             ('previus_week', 'Previous week', ),
             ('current_month', 'Current month', ),
+            ('previous_month', 'Previous month', ),
             ('last_30_days', 'Last 30 days', ),
         )
 
@@ -356,6 +357,15 @@ class BannedDateListFilter(SimpleListFilter):
             current_month_start = now - datetime.timedelta(days=now.day - 1)
             return queryset.filter(
                 banned_date__gte=current_month_start,
+            )
+        if self.value() == 'previous_month':
+            now = timezone.now()
+            now = timezone.now()
+            end_date = now.replace(day=1, hour=0, minute=0, second=0)
+            start_date = (end_date - datetime.timedelta(hours=1)).replace(day=1, hour=0, minute=0, second=0)
+            return queryset.filter(
+                banned_date__gte=start_date,
+                banned_date__lte=end_date,
             )
         if self.value() == 'last_30_days':
             now = timezone.now()
