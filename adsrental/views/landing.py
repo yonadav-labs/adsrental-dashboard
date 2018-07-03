@@ -44,11 +44,10 @@ class LandingView(View):
             request.session['utm_source'] = utm_source
 
         utm_source = request.session.get('utm_source')
-        if not utm_source:
-            return redirect('user_login')
-
         bundler = Bundler.objects.filter(utm_source=utm_source, is_active=True).first()
-        if not bundler:
+        if not utm_source or not bundler:
+            if request.user.is_authenticated:
+                return redirect('main')
             return redirect('user_login')
 
         return render(request, 'landing.html', dict(

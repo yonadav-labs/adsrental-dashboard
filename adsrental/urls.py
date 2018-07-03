@@ -45,7 +45,7 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^cron/bundler_lead_stat/$', BundlerLeadStatsCalculate.as_view(), name='cron_bundler_lead_stat'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
     url(r'^thankyou/(?P<leadid>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
-    url(r'^thankyou.html$', MainView.as_view(), name='main'),
+    url(r'^home/$', MainView.as_view(), name='main'),
     url(r'^report/$', ReportView.as_view(), name='report'),
     url(r'^dashboard/$', DashboardView.as_view(), name='dashboard'),
     url(r'^dashboard/check_sent/$', CheckSentView.as_view(), name='dashboard_check_sent'),
