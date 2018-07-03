@@ -252,7 +252,7 @@ class AdminPrepareForReshipmentForm(forms.Form):
 
 class UserLoginForm(forms.Form):
     first_name = forms.CharField(label='First name', required=True)
-    last_name = forms.CharField(label='First name', required=True)
+    last_name = forms.CharField(label='Last name', required=True)
     postal_code = forms.CharField(label='Zip code', required=True)
 
     def get_lead(self, data):

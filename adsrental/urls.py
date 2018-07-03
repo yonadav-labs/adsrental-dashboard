@@ -57,7 +57,7 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^log/(?P<rpid>RP\d+)/$', ShowLogDirView.as_view(), name='show_log_dir'),
     url(r'^log/(?P<rpid>RP\d+)/(?P<filename>\d+\.log)$', ShowLogView.as_view(), name='show_log'),
     url(r'^login/$', auth_views.login, {'template_name': 'login.html'}, name='login'),
-    url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^logout/$', auth_views.logout, {'next_page': '/login/'}, name='logout'),
     url(r'^farming/pi_config/(?P<rpid>.*)/$', PiConfigView.as_view(), name='farming_pi_config'),
     url(r'^signup/$', SignupView.as_view(), name='signup'),
     url(r'^photo/(?P<leadid>.*)/$', PhotoIdView.as_view(), name='photo_id'),
