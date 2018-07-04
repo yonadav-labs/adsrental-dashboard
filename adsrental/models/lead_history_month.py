@@ -22,6 +22,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     MAX_PAYMENT = decimal.Decimal('25.00')
     NEW_MAX_PAYMENT = decimal.Decimal('15.00')
     AMAZON_MAX_PAYMENT = decimal.Decimal('10.00')
+    MOVE_AMOUNT = decimal.Decimal('5.00')
     NEW_FACEBOOK_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 19, tzinfo=timezone.get_default_timezone())
     NEW_GOOGLE_MAX_PAYMENT_DATE = datetime.datetime(2018, 3, 29, tzinfo=timezone.get_default_timezone())
 
@@ -33,6 +34,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
     amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
     amount_paid = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
+    move_to_next_month = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -59,6 +61,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         self.max_payment = self.get_max_payment()
         self.amount = self.get_amount()
+        if self.amount < self.MOVE_AMOUNT:
+            self.move_to_next_month = True
 
     @classmethod
     def get_or_create(cls, lead, date):
@@ -76,6 +80,15 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             return result
         for lead_account in self.lead.lead_accounts.all():
             if not lead_account.active:
+                continue
+
+            if lead_account.ban_reason and lead_account.ban_reason in [
+                LeadAccount.BAN_REASON_AUTO_NOT_USED,
+                LeadAccount.BAN_REASON_AUTO_OFFLINE,
+                LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
+                LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+                LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
+            ]:
                 continue
 
             created_date = lead_account.created

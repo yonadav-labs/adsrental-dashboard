@@ -55,6 +55,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_AUTO_WRONG_PASSWORD = 'auto_wrong_password'
     BAN_REASON_AUTO_CHECKPOINT = 'auto_checkpoint'
     BAN_REASON_AUTO_NOT_USED = 'auto_not_used'
+    BAN_REASON_FACEBOOK_UNRESPONSIVE_USER = 'Facebook - Unresponsive User'
+    BAN_REASON_GOOGLE_UNRESPONSIVE_USER = 'Google - Unresponsive User'
 
     AUTO_BAN_REASONS = (
         BAN_REASON_AUTO_OFFLINE,
@@ -66,11 +68,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_CHOICES = (
         ('Google - Policy', 'Google - Policy', ),
         ('Google - Billing', 'Google - Billing', ),
-        ('Google - Unresponsive User', 'Google - Unresponsive User', ),
+        (BAN_REASON_GOOGLE_UNRESPONSIVE_USER, 'Google - Unresponsive User', ),
         ('Facebook - Policy', 'Facebook - Policy', ),
         ('Facebook - Suspicious', 'Facebook - Suspicious', ),
         ('Facebook - Lockout', 'Facebook - Lockout', ),
-        ('Facebook - Unresponsive User', 'Facebook - Unresponsive User', ),
+        (BAN_REASON_FACEBOOK_UNRESPONSIVE_USER, 'Facebook - Unresponsive User', ),
         ('Duplicate', 'Duplicate', ),
         ('Bad ad account', 'Bad ad account', ),
         (BAN_REASON_AUTO_OFFLINE, 'Auto: offline for 2 weeks', ),

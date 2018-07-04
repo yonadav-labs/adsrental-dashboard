@@ -37,6 +37,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_wrong_password',
         'max_payment',
         'amount',
+        'move_to_next_month',
         'links',
     )
     csv_fields = (
@@ -55,6 +56,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', )
     list_filter = (
+        'move_to_next_month',
         DateMonthListFilter,
         AmountListFilter,
         LeadStatusListFilter,
