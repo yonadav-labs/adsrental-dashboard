@@ -180,6 +180,11 @@ class BundlerPaymentsView(View):
                         'payment': str(i.payment),
                         'parent_payment': str(i.parent_payment),
                     } for i in data['google_entries']],
+                    amazon_entries=[{
+                        'id': i.id,
+                        'payment': str(i.payment),
+                        'parent_payment': str(i.parent_payment),
+                    } for i in data['amazon_entries']],
                 ))
 
             report = BundlerPaymentsReport(
