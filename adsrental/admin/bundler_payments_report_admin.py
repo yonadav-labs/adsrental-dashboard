@@ -20,7 +20,6 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     search_fields = ('date', )
     actions = (
         'mark_as_paid',
-        # 'rollback',
         'send_by_email',
         'mark',
         'unmark',
@@ -41,18 +40,6 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     def mark_as_paid(self, request, queryset):
         queryset.update(paid=True)
 
-    def rollback(self, request, queryset):
-        for report in queryset:
-            if report.paid:
-                messages.warning(request, 'Report {} was already paid.'.format(report.id))
-                continue
-            if report.cancelled:
-                messages.warning(request, 'Report {} was already cancelled.'.format(report.id))
-                continue
-
-            report.rollback()
-            messages.success(request, 'Report {} was rolled back successfully.'.format(report.id))
-
     def mark(self, request, queryset):
         for report in queryset:
             result = report.mark()
@@ -66,8 +53,6 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     def send_by_email(self, request, queryset):
         for report in queryset:
             report.send_by_email()
-
-    rollback.short_description = 'DEBUG: Rollback old reports'
 
     mark.short_description = 'DEBUG: Mark all affected lead accounts'
 

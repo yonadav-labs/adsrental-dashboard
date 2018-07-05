@@ -49,29 +49,6 @@ class BundlerPaymentsReport(models.Model):
         # result.append('<h3>' + html_parts[-1])
         return ''.join(result)
 
-    def rollback(self):
-        if self.cancelled:
-            return False
-
-        regexp = r'<td>([^<]+@[^<]+)</td>'
-        emails = re.findall(regexp, self.html)
-
-        regexp = r'<td>(\d{8,40})</td>'
-        phones = re.findall(regexp, self.html)
-        usernames = phones + emails
-        lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
-        for lead_account in lead_accounts:
-            lead_account.bundler_paid = False
-            lead_account.bundler_paid_date = None
-            lead_account.save()
-        lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, charge_back_billed=True)
-        for lead_account in lead_accounts:
-            lead_account.charge_back_billed = False
-            lead_account.save()
-
-        self.cancelled = True
-        self.save()
-
     def mark(self):
         result = {
             'facebook_entries_ids': 0,
@@ -84,11 +61,15 @@ class BundlerPaymentsReport(models.Model):
             chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
             google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
             chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
+            amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) < 0]
 
             result['facebook_entries_ids'] += len(facebook_entries_ids)
             result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
             result['google_entries_ids'] += len(google_entries_ids)
             result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
+            result['amazon_entries_ids'] += len(amazon_entries_ids)
+            result['chargeback_amazon_entries_ids'] += len(chargeback_amazon_entries_ids)
 
             LeadAccount.objects.filter(id__in=facebook_entries_ids).update(
                 bundler_paid_date=self.date,
@@ -102,6 +83,13 @@ class BundlerPaymentsReport(models.Model):
                 bundler_paid=True,
             )
             LeadAccount.objects.filter(id__in=chargeback_google_entries_ids).update(
+                charge_back_billed=True,
+            )
+            LeadAccount.objects.filter(id__in=amazon_entries_ids).update(
+                bundler_paid_date=self.date,
+                bundler_paid=True,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_amazon_entries_ids).update(
                 charge_back_billed=True,
             )
 
@@ -122,11 +110,15 @@ class BundlerPaymentsReport(models.Model):
             chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
             google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
             chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
+            amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) >= 0]
+            chargeback_amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) < 0]
 
             result['facebook_entries_ids'] += len(facebook_entries_ids)
             result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
             result['google_entries_ids'] += len(google_entries_ids)
             result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
+            result['amazon_entries_ids'] += len(amazon_entries_ids)
+            result['chargeback_amazon_entries_ids'] += len(chargeback_amazon_entries_ids)
 
             LeadAccount.objects.filter(id__in=facebook_entries_ids).update(
                 bundler_paid_date=None,
@@ -140,6 +132,13 @@ class BundlerPaymentsReport(models.Model):
                 bundler_paid=False,
             )
             LeadAccount.objects.filter(id__in=chargeback_google_entries_ids).update(
+                charge_back_billed=False,
+            )
+            LeadAccount.objects.filter(id__in=amazon_entries_ids).update(
+                bundler_paid_date=None,
+                bundler_paid=False,
+            )
+            LeadAccount.objects.filter(id__in=chargeback_amazon_entries_ids).update(
                 charge_back_billed=False,
             )
         self.cancelled = True

@@ -78,7 +78,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         raspberry_pi = self.lead.raspberry_pi
         if not raspberry_pi or not raspberry_pi.first_seen:
             return result
-        for lead_account in self.lead.lead_accounts.all():
+        for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False):
             if not lead_account.active:
                 continue
 
