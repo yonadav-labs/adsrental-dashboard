@@ -82,7 +82,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             if not lead_account.active:
                 continue
 
-            if lead_account.ban_reason and lead_account.ban_reason in [
+            if lead_account.is_banned() and lead_account.ban_reason in [
                 LeadAccount.BAN_REASON_AUTO_NOT_USED,
                 LeadAccount.BAN_REASON_AUTO_OFFLINE,
                 LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
