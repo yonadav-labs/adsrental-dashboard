@@ -168,9 +168,12 @@ class LeadHistoryView(View):
                 'result': True,
             })
         if aggregate:
-            leads = Lead.objects.all().prefetch_related('raspberry_pi')
+            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE).prefetch_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
+            else:
+                LeadHistoryMonth.objects.filter(date=date).delete()
+
             start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             start_date = start_date.replace(day=1)
             for lead in leads:
