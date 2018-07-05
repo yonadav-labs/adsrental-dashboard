@@ -2,6 +2,7 @@ from django.views import View
 from django.shortcuts import redirect
 
 from adsrental.models.lead import Lead
+from adsrental.models.lead_change import LeadChange
 from adsrental.forms import UserFixPasswordForm
 
 
