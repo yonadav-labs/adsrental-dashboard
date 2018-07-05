@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-
 import django.contrib.auth.views as auth_views
 from django.conf.urls import url
+from django.urls import include, path
 
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
-from adsrental.views.bundler import BundlerLeaderboardView, BundlerPaymentsView, BundlerLeadPaymentsView, BundlerPaymentsHTMLView, AdminBundlerPaymentsHTMLView, BundlerPaymentsListView, BundlerCheckView, BundlerCheckDaysView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
@@ -16,7 +14,6 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, SyncDeliveredView, SyncFromShipStationView, SyncOfflineView, AutoBanView, CheckEC2View, BundlerLeadStatsCalculate
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
@@ -34,15 +31,6 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^terms/$', TermsView.as_view(), name='terms'),
     url(r'^rdp/connect/$', RDPConnectView.as_view(), name='rdp_connect'),
     url(r'^rdp/(?P<rpid>.*)/$', RDPDownloadView.as_view(), name='rdp'),
-    url(r'^cron/sync_from_shipstation/$', SyncFromShipStationView.as_view(), name='cron_sync_from_shipstation'),
-    url(r'^cron/sync_delivered/$', SyncDeliveredView.as_view(), name='cron_sync_delivered'),
-    url(r'^cron/sync_offline/$', SyncOfflineView.as_view(), name='sync_offline'),
-    url(r'^cron/sync_ec2/$', SyncEC2View.as_view(), name='cron_sync_ec2'),
-    url(r'^cron/lead_history/$', LeadHistoryView.as_view(), name='cron_lead_history'),
-    url(r'^cron/update_ping/$', UpdatePingView.as_view(), name='cron_update_ping'),
-    url(r'^cron/auto_ban/$', AutoBanView.as_view(), name='cron_auto_ban'),
-    url(r'^cron/check_ec2/$', CheckEC2View.as_view(), name='cron_check_ec2'),
-    url(r'^cron/bundler_lead_stat/$', BundlerLeadStatsCalculate.as_view(), name='cron_bundler_lead_stat'),
     url(r'^thankyou/$', ThankyouView.as_view(), name='thankyou'),
     url(r'^thankyou/(?P<leadid>.*)/$', ThankyouView.as_view(), name='thankyou_email'),
     url(r'^home/$', MainView.as_view(), name='main'),
@@ -68,19 +56,11 @@ urlpatterns = [  # pylint: disable=C0103
     url(r'^ec2_ssh/get_netstat/(?P<rpid>.*)/$', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
     url(r'^rpi/ec2_data/(?P<rpid>.*)/$', EC2DataView.as_view(), name='rpi_ec2_data'),
     url(r'^adsdb/lead/$', ADSDBLeadView.as_view(), name='adsdb_lead'),
-    url(r'^bundler/(?P<bundler_id>\d+)/leaderboard/$', BundlerLeaderboardView.as_view(), name='bundler_leaderboard'),
-    url(r'^bundler/(?P<bundler_id>\d+)/lead_payments/$', BundlerLeadPaymentsView.as_view(), name='bundler_lead_payments'),
-    url(r'^bundler/all/lead_payments/$', BundlerLeadPaymentsView.as_view(), name='bundler_lead_payments', kwargs=dict(bundler_id='all')),
-    url(r'^bundler/(?P<bundler_id>\d+)/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments'),
-    url(r'^bundler/all/payments/$', BundlerPaymentsView.as_view(), name='bundler_payments', kwargs=dict(bundler_id='all')),
-    url(r'^bundler/report/payments/(?P<report_id>\d+)/$', AdminBundlerPaymentsHTMLView.as_view(), name='admin_bundler_report_payments'),
-    url(r'^bundler/report/payments/(?P<report_id>\d+)/(?P<bundler_id>\d+)/$', BundlerPaymentsHTMLView.as_view(), name='bundler_report_payments'),
-    url(r'^bundler/report/payments/list/$', BundlerPaymentsListView.as_view(), name='bundler_report_payments_list'),
-    url(r'^bundler/report/check/(?P<bundler_id>\d+)/$', BundlerCheckView.as_view(), name='bundler_report_check'),
-    url(r'^bundler/report/check/(?P<bundler_id>\d+)/days/(?P<lead_id>\S*)/$', BundlerCheckDaysView.as_view(), name='bundler_report_check_days'),
     url(r'^user/login/$', UserLoginView.as_view(), name='user_login'),
     url(r'^user/logout/$', UserLogoutView.as_view(), name='user_logout'),
     url(r'^user/stats/$', UserStatsView.as_view(), name='user_stats'),
     url(r'^user/stats/timestamps/$', UserTimestampsView.as_view(), name='user_timestamps'),
     url(r'^user/fix_password/$', UserFixPasswordView.as_view(), name='user_fix_password'),
+    path('bundler/', include('adsrental.urls.bundler')),
+    path('cron/', include('adsrental.urls.cron')),
 ]
