@@ -78,19 +78,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         raspberry_pi = self.lead.raspberry_pi
         if not raspberry_pi or not raspberry_pi.first_seen:
             return result
-        for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False):
-            if not lead_account.active:
-                continue
-
-            if lead_account.is_banned() and lead_account.ban_reason in [
-                LeadAccount.BAN_REASON_AUTO_NOT_USED,
-                LeadAccount.BAN_REASON_AUTO_OFFLINE,
-                LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
-                LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-                LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
-            ]:
-                continue
-
+        for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True).exclude(status=LeadAccount.STATUS_BANNED):
             created_date = lead_account.created
             if created_date.date() > self.get_last_day():
                 continue
