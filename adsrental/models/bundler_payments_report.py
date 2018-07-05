@@ -77,7 +77,7 @@ class BundlerPaymentsReport(models.Model):
                 bundler_paid_date=self.date,
                 bundler_paid=True,
             )
-            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids + + chargeback_google_entries_ids + chargeback_amazon_entries_ids).update(
+            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids + chargeback_google_entries_ids + chargeback_amazon_entries_ids).update(
                 charge_back_billed=True,
             )
 
