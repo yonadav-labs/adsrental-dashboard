@@ -74,12 +74,14 @@ class CustomIndexDashboard(Dashboard):
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urlencode(dict(
                         date=datetime.date.today().replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
+                        move_to_next_month__exact=0,
                     )),
                 )],
                 [_('Check Report for previous month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urlencode(dict(
                         date=(datetime.date.today() - relativedelta(months=1)).replace(day=1).strftime(settings.SYSTEM_DATE_FORMAT),
+                        move_to_next_month__exact=0,
                     )),
                 )],
                 [_('Devices shipped this week ({} - {})'.format(
