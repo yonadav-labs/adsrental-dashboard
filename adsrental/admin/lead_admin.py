@@ -5,6 +5,7 @@ import html
 
 from django.contrib import admin
 from django.shortcuts import render
+from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
@@ -257,7 +258,7 @@ class LeadAdmin(admin.ModelAdmin):
             return None
 
         first_seen = obj.raspberry_pi.get_first_seen()
-        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
+        return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, first_seen.strftime(settings.HUMAN_DATE_FORMAT)))
 
     def last_seen(self, obj):
         if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
