@@ -593,7 +593,6 @@ class AutoBanView(View):
         days_delivered = int(request.GET.get('days_delivered', 14))
         for lead_account in LeadAccount.objects.filter(
                 wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
-                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
@@ -611,7 +610,6 @@ class AutoBanView(View):
 
         for lead_account in LeadAccount.objects.filter(
                 lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
-                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
@@ -629,7 +627,6 @@ class AutoBanView(View):
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
-                account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
@@ -646,7 +643,6 @@ class AutoBanView(View):
 
         for lead_account in LeadAccount.objects.filter(
                 status=Lead.STATUS_QUALIFIED,
-                # account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                 lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
                 active=True,
                 auto_ban_enabled=True,
