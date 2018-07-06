@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler payments{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for entry in entries %}
+        <h3>Reports for UTM source {{ entry.bundler.utm_source }}</h3>
+        {% include 'include/bundler_report_table.html' with show_links=show_links title='Facebook accounts' entries=entry.facebook_entries chargeback_total=entry.facebook_chargeback_total total=entry.facebook_total final_total=entry.facebook_final_total %}
+        {% include 'include/bundler_report_table.html' with show_links=show_links title='Google accounts' entries=entry.google_entries chargeback_total=entry.google_chargeback_total total=entry.google_total final_total=entry.google_final_total %}
+        {% include 'include/bundler_report_table.html' with show_links=show_links title='Amazon accounts' entries=entry.amazon_entries chargeback_total=entry.amazon_chargeback_total total=entry.amazon_total final_total=entry.amazon_final_total %}
+    {% endfor %}
+{% endblock %}

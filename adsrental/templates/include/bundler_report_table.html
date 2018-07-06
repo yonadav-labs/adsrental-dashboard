@@ -1,0 +1,86 @@
+
+{% if entries %}
+{% if title %}
+    <h4>{{ title }}</h4> 
+{% endif %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Lead</th>
+            <th>Account</th>
+            <th>First seen</th>
+            <th>Status</th>
+            <th>Paid</th>
+            <th>Chargeback</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>
+                {% if show_links %}
+                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?q={{ entry.lead.email }}">{{ entry.lead_account.lead.name }}</a>
+                {% else %}
+                    {{ entry.lead_account.lead.name }}
+                {% endif %}
+            </td>
+            <td>{{ entry.lead_account.username }}</td>
+            <td>{{ entry.lead_account.lead.raspberry_pi.first_seen.date }}</td>
+            <td>{{ entry.lead_account.status }}</td>
+            <td>
+                {% if entry.bundler_paid %}
+                    <span class="glyphicon glyphicon-ok"><span class="pdf_only">Yes</span></span>
+                {% else %}
+                    <span class="glyphicon glyphicon-remove"><span class="pdf_only">No</span></span>
+                {% endif %}
+            </td>
+            <td>
+                {% if entry.charge_back %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+            <td>
+                ${{ entry.payment|floatformat:2 }}
+                {% if entry.split_payment %}
+                    / ${{ entry.split_payment|floatformat:2 }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>${{ chargeback_total|floatformat:2 }}</th>
+            <th>${{ total|floatformat:2 }}</th>
+        </tr>
+        <tr>
+            <th>Final total</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>${{ final_total|floatformat:2 }}</th>
+        </tr>
+        {% if split_total %}
+        <tr>
+            <th>Split total</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>${{ split_total|floatformat:2 }}</th>
+        </tr>
+        {% endif %}
+    </tfoot>
+</table>
+{% endif %}
