@@ -564,7 +564,7 @@ class DateMonthListFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         month_start = datetime.date.today().replace(day=1)
         choices = []
-        for i in range(3):
+        for i in range(6):
             date_month = month_start - relativedelta(months=i)
             choices.append((date_month.strftime(settings.SYSTEM_DATE_FORMAT), date_month.strftime('%b %Y')))
 
