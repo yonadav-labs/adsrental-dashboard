@@ -16,6 +16,7 @@
 
     <h4>Rank cross all bundlers: {% if rank %}{{rank|ordinal}}{% else %}n/a{% endif%}</h4>
     <h4>Total accounts in progress: {{bundler_lead_stat.in_progress_total}}</h4>
+    <h4>Total accounts qualified today: {{lead_accounts_today_total}}</h4>
 
     <h3>Qualified leads today</h3>
     <canvas id="today_chart" style="width: 900px; height: 300px;"></canvas>

@@ -81,8 +81,11 @@ class BundlerLeaderboardView(View):
             .values_list('lead__bundler__utm_source', 'count')
         )
 
+        lead_accounts_today_total = 0
+
         lead_accounts_today_sorted = sorted(list(lead_accounts_today), key=lambda x: x[1], reverse=True)
         for index, value in enumerate(lead_accounts_today_sorted):
+            lead_accounts_today_total += value
             if bundler.utm_source == value[0] and value[0]:
                 current_rank = index + 1
 
@@ -95,4 +98,5 @@ class BundlerLeaderboardView(View):
             week_entries_json=json.dumps(list(lead_accounts_last_week)),
             today_entries_json=json.dumps(list(lead_accounts_today)),
             yesterday_entries_json=json.dumps(list(lead_accounts_yesterday)),
+            lead_accounts_today_total=lead_accounts_today_total,
         ))
