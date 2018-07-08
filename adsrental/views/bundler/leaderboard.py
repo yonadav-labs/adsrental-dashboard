@@ -85,7 +85,7 @@ class BundlerLeaderboardView(View):
 
         lead_accounts_today_sorted = sorted(list(lead_accounts_today), key=lambda x: x[1], reverse=True)
         for index, value in enumerate(lead_accounts_today_sorted):
-            lead_accounts_today_total += value
+            lead_accounts_today_total += value[1]
             if bundler.utm_source == value[0] and value[0]:
                 current_rank = index + 1
 
