@@ -340,7 +340,7 @@ class LeadAdmin(admin.ModelAdmin):
         for lead_account in obj.lead_accounts.all():
             result.append('<a href="{}?q={}&account_type__exact={}">{} ({})</a>'.format(
                 reverse('admin:adsrental_leadaccount_changelist'),
-                obj.leadid,
+                obj.email,
                 lead_account.account_type,
                 lead_account.account_type,
                 lead_account.status,

@@ -60,7 +60,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'ban_reason',
         LeadBundlerListFilter,
     )
-    search_fields = ('lead__leadid', 'username', )
+    search_fields = ('lead__leadid', 'lead__email', 'username', )
     actions = (
         'mark_as_qualified',
         'mark_as_disqualified',
