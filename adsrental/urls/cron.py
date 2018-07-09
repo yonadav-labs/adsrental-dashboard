@@ -1,6 +1,14 @@
 from django.urls import path
 
-from adsrental.views.cron import SyncEC2View, LeadHistoryView, UpdatePingView, SyncDeliveredView, SyncFromShipStationView, SyncOfflineView, AutoBanView, CheckEC2View, BundlerLeadStatsCalculate
+from adsrental.views.cron.sync_ec2 import SyncEC2View
+from adsrental.views.cron.bundler_lead_stats_calculate import BundlerLeadStatsCalculateView
+from adsrental.views.cron.lead_history import LeadHistoryView
+from adsrental.views.cron.update_ping import UpdatePingView
+from adsrental.views.cron.sync_delivered import SyncDeliveredView
+from adsrental.views.cron.sync_from_shipstation import SyncFromShipStationView
+from adsrental.views.cron.sync_offline import SyncOfflineView
+from adsrental.views.cron.autoban import AutoBanView
+from adsrental.views.cron.check_ec2 import CheckEC2View
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -12,5 +20,5 @@ urlpatterns = [  # pylint: disable=C0103
     path('update_ping/', UpdatePingView.as_view(), name='cron_update_ping'),
     path('auto_ban/', AutoBanView.as_view(), name='cron_auto_ban'),
     path('check_ec2/', CheckEC2View.as_view(), name='cron_check_ec2'),
-    path('bundler_lead_stat/', BundlerLeadStatsCalculate.as_view(), name='cron_bundler_lead_stat'),
+    path('bundler_lead_stat/', BundlerLeadStatsCalculateView.as_view(), name='cron_bundler_lead_stat'),
 ]
