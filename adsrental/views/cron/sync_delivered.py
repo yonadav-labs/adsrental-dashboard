@@ -71,7 +71,7 @@ class SyncDeliveredView(View):
                 not_delivered.append(lead.email)
 
         if not test:
-            bulk_update(leads, update_fields=['tracking_info', 'pi_delivered'])
+            bulk_update(leads, update_fields=['tracking_info', 'pi_delivered', 'delivery_date'])
         else:
             bulk_update(leads, update_fields=['tracking_info', ])
 
