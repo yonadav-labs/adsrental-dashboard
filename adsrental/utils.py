@@ -373,7 +373,7 @@ class BotoResource(object):
         return uuid.uuid4()
 
     def launch_essential_instance(self, ec2_instance):
-        'Start otr create AWS EC2 instance for given RPID'
+        'Start or create AWS EC2 instance for given RPID'
         boto_instance = self.get_by_essential_key(ec2_instance.essential_key)
         if boto_instance:
             return ec2_instance

@@ -50,7 +50,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         LastTroubleshootListFilter,
     )
     readonly_fields = ('created', 'updated', )
-    search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', )
+    search_fields = ('instance_id', 'email', 'rpid', 'lead__leadid', 'essential_key', )
     list_select_related = ('lead', 'lead__raspberry_pi', )
     actions = (
         'update_ec2_tags',
@@ -63,6 +63,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'terminate',
         'update_password',
         'upgrade_to_large',
+        'launch_essential_ec2',
     )
     raw_id_fields = ('lead', )
 
@@ -217,6 +218,10 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             ec2_instance.save()
             messages.success(request, 'EC2 is upgraded successfully')
 
+    def launch_essential_ec2(self, request, queryset):
+        ec2_instance = EC2Instance.launch_essential()
+        messages.success(request, 'Essential EC2 {} is started successfully'.format(ec2_instance.essential_key))
+
     lead_link.short_description = 'Lead'
 
     raspberry_pi_link.short_description = 'RaspberryPi'
@@ -239,3 +244,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     terminate.short_description = 'DEBUG: Terminate'
 
     upgrade_to_large.short_description = 'DEBUG: Upgrade to M5 Large instance'
+
+    launch_essential_ec2.short_description = 'DEBUG: Launch essential EC2'

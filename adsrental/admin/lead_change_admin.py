@@ -24,7 +24,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
     list_filter = (
         'field',
     )
-    search_fields = ('lead__leadid', 'lead__first_name', 'lead__last_name', 'lead__raspberry_pi__rpid', )
+    search_fields = ('lead__email', 'lead__raspberry_pi__rpid', )
 
     def lead_field(self, obj):
         lead = obj.lead

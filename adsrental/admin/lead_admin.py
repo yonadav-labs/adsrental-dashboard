@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.lead_change import LeadChange
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import \
     StatusListFilter, \
@@ -42,6 +43,24 @@ class LeadAccountInline(admin.StackedInline):
         'bundler_paid',
         'primary',
     )
+
+
+class LeadChangeInline(admin.TabularInline):
+    model = LeadChange
+    max_num = 2
+    readonly_fields = (
+        'field',
+        'value',
+        'old_value',
+        'created',
+        'edited_by',
+    )
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -94,6 +113,7 @@ class LeadAdmin(admin.ModelAdmin):
         'lead_account__charge_back_billed',
     )
     inlines = (
+        # LeadChangeInline,
         LeadAccountInline,
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
@@ -189,7 +209,7 @@ class LeadAdmin(admin.ModelAdmin):
         title = 'Show changes'
         return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
-            q=obj.leadid,
+            q=obj.email,
             title=title,
             status=obj.status,
         ))

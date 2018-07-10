@@ -288,7 +288,7 @@ class Lead(models.Model, FulltextSearchMixin):
             raspberry_pi.last_seen = None
             raspberry_pi.first_seen = None
             raspberry_pi.save()
-        LeadChange(lead=self, field='pi_delivered', value=False, old_value=old_value, edited_by=edited_by).save()
+        LeadChange(lead=self, field='prepare_for_reshipment', value=False, old_value=old_value, edited_by=edited_by).save()
         return True
 
     def ban(self, edited_by, reason=None):
