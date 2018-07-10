@@ -310,7 +310,7 @@ class EC2Instance(models.Model):
         return self
 
     def __str__(self):
-        return self.instance_id
+        return self.instance_id or self.id
 
     def get_ssh(self, timeout=20):
         '''
