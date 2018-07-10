@@ -293,10 +293,11 @@ class EC2Instance(models.Model):
 
         lead = lead_model.objects.filter(raspberry_pi__rpid=rpid).first() if is_active and rpid else None
 
-        self.email = lead_email
-        self.rpid = rpid
-        self.lead = lead
-        self.is_duplicate = is_duplicate
+        if not self.is_essential:
+            self.email = lead_email
+            self.rpid = rpid
+            self.lead = lead
+            self.is_duplicate = is_duplicate
         if self.is_running():
             self.hostname = boto_instance.public_dns_name
             self.ip_address = boto_instance.public_ip_address
