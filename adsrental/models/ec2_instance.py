@@ -291,7 +291,7 @@ class EC2Instance(models.Model):
         self.status = boto_instance.state['Name']
         is_active = self.is_active()
 
-        lead = lead_model.objects.filter(raspberry_pi__rpid=rpid).first() if is_active else None
+        lead = lead_model.objects.filter(raspberry_pi__rpid=rpid).first() if is_active and rpid else None
 
         self.email = lead_email
         self.rpid = rpid
