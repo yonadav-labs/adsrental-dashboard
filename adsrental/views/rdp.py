@@ -95,7 +95,9 @@ class RDPConnectView(View):
 
         ec2_instance = EC2Instance.get_by_rpid(rpid)
         if not ec2_instance:
-            ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
+            ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_RUNNING).first()
+            if not ec2_instance:
+                ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
             if not ec2_instance:
                 ec2_instance = EC2Instance.launch_essential()
                 messages.info(request, 'New Essential EC2 instance has been launched.')
