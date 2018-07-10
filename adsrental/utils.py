@@ -370,7 +370,7 @@ class BotoResource(object):
 
     @staticmethod
     def generate_key():
-        return uuid.uuid4()
+        return str(uuid.uuid4())
 
     def launch_essential_instance(self, ec2_instance):
         'Start or create AWS EC2 instance for given RPID'
