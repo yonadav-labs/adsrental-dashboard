@@ -69,7 +69,7 @@ class SyncEC2View(View):
             if ec2:
                 if execute:
                     ec2.update_from_boto(ec2_boto)
-                updated_rpids.append(ec2.rpid)
+                updated_rpids.append(ec2.rpid or '<NORPID>')
 
         return JsonResponse({
             'updated_rpids': sorted(updated_rpids),
