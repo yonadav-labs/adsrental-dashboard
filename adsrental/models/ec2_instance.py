@@ -559,8 +559,8 @@ class EC2Instance(models.Model):
         self.set_ec2_tags()
 
     def unassign_essential(self):
-        if self.rpid:
-            self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
+        # if self.rpid:
+        #     self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
         self.rpid = None
         self.lead = None
         self.email = None
