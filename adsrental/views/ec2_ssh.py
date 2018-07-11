@@ -1,5 +1,6 @@
 'Views used by RaspberryPi devices'
 import os
+import time
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
@@ -26,15 +27,24 @@ class StartReverseTunnelView(View):
             attempts += 1
             netstat_output = ''
             try:
-                ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
                 netstat_output = ec2_instance.ssh_execute('netstat -an') or ''
-                if ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
-                    tunnel_up = True
             except SSHConnectException:
                 pass
+
+            if ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
+                tunnel_up = True
+                break
+
+            try:
+                ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
+            except SSHConnectException:
+                pass
+            time.sleep(5)
+
         return JsonResponse(dict(
             result=tunnel_up,
             attempts=attempts,
+            netstat=ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output),
         ))
 
 
