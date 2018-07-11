@@ -559,12 +559,13 @@ class EC2Instance(models.Model):
         self.set_ec2_tags()
 
     def unassign_essential(self):
+        if self.rpid:
+            self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
         self.rpid = None
         self.lead = None
         self.email = None
         self.save()
         self.set_ec2_tags()
-        self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
         # self.ssh_execute('ssh pi@localhost -p 2046 Taskkill /IM ssh.exe /F')
 
     def clear_ping_cache(self):
