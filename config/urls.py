@@ -14,7 +14,6 @@ urlpatterns = [
     path('app/', include('adsrental.urls')),
     path('app/admin/doc/', include('django.contrib.admindocs.urls')),
     path('__debug__/', include(debug_toolbar.urls)),
-    path('robots.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /", mimetype="text/plain")),
 ]
 
 handler404 = Error404View.as_view()  # noqa: F811
