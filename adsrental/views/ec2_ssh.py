@@ -44,7 +44,7 @@ class StartReverseTunnelView(View):
         return JsonResponse(dict(
             result=tunnel_up,
             attempts=attempts,
-            netstat=ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output),
+            netstat=ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output).group(0),
         ))
 
 
