@@ -54,7 +54,7 @@ class CheckEC2View(View):
                 online_essential_ec2s.append(ec2_instance.rpid)
             else:
                 essential_running_counter += 1
-                unassigned_essential_ec2s.append(ec2_instance.rpid)
+                unassigned_essential_ec2s.append(ec2_instance.rpid or ec2_instance.essential_key)
                 ec2_instance.unassign_essential()
                 if essential_running_counter > self.MAX_ESSENTIAL_RUNNING:
                     ec2_instance.stop()
