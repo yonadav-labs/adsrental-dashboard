@@ -564,6 +564,7 @@ class EC2Instance(models.Model):
         self.email = None
         self.save()
         self.set_ec2_tags()
+        self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
 
     def clear_ping_cache(self):
         'Delete cache for this instance RPID.'

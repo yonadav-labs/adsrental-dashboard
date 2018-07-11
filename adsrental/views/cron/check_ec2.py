@@ -43,7 +43,6 @@ class CheckEC2View(View):
         ec2_instances = EC2Instance.objects.filter(
             last_rdp_start__lt=now - datetime.timedelta(minutes=15),
             status=EC2Instance.STATUS_RUNNING,
-            rpid__isnull=False,
             is_essential=True,
         )
         essential_running_counter = 0
