@@ -23,7 +23,7 @@ class StartReverseTunnelView(View):
         attempts = 0
         netstat_output = True
 
-        while not tunnel_up and attempts < MAX_ATTEMPTS and netstat_output:
+        while not tunnel_up and attempts < self.MAX_ATTEMPTS and netstat_output:
             attempts += 1
             netstat_output = ''
             try:
