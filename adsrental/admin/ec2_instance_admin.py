@@ -240,6 +240,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 ec2.save()
                 ec2.stop()
                 ec2.set_ec2_tags()
+                time.sleep(10)
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2.rpid, statuses))
             else:
