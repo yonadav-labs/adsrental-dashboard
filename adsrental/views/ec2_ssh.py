@@ -33,7 +33,8 @@ class StartReverseTunnelView(View):
 
             if ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
                 tunnel_up = True
-                break
+                if attempts:
+                    break
 
             try:
                 ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
