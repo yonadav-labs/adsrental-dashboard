@@ -38,6 +38,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'max_payment',
         'amount',
         'move_to_next_month',
+        'check_number',
         'links',
     )
     csv_fields = (

@@ -35,6 +35,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
     amount_paid = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
     move_to_next_month = models.BooleanField(default=False)
+    check_number = models.IntegerField(default=None, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
