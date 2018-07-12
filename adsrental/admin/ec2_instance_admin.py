@@ -239,9 +239,9 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 ec2.rpid = 'OLD:' + ec2.rpid 
                 ec2.save()
                 EC2Instance.launch_for_lead(lead)
-                messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2_instance.rpid, statuses))
+                messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2.rpid, statuses))
             else:
-                messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2_instance.rpid, statuses))
+                messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2.rpid, statuses))
 
 
     lead_link.short_description = 'Lead'
