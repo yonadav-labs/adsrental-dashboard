@@ -455,6 +455,12 @@ class PingCacheHelper(object):
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
 
+        if not ec2_instance:
+            if ec2_ip_address:
+                return False
+            else:
+                return True
+
         if ec2_instance_status != ec2_instance.status:
             return False
 
@@ -480,7 +486,7 @@ class PingCacheHelper(object):
         if restart_required != raspberry_pi.restart_required:
             return False
 
-        if ec2_instance and not cls.is_ec2_instance_data_consistent(data, ec2_instance):
+        if not cls.is_ec2_instance_data_consistent(data, ec2_instance):
             return False
 
         if lead and lead_status != lead.status:
