@@ -64,6 +64,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'update_password',
         'upgrade_to_large',
         'launch_essential_ec2',
+        'check_status',
     )
     raw_id_fields = ('lead', )
 
@@ -222,6 +223,27 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         ec2_instance = EC2Instance.launch_essential()
         messages.success(request, 'Essential EC2 {} is started successfully'.format(ec2_instance.essential_key))
 
+    def check_status(self, request, queryset):
+        for ec2 in queryset:
+            if not ec2.lead:
+                continue
+
+            ec2_client = BotoResource().get_client('ec2')
+            statuses = ec2_client.describe_instance_status(
+                InstanceIds=[ec2.instance_id],
+                IncludeAllInstances=True
+            )
+            if statuses['InstanceStatuses'][0]['InstanceStatus']['Status'] == 'impaired':
+                lead = ec2.lead
+                ec2.lead = None
+                ec2.rpid = 'OLD:' + ec2.rpid 
+                ec2.save()
+                EC2Instance.launch_for_lead(lead)
+                messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2_instance.rpid, statuses))
+            else:
+                messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2_instance.rpid, statuses))
+
+
     lead_link.short_description = 'Lead'
 
     raspberry_pi_link.short_description = 'RaspberryPi'
@@ -246,3 +268,5 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     upgrade_to_large.short_description = 'DEBUG: Upgrade to M5 Large instance'
 
     launch_essential_ec2.short_description = 'DEBUG: Launch essential EC2'
+
+    check_status.short_description = 'DEBUG: Check status'
