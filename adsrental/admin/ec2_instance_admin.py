@@ -238,6 +238,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 ec2.lead = None
                 ec2.rpid = 'OLD:' + ec2.rpid 
                 ec2.save()
+                ec2.stop()
                 ec2.set_ec2_tags()
                 EC2Instance.launch_for_lead(lead)
                 messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2.rpid, statuses))
