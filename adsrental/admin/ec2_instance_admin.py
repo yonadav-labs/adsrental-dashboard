@@ -55,7 +55,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     actions = (
         'update_ec2_tags',
         'get_currect_state',
-        'check_missing',
         'start',
         'stop',
         'restart_raspberry_pi',
@@ -182,15 +181,6 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 ec2_instance.lead.raspberry_pi.save()
                 ec2_instance.clear_ping_cache()
 
-    def check_missing(self, request, queryset):
-        leads = Lead.objects.filter(
-            ec2instance__isnull=True,
-            raspberry_pi__isnull=False,
-            status__in=[Lead.STATUS_QUALIFIED, Lead.STATUS_AVAILABLE, Lead.STATUS_IN_PROGRESS],
-        )
-        for lead in leads:
-            EC2Instance.launch_for_lead(lead)
-
     def clear_ping_cache(self, request, queryset):
         for ec2_instance in queryset:
             ec2_instance.clear_ping_cache()
@@ -240,8 +230,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 ec2.save()
                 ec2.set_ec2_tags()
                 ec2.stop()
-                EC2Instance.launch_for_lead(lead)
-                messages.info(request, 'Essential EC2 {} status is relaunched: {}'.format(ec2.rpid, statuses))
+                messages.info(request, 'Essential EC2 {} status is stopped and unassigned: {}'.format(ec2.rpid, statuses))
             else:
                 messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2.rpid, statuses))
 

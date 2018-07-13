@@ -87,13 +87,6 @@ class SyncEC2View(View):
                     instance.start(blocking=True)
                 started_rpids.append(instance.rpid)
 
-        leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, ec2instance__isnull=True).select_related('raspberry_pi', 'ec2instance')
-        for lead in leads:
-            if lead.is_active() and not lead.get_ec2_instance():
-                if execute:
-                    EC2Instance.launch_for_lead(lead)
-                launched_rpids.append(lead.raspberry_pi.rpid)
-
         return JsonResponse({
             'launched_rpids': launched_rpids,
             'started_rpids': started_rpids,

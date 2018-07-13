@@ -198,8 +198,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(
                     request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
 
-            EC2Instance.launch_for_lead(lead_account.lead)
-
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_banned():
@@ -232,7 +230,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead_account in queryset:
             if lead_account.unban(request.user):
-                EC2Instance.launch_for_lead(lead_account.lead)
                 messages.info(request, 'Lead Account {} is unbanned.'.format(lead_account))
 
     def report_wrong_password(self, request, queryset):

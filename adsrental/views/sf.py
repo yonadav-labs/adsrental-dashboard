@@ -32,7 +32,6 @@ class SFToShipstationView(View):
             })
 
         order = shipstation_client.add_lead_order(lead)
-        EC2Instance.launch_for_lead(lead)
 
         return JsonResponse({
             'result': True,

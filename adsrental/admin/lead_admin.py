@@ -391,7 +391,6 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                EC2Instance.launch_for_lead(lead_account.lead)
                 if lead_account.lead.add_shipstation_order():
                     messages.success(
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
@@ -411,7 +410,6 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                EC2Instance.launch_for_lead(lead_account.lead)
                 if lead_account.lead.add_shipstation_order():
                     messages.success(
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
@@ -431,7 +429,6 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                EC2Instance.launch_for_lead(lead_account.lead)
                 if lead_account.lead.add_shipstation_order():
                     messages.success(
                         request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
@@ -474,7 +471,6 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
                 if lead_account.unban(request.user):
-                    EC2Instance.launch_for_lead(lead_account.lead)
                     messages.info(request, '{} is unbanned.'.format(lead_account))
 
     def ban_facebook_account(self, request, queryset):
@@ -502,7 +498,6 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 if lead_account.unban(request.user):
-                    EC2Instance.launch_for_lead(lead_account.lead)
                     messages.info(request, '{} is unbanned.'.format(lead_account))
 
     def ban_amazon_account(self, request, queryset):
@@ -530,7 +525,6 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_AMAZON):
                 if lead_account.unban(request.user):
-                    EC2Instance.launch_for_lead(lead_account.lead)
                     messages.info(request, '{} is unbanned.'.format(lead_account))
 
     def restart_raspberry_pi(self, request, queryset):

@@ -65,7 +65,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     actions = (
         'export_as_csv',
         'restart_raspberry_pi',
-        'start_ec2',
         'prepare_for_testing',
         'touch',
         'aggregate',
@@ -157,11 +156,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 row.append(item)
             writer.writerow(row)
         return response
-
-    def start_ec2(self, request, queryset):
-        for lead_history_month in queryset:
-            lead = lead_history_month.lead
-            EC2Instance.launch_for_lead(lead)
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
