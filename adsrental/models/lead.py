@@ -376,12 +376,15 @@ class Lead(models.Model, FulltextSearchMixin):
         self.tracking_info = tracking_info_xml
         self.pi_delivered = pi_delivered
 
-        dates = re.findall(r'\S+ \d{1,2}, \d{4}', tracking_info_xml)
-        if dates:
-            try:
-                self.delivery_date = datetime.datetime.strptime(dates[0], '%B %d, %Y').date()
-            except ValueError:
-                pass
+        if pi_delivered:
+            dates = re.findall(r'\S+ \d{1,2}, \d{4}', tracking_info_xml)
+            if dates:
+                try:
+                    self.delivery_date = datetime.datetime.strptime(dates[0], '%B %d, %Y').date()
+                except ValueError:
+                    pass
+        else:
+            self.delivery_date = None
 
     def get_shippingapis_tracking_info(self):
         'Get tracking info as XML string from secure.shippingapis.com'
