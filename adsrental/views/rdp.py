@@ -90,7 +90,7 @@ class RDPConnectView(View):
                 ec2_instance=None,
                 check_connection=False,
                 is_ready=is_ready,
-                netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
+                netstat_url='',
             ))
 
         ec2_instance = EC2Instance.get_by_rpid(rpid)
