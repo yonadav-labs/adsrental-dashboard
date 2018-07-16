@@ -103,6 +103,7 @@ class LeadAdmin(admin.ModelAdmin):
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
         LeadAccountTouchCountListFilter,
+        'shipstation_order_status',
         'company',
         'lead_account__bundler_paid',
         ShipDateListFilter,
