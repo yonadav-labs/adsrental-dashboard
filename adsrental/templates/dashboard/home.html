@@ -41,13 +41,18 @@
                         <td>{{ entry.account_name }}</td>
                         <td>{{ entry.utm_source }}</td>
                         <td>{{ entry.status }}</td>
-                        <td>{{entry.phone}}</td>
+                        <td>{{ entry.phone }}</td>
                         <td>
                             {{ entry.get_address }}
                             {% if entry.usps_tracking_code %}
                                 <br />    
                                 USPS: {{entry.usps_tracking_code}}
                             {% endif %}
+                            {% comment "test change address form" %}
+                                {% if entry.is_order_on_hold %}
+                                    <a href="{% url 'dashboard_change_address' lead_id=entry.leadid %}" class="btn btn-lg btn-primary">Fix</a>
+                                {% endif %}
+                            {% endcomment %}
                         </td>
                         <td>
                             {% for lead_account in entry.lead_accounts.all %}
@@ -72,8 +77,12 @@
                         </td>
                         <td>
                             {% if entry.is_wrong_password %}
-                                <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                                <a target="_blank" href="{% url 'dashboard_set_password' lead_id=entry.leadid %}">Fix</a>
+                                {% for lead_account in entry.lead_accounts.all %}
+                                    {% if lead_account.is_wrong_password %}
+                                        <span class="glyphicon glyphicon-ok" style="color: red;"></span>
+                                        <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=lead_account.id %}">Fix</a>
+                                    {% endif %}
+                                {% endfor %}
                             {% else %}
                                 <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
                             {% endif %}   

@@ -1,13 +1,8 @@
-from __future__ import unicode_literals
-
 import datetime
-from urllib.parse import urlencode
 
 from django.views import View
+from django.shortcuts import render
 from django.db.models import Q
-from django.urls import reverse
-from django.shortcuts import render, redirect, Http404
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -15,67 +10,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
-from adsrental.models.lead_change import LeadChange
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.forms import DashboardForm, SetPasswordForm
+from adsrental.forms import DashboardForm
 
 
-class CheckSentView(View):
-    @method_decorator(login_required)
-    def post(self, request):
-        lead_id = request.POST.get('leadid')
-        lead = Lead.objects.get(leadid=lead_id)
-        lead.pi_sent = timezone.now()
-        lead.save()
-        return redirect('dashboard')
-
-
-class SetPasswordView(View):
-    @method_decorator(login_required)
-    def get(self, request, lead_id):
-        lead = Lead.objects.get(leadid=lead_id)
-        lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
-        if not lead_account:
-            raise Http404
-        form = SetPasswordForm(initial=dict(
-            leadid=lead.leadid,
-            lead_email=lead.email,
-            email=lead_account.username,
-            new_password=lead_account.password,
-        ))
-        return render(request, 'dashboard_lead_password.html', dict(
-            form=form,
-            lead=lead,
-        ))
-
-    @method_decorator(login_required)
-    def post(self, request, lead_id):
-        form = SetPasswordForm(request.POST)
-        lead = Lead.objects.get(leadid=lead_id)
-        if form.is_valid():
-            lead_account = lead.lead_accounts.filter(active=True, wrong_password_date__isnull=False).first()
-            if not lead_account:
-                raise Http404
-            old_value = lead_account.password
-            lead_account.password = form.cleaned_data['new_password']
-            lead_account.wrong_password_date = None
-            lead_account.save()
-            value = lead_account.password
-            LeadChange(lead=lead, field='password', value=value, old_value=old_value, edited_by=request.user).save()
-            return HttpResponseRedirect('{}?{}'.format(
-                reverse('dashboard'),
-                urlencode(dict(
-                    search=lead.email,
-                )),
-            ))
-
-        return render(request, 'dashboard_lead_password.html', dict(
-            form=form,
-            lead=lead,
-        ))
-
-
-class DashboardView(View):
+class DashboardHomeView(View):
     items_per_page = 100
 
     def get_entries(self, user):
@@ -214,7 +153,7 @@ class DashboardView(View):
             except EmptyPage:
                 entries = paginator.page(paginator.num_pages)
 
-        return render(request, 'dashboard.html', dict(
+        return render(request, 'dashboard/home.html', dict(
             utm_source=request.user.bundler and request.user.bundler.utm_source,
             entries=entries,
             form=form,

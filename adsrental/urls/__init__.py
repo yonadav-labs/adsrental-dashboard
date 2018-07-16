@@ -5,7 +5,6 @@ from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
-from adsrental.views.dashboard import DashboardView, CheckSentView, SetPasswordView
 from adsrental.views.report import ReportView
 from adsrental.views.rdp import RDPDownloadView, RDPConnectView
 from adsrental.views.farming import PiConfigView
@@ -31,9 +30,6 @@ urlpatterns = [
     path('thankyou/<leadid>/', ThankyouView.as_view(), name='thankyou_email'),
     path('home/', MainView.as_view(), name='main'),
     path('report/', ReportView.as_view(), name='report'),
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('dashboard/check_sent/', CheckSentView.as_view(), name='dashboard_check_sent'),
-    path('dashboard/set_password/<lead_id>/', SetPasswordView.as_view(), name='dashboard_set_password'),
     path('log.php', LogView.as_view(), name='old_log'),
     path('rlog.php', LogView.as_view(), name='old_rlog'),
     path('keepalive.php', StubView.as_view(), name='old_keepalive'),
@@ -55,5 +51,6 @@ urlpatterns = [
     path('bundler/', include('adsrental.urls.bundler')),
     path('cron/', include('adsrental.urls.cron')),
     path('user/', include('adsrental.urls.user')),
+    path('dashboard/', include('adsrental.urls.dashboard')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
 ]

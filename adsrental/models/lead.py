@@ -474,6 +474,9 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return None
 
+    def is_order_on_hold(self):
+        return self.shipstation_order_status == 'on_hold'
+
 
 class ReportProxyLead(Lead):
     'A proxy model to register Lead in admin UI twice for Reports'

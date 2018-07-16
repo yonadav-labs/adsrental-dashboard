@@ -69,10 +69,29 @@ class DashboardForm(forms.Form):
 
 
 class SetPasswordForm(forms.Form):
-    leadid = forms.CharField(label='ID', widget=forms.TextInput(attrs={'readonly': True}))
     lead_email = forms.CharField(label='Lead Email', widget=forms.TextInput(attrs={'readonly': True}))
     email = forms.CharField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
     new_password = forms.CharField(label='Password')
+
+    def update_lead_account(self, lead_account):
+        lead_account.password = self.cleaned_data['new_password']
+        lead_account.wrong_password_date = None
+        lead_account.save()
+
+
+class ChangeAddressForm(forms.Form):
+    street = forms.CharField(label='Street')
+    city = forms.CharField(label='City')
+    country = forms.CharField(label='Country', widget=forms.TextInput(attrs={'readonly': True}), required=False)
+    state = forms.CharField(label='State')
+    postal_code = forms.CharField(label='Postal code')
+
+    def update_lead(self, lead):
+        lead.street = self.cleaned_data['street']
+        lead.city = self.cleaned_data['city']
+        lead.state = self.cleaned_data['state']
+        lead.postal_code = self.cleaned_data['postal_code']
+        lead.save()
 
 
 class SignupForm(forms.Form):
