@@ -82,7 +82,7 @@ class LeadAdmin(admin.ModelAdmin):
         'accounts_field',
         'raspberry_pi_link',
         'tested_field',
-        'usps_tracking_code',
+        'usps_field',
         'first_seen',
         'last_seen',
         'online',
@@ -205,6 +205,15 @@ class LeadAdmin(admin.ModelAdmin):
                 obj.name(),
             ))
         return obj.name()
+
+    def usps_field(self, obj):
+        if not self.shipstation_order_status:
+            return None
+
+        return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
+            html.escape(obj.usps_tracking_code or 'n/a'),
+            obj.shipstation_order_status or 'n/a',
+        ))
 
     def status_field(self, obj):
         title = 'Show changes'
@@ -943,6 +952,9 @@ class LeadAdmin(admin.ModelAdmin):
     touch_button.short_description = ' '
     fix_button.short_description = ' '
 
+    usps_field.short_description = 'USPS'
+    usps_field.admin_order_field = 'shipstation_order_status'
+
 
 class ReportLeadAdmin(LeadAdmin):
     class Media:
@@ -963,7 +975,7 @@ class ReportLeadAdmin(LeadAdmin):
         'accounts_field',
         'raspberry_pi_link',
         'tested_field',
-        'usps_tracking_code',
+        'usps_field',
         'first_seen',
         'last_seen',
         'online',

@@ -112,6 +112,13 @@ class Lead(models.Model, FulltextSearchMixin):
 
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
+    SHIPSTATION_ORDER_STATUS_CHOICES = (
+        ('shipped', 'Shipped', ),
+        ('awaiting_shipment', 'Awaiting', ),
+        ('on_hold', 'On Hold', ),
+        ('cancelled', 'Cancelled', ),
+    )
+
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True, help_text='UUID is now used as a primary key for lead')
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
@@ -124,7 +131,7 @@ class Lead(models.Model, FulltextSearchMixin):
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True, help_text='Tracking code. Populated by sync_from-shipstation once order is shipped')
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Bundler UTM. Obsolete, use bundler instead')
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
-    shipstation_order_status = models.CharField(max_length=100, null=True, blank=True, help_text='Populated by cron script.')
+    shipstation_order_status = models.CharField(choices=SHIPSTATION_ORDER_STATUS_CHOICES, max_length=100, null=True, blank=True, help_text='Populated by cron script.')
     raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
     pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi delivered to end user.')
