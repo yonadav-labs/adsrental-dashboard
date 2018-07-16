@@ -8,7 +8,6 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 from adsrental.utils import BotoResource
 
@@ -224,16 +223,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 IncludeAllInstances=True
             )
             if statuses['InstanceStatuses'][0]['InstanceStatus']['Status'] == 'impaired':
-                lead = ec2.lead
                 ec2.lead = None
-                ec2.rpid = 'OLD:' + ec2.rpid 
+                ec2.rpid = 'OLD:' + ec2.rpid
                 ec2.save()
                 ec2.set_ec2_tags()
                 ec2.stop()
                 messages.info(request, 'Essential EC2 {} status is stopped and unassigned: {}'.format(ec2.rpid, statuses))
             else:
                 messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2.rpid, statuses))
-
 
     lead_link.short_description = 'Lead'
 
