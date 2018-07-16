@@ -124,6 +124,7 @@ class Lead(models.Model, FulltextSearchMixin):
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True, help_text='Tracking code. Populated by sync_from-shipstation once order is shipped')
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Bundler UTM. Obsolete, use bundler instead')
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
+    shipstation_order_status = models.CharField(max_length=100, null=True, blank=True, help_text='Populated by cron script.')
     raspberry_pi = models.OneToOneField(RaspberryPi, null=True, blank=True, default=None, db_index=True, help_text='Linked RaspberryPi device', on_delete=models.SET_NULL)
     bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, default=None, help_text='New UTM source representation', on_delete=models.SET_DEFAULT)
     pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi delivered to end user.')
