@@ -207,12 +207,12 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.name()
 
     def usps_field(self, obj):
-        if not self.shipstation_order_status:
+        if not obj.shipstation_order_status:
             return None
 
         return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
             html.escape(obj.usps_tracking_code or 'n/a'),
-            obj.shipstation_order_status or 'n/a',
+            obj.shipstation_order_status,
         ))
 
     def status_field(self, obj):
