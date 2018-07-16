@@ -42,6 +42,7 @@ class LeadAccountInline(admin.StackedInline):
         'qualified_date',
         'bundler_paid',
         'primary',
+        'active',
     )
 
 

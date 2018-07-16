@@ -79,6 +79,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'qualified_date',
         'bundler_paid',
         'primary',
+        'active',
     )
 
     def get_actions(self, request):
