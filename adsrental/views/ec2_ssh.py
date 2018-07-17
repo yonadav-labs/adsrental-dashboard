@@ -1,11 +1,8 @@
 'Views used by RaspberryPi devices'
-import os
 import time
 
 from django.views import View
 from django.http import JsonResponse, HttpResponse
-from django.utils import timezone
-from django.conf import settings
 
 from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 
@@ -13,6 +10,7 @@ from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 class StartReverseTunnelView(View):
     'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
     MAX_ATTEMPTS = 10
+
     def get(self, request, rpid):
         'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
         ec2_instance = EC2Instance.get_by_rpid(rpid)
