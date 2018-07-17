@@ -15,10 +15,6 @@
             {% endif %}
         </h1>
 
-        {% for message in messages %}
-            <div class="alert alert-{{ message.level_tag }}">{{ message }}</div>
-        {% endfor %}
-
         {% if ec2_instance %}
             {% if is_ready %}
                 <div id="client_message_container">
