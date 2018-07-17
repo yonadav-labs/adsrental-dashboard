@@ -75,12 +75,21 @@ class RDPConnectView(View):
             ec2_instance.disable_proxy()
             messages.success(request, 'Proxy is successfully disabled')
 
+        if action == 'start_reverse_tunnel':
+            try:
+                ec2_instance.ssh_execute('ssh -N -D 3808 -p 2046 pi@localhost')
+            except SSHConnectException:
+                messages.warning(request, 'Could not start reverse tunnel')
+            else:
+                messages.warning(request, 'Reverse tunnel is started')
+
     @method_decorator(login_required)
     def get(self, request):
         rpid = request.GET.get('rpid', 'none')
         force = request.GET.get('force', '') == 'true'
         action = request.GET.get('action', '')
         is_ready = False
+        show_restart_tunnel = False
 
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
         if not lead:
@@ -91,6 +100,7 @@ class RDPConnectView(View):
                 check_connection=False,
                 is_ready=is_ready,
                 netstat_url='',
+                show_restart_tunnel=show_restart_tunnel,
             ))
 
         ec2_instance = EC2Instance.get_by_rpid(rpid)
@@ -145,8 +155,9 @@ class RDPConnectView(View):
             is_ready = True
             if not ec2_instance.TUNNEL_RE.search(netstat_output):
                 messages.warning(request, 'SSH Tunnel is down, instance has no internet connection yet')
-            if not ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
+            elif not ec2_instance.REVERSE_TUNNEL_RE.search(netstat_output):
                 messages.warning(request, 'Reverse Tunnel is down, instance has no internet connection yet')
+                show_restart_tunnel = True
 
         if ec2_instance.is_running():
             if ec2_instance.password == settings.EC2_ADMIN_PASSWORD:
@@ -160,5 +171,6 @@ class RDPConnectView(View):
             ec2_instance=ec2_instance,
             check_connection=True,
             is_ready=is_ready,
+            show_restart_tunnel=show_restart_tunnel,
             netstat_url=request.build_absolute_uri(reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=rpid))),
         ))

@@ -45,6 +45,9 @@
                         <p>
                             <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=install_antidetect_script"><button class="btn btn-default">Install Antidetect</button></a>
                             <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=install_mla_script"><button class="btn btn-default">Install MLA</button></a>
+                            {% if show_restart_tunnel %}
+                                <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=start_reverse_tunnel"><button class="btn btn-default">Restart reverse tunnel</button></a>
+                            {% endif %}
                             {% if request.user.is_staff %}
                                 <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=fix_performance"><button class="btn btn-default">Fix performance</button></a>
                                 <a href="{% url 'rdp_connect' %}?rpid={{ rpid }}&amp;action=enable_proxy"><button class="btn btn-default">Enable proxy</button></a>
