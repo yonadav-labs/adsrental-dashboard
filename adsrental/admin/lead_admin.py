@@ -349,10 +349,9 @@ class LeadAdmin(admin.ModelAdmin):
                 'rpid': obj.raspberry_pi.rpid,
             })))
 
-        if obj.is_order_on_hold():
-            result.append('<a href="{url}">Fix address</a>'.format(
-                url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
-            ))
+        result.append('<a href="{url}">Fix address</a>'.format(
+            url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
+        ))
 
         result.append('<a target="_blank" href="{url}?q={q}">History</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
