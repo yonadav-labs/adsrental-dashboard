@@ -112,7 +112,7 @@ class ShipStationClient(object):
         'Get native shipstation client'
         return self.client
 
-    def add_lead_order(self, lead):
+    def add_lead_order(self, lead, status=None):
         'Create order for given lead.'
         if not lead.shipstation_order_number:
             random_str = str(uuid.uuid4()).replace('-', '')[:10]
@@ -125,6 +125,9 @@ class ShipStationClient(object):
             username=lead.safe_name(),
             email=lead.email,
         )
+
+        if status:
+            order.set_status(status)
 
         shipping_address = ShipStationAddress(
             name=lead.safe_name(),

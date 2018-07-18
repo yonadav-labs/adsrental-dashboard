@@ -48,11 +48,9 @@
                                 <br />    
                                 USPS: {{entry.usps_tracking_code}}
                             {% endif %}
-                            {% comment "test change address form" %}
-                                {% if entry.is_order_on_hold %}
-                                    <a href="{% url 'dashboard_change_address' lead_id=entry.leadid %}" class="btn btn-lg btn-primary">Fix</a>
-                                {% endif %}
-                            {% endcomment %}
+                            {% if entry.is_order_on_hold %}
+                                <a href="{% url 'dashboard_change_address' lead_id=entry.leadid %}">Fix</a>
+                            {% endif %}
                         </td>
                         <td>
                             {% for lead_account in entry.lead_accounts.all %}

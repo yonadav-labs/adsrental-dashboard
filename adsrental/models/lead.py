@@ -112,11 +112,15 @@ class Lead(models.Model, FulltextSearchMixin):
 
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
+    SHIPSTATION_ORDER_STATUS_SHIPPED = 'shipped'
+    SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT = 'awaiting_shipment'
+    SHIPSTATION_ORDER_STATUS_ON_HOLD = 'on_hold'
+    SHIPSTATION_ORDER_STATUS_CANCELLED = 'cancelled'
     SHIPSTATION_ORDER_STATUS_CHOICES = (
-        ('shipped', 'Shipped', ),
-        ('awaiting_shipment', 'Awaiting', ),
-        ('on_hold', 'On Hold', ),
-        ('cancelled', 'Cancelled', ),
+        (SHIPSTATION_ORDER_STATUS_SHIPPED, 'Shipped', ),
+        (SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT, 'Awaiting', ),
+        (SHIPSTATION_ORDER_STATUS_ON_HOLD, 'On Hold', ),
+        (SHIPSTATION_ORDER_STATUS_CANCELLED, 'Cancelled', ),
     )
 
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True, help_text='UUID is now used as a primary key for lead')
@@ -475,7 +479,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return None
 
     def is_order_on_hold(self):
-        return self.shipstation_order_status == 'on_hold'
+        return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
 
 
 class ReportProxyLead(Lead):

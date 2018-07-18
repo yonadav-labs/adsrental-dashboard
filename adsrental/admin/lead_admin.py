@@ -17,7 +17,6 @@ from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentFo
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_change import LeadChange
-from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import \
     StatusListFilter, \
     RaspberryPiOnlineListFilter, \
@@ -349,6 +348,11 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<a href="{config_url}">pi.conf</a>'.format(config_url=reverse('farming_pi_config', kwargs={
                 'rpid': obj.raspberry_pi.rpid,
             })))
+
+        if obj.is_order_on_hold():
+            result.append('<a href="{url}">Fix address</a>'.format(
+                url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
+            ))
 
         result.append('<a target="_blank" href="{url}?q={q}">History</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
