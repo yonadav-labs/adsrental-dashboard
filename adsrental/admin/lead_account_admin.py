@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
-from adsrental.models.ec2_instance import EC2Instance
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
