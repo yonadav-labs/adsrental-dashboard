@@ -218,7 +218,7 @@ class LeadAdmin(admin.ModelAdmin):
 
         return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
             html.escape(obj.usps_tracking_code or 'n/a'),
-            obj.shipstation_order_status,
+            obj.get_shipstation_order_status_display(),
         ))
 
     def status_field(self, obj):
