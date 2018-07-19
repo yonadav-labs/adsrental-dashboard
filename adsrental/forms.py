@@ -66,6 +66,7 @@ class DashboardForm(forms.Form):
     banned = forms.ChoiceField(label='Banned', choices=BANNED_CHOICES, required=False)
     pi_delivered = forms.ChoiceField(label='Delivered', choices=PI_DELIVERED_CHOICES, required=False)
     account_type = forms.ChoiceField(label='Account Type', choices=ACCOUNT_TYPE_CHOICES, required=False)
+    shipstation_order_status = forms.ChoiceField(label='Order status', choices=Lead.SHIPSTATION_ORDER_STATUS_CHOICES, required=False)
 
 
 class SetPasswordForm(forms.Form):

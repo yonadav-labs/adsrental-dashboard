@@ -141,6 +141,11 @@ class DashboardHomeView(View):
                 if value == 'google':
                     entries = entries.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
+            if form.cleaned_data['shipstation_order_status']:
+                value = form.cleaned_data['shipstation_order_status']
+                if value:
+                    entries = entries.filter(shipstation_order_status=value)
+
             order = request.GET.get('order', '-raspberry_pi__last_seen')
             entries = entries.order_by(order)
 
