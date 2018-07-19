@@ -7,7 +7,7 @@ from adsrental.models.customerio_event import CustomerIOEvent
 
 class CustomerIOEventAdmin(admin.ModelAdmin):
     model = CustomerIOEvent
-    list_display = ('id', 'lead', 'lead_name', 'lead_email', 'name',  'sent', 'created')
+    list_display = ('id', 'lead', 'lead_name', 'lead_email', 'name', 'sent', 'created')
     search_fields = ('lead__email', 'lead__first_name',
                      'lead__last_name', 'name', )
     list_filter = ('name', )

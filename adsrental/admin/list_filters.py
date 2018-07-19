@@ -321,6 +321,7 @@ class AutoBanListFilter(SimpleListFilter):
             ).exclude(
                 ban_reason__in=LeadAccount.AUTO_BAN_REASONS,
             )
+        return None
 
 
 class BannedDateListFilter(SimpleListFilter):

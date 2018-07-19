@@ -19,7 +19,7 @@ from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, S
 from adsrental.models.customerio_event import CustomerIOEvent
 
 
-class CustomerIOClient(object):
+class CustomerIOClient():
     '''Manages lead data ans send events for leads to customer.io'''
     EVENT_SHIPPED = 'shipped'
     EVENT_DELIVERED = 'delivered'
@@ -102,7 +102,7 @@ class CustomerIOClient(object):
         return self.client is not None
 
 
-class ShipStationClient(object):
+class ShipStationClient():
     'Handles order creation and check on shipstation.'
     def __init__(self):
         self.client = ShipStation(
@@ -193,7 +193,7 @@ class ShipStationClient(object):
         return data
 
 
-class BotoResource(object):
+class BotoResource():
     'Handles AWS boto operations.'
     def __init__(self):
         self.session = boto3.Session(
@@ -250,7 +250,7 @@ class BotoResource(object):
             return instance
 
         for instance in instances_list:
-            if instance_state == 'terminated' or instance_state == 'shutting-down':
+            if instance_state in ('terminated', 'shutting-down'):
                 continue
 
             if self.get_instance_tag(instance, 'Duplicate') == 'true':
@@ -260,7 +260,7 @@ class BotoResource(object):
 
         for instance in instances_list:
             instance_state = instance.state['Name']
-            if instance_state == 'terminated' or instance_state == 'shutting-down':
+            if instance_state in ('terminated', 'shutting-down'):
                 continue
             return instance
 
@@ -421,7 +421,7 @@ class BotoResource(object):
         return boto_instance
 
 
-class PingCacheHelper(object):
+class PingCacheHelper():
     'Simplifies cache operations for updating timestamps'
     KEY_TEMPLATE = 'ping_{}'
     KEYS = 'ping_keys'
@@ -461,8 +461,8 @@ class PingCacheHelper(object):
         if not ec2_instance:
             if ec2_ip_address:
                 return False
-            else:
-                return True
+
+            return True
 
         if ec2_instance_status != ec2_instance.status:
             return False

@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 
-class FulltextSearchMixin(object):
+class FulltextSearchMixin():
     @staticmethod
     def normalize_query(query_string,
                         findterms=re.compile(r'"([^"]+)"|(\S+)').findall,

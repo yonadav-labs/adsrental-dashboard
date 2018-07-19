@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
-from adsrental.models.ec2_instance import EC2Instance
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import AmountListFilter, DateMonthListFilter, LeadStatusListFilter

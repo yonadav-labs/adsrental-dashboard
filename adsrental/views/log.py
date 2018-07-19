@@ -111,7 +111,7 @@ class LogView(View):
         ec2_ip_address = ping_data.get('ec2_ip_address')
 
         if reported_hostname is not None and ec2_hostname:
-            if ec2_hostname != reported_hostname and ec2_ip_address != reported_hostname:
+            if reported_hostname not in (ec2_hostname, ec2_ip_address):
                 return True
 
         return False
