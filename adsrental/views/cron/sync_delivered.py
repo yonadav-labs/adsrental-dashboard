@@ -1,3 +1,4 @@
+'Sync delivered status from ShippingAPI'
 import datetime
 from multiprocessing.pool import ThreadPool
 
@@ -23,10 +24,12 @@ class SyncDeliveredView(View):
     * threads - amount of threads to send requests to remote server. Default 10.
     '''
     def get_tracking_info(self, lead):
+        'Miltithreding func to build array fo results'
         tracking_info_xml = lead.get_shippingapis_tracking_info()
         return [lead.email, tracking_info_xml]
 
     def get(self, request):
+        'Get endpoint'
         leads = []
         delivered = []
         not_delivered = []
