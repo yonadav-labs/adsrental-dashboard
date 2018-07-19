@@ -19,6 +19,7 @@ class SyncOfflineView(View):
 
     * test - if 'true' does not close sessions and generate events, just provides output.
     '''
+
     def get(self, request):
         reported_offline_leads = []
         reported_checkpoint = []
