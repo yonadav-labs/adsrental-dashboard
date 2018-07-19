@@ -321,7 +321,7 @@ class LeadAdmin(admin.ModelAdmin):
             if not lead_account.security_checkpoint_date:
                 continue
 
-            return mark_safe('<span class="has_note"     title="{}">{}</span>'.format(
+            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
                 lead_account.security_checkpoint_date,
                 naturaltime(lead_account.security_checkpoint_date),
             ))
@@ -1020,6 +1020,7 @@ class ReadOnlyLeadAdmin(LeadAdmin):
         'raspberry_pi',
         'online',
         'wrong_password_field',
+        'security_checkpoint_field',
         'fix_button',
     )
 
