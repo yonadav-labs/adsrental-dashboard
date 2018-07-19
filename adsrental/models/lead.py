@@ -303,7 +303,7 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='prepare_for_reshipment', value=False, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def ban(self, edited_by, reason=None):
+    def ban(self, edited_by):
         'Mark lead as banned, send cutomer.io event.'
         result = self.set_status(Lead.STATUS_BANNED, edited_by)
         return result
