@@ -361,6 +361,11 @@ class LeadAdmin(admin.ModelAdmin):
         if obj.photo_id:
             result.append('<a href="{url}">Photo ID</a>'.format(url=obj.photo_id.url))
 
+        result.append('<a href="{url}?q={search}">Checks</a>'.format(
+            url=reverse('admin:adsrental_leadhistorymonth_changelist'),
+            search=obj.email,
+        ))
+
         return mark_safe(', '.join(result))
 
     def ec2_instance_link(self, obj):
