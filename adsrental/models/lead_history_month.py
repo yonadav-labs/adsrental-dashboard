@@ -82,7 +82,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         note = []
         if not raspberry_pi or not raspberry_pi.first_seen:
-            return result
+            return result, 'n/a'
         for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True):
             created_date = lead_account.created
             if lead_account.is_banned():
