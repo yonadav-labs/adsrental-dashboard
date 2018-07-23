@@ -20,6 +20,10 @@ from adsrental.forms import AdminPrepareForReshipmentForm
 
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
+    class Meta:
+        verbose_name = 'Lead Check'
+        verbose_name_plural = 'Lead Checks'
+
     model = LeadHistoryMonth
     # admin_caching_enabled = True
     list_per_page = 5000

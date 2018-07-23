@@ -10,8 +10,8 @@ from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilt
 
 class LeadHistoryAdmin(admin.ModelAdmin):
     class Meta:
-        verbose_name = 'Lead Check'
-        verbose_name_plural = 'Lead Checks'
+        verbose_name = 'Lead Timestamp'
+        verbose_name_plural = 'Lead Timestamps'
 
     model = LeadHistory
     list_display = ('id', 'lead_link', 'email', 'rpid', 'date', 'active', 'online', 'wrong_password', )
