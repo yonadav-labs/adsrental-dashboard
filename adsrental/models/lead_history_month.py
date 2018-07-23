@@ -88,7 +88,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             if lead_account.is_banned():
                 note.append('{type} account was banned on {date} ($0.00)'.format(
                     type=lead_account.get_account_type_display(),
-                    date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
+                    date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT) if lead_account.banned_date else 'unknown date',
                 ))
                 continue
 
