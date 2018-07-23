@@ -20,6 +20,11 @@ from adsrental.forms import AdminPrepareForReshipmentForm
 
 
 class LeadHistoryMonthAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     class Meta:
         verbose_name = 'Lead Check'
         verbose_name_plural = 'Lead Checks'
@@ -38,7 +43,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_online',
         'days_offline',
         'days_wrong_password',
-        'max_payment',
+        'max_payment_field',
         'amount',
         'move_to_next_month',
         'check_number',
@@ -101,8 +106,14 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def lead_address(self, obj):
         return obj.lead and obj.lead.get_address()
 
-    def max_payment(self, obj):
-        return '${}'.format(round(obj.max_payment, 2)) if obj.max_payment is not None else None
+    def max_payment_field(self, obj):
+        if obj.max_payment is None:
+            return None
+
+        return mark_safe('<span class="has_note" title="{}">${}</span>'.format(
+            obj.note or 'n/a',
+            obj.max_payment,
+        ))
 
     def amount(self, obj):
         return '${}'.format(round(obj.amount, 2)) if obj.amount is not None else None
@@ -224,3 +235,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     date_field.short_description = 'Date'
     lead_link.short_description = 'Lead'
     aggregate.short_description = 'DEBUG: Aggregate'
+
+    max_payment_field.short_description = 'Max payment'
+    max_payment_field.admin_order_field = 'max_payment'

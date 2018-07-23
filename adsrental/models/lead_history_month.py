@@ -2,6 +2,7 @@ import datetime
 import decimal
 
 from django.utils import timezone
+from django.conf import settings
 from django.db import models
 
 from adsrental.models.lead_history import LeadHistory
@@ -34,6 +35,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
     amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
     amount_paid = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
+    note = models.TextField(blank=True, null=True, help_text='Note about payment calc')
     move_to_next_month = models.BooleanField(default=False)
     check_number = models.IntegerField(default=None, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -60,7 +62,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             else:
                 self.days_offline += 1
 
-        self.max_payment = self.get_max_payment()
+        self.max_payment, self.note = self.get_max_payment_with_note()
         self.amount = self.get_amount()
         if self.amount < self.MOVE_AMOUNT:
             self.move_to_next_month = True
@@ -74,14 +76,27 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         return cls(lead=lead, date=date_month)
 
-    def get_max_payment(self):
+    def get_max_payment_with_note(self):
         result = decimal.Decimal('0.00')
         raspberry_pi = self.lead.raspberry_pi
+
+        note = []
         if not raspberry_pi or not raspberry_pi.first_seen:
             return result
-        for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True).exclude(status=LeadAccount.STATUS_BANNED):
+        for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True):
             created_date = lead_account.created
+            if lead_account.is_banned():
+                note.append('{type} account was banned on {date} ($0)'.format(
+                    type=lead_account.get_account_type_display(),
+                    date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
+                ))
+                continue
+
             if created_date.date() > self.get_last_day():
+                note.append('{type} account was created only on {date} ($0)'.format(
+                    type=lead_account.get_account_type_display(),
+                    date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
+                ))
                 continue
 
             coef = decimal.Decimal('1.00')
@@ -90,20 +105,31 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                 registered_days = (self.get_last_day() - created_date.date()).days + 1
                 coef = decimal.Decimal(registered_days / days_in_month)
 
+            base_payment = decimal.Decimal('0.00')
+
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 if created_date > self.NEW_GOOGLE_MAX_PAYMENT_DATE:
-                    result += self.NEW_MAX_PAYMENT * coef
+                    base_payment = self.NEW_MAX_PAYMENT
                 else:
-                    result += self.MAX_PAYMENT * coef
+                    base_payment = self.MAX_PAYMENT
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
-                    result += self.NEW_MAX_PAYMENT * coef
+                    base_payment = self.NEW_MAX_PAYMENT
                 else:
-                    result += self.MAX_PAYMENT * coef
+                    base_payment = self.MAX_PAYMENT
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
-                result += self.AMAZON_MAX_PAYMENT * coef
+                base_payment = self.AMAZON_MAX_PAYMENT
 
-        return result
+            result += base_payment * coef
+            note.append('{type} account created on {date} (${base} * {coef} = ${result})'.format(
+                type=lead_account.get_account_type_display(),
+                date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
+                base=base_payment,
+                coef=coef,
+                result=base_payment * coef,
+            ))
+
+        return result, '\n'.join(note)
 
     def get_last_day(self):
         next_month = self.date.replace(day=28) + datetime.timedelta(days=4)
@@ -118,8 +144,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         days_total = self.days_online + self.days_offline
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
-        max_payment = self.get_max_payment()
-        return round(max_payment * days_online_valid / days_total, 2)
+        return round(self.max_payment * days_online_valid / days_total, 2)
 
     def get_remaining_amount(self):
         return self.amount - self.amount_paid

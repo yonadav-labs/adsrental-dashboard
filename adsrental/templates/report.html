@@ -42,7 +42,7 @@
                     <td>{{ entry.days_online }}</td>
                     <td>{{ entry.days_offline }}</td>
                     <td>{{ entry.days_wrong_password }}</td>
-                    <td>${{ entry.get_amount|floatformat:2 }}</td>
+                    <td>${{ entry.amount|floatformat:2 }}</td>
                 </tr>
             </tbody>
         {% empty %}

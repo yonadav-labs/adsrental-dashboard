@@ -133,7 +133,7 @@
 
             {% for lead_history_month in lead_histories_month %}
                 <div class="alert alert-info">
-                    <strong>{{ lead_history_month.date|date:"F Y" }}</strong> - ${{ lead_history_month.get_amount }}
+                    <strong>{{ lead_history_month.date|date:"F Y" }}</strong> - ${{ lead_history_month.amount }}
                     <a class="badge badge-primary" href="{% url "user_timestamps" %}?date={{ lead_history_month.date|date:"Y-m-d" }}">Timestamps</a>
                 </div>
             {% endfor %}
