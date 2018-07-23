@@ -125,8 +125,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                 type=lead_account.get_account_type_display(),
                 date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
                 base=base_payment,
-                coef=coef,
-                result=base_payment * coef,
+                coef=round(coef, 2),
+                result=round(base_payment * coef, 2),
             ))
 
         return result, '\n'.join(note)
