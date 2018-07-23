@@ -129,6 +129,9 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                 result=round(base_payment * coef, 2),
             ))
 
+        note.append('Total: {result}'.format(
+            result=round(result, 2),
+        ))
         return result, '\n'.join(note)
 
     def get_last_day(self):
