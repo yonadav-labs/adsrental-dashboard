@@ -82,18 +82,18 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         note = []
         if not raspberry_pi or not raspberry_pi.first_seen:
-            return result, 'RaspberryPi does not exist or is not active ($0)'
+            return result, 'RaspberryPi does not exist or is not active ($0.00)'
         for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True):
             created_date = lead_account.created
             if lead_account.is_banned():
-                note.append('{type} account was banned on {date} ($0)'.format(
+                note.append('{type} account was banned on {date} ($0.00)'.format(
                     type=lead_account.get_account_type_display(),
                     date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
                 ))
                 continue
 
             if created_date.date() > self.get_last_day():
-                note.append('{type} account was created only on {date} ($0)'.format(
+                note.append('{type} account was created only on {date} ($0.00)'.format(
                     type=lead_account.get_account_type_display(),
                     date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
                 ))
@@ -129,7 +129,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                 result=round(base_payment * coef, 2),
             ))
 
-        note.append('Total: {result}'.format(
+        note.append('Total: ${result}'.format(
             result=round(result, 2),
         ))
         return result, '\n'.join(note)
