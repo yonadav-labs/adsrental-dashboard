@@ -1,3 +1,5 @@
+import mimetypes
+
 from django.views import View
 from django.http import HttpResponse
 from django.shortcuts import Http404
@@ -15,7 +17,9 @@ class PhotoIDVIew(View):
             raise Http404
 
         filename = lead.photo_id.name.split('/')[-1]
-        response = HttpResponse(lead.photo_id, content_type='text/plain')
+
+        mimetype = mimetypes.guess_type(filename)[0] or 'text/plain'
+        response = HttpResponse(lead.photo_id, content_type=mimetype)
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
         return response
