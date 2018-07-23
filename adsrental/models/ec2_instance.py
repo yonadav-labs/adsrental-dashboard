@@ -2,6 +2,7 @@ import socket
 import datetime
 import time
 import re
+import logging
 
 from django.db import models
 from django.conf import settings
@@ -11,6 +12,9 @@ from django_bulk_update.manager import BulkUpdateManager
 import paramiko
 
 from adsrental.utils import BotoResource, PingCacheHelper
+
+
+logging.getLogger("paramiko").setLevel(logging.CRITICAL)
 
 
 class SSHConnectException(Exception):
