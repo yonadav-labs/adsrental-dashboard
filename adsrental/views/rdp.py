@@ -74,6 +74,13 @@ class RDPConnectView(View):
         if action == 'disable_proxy':
             ec2_instance.disable_proxy()
             messages.success(request, 'Proxy is successfully disabled')
+        if action == 'restart_rpi':
+            raspberry_pi = ec2_instance.get_raspberry_pi()
+            if raspberry_pi:
+                raspberry_pi.restart_required = True
+                raspberry_pi.save()
+
+            messages.success(request, 'RaspberryPi will restart in a couple of minutes.')
 
     @method_decorator(login_required)
     def get(self, request):
