@@ -126,8 +126,6 @@ class ADSDBLeadView(View):
             return HttpResponseBadRequest('No JSON could be decoded')
 
         lead_id = str(uuid.uuid4()).replace('-', '')
-        last_account_name = Lead.objects.filter(account_name__startswith='ACT').order_by('-account_name').first().account_name
-        account_name = 'ACT%05d' % (int(last_account_name.replace('ACT', '')) + 1)
 
         bundler = Bundler.get_by_adsdb_id(data.get('bundler_id'))
         if not bundler:
@@ -135,7 +133,7 @@ class ADSDBLeadView(View):
 
         lead = Lead(
             leadid=lead_id,
-            account_name=account_name,
+            account_name='',
             first_name=data['first_name'],
             last_name=data['last_name'],
             status=Lead.STATUS_AVAILABLE,
