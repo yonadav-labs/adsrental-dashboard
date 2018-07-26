@@ -36,7 +36,7 @@
             <tbody>
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ entry.created|date:'d M Y H:i' }}</td>
+                    <td>{{ entry.lead.created|date:'d M Y H:i' }}</td>
                     <td>{{ entry.lead.name }}</td>
                     <td>{{ entry.lead.status }}</td>
                     <td>{{ entry.days_online }}</td>
