@@ -160,6 +160,7 @@ class DashboardHomeView(View):
 
         return render(request, 'dashboard/home.html', dict(
             utm_source=request.user.bundler and request.user.bundler.utm_source,
+            preset=request.GET.get('preset'),
             entries=entries,
             form=form,
         ))
