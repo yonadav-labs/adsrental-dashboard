@@ -161,6 +161,7 @@ class LeadAdmin(admin.ModelAdmin):
     readonly_fields = (
         'created',
         'updated',
+        'account_name',
         'status',
         'old_status',
         'shipstation_order_number',
