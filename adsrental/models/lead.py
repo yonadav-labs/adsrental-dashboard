@@ -131,7 +131,7 @@ class Lead(models.Model, FulltextSearchMixin):
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
-    account_name = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Obsolete, was used in SF, should be removed')
+    account_name = models.CharField(max_length=255, blank=True, null=True, help_text='Obsolete, was used in SF, should be removed')
     usps_tracking_code = models.CharField(max_length=255, blank=True, null=True, help_text='Tracking code. Populated by sync_from-shipstation once order is shipped')
     utm_source = models.CharField(max_length=255, blank=True, null=True, db_index=True, help_text='Bundler UTM. Obsolete, use bundler instead')
     shipstation_order_number = models.CharField(max_length=100, null=True, blank=True, help_text='Populated on mark as qualified, when SS ordeer is created.')
