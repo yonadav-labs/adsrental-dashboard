@@ -10,13 +10,27 @@
 <div class="container">
     <a href="{% url 'bookkeeper_report_preview' %}" class="btn btn-primary">Preview new report</a>
     <h3>Reports</h3>
-    <ul>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Reports</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
         {% for report in reports %}
-            <li>
-                {{ report.date }}
-                <a href="{% url 'bookkeeper_report_html' report_id=report.id %}">HTML</a>
-            </li>
+            <tr>
+                <td>{{ report.date }}</td>
+                <td>
+                    <a class="btn btn-primary" target="_blank" href="{{ report.pdf.url|safe }}">PDF</a>
+                    <a class="btn btn-default" target="_blank"  href="{% url 'bookkeeper_report_html' report_id=report.id %}">HTML</a>
+                </td>
+                <td>
+                    <a class="btn btn-default" href="{% url 'bookkeeper_report_send_emails' report_id=report.id %}">Send by email</a>
+                </td>
+            </tr>
         {% endfor %}
-    </ul>
-    </script>
+        </tbody>
+    </table>
 {% endblock %}
