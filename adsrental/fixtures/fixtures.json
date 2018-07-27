@@ -45,5 +45,14 @@
                 1163
             ]
         }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "Bookkeeper",
+            "permissions": [
+            ]
+        }
     }
 ]
