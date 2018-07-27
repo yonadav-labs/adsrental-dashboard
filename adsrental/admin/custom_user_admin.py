@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
-    filter_horizontal = ["allowed_raspberry_pis", ]
+    filter_horizontal = ('groups', 'user_permissions', 'allowed_raspberry_pis', )
     list_filter = UserAdmin.list_filter + (
         'bundler',
     )

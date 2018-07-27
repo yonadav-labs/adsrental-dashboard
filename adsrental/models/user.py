@@ -47,3 +47,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not self.username:
             self.username = self.email
         super(User, self).save(*args, **kwargs)
+
+    def is_bookkeeper(self):
+        return self.groups.filter(name='Bookkeeper').exists()
