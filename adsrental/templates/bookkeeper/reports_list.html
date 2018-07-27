@@ -26,8 +26,9 @@
                 <td>
                     {% if report.paid %}
                         <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
-                    {% else %}
+                        {% else %}
                         <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                        <a class="btn btn-primary" href="{% url 'bookkeeper_report_mark_as_paid' report_id=report.id %}">Mark as paid</a>
                     {% endif %}
                 </td>
                 <td>

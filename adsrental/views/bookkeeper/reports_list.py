@@ -35,3 +35,18 @@ class BookkeeperReportSendEmailsView(View):
             report.date.strftime(settings.HUMAN_DATE_FORMAT),
         ))
         return redirect('bookkeeper_reports_list')
+
+
+class BookkeeperReportMarkAsPaidView(View):
+    @method_decorator(login_required)
+    def get(self, request, report_id):
+        if not request.user.is_bookkeeper():
+            raise Http404
+
+        report = get_object_or_404(BundlerPaymentsReport, id=report_id)
+        report.send_by_email()
+
+        messages.success(request, 'Report for {} was successfuly marked as paid.'.format(
+            report.date.strftime(settings.HUMAN_DATE_FORMAT),
+        ))
+        return redirect('bookkeeper_reports_list')
