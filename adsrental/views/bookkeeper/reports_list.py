@@ -44,7 +44,8 @@ class BookkeeperReportMarkAsPaidView(View):
             raise Http404
 
         report = get_object_or_404(BundlerPaymentsReport, id=report_id)
-        report.send_by_email()
+        report.paid = True
+        report.save()
 
         messages.success(request, 'Report for {} was successfuly marked as paid.'.format(
             report.date.strftime(settings.HUMAN_DATE_FORMAT),
