@@ -11,7 +11,8 @@
                 <h1 class="display-3">Welcome to RentYourSocialMedia</h1>
                 {% if user.is_bookkeeper %}
                   <p>
-                    <a class="btn btn-default btn-lg" href="{% url "bookkeeper_report_preview" %}" role="button">See report preview »</a>
+                    <a class="btn btn-default btn-lg" href="{% url "bookkeeper_reports_list" %}" role="button">See reports »</a>
+                    <a class="btn btn-primary btn-lg" href="{% url "bookkeeper_report_preview" %}" role="button">See report preview »</a>
                   </p>
                 {% else %}
                   <p>
