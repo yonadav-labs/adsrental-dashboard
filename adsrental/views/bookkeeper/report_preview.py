@@ -3,7 +3,7 @@ import json
 import io
 import decimal
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, Http404
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -79,9 +79,8 @@ class BookkepperReportPreviewView(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        bundlers = []
-        if request.user.bundler:
-            bundlers = [request.user.bundler]
+        if not request.user.is_bookkeeper():
+            raise Http404
 
         bundlers = Bundler.objects.all()
 
