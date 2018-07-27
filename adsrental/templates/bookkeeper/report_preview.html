@@ -11,52 +11,48 @@
 <div class="container">
     {% block actions_buttons %}
         <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
-        {% if allow_change %}
-            <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
-        {% endif %}
+        <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
     {% endblock actions_buttons %}
 
-    {% if allow_change %}
-        <h3>Summary</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in bundlers_data %}
-                    {% if data.total %}
-                        <tr>
-                            <td>Bundler {{ data.bundler }}</td>
-                            <td>${{ data.total }}</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-                <tr>
-                    <td>Total Google pay </td>
-                    <td>${{ total_google }}</td>
-                </tr>
-                <tr>
-                    <td>Total Facebook pay </td>
-                    <td>${{ total_facebook }}</td>
-                </tr>
-                <tr>
-                    <td>Total Amazon pay </td>
-                    <td>${{ total_amazon }}</td>
-                </tr>
-                <tr>
-                    <td>Total Chargebacks </td>
-                    <td>${{ total_chargeback }}</td>
-                </tr>
-                <tr>
-                    <td>Total pay for all accounts </td>
-                    <td>${{ total }}</td>
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
+    <h3>Summary</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in bundlers_data %}
+                {% if data.total %}
+                    <tr>
+                        <td>Bundler {{ data.bundler }}</td>
+                        <td>${{ data.total }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td>Total Google pay </td>
+                <td>${{ total_google }}</td>
+            </tr>
+            <tr>
+                <td>Total Facebook pay </td>
+                <td>${{ total_facebook }}</td>
+            </tr>
+            <tr>
+                <td>Total Amazon pay </td>
+                <td>${{ total_amazon }}</td>
+            </tr>
+            <tr>
+                <td>Total Chargebacks </td>
+                <td>${{ total_chargeback }}</td>
+            </tr>
+            <tr>
+                <td>Total pay for all accounts </td>
+                <td>${{ total }}</td>
+            </tr>
+        </tbody>
+    </table>
 
     {% for data in bundlers_data %}
         {% if show_bundler_name %}
