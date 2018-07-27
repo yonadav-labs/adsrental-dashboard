@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler Payments{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% block actions_buttons %}
+        <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
+        {% if allow_change %}
+            <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
+        {% endif %}
+    {% endblock actions_buttons %}
+
+    {% if allow_change %}
+        <h3>Summary</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in bundlers_data %}
+                    {% if data.total %}
+                        <tr>
+                            <td>Bundler {{ data.bundler }}</td>
+                            <td>${{ data.total }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <td>Total Google pay </td>
+                    <td>${{ total_google }}</td>
+                </tr>
+                <tr>
+                    <td>Total Facebook pay </td>
+                    <td>${{ total_facebook }}</td>
+                </tr>
+                <tr>
+                    <td>Total Amazon pay </td>
+                    <td>${{ total_amazon }}</td>
+                </tr>
+                <tr>
+                    <td>Total Chargebacks </td>
+                    <td>${{ total_chargeback }}</td>
+                </tr>
+                <tr>
+                    <td>Total pay for all accounts </td>
+                    <td>${{ total }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% for data in bundlers_data %}
+        {% if show_bundler_name %}
+            <h3>
+                Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}
+                {% if not data.bundler.is_active %}(disabled){% endif %}
+            </h3>
+        {% else %}
+            <h3>UTM source {{ data.bundler.utm_source }} paid report {{ end_date }}</h3>
+        {% endif %}
+
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
+        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Amazon accounts' entries=data.amazon_entries chargeback_total=data.amazon_chargeback_total total=data.amazon_total final_total=data.amazon_final_total %}
+        {% for child_stats in data.facebook_children_stats %}
+            {% if child_stats.entries %}  
+                <h4>
+                    Child bundler Facebook accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
+                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
+                </h4>
+                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
+            {% endif %}
+        {% endfor %}
+        {% for child_stats in data.google_children_stats %}
+            {% if child_stats.entries %}
+                <h4>
+                    Child bundler Google accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
+                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
+                </h4>
+                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
+            {% endif %}
+        {% endfor %}
+        {% for child_stats in data.amazon_children_stats %}
+            {% if child_stats.entries %}
+                <h4>
+                    Child bundler Amazon accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
+                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
+                </h4>
+                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
+            {% endif %}
+        {% endfor %}
+
+        <h4>Total: ${{ data.total|floatformat:2 }}</h4>
+    {% endfor %}
+    <h3>Total for all bundlers: ${{ total|floatformat:2 }}</h3>
+{% endblock %}

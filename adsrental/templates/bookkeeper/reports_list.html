@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="container">
-    <a href="{% url 'bundler_payments' %}" class="btn btn-primary">Preview new report</a>
+    <a href="{% url 'bookkeeper_report_preview' %}" class="btn btn-primary">Preview new report</a>
     <h3>Reports</h3>
     <ul>
         {% for report in reports %}
