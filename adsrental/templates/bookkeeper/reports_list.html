@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler Reports List{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{% url 'bundler_payments' %}" class="btn btn-primary">Preview new report</a>
+    <h3>Reports</h3>
+    <ul>
+        {% for report in reports %}
+            <li>
+                {{ report.date }}
+                <a href="{% url 'bookkeeper_report_html' report_id=report.id %}">HTML</a>
+            </li>
+        {% endfor %}
+    </ul>
+    </script>
+{% endblock %}

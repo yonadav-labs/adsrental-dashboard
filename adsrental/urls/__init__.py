@@ -52,5 +52,6 @@ urlpatterns = [
     path('cron/', include('adsrental.urls.cron')),
     path('user/', include('adsrental.urls.user')),
     path('dashboard/', include('adsrental.urls.dashboard')),
+    path('bookkeeper/', include('adsrental.urls.bookkeeper')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
 ]
