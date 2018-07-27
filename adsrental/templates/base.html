@@ -34,8 +34,10 @@
             </div>
               <div id="navbar">
                 <ul class="nav navbar-nav navbar-right">
-                  <li><a href="{% url "dashboard" %}">Dashboard</a></li>
-                  <li><a href="{% url "dashboard" %}?shipstation_order_status=on_hold">On-hold orders</a></li>
+                    {% if not user.is_bookkepper %}
+                      <li><a href="{% url "dashboard" %}">Dashboard</a></li>
+                      <li><a href="{% url "dashboard" %}?shipstation_order_status=on_hold">On-hold orders</a></li>
+                    {% endif %}
                     {% if user.bundler %}
                       <li><a href="{% url "bundler_leaderboard" bundler_id=user.bundler.id %}">Leaderboard</a></li>
                       <li><a href="{% url "bundler_report_payments_list" %}">Reports</a></li>
