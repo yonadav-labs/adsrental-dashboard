@@ -34,7 +34,7 @@
             </div>
               <div id="navbar">
                 <ul class="nav navbar-nav navbar-right">
-                    {% if not user.is_bookkepper %}
+                    {% if not user.is_bookkeeper %}
                       <li><a href="{% url "dashboard" %}">Dashboard</a></li>
                       <li><a href="{% url "dashboard" %}?shipstation_order_status=on_hold">On-hold orders</a></li>
                     {% endif %}
