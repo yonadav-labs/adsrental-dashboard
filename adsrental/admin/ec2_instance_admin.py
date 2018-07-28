@@ -128,9 +128,8 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def links(self, obj):
         links = []
         if obj.rpid:
-            links.append('<a target="_blank" href="{url}?rpid={rpid}">RDP</a>'.format(
-                url=reverse('rdp_connect'),
-                rpid=obj.rpid,
+            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+                url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
         if obj.lead and obj.lead.raspberry_pi:
             now = timezone.localtime(timezone.now())
