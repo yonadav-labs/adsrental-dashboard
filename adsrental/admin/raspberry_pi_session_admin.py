@@ -28,7 +28,6 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
             result.append('<a target="_blank" href="{url}?q={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>, <a href="{config_url}">Config file</a>)'.format(
                 rdp_url=reverse('rdp_ec2_connect', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
-                config_url=reverse('farming_pi_config', kwargs={'rpid': obj.raspberry_pi}),
                 rpid=obj.raspberry_pi,
             ))
 

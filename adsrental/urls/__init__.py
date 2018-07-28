@@ -6,7 +6,6 @@ from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.report import ReportView
-from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
@@ -35,7 +34,6 @@ urlpatterns = [
     path('log/<rpid>/<filename>', ShowLogView.as_view(), name='show_log'),
     path('login/', auth_views.login, {'template_name': 'login.html'}, name='login'),
     path('logout/', auth_views.logout, {'next_page': '/login/'}, name='logout'),
-    path('farming/pi_config/<rpid>/', PiConfigView.as_view(), name='farming_pi_config'),
     path('signup/', SignupView.as_view(), name='signup'),
     path('photo/<leadid>/', PhotoIdView.as_view(), name='photo_id'),
     path('sf/to_shipstation/', SFToShipstationView.as_view(), name='sf_to_shipstation'),
