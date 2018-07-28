@@ -16,9 +16,12 @@
                 Instance is {{ vultr_instance.status }} now!
             </div>
             <div class="panel-body">
-                <p>
-                    <a target="_blank" href="{{ vultr_instance.get_web_rdp_link|safe }}" class="btn btn-primary btn-lg">View in Adsrental WebConnect</a>
-                </p>
+                {% comment %}
+                    <p>
+                        <a target="_blank" href="{{ vultr_instance.get_web_rdp_link|safe }}" class="btn btn-primary btn-lg">View in Adsrental WebConnect</a>
+                    </p>
+                {% endcomment %}
+
                 <p>
                     <a href="{{ vultr_instance.get_windows_rdp_uri|safe }}" class="btn btn-default btn-lg">View in Windows RDP Client</a>
                 </p>

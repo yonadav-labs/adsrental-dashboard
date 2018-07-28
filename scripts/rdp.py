@@ -5,9 +5,8 @@ from pathlib import Path
 import base64
 import pymysql
 
-
-from Crypto.Cipher import DES3
 import boto3
+from Crypto.Cipher import DES3
 
 
 remmina_template = '''[remmina]
