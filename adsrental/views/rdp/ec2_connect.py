@@ -59,6 +59,8 @@ class EC2ConnectView(View):
 
     @method_decorator(login_required)
     def get(self, request, rpid, action=None):
+        if rpid == 'redirect':
+            return redirect('rdp_ec2_connect', rpid=request.GET.get('rpid', ''))
         is_ready = False
 
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()

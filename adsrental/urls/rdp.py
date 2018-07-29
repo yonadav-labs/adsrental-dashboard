@@ -7,6 +7,8 @@ from adsrental.views.rdp.vultr_rdp_file import VultrRDPFileView
 
 
 urlpatterns = [
+    # remove this later, obsolete
+    path('connect/', EC2ConnectView.as_view(), name='rdp_ec2_connect', kwargs=dict(rpid='redirect')),
     path('ec2/<rpid>/connect/', EC2ConnectView.as_view(), name='rdp_ec2_connect'),
     path('ec2/<rpid>/connect/<action>/', EC2ConnectView.as_view(), name='rdp_ec2_connect'),
     path('ec2/<rpid>/file/', EC2RDPFileView.as_view(), name='rdp_ec2_file'),
