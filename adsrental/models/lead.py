@@ -443,8 +443,8 @@ class Lead(models.Model, FulltextSearchMixin):
     def get_ec2_instance(self):
         'Get corresponding EC2 object.'
         try:
-            return self.ec2instance
-        except Lead.ec2instance.RelatedObjectDoesNotExist:
+            return self.ec2instance # pylint: disable=E1101
+        except Lead.ec2instance.RelatedObjectDoesNotExist: # pylint: disable=E1101
             return None
 
     def is_active(self):

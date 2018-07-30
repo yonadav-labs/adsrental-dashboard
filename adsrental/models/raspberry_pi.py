@@ -78,8 +78,8 @@ class RaspberryPi(models.Model):
     def get_lead(self):
         'Get linked Lead object'
         try:
-            return self.lead
-        except RaspberryPi.lead.RelatedObjectDoesNotExist:
+            return self.lead # pylint: disable=E1101
+        except RaspberryPi.lead.RelatedObjectDoesNotExist: # pylint: disable=E1101
             return None
 
     def get_ec2_instance(self):
@@ -123,6 +123,9 @@ class RaspberryPi(models.Model):
             for lead_account in lead.lead_accounts.all():
                 if lead_account.status == lead_account.STATUS_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
+                    if not lead_account.in_progress_date:
+                        lead_account.in_progress_date = now
+                        lead_account.save()
             # lead.sync_to_adsdb()
 
         if not self.first_seen:
