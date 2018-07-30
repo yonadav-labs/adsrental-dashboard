@@ -44,6 +44,7 @@ class LeadAccountInline(admin.StackedInline):
         'primary',
         'active',
     )
+    raw_id_fields = ('lead', )
 
 
 class LeadChangeInline(admin.TabularInline):

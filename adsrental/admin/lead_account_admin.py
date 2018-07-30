@@ -336,6 +336,7 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         'billed',
         'created',
     )
+    raw_id_fields = ('lead', )
 
     editable_fields = (
         'note',
