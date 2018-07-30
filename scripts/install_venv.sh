@@ -8,9 +8,12 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-pip install -U pip rope --upgrade-strategy=eager
-pip install git+https://github.com/PyCQA/pylint.git
-pip install git+https://github.com/PyCQA/pylint-django.git
-cat requirements.txt | awk 'BEGIN{FS="=="}{print $1}' > requirements_temp.txt
+pip install -U pip rope pylint pylint-django --upgrade-strategy=eager
+# pip install git+https://github.com/PyCQA/pylint.git
+# pip install git+https://github.com/PyCQA/pylint-django.git
+cat requirements.txt > requirements_temp.txt
+if [[ "$1" == "--upgrade" ]]; then
+    cat requirements.txt | awk 'BEGIN{FS="=="}{print $1}' > requirements_temp.txt
+fi
 pip install -U -r requirements_temp.txt --upgrade-strategy=eager
 rm requirements_temp.txt

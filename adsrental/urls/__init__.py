@@ -6,8 +6,6 @@ from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
 from adsrental.views.report import ReportView
-from adsrental.views.rdp import RDPDownloadView, RDPConnectView
-from adsrental.views.farming import PiConfigView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
@@ -23,8 +21,6 @@ urlpatterns = [
     path('admin_helpers/action/<model_name>/<action_name>/<object_id>/', AdminActionView.as_view(), name='admin_helpers_action'),
     path('', LandingView.as_view(), name='home'),
     path('terms/', TermsView.as_view(), name='terms'),
-    path('rdp/connect/', RDPConnectView.as_view(), name='rdp_connect'),
-    path('rdp/<rpid>/', RDPDownloadView.as_view(), name='rdp'),
     path('thankyou/', ThankyouView.as_view(), name='thankyou'),
     path('thankyou.php', ThankyouView.as_view(), name='thankyou'),
     path('thankyou/<leadid>/', ThankyouView.as_view(), name='thankyou_email'),
@@ -38,7 +34,6 @@ urlpatterns = [
     path('log/<rpid>/<filename>', ShowLogView.as_view(), name='show_log'),
     path('login/', auth_views.login, {'template_name': 'login.html'}, name='login'),
     path('logout/', auth_views.logout, {'next_page': '/login/'}, name='logout'),
-    path('farming/pi_config/<rpid>/', PiConfigView.as_view(), name='farming_pi_config'),
     path('signup/', SignupView.as_view(), name='signup'),
     path('photo/<leadid>/', PhotoIdView.as_view(), name='photo_id'),
     path('sf/to_shipstation/', SFToShipstationView.as_view(), name='sf_to_shipstation'),
@@ -48,6 +43,7 @@ urlpatterns = [
     path('ec2_ssh/get_netstat/<rpid>/', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
     path('rpi/ec2_data/<rpid>/', EC2DataView.as_view(), name='rpi_ec2_data'),
     path('adsdb/lead/', ADSDBLeadView.as_view(), name='adsdb_lead'),
+    path('rdp/', include('adsrental.urls.rdp')),
     path('bundler/', include('adsrental.urls.bundler')),
     path('cron/', include('adsrental.urls.cron')),
     path('user/', include('adsrental.urls.user')),

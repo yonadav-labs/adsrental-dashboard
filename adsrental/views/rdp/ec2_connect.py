@@ -1,8 +1,6 @@
-from __future__ import unicode_literals
-
 from django.views import View
-from django.http import FileResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
@@ -11,34 +9,11 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 
 from adsrental.utils import generate_password, BotoResource
-from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 
 
-class RDPDownloadView(View):
-    @method_decorator(login_required)
-    def get(self, request, rpid):
-        raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
-        ec2_instance = raspberry_pi.get_ec2_instance()
-
-        if not ec2_instance:
-            return HttpResponse('EC2 instance {} does not exist'.format(rpid))
-
-        lines = []
-        lines.append('auto connect:i:1')
-        lines.append('full address:s:{}:23255'.format(ec2_instance.hostname))
-        lines.append('username:s:Administrator')
-        lines.append('password:s:{}'.format(ec2_instance.password))
-        lines.append('')
-        content = '\n'.join(lines)
-
-        response = FileResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="{}.rdp"'.format(rpid)
-        return response
-
-
-class RDPConnectView(View):
+class EC2ConnectView(View):
     def handle_action(self, request, ec2_instance, action):
         if action == 'install_antidetect_script':
             try:
@@ -83,10 +58,9 @@ class RDPConnectView(View):
             messages.success(request, 'RaspberryPi will restart in a couple of minutes.')
 
     @method_decorator(login_required)
-    def get(self, request):
-        rpid = request.GET.get('rpid', 'none')
-        force = request.GET.get('force', '') == 'true'
-        action = request.GET.get('action', '')
+    def get(self, request, rpid, action=None):
+        if rpid == 'redirect':
+            return redirect('rdp_ec2_connect', rpid=request.GET.get('rpid', ''))
         is_ready = False
 
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
@@ -132,9 +106,9 @@ class RDPConnectView(View):
 
         if action:
             self.handle_action(request, ec2_instance, action)
-            return HttpResponseRedirect('{}?rpid={}'.format(reverse('rdp_connect'), ec2_instance.rpid))
+            return redirect('rdp_ec2_connect', rpid=ec2_instance.rpid)
         ec2_instance.update_from_boto()
-        if not ec2_instance.is_running() or force:
+        if not ec2_instance.is_running():
             ec2_instance.start()
 
         ec2_instance.last_rdp_start = timezone.now()
@@ -164,7 +138,7 @@ class RDPConnectView(View):
                 except SSHConnectException:
                     pass
 
-        return render(request, 'rdp_connect.html', dict(
+        return render(request, 'rdp/ec2_connect.html', dict(
             rpid=rpid,
             ec2_instance=ec2_instance,
             check_connection=True,

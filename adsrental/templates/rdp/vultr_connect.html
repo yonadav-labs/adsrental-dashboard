@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load bootstrap %}
+
+{% block title_extra %}| RDP connection to {{ vultr_instance.label }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>
+            Connect to Vultr Instance {{ vultr_instance.label }}
+        </h1>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Instance is {{ vultr_instance.status }} now!
+            </div>
+            <div class="panel-body">
+                {% comment %}
+                    <p>
+                        <a target="_blank" href="{{ vultr_instance.get_web_rdp_link|safe }}" class="btn btn-primary btn-lg">View in Adsrental WebConnect</a>
+                    </p>
+                {% endcomment %}
+
+                <p>
+                    <a href="{{ vultr_instance.get_windows_rdp_uri|safe }}" class="btn btn-default btn-lg">View in Windows RDP Client</a>
+                </p>
+                <p>If button above does not work, download and launch BAT script <a href="{% static 'scripts/install_rdp.bat' %}">from here</a></p>
+                <p>
+                    <a href="{{ vultr_instance.get_rdp_uri|safe }}" class="btn btn-default">View in Mac/Android RDP Client</a>
+                    <a href="{% url 'rdp_vultr_file' vultr_instance_id=vultr_instance.id %}" class="btn btn-default">Download RDP config file</a>
+                </p>
+                <p>
+                    Username: <strong>{{ vultr_instance.USERNAME }}</strong><br>
+                    Password: <strong>{{ vultr_instance.password }}</strong>
+                </p>
+                <h4>Actions</h4>
+                <p>
+                    <a href="{% url 'rdp_vultr_connect' vultr_instance_id=vultr_instance.id action='refresh' %}"><button class="btn btn-default">Refresh state</button></a>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <a href="{% url 'home' %}">
+                <button class="btn btn-lg btn-primary">Back to main page</button>
+            </a>
+        </div>
+    </div>
+{% endblock %}
