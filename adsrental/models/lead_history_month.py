@@ -64,6 +64,11 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         self.max_payment, self.note = self.get_max_payment_with_note()
         self.amount = self.get_amount()
+
+        prev_history = LeadHistoryMonth.objects.filter(lead=self.lead).order_by('-date').first()
+        if prev_history and prev_history.move_to_next_month:
+            self.amount += prev_history.amount
+
         if self.amount < self.MOVE_AMOUNT:
             self.move_to_next_month = True
 
