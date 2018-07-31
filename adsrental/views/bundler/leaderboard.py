@@ -11,6 +11,7 @@ from django.utils import timezone
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler_lead_stat import BundlerLeadStat
+from adsrental.utils import get_week_boundaries_for_dt, get_month_boundaries_for_dt
 
 
 class BundlerLeaderboardView(View):
@@ -42,18 +43,27 @@ class BundlerLeaderboardView(View):
             primary=True,
         )
 
+        month_start, _ = get_month_boundaries_for_dt(now)
+        last_month_start, last_month_end = get_month_boundaries_for_dt(month_start - datetime.timedelta(days=1))
         lead_accounts_last_month = (
             lead_accounts
-            .filter(qualified_date__gt=now - datetime.timedelta(days=31))
+            .filter(
+                qualified_date__gt=last_month_start,
+                qualified_date__lt=last_month_end,
+            )
             .values('lead__bundler__utm_source')
             .annotate(count=Count('id'))
             .order_by('lead__bundler__utm_source')
             .values_list('lead__bundler__utm_source', 'count')
         )
 
+        last_week_start, last_week_end = get_week_boundaries_for_dt(now - datetime.timedelta(days=7))
         lead_accounts_last_week = (
             lead_accounts
-            .filter(qualified_date__gt=now - datetime.timedelta(days=7))
+            .filter(
+                qualified_date__gt=last_week_start,
+                qualified_date__lt=last_week_end,
+            )
             .values('lead__bundler__utm_source')
             .annotate(count=Count('id'))
             .order_by('lead__bundler__utm_source')
@@ -99,4 +109,8 @@ class BundlerLeaderboardView(View):
             today_entries_json=json.dumps(list(lead_accounts_today)),
             yesterday_entries_json=json.dumps(list(lead_accounts_yesterday)),
             lead_accounts_today_total=lead_accounts_today_total,
+            last_week_start=last_week_start,
+            last_week_end=last_week_end - datetime.timedelta(days=1),
+            last_month_start=last_month_start,
+            last_month_end=last_month_end - datetime.timedelta(days=1),
         ))

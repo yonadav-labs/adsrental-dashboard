@@ -5,6 +5,7 @@ import uuid
 import secrets
 import string
 import random
+import datetime
 
 import requests
 import boto3
@@ -596,3 +597,18 @@ def generate_password(length=12):
 
     random.shuffle(result)
     return ''.join(result)
+
+
+def get_week_boundaries_for_dt(d):
+    d_midnight = d.replace(hour=0, minute=0, second=0)
+    start = d_midnight - datetime.timedelta(days=d_midnight.weekday())
+    end = start + datetime.timedelta(days=7)
+    return start, end
+
+
+def get_month_boundaries_for_dt(d):
+    d_midnight = d.replace(hour=0, minute=0, second=0)
+    start = d_midnight.replace(day=1)
+    next_month = start.replace(day=28) + datetime.timedelta(days=4)
+    end = next_month - datetime.timedelta(days=next_month.day - 1)
+    return start, end
