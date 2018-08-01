@@ -59,10 +59,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         ('lead__city', 'City', ),
         ('lead__state', 'State', ),
         ('lead__postal_code', 'Postal Code', ),
-        ('days_online', 'Days online'),
-        ('days_offline', 'Days offline'),
-        ('days_wrong_password', 'Days wrong password'),
-        ('amount', 'Amount Paid'),
+        ('amount', 'Total Amount'),
     )
     search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', 'check_number', )
     list_filter = (
