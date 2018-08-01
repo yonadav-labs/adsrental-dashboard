@@ -44,8 +44,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_offline',
         'days_wrong_password',
         'max_payment_field',
-        'amount_field',
+        'amount_current_field',
         'amount_moved_field',
+        'amount_field',
         'move_to_next_month',
         'check_number',
         'links',
@@ -115,6 +116,9 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def amount_field(self, obj):
         return '${}'.format(round(obj.amount, 2)) if obj.amount is not None else None
+
+    def amount_current_field(self, obj):
+        return '${}'.format(round(obj.amount - obj.amount_moved, 2)) if obj.amount is not None else None
 
     def amount_moved_field(self, obj):
         return '${}'.format(round(obj.amount_moved, 2)) if obj.amount_moved is not None else None
@@ -240,8 +244,11 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     max_payment_field.short_description = 'Max payment'
     max_payment_field.admin_order_field = 'max_payment'
 
-    amount_field.short_description = 'Amount'
+    amount_field.short_description = 'Amount Total'
     amount_field.admin_order_field = 'amount'
 
     amount_moved_field.short_description = 'Amount moved'
     amount_moved_field.admin_order_field = 'amount_moved'
+
+    amount_current_field.short_description = 'Payment'
+    amount_current_field.admin_order_field = 'amount'
