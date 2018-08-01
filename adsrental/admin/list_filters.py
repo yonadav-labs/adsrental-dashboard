@@ -731,7 +731,7 @@ class BundlerListFilter(SimpleListFilter):
         return [int(i) for i in result.split(',') if i.isdigit()]
 
     def lookups(self, request, model_admin):
-        choices = [(i[0], '%s (%s)' % i[1:]) for i in Bundler.objects.all().values_list('id', 'name', 'utm_source')]
+        choices = [(i[0], '%s (%s)' % i[1:]) for i in Bundler.objects.all().order_by('name').values_list('id', 'name', 'utm_source')]
         return choices
 
     def queryset(self, request, queryset):
