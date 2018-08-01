@@ -34,6 +34,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least once.')
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
     amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
+    amount_moved = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Amount moved from next month')
     amount_paid = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum paid tot lead')
     note = models.TextField(blank=True, null=True, help_text='Note about payment calc')
     move_to_next_month = models.BooleanField(default=False)
@@ -68,6 +69,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         prev_history = LeadHistoryMonth.objects.filter(lead=self.lead).order_by('-date').first()
         if prev_history and prev_history.move_to_next_month:
             self.amount += prev_history.amount
+            self.amount_moved = prev_history.amount
 
         if self.amount < self.MOVE_AMOUNT:
             self.move_to_next_month = True
