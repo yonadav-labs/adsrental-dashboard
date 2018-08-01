@@ -247,7 +247,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     amount_field.short_description = 'Amount Total'
     amount_field.admin_order_field = 'amount'
 
-    amount_moved_field.short_description = 'Amount moved'
+    amount_moved_field.short_description = 'Moved from previous month'
     amount_moved_field.admin_order_field = 'amount_moved'
 
     amount_current_field.short_description = 'Payment'
