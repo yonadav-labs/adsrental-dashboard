@@ -275,6 +275,8 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_ready_for_testing(self):
         'Check if RaspberryPi is ready to be tested.'
+        if not self.raspberry_pi:
+            return False
         if self.raspberry_pi.first_tested:
             return False
         if self.raspberry_pi.first_seen:

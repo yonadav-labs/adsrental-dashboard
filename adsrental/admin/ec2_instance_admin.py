@@ -131,6 +131,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
+        if obj.lead and obj.lead.is_ready_for_testing():
             links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
             ))
