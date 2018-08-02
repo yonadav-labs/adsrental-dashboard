@@ -81,6 +81,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'primary',
         'active',
     )
+    raw_id_fields = ('lead', )
 
     def get_actions(self, request):
         actions = super(LeadAccountAdmin, self).get_actions(request)
@@ -336,7 +337,6 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         'billed',
         'created',
     )
-    raw_id_fields = ('lead', )
 
     editable_fields = (
         'note',
