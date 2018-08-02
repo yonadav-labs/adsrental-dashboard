@@ -131,6 +131,9 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
+            links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+                url=reverse('rdp_ec2_file', kwargs=dict(rpid=obj.rpid)),
+            ))
         if obj.lead and obj.lead.raspberry_pi:
             now = timezone.localtime(timezone.now())
             today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))

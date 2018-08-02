@@ -347,6 +347,9 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
             ))
+            result.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+                url=reverse('rdp_ec2_file', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
+            ))
 
         result.append('<a href="{url}">Fix address</a>'.format(
             url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
