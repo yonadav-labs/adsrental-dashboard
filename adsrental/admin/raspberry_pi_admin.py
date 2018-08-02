@@ -122,7 +122,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
         ))
         links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
-            url=reverse('rdp_ec2_file', kwargs=dict(rpid=obj.rpid)),
+            url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
         ))
         today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
         links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(

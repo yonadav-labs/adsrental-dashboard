@@ -15,6 +15,7 @@ from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.admin_helpers import AdminActionView
 from adsrental.views.robots import RobotsView
+from adsrental.views.pi_config import PiConfigView
 
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
     path('ec2_ssh/start_reverse_tunnel/<rpid>/', StartReverseTunnelView.as_view(), name='ec2_ssh_start_reverse_tunnel'),
     path('ec2_ssh/get_netstat/<rpid>/', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
     path('rpi/ec2_data/<rpid>/', EC2DataView.as_view(), name='rpi_ec2_data'),
+    path('rpi/config/<rpid>/', PiConfigView.as_view(), name='pi_config'),
     path('adsdb/lead/', ADSDBLeadView.as_view(), name='adsdb_lead'),
     path('rdp/', include('adsrental.urls.rdp')),
     path('bundler/', include('adsrental.urls.bundler')),
