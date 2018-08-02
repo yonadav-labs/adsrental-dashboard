@@ -40,7 +40,6 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
-                bundler_paid=True,
         ):
             banned_wrong_password.append({
                 'account': str(lead_account),
@@ -57,7 +56,6 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
-                bundler_paid=True,
         ):
             banned_offline.append({
                 'account': str(lead_account),
@@ -74,7 +72,6 @@ class AutoBanView(View):
                 status=LeadAccount.STATUS_IN_PROGRESS,
                 active=True,
                 auto_ban_enabled=True,
-                bundler_paid=True,
         ):
             banned_security_checkpoint.append({
                 'account': str(lead_account),

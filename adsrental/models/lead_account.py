@@ -129,7 +129,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result += bundler.amazon_payment
                 result -= self.get_parent_bundler_payment(bundler)
 
-        if bundler.enable_chargeback and self.charge_back and not self.charge_back_billed:
+        if bundler.enable_chargeback and self.charge_back and self.bundler_paid and not self.charge_back_billed:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result -= bundler.facebook_chargeback
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
