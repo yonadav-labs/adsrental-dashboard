@@ -118,14 +118,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
-        lead = obj.get_lead()
         links.append('<a target="_blank" href="{url}">RDP</a>'.format(
             url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
         ))
-        if lead and lead.is_ready_for_testing():
-            links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
-                url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
-            ))
+        links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+            url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
+        ))
         today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
         links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
             log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
