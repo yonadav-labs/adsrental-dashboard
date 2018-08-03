@@ -190,7 +190,7 @@ class BookkepperReportPreviewView(View):
             if request.GET.get('mark', '') == 'true':
                 report.mark()
 
-            return redirect('admin:adsrental_bundlerpaymentsreport_changelist')
+            return redirect('bookkeeper_report_preview')
 
         if request.GET.get('pdf'):
             html = render_to_string(
