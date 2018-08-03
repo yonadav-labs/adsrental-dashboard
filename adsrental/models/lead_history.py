@@ -107,7 +107,7 @@ class LeadHistory(models.Model):
         if self.checks_wrong_password_amazon >= self.WRONG_PASSWORD_CHECKS_MIN:
             return True
 
-        return True
+        return False
 
     def is_sec_checkpoint(self):
         'Check if security checkpoint for this day was reported at least 3 times.'
@@ -118,7 +118,7 @@ class LeadHistory(models.Model):
         if self.checks_sec_checkpoint_amazon >= self.SEC_CHECKPOINT_CHECKS_MIN:
             return True
 
-        return True
+        return False
 
     @classmethod
     def get_queryset_for_month(cls, year, month, lead_ids=None):
