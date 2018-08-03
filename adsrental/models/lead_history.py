@@ -17,9 +17,9 @@ class LeadHistory(models.Model):
     Aggregated daily stats for :model:`adsrental.Lead`.
     Used to calculate payments to leads.
     '''
-    ONLINE_CHECKS_MIN = 12
-    WRONG_PASSWORD_CHECKS_MIN = 3
-    SEC_CHECKPOINT_CHECKS_MIN = 3
+    ONLINE_CHECKS_MIN = 3
+    WRONG_PASSWORD_CHECKS_MIN = 21
+    SEC_CHECKPOINT_CHECKS_MIN = 21
 
     MAX_PAYMENT = decimal.Decimal('25.00')
     NEW_MAX_PAYMENT = decimal.Decimal('15.00')
