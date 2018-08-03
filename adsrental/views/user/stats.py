@@ -10,6 +10,7 @@ class UserStatsView(View):
         leadid = request.session.get('leadid')
         leads = Lead.objects.filter(leadid=leadid)
         if not leads:
+            messages.error(request, 'Lead not found')
             return redirect('user_login')
 
         lead = leads.first()
