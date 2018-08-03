@@ -126,6 +126,7 @@ class LeadAdmin(admin.ModelAdmin):
         'account_name',
         'first_name',
         'last_name',
+        'phone',
         'raspberry_pi__rpid',
         'email',
     )
