@@ -25,6 +25,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
         'online',
         'amount_field',
         'wrong_password',
+        'security_checkpoint',
     )
     raw_id_fields = ('lead', )
     list_select_related = ('lead', 'lead__raspberry_pi')
