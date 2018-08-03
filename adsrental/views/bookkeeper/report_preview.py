@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
 import xhtml2pdf.pisa as pisa
+from django.contrib import messages
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
@@ -190,6 +191,7 @@ class BookkepperReportPreviewView(View):
             if request.GET.get('mark', '') == 'true':
                 report.mark()
 
+            messages.success(request, 'New report was successfully generated')
             return redirect('bookkeeper_reports_list')
 
         if request.GET.get('pdf'):
