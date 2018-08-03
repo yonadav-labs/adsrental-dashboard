@@ -48,11 +48,14 @@ class LeadHistoryView(View):
 
             start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             start_date = start_date.replace(day=1)
+            counter = 0
             for lead in leads:
                 item = LeadHistoryMonth.get_or_create(lead=lead, date=start_date)
                 item.aggregate()
                 if item.amount or item.id:
                     item.save()
+                counter += 1
+                print(lead.name(), counter, leads.count())
             return JsonResponse({
                 'result': True,
             })

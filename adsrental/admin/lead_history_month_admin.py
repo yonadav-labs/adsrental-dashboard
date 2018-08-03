@@ -43,7 +43,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'days_online',
         'days_offline',
         'days_wrong_password',
-        'max_payment_field',
         'amount_current_field',
         'amount_moved_field',
         'amount_field',
@@ -104,15 +103,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def lead_address(self, obj):
         return obj.lead and obj.lead.get_address()
-
-    def max_payment_field(self, obj):
-        if obj.max_payment is None:
-            return None
-
-        return mark_safe('<span class="has_note" title="{}">${}</span>'.format(
-            obj.note or 'n/a',
-            obj.max_payment,
-        ))
 
     def amount_field(self, obj):
         return '${}'.format(round(obj.amount, 2)) if obj.amount is not None else None
@@ -240,9 +230,6 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     date_field.short_description = 'Date'
     lead_link.short_description = 'Lead'
     aggregate.short_description = 'DEBUG: Aggregate'
-
-    max_payment_field.short_description = 'Max payment'
-    max_payment_field.admin_order_field = 'max_payment'
 
     amount_field.short_description = 'Amount Total'
     amount_field.admin_order_field = 'amount'

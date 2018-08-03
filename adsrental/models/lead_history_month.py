@@ -4,6 +4,8 @@ import decimal
 from django.utils import timezone
 from django.conf import settings
 from django.db import models
+from django_bulk_update.manager import BulkUpdateManager
+from django_bulk_update.helper import bulk_update
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.mixins import FulltextSearchMixin
@@ -42,6 +44,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    objects = BulkUpdateManager()
+
     def aggregate(self):
         self.days_offline = 0
         self.days_online = 0
@@ -55,16 +59,17 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             'lead__raspberry_pi',
             'lead__lead_accounts',
         )
-        for lead_history in lead_histories:
-            if lead_history.checks_online and lead_history.checks_online > lead_history.checks_offline:
-                self.days_online += 1
-                if lead_history.checks_wrong_password:
-                    self.days_wrong_password += 1
-            else:
-                self.days_offline += 1
 
-        self.max_payment, self.note = self.get_max_payment_with_note()
-        self.amount = self.get_amount()
+        total_amount = decimal.Decimal('0.00')
+        for lead_history in lead_histories:
+            amount, note = lead_history.get_amount_with_note()
+            lead_history.amount = amount
+            lead_history.note = note
+            total_amount += amount
+
+        bulk_update(lead_histories, update_fields=['amount', 'note'])
+
+        self.amount = total_amount
 
         prev_history = LeadHistoryMonth.objects.filter(lead=self.lead).order_by('-date').first()
         if prev_history and prev_history.move_to_next_month:
