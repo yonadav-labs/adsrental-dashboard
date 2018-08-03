@@ -283,11 +283,22 @@ class UserLoginForm(forms.Form):
     postal_code = forms.CharField(label='Zip code', required=True)
 
     def get_lead(self, data):
-        return Lead.objects.filter(
+        leads = Lead.objects.filter(
             first_name__iexact=data.get('first_name'),
             last_name__iexact=data.get('last_name'),
             postal_code=data.get('postal_code'),
-        ).first()
+        ).order_by('-created')
+
+        if not leads:
+            return None
+
+        for lead in leads:
+            if lead.is_active():
+                return lead
+
+        first_lead = leads.first()
+        return first_lead
+
 
     def clean(self):
         cleaned_data = super().clean()

@@ -1,5 +1,6 @@
 from django.views import View
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from adsrental.forms import UserLoginForm
 from adsrental.models.lead import Lead
@@ -20,6 +21,9 @@ class UserLoginView(View):
             ))
 
         lead = form.get_lead(form.cleaned_data)
+        if not lead:
+            messages.info(request, 'Lead not found')
+            return redirect('user_login')
 
         request.session['leadid'] = lead.leadid
         return redirect('user_stats')

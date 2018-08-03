@@ -1,6 +1,5 @@
 from django.views import View
 from django.shortcuts import render, redirect
-from django.contrib import messages
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_history_month import LeadHistoryMonth
@@ -9,15 +8,11 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 class UserStatsView(View):
     def get(self, request):
         leadid = request.session.get('leadid')
-        leads = Lead.objects.filter(leadid=leadid)
-        if not leads:
-            messages.info(request, 'Lead not found')
+        if not leadid:
             return redirect('user_login')
-
-        lead = leads.first()
-        for l in leads:
-            if l.is_active():
-                lead = l
+        lead = Lead.objects.filter(leadid=leadid).first()
+        if not lead:
+            return redirect('user_login')
 
         if not lead.is_active():
             return render(request, 'user/stats_banned.html', dict(
