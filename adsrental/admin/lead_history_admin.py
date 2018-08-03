@@ -56,6 +56,9 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     def wrong_password(self, obj):
         return obj.is_wrong_password()
 
+    def security_checkpoint(self, obj):
+        return obj.is_sec_checkpoint()
+
     def amount_field(self, obj):
         amount, note = obj.get_amount_with_note()
 
@@ -73,3 +76,5 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     online.boolean = True
 
     wrong_password.boolean = True
+
+    security_checkpoint.boolean = True

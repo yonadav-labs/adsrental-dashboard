@@ -99,8 +99,26 @@ class LeadHistory(models.Model):
         return not self.is_wrong_password() and self.is_online()
 
     def is_wrong_password(self):
-        'Check if password for this day was reported wrong at lead once.'
-        return self.checks_wrong_password > self.WRONG_PASSWORD_CHECKS_MIN
+        'Check if password for this day was reported wrong at least 3 times.'
+        if self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN:
+            return True
+        if self.checks_wrong_password_google >= self.WRONG_PASSWORD_CHECKS_MIN:
+            return True
+        if self.checks_wrong_password_amazon >= self.WRONG_PASSWORD_CHECKS_MIN:
+            return True
+
+        return True
+
+    def is_sec_checkpoint(self):
+        'Check if security checkpoint for this day was reported at least 3 times.'
+        if self.checks_sec_checkpoint_facebook >= self.SEC_CHECKPOINT_CHECKS_MIN:
+            return True
+        if self.checks_sec_checkpoint_google >= self.SEC_CHECKPOINT_CHECKS_MIN:
+            return True
+        if self.checks_sec_checkpoint_amazon >= self.SEC_CHECKPOINT_CHECKS_MIN:
+            return True
+
+        return True
 
     @classmethod
     def get_queryset_for_month(cls, year, month, lead_ids=None):
