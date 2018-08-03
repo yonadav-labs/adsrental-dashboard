@@ -24,15 +24,20 @@ class UserTimestampsView(View):
         date_start = date.replace(day=1)
         date_end = self.last_day_of_month(date)
 
+        lead_histories = LeadHistory.objects.filter(
+            lead=lead,
+            date__gte=date_start,
+            date__lte=date_end,
+        ).order_by('-date')
+
+        for lh in lead_histories:
+            lh.amount, _ = lh.get_amount_with_note()
+
         return render(request, 'user/timestamps.html', dict(
             lead=lead,
             lead_accounts=lead.lead_accounts.all(),
             date_start=date_start,
             date_end=date_end,
             raspberry_pi=lead.raspberry_pi,
-            lead_histories=LeadHistory.objects.filter(
-                lead=lead,
-                date__gte=date_start,
-                date__lte=date_end,
-            ).order_by('-date'),
+            lead_histories=lead_histories,
         ))
