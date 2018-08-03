@@ -66,6 +66,10 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             lead_history.amount = amount
             lead_history.note = note
             total_amount += amount
+            if lead_history.is_online():
+                self.days_online += 1
+            else:
+                self.days_offline += 1
 
         bulk_update(lead_histories, update_fields=['amount', 'note'])
 
