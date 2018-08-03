@@ -92,7 +92,8 @@ class BundlerPaymentsView(View):
         if not bundlers:
             raise Http404
 
-        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        today = timezone.localtime(timezone.now()).date()
+        yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
         bundlers_data = []
         total = decimal.Decimal('0.00')
         total_google = decimal.Decimal('0.00')
@@ -188,7 +189,7 @@ class BundlerPaymentsView(View):
                 ))
 
             report = BundlerPaymentsReport(
-                date=yesterday,
+                date=today,
                 data=json.dumps(report_data),
                 html=html,
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),

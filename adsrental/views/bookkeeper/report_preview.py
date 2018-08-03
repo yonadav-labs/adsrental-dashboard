@@ -85,7 +85,8 @@ class BookkepperReportPreviewView(View):
 
         bundlers = Bundler.objects.all()
 
-        yesterday = (timezone.now() - datetime.timedelta(days=1)).date()
+        today = timezone.localtime(timezone.now()).date()
+        yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
         bundlers_data = []
         total = decimal.Decimal('0.00')
         total_google = decimal.Decimal('0.00')
@@ -181,7 +182,7 @@ class BookkepperReportPreviewView(View):
                 ))
 
             report = BundlerPaymentsReport(
-                date=yesterday,
+                date=today,
                 data=json.dumps(report_data),
                 html=html,
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
