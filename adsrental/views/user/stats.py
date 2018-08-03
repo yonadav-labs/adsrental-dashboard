@@ -8,9 +8,14 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 class UserStatsView(View):
     def get(self, request):
         leadid = request.session.get('leadid')
-        lead = Lead.objects.filter(leadid=leadid).first()
-        if not lead:
+        leads = Lead.objects.filter(leadid=leadid)
+        if not leads:
             return redirect('user_login')
+
+        lead = leads.first()
+        for l in leads:
+            if l.is_active():
+                lead = l
 
         if not lead.is_active():
             return render(request, 'user/stats_banned.html', dict(
