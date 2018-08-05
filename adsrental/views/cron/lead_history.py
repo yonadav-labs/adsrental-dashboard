@@ -28,6 +28,7 @@ class LeadHistoryView(View):
         date = request.GET.get('date')
         rpid = request.GET.get('rpid')
         aggregate = request.GET.get('aggregate')
+        banned = request.GET.get('banned', '') == 'true'
         results = []
 
         if now:
@@ -40,7 +41,10 @@ class LeadHistoryView(View):
                 'result': True,
             })
         if aggregate:
-            leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE).prefetch_related('raspberry_pi')
+            if banned:
+                leads = Lead.objects.filter(status=Lead.STATUS_BANNED).prefetch_related('raspberry_pi')
+            else:
+                leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE).prefetch_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             else:
