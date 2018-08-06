@@ -156,7 +156,7 @@ class LeadHistory(models.Model):
                     date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
                 ))
                 continue
-            if lead_account.is_banned() and (not lead_account.banned_date or lead_account.banned_date.date() <= self.date):
+            if lead_account.is_banned() and (not lead_account.banned_date or lead_account.banned_date.date() <= self.get_last_day()):
                 note.append('{type} account was banned on {date} ($0.00)'.format(
                     type=lead_account.get_account_type_display(),
                     date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT) if lead_account.banned_date else 'unknown date',
