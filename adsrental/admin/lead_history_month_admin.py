@@ -60,7 +60,14 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         ('lead__postal_code', 'Postal Code', ),
         ('amount', 'Total Amount'),
     )
-    search_fields = ('lead__raspberry_pi__rpid', 'lead__first_name', 'lead__last_name', 'lead__email', 'lead__phone', 'check_number', )
+    search_fields = (
+        'lead__raspberry_pi__rpid',
+        'lead__first_name',
+        'lead__last_name',
+        'lead__email',
+        'lead__phone',
+        'check_number',
+    )
     list_filter = (
         'move_to_next_month',
         DateMonthListFilter,
