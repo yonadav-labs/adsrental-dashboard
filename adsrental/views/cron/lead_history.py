@@ -43,7 +43,7 @@ class LeadHistoryView(View):
         if aggregate:
             start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
             start_date = start_date.replace(day=1)
-            leads = Lead.objects.filter(raspberry_pi__last_seen__gt=start_date).prefetch_related('raspberry_pi')
+            leads = Lead.objects.filter(raspberry_pi__last_seen__gte=start_date).prefetch_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             else:
