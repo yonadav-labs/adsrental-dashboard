@@ -59,6 +59,7 @@ class LeadHistoryView(View):
                 print(lead.name(), counter, leads.count())
             return JsonResponse({
                 'result': True,
+                'count': leads.count(),
             })
         if date:
             leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
