@@ -41,10 +41,7 @@ class LeadHistoryView(View):
                 'result': True,
             })
         if aggregate:
-            if banned:
-                leads = Lead.objects.filter(status=Lead.STATUS_BANNED).prefetch_related('raspberry_pi')
-            else:
-                leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE).prefetch_related('raspberry_pi')
+            leads = Lead.objects.all().prefetch_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             else:
