@@ -38,13 +38,16 @@ def basicauth_required(view_func):
 
 def https_required(function):
     def wrap(self, request, *args, **kwargs):
+        protocol = 'http'
         if request.is_secure():
+            protocol = 'https'
+
+        actual_domain = '{}://{}'.format(protocol, request.get_host())
+        if actual_domain == settings.DOMAIN:
             return function(self, request, *args, **kwargs)
 
-        host = settings.DOMAIN
-
         url = u'{host}{path}'.format(
-            host=host,
+            host=settings.DOMAIN,
             path=request.get_full_path()
         )
         return HttpResponseRedirect(url)
