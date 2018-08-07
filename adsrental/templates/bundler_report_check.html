@@ -25,8 +25,6 @@
                 <th>Address</th>
                 <th>Days online</th>
                 <th>Days offline</th>
-                <th>Days wrong password</th>
-                <th>Max payment</th>
                 <th>Amount</th>
                 <th>Amount paid</th>
                 <th>Links</th>
@@ -41,8 +39,6 @@
                     <td>{{ lead_history.lead.get_address }}</td>
                     <td>{{ lead_history.days_online }}</td>
                     <td>{{ lead_history.days_offline }}</td>
-                    <td>{{ lead_history.days_wrong_password }}</td>
-                    <td>${{ lead_history.max_payment }}</td>
                     <td>${{ lead_history.amount }}</td>
                     <td>${{ lead_history.amount_paid }}</td>
                     <td><a target="_blank" href="{% url 'bundler_report_check_days' bundler_id=bundler.id lead_id=lead_history.lead.leadid %}?date={{ date|date:"Y-m-d" }}">Timestamps</a></td>

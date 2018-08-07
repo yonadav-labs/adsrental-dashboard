@@ -39,7 +39,8 @@ class BundlerCheckDaysView(View):
         ).select_related('lead', 'lead__raspberry_pi')
         total = decimal.Decimal('0.00')
         for lead_history in lead_histories:
-            total += lead_history.get_amount()
+            lead_history.amount, lead_history.note = lead_history.get_amount_with_note()
+            total += lead_history.amount
 
         return render(request, 'bundler_report_check_days.html', context=dict(
             lead_histories=lead_histories,
