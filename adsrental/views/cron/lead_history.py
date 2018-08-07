@@ -28,7 +28,6 @@ class LeadHistoryView(View):
         date = request.GET.get('date')
         rpid = request.GET.get('rpid')
         aggregate = request.GET.get('aggregate')
-        banned = request.GET.get('banned', '') == 'true'
         results = []
 
         if now:
