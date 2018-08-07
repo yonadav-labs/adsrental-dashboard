@@ -98,6 +98,15 @@ class LeadHistory(models.Model):
         'Check password was not reported as wrong and device was online'
         return not self.is_wrong_password() and self.is_online()
 
+    def is_wrong_password_facebook(self):
+        return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
+
+    def is_wrong_password_google(self):
+        return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
+
+    def is_wrong_password_amazon(self):
+        return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
+
     def is_wrong_password(self):
         'Check if password for this day was reported wrong at least 3 times.'
         if self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN:
