@@ -4,43 +4,42 @@
 {% load static %}
 
 {% block content %}
-    <body>
-            <!-- Main jumbotron for a primary marketing message or call to action -->
-            <div class="jumbotron">
-              <div class="container">
-                <h1 class="display-3">Welcome to RentYourSocialMedia</h1>
-                {% if user.is_bookkeeper %}
-                  <p>
-                    <a class="btn btn-default btn-lg" href="{% url "bookkeeper_reports_list" %}" role="button">See reports »</a>
-                    <a class="btn btn-primary btn-lg" href="{% url "bookkeeper_report_preview" %}" role="button">See report preview »</a>
-                  </p>
-                {% else %}
-                  <p>
-                    {% if bundler %}
-                      Your UTM Source is {{bundler.utm_source}}. If you want to see your leads, just click on the button below.
-                    {% else %}
-                      You can see all leads.
-                    {% endif %}
-                  </p>
-                  <p>
-                    <a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a>
-                    <a class="btn btn-default btn-lg" href="{% url "report" %}" role="button">Go to reports »</a>
-                  </p>
-                {% endif %}
-              </div>
-            </div>
-        
-            <div class="container">
-              <footer>
-                <p>© RentYourSocialMedia 2018</p>
-              </footer>
-            </div> <!-- /container -->
-        
-        
-            <!-- Bootstrap core JavaScript
-            ================================================== -->
-            <!-- Placed at the end of the document so the pages load faster -->
-            <script src="{% static 'scripts/jquery.min.js' %}"></script>
-            <script src="{% static 'scripts/bootstrap.min.js' %}"></script>
-        <span id="sbmarwbthv5"></span></body>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <div class="container">
+      <h1 class="display-3">Welcome to RentYourSocialMedia</h1>
+      {% if user.is_bookkeeper %}
+        <p>
+          <a class="btn btn-default btn-lg" href="{% url "bookkeeper_reports_list" %}" role="button">See reports »</a>
+          <a class="btn btn-primary btn-lg" href="{% url "bookkeeper_report_preview" %}" role="button">See report preview »</a>
+        </p>
+      {% else %}
+        <p>
+          {% if bundler %}
+            Your UTM Source is {{bundler.utm_source}}. If you want to see your leads, just click on the button below.
+          {% else %}
+            You can see all leads.
+          {% endif %}
+        </p>
+        <p>
+          <a class="btn btn-primary btn-lg" href="{% url "dashboard" %}" role="button">Go to dashboard »</a>
+          <a class="btn btn-default btn-lg" href="{% url "report" %}" role="button">Go to reports »</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container">
+    <footer>
+      <p>© RentYourSocialMedia 2018</p>
+    </footer>
+  </div> <!-- /container -->
+
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="{% static 'scripts/jquery.min.js' %}"></script>
+  <script src="{% static 'scripts/bootstrap.min.js' %}"></script>
+<span id="sbmarwbthv5"></span>
 {% endblock %}

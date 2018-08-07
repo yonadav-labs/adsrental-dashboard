@@ -6,6 +6,7 @@ from functools import wraps
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.conf import settings
+from django.http import HttpResponseRedirect
 
 
 def view_or_basicauth(view, request, *args, **kwargs):
@@ -34,3 +35,30 @@ def basicauth_required(view_func):
     def wrapper(request, *args, **kwargs):
         return view_or_basicauth(view_func, request, *args, **kwargs)
     return wrapper
+
+def https_required(function):
+    def wrap(self, request, *args, **kwargs):
+        if request.is_secure():
+            return function(self, request, *args, **kwargs)
+
+        protocol = u'https'
+        host = u'{protocol}://{domain}'.format(
+            protocol=protocol,
+            domain=request.get_host().split(':')[0],
+        )
+
+        if settings.SSL_PORT:
+            host = u'{host}:{port}'.format(
+                host=host,
+                port=settings.SSL_PORT,
+            )
+
+        url = u'{host}{path}'.format(
+            host=host,
+            path=request.get_full_path()
+        )
+        return HttpResponseRedirect(url)
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap

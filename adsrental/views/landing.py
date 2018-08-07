@@ -4,11 +4,10 @@ import json
 
 from django.views import View
 from django.shortcuts import render, redirect
-from django.conf import settings
-from django.http import HttpResponseRedirect
 
 from adsrental.forms import LandingForm
 from adsrental.models.bundler import Bundler
+from adsrental.decorators import https_required
 
 
 class TermsView(View):
@@ -17,28 +16,8 @@ class TermsView(View):
 
 
 class LandingView(View):
-    def redirect_https(self, request):
-        protocol = u'https'
-        host = u'{protocol}://{domain}'.format(
-            protocol=protocol,
-            domain=request.get_host().split(':')[0],
-        )
-
-        if settings.SSL_PORT:
-            host = u'{host}:{port}'.format(
-                host=host,
-                port=settings.SSL_PORT,
-            )
-
-        url = u'{host}{path}'.format(
-            host=host,
-            path=request.get_full_path()
-        )
-        return HttpResponseRedirect(url)
-
+    @https_required
     def get(self, request):
-        if not request.is_secure():
-            return self.redirect_https(request)
         if 'utm_source' in request.GET:
             utm_source = request.GET.get('utm_source')
             request.session['utm_source'] = utm_source
@@ -55,6 +34,7 @@ class LandingView(View):
             form=LandingForm(),
         ))
 
+    @https_required
     def post(self, request):
         form = LandingForm(request.POST)
         if form.is_valid():
