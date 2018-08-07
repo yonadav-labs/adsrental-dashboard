@@ -41,17 +41,7 @@ def https_required(function):
         if request.is_secure():
             return function(self, request, *args, **kwargs)
 
-        protocol = u'https'
-        host = u'{protocol}://{domain}'.format(
-            protocol=protocol,
-            domain=request.get_host().split(':')[0],
-        )
-
-        if settings.SSL_PORT:
-            host = u'{host}:{port}'.format(
-                host=host,
-                port=settings.SSL_PORT,
-            )
+        host = settings.DOMAIN
 
         url = u'{host}{path}'.format(
             host=host,
