@@ -67,6 +67,8 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'unban',
         'report_wrong_password',
         'report_correct_password',
+        'report_security_checkpoint',
+        'report_security_checkpoint_resolved',
         'sync_to_adsdb',
     )
     readonly_fields = (
@@ -271,6 +273,27 @@ class LeadAccountAdmin(admin.ModelAdmin):
             'form': form,
         })
 
+
+    def report_security_checkpoint(self, request, queryset):
+        for lead_account in queryset:
+            if lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
+
+    def report_security_checkpoint_resolved(self, request, queryset):
+        for lead_account in queryset:
+            if not lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = None
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
+
     def sync_to_adsdb(self, request, queryset):
         for lead_account in queryset:
             result = lead_account.sync_to_adsdb()
@@ -345,6 +368,8 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
     actions = (
         'report_wrong_password',
         'report_correct_password',
+        'report_security_checkpoint',
+        'report_security_checkpoint_resolved',
     )
 
     # We cannot call super().get_fields(request, obj) because that method calls
