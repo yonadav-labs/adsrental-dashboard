@@ -187,13 +187,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_banned():
-                messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
                 continue
 
             lead_account.qualify(request.user)
             if lead_account.lead.assign_raspberry_pi():
                 messages.success(
-                    request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
+                    request, '{} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
             if lead_account.lead.add_shipstation_order():
                 messages.success(
@@ -205,11 +205,11 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_banned():
-                messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
                 continue
 
             lead_account.disqualify(request.user)
-            messages.info(request, 'Lead Account {} is disqualified.'.format(lead_account))
+            messages.info(request, '{} is disqualified.'.format(lead_account))
 
     def ban(self, request, queryset):
         if 'do_action' in request.POST:
@@ -218,7 +218,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 reason = form.cleaned_data['reason']
                 for lead_account in queryset:
                     lead_account.ban(request.user, reason)
-                    messages.info(request, 'Lead Account {} is banned.'.format(lead_account))
+                    messages.info(request, '{} is banned.'.format(lead_account))
                 return None
         else:
             form = AdminLeadAccountBanForm()
@@ -234,14 +234,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead_account in queryset:
             if lead_account.unban(request.user):
-                messages.info(request, 'Lead Account {} is unbanned.'.format(lead_account))
+                messages.info(request, '{} is unbanned.'.format(lead_account))
 
     def report_wrong_password(self, request, queryset):
         for lead_account in queryset:
             if lead_account.wrong_password_date is None:
                 lead_account.wrong_password_date = timezone.now()
                 lead_account.save()
-                messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+                messages.info(request, '{} password is marked as wrong.'.format(lead_account))
 
     def report_correct_password(self, request, queryset):
         if queryset.count() != 1:
@@ -277,35 +277,35 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def report_security_checkpoint(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_security_checkpoint_reported():
-                messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
+                messages.info(request, '{} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
             lead_account.security_checkpoint_date = timezone.now()
             lead_account.save()
-            messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
+            messages.info(request, '{} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_resolved(self, request, queryset):
         for lead_account in queryset:
             if not lead_account.is_security_checkpoint_reported():
-                messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
+                messages.info(request, '{} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
             lead_account.security_checkpoint_date = None
             lead_account.save()
-            messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
+            messages.info(request, '{} security checkpoint reported as resolved.'.format(lead_account))
 
     def sync_to_adsdb(self, request, queryset):
         for lead_account in queryset:
             result = lead_account.sync_to_adsdb()
             if result:
-                messages.info(request, 'Lead Account {} is synced: {}'.format(lead_account, result))
+                messages.info(request, '{} is synced: {}'.format(lead_account, result))
             else:
-                messages.warning(request, 'Lead Account {} does not meet conditions to sync.'.format(lead_account))
+                messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
 
     def touch(self, request, queryset):
         for lead_account in queryset:
             lead_account.touch()
-            messages.info(request, 'Lead Account {} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
+            messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = 'lead__leadid'
