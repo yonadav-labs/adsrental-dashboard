@@ -133,9 +133,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result -= bundler.facebook_chargeback
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                result -= bundler.google_changeback
+                result -= bundler.google_chargeback
             if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
-                result -= bundler.amazon_changeback
+                result -= bundler.amazon_chargeback
 
         return result
 
