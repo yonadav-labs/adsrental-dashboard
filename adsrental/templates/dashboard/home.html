@@ -10,7 +10,7 @@
 <div class="">
     <div class="col-md-10">
         <h3>Filter presets</h3>
-        <div class="btn-group" role="group" aria-label="Basic example">
+        <div class="btn-group" role="group">
             <a href="{% url 'dashboard' %}?lead_status=In-Progress&amp;preset=offline&amp;raspberry_pi_status=offline" type="button" class="btn {% if preset == 'offline' %}btn-primary{% else %} btn-default{% endif %}">
                 In-Progress Offline
             </button>

@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Bundler bonuses for {{start_date|date:"d M"}} - {{end_date|date:"d M"}}</h1>
+
+    <h2>Select date</h2>
+        {% for dates in dates_list %}
+            {% if dates.start_date == start_date %}
+                {{dates.start_date|date:"d M"}} - {{dates.end_date|date:"d M"}}
+            {% else %}
+                <a class="button" href="{% url 'admin_helpers:bundler_bonuses' %}?date={{dates.start_date|date:"Y-m-d"|urlencode }}">
+                    {% if dates.start_date < start_date  %}
+                        &lt;&lt;
+                    {% else %}
+                        &gt;&gt;
+                    {% endif %}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+    <h2>Bundler bonuses</h2>
+
+    {% if bundler_stats %}
+        <table>
+            <thead>
+                <th>Bundler</th>
+                <th>Parent bundler</th>
+                <th>Lead accounts</th>
+                <th>Bonus</th>
+            </thead>
+            <tbody>
+                {% for bundler_stat in bundler_stats %}
+                    <tr>
+                        <th>
+                            <a href="{% url 'admin:adsrental_bundler_changelist' %}?q={{ bundler_stat.lead__bundler__name|urlencode }}">
+                                {{ bundler_stat.lead__bundler__name }}
+                            </a>
+                        </th>
+                        <td>
+                            {% if bundler_stat.lead__bundler__parent_bundler__name %}
+                                <a href="{% url 'admin:adsrental_bundler_changelist' %}?q={{ bundler_stat.lead__bundler__parent_bundler__name|urlencode }}">
+                                    {{ bundler_stat.lead__bundler__parent_bundler__name }}
+                                </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ bundler_stat.lead_accounts_count }}
+                        </td>
+                        <td>
+                            ${{ bundler_stat.bonus|floatformat:2 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        No data
+    {% endif %}
+    
+
+
+    <h2>Parent bundler bonuses</h2>
+    {% if parent_bundler_stats %}
+        <table>
+            <thead>
+                <th>Bundler</th>
+                <th>Lead accounts</th>
+                <th>Bonus</th>
+            </thead>
+            <tbody>
+                {% for bundler_stat in parent_bundler_stats %}
+                    <tr>
+                        <th>
+                            <a href="{% url 'admin:adsrental_bundler_changelist' %}?q={{ bundler_stat.bundler_name|urlencode }}">
+                                {{ bundler_stat.bundler_name }}
+                            </a>
+                        </th>
+                        <td>
+                            {{ bundler_stat.lead_accounts_count }}
+                        </td>
+                        <td>
+                            ${{ bundler_stat.bonus|floatformat:2 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        No data
+    {% endif %}
+
+{% endblock %}

@@ -10,7 +10,7 @@
 <div class="container">
     <h3>Check report for UTM source {{ bundler.utm_source }} for {{ date_formatted }}</h3>
 
-    <div class="btn-group" role="group" aria-label="Basic example">
+    <div class="btn-group" role="group">
         {% for select_date in select_dates %}
             <a href="{% url 'bundler_report_check' bundler_id=bundler.id %}?date={{ select_date|date:"Y-m-d" }}" class="btn btn-default {% if select_date == date %}btn-primary{% endif %}">{{ select_date|date:"M Y" }}</a>
         {% endfor %}

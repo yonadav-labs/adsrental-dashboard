@@ -127,6 +127,9 @@ class CustomIndexDashboard(Dashboard):
                         banned_date='last_30_days',
                     )),
                 )],
+                [_('Bundler bonuses'), '{}'.format(
+                    reverse('admin_helpers:bundler_bonuses'),
+                )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urlencode(dict(

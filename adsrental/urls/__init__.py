@@ -13,13 +13,11 @@ from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
 from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
-from adsrental.views.admin_helpers import AdminActionView
 from adsrental.views.robots import RobotsView
 from adsrental.views.pi_config import PiConfigView
 
 
 urlpatterns = [
-    path('admin_helpers/action/<model_name>/<action_name>/<object_id>/', AdminActionView.as_view(), name='admin_helpers_action'),
     path('', LandingView.as_view(), name='home'),
     path('terms/', TermsView.as_view(), name='terms'),
     path('thankyou/', ThankyouView.as_view(), name='thankyou'),
@@ -51,5 +49,6 @@ urlpatterns = [
     path('user/', include('adsrental.urls.user')),
     path('dashboard/', include('adsrental.urls.dashboard')),
     path('bookkeeper/', include('adsrental.urls.bookkeeper')),
+    path('admin_helpers/', include(('adsrental.urls.admin_helpers', 'adsrental'), namespace='admin_helpers')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
 ]

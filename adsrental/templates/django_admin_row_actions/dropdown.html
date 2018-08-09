@@ -2,7 +2,7 @@
 <div>
     {% for item in items %}
         {% if item.enabled %}
-            <a class="button" href="{% url 'admin_helpers_action' model_name=model_name action_name=item.action object_id=obj.pk %}?next={{ request.get_full_path }}">{{ item.label }}</a>
+            <a class="button" href="{% url 'admin_helpers:action' model_name=model_name action_name=item.action object_id=obj.pk %}?next={{ request.get_full_path|urlencode }}">{{ item.label }}</a>
         {% endif %}
     {% endfor %}
 </div>
