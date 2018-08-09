@@ -579,11 +579,8 @@ class LeadAdmin(admin.ModelAdmin):
                         lead.unban(request.user)
                         messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
 
-                    if lead.raspberry_pi.first_tested:
-                        lead.prepare_for_reshipment(request.user)
-                        messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
-
-                    messages.success(request, 'RPID {} is ready to be tested.'.format(lead.raspberry_pi.rpid))
+                    lead.prepare_for_reshipment(request.user)
+                    messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
                 return None
         else:
             rpids = [i.raspberry_pi.rpid for i in queryset if i.raspberry_pi]
