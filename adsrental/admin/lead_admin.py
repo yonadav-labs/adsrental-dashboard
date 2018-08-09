@@ -576,8 +576,8 @@ class LeadAdmin(admin.ModelAdmin):
                 queryset = Lead.objects.filter(raspberry_pi__rpid__in=rpids)
                 for lead in queryset:
                     if lead.is_banned():
-                        lead.unban(request.user)
-                        messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+                        messages.info(request, 'Lead {} is banned, skipping.'.format(lead.email))
+                        continue
 
                     lead.prepare_for_reshipment(request.user)
                     messages.info(request, 'RPID {} is prepared for testing.'.format(lead.raspberry_pi.rpid))
