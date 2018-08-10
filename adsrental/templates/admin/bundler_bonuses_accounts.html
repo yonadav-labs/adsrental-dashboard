@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Bundler {{ bundler.name }} bonuses for {{start_date|date:"d M"}} - {{end_date|date:"d M"}}</h1>
+
+    <a class="button" href="{% url 'admin_helpers:bundler_bonuses' %}?date={{start_date|date:"Y-m-d"|urlencode }}">
+        &lt;&lt; Back
+    </a>
+
+
+    <h2>Select date</h2>
+        {% for dates in dates_list %}
+            {% if dates.start_date == start_date %}
+                {{dates.start_date|date:"d M"}} - {{dates.end_date|date:"d M"}}
+            {% else %}
+                <a class="button" href="{% url 'admin_helpers:bundler_bonuses_accounts' bundler_id=bundler.id %}?date={{dates.start_date|date:"Y-m-d"|urlencode }}">
+                    {% if dates.start_date < start_date  %}
+                        &lt;&lt;
+                    {% else %}
+                        &gt;&gt;
+                    {% endif %}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+    <h2>Bundler bonuses</h2>
+
+    {% if lead_accounts %}
+        <table>
+            <thead>
+                <th>Lead</th>
+                <th>Username</th>
+                <th>Type</th>
+                <th>Qualified date</th>
+            </thead>
+            <tbody>
+                {% for lead_account in lead_accounts %}
+                    <tr>
+                        <th>
+                            <a href="{% url 'admin:adsrental_lead_changelist'%}?q={{ lead_account.lead.email|urlencode }}">
+                                {{ lead_account.lead.name }}
+                            </a>
+                        </th>
+                        <td>
+                            {{ lead_account.username }}
+                        </td>
+                        <td>
+                            {{ lead_account.get_account_type_display }}
+                        </td>
+                        <td>
+                            {{ lead_account.qualified_date|date:"d M Y" }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        No data
+    {% endif %}
+
+{% endblock %}

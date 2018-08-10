@@ -46,7 +46,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            {{ bundler_stat.lead_accounts_count }}
+                            <a href="{% url 'admin_helpers:bundler_bonuses_accounts' bundler_id=bundler_stat.lead__bundler_id %}?date={{ start_date|urlencode }}">
+                                {{ bundler_stat.lead_accounts_count }}
+                            </a>
                         </td>
                         <td>
                             ${{ bundler_stat.bonus|floatformat:2 }}

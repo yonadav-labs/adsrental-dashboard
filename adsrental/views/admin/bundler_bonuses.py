@@ -50,6 +50,7 @@ class AdminBundlerBonusesView(View):
                 ))
 
         bundler_stats = LeadAccount.objects.filter(
+            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             lead__bundler__isnull=False,
             qualified_date__gt=start_date,
             qualified_date__lt=end_date + datetime.timedelta(days=1),
