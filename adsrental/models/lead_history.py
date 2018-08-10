@@ -109,11 +109,11 @@ class LeadHistory(models.Model):
 
     def is_wrong_password(self):
         'Check if password for this day was reported wrong at least 3 times.'
-        if self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN:
+        if self.is_wrong_password_facebook():
             return True
-        if self.checks_wrong_password_google >= self.WRONG_PASSWORD_CHECKS_MIN:
+        if self.is_wrong_password_google():
             return True
-        if self.checks_wrong_password_amazon >= self.WRONG_PASSWORD_CHECKS_MIN:
+        if self.is_wrong_password_amazon():
             return True
 
         return False

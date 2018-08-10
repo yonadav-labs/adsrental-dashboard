@@ -31,9 +31,10 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
     lead = models.ForeignKey(Lead, help_text='Linked lead.', on_delete=models.CASCADE)
     date = models.DateField(db_index=True)
-    days_offline = models.IntegerField(default=0, help_text='Days when device had been online less than 12 hours.')
-    days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 12 hours.')
-    days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least once.')
+    days_offline = models.IntegerField(default=0, help_text='Days when device had been online less than 3 hours.')
+    days_online = models.IntegerField(default=0, help_text='Days when device had been online more than 3 hours.')
+    days_wrong_password = models.IntegerField(default=0, help_text='Days when wrong password was reported at least 3 hours.')
+    days_sec_checkpoint = models.IntegerField(default=0, help_text='Days when security checkpoint was reported at least 3 hours.')
     max_payment = models.DecimalField(null=True, blank=True, max_digits=6, decimal_places=2, help_text='Max payment to lead, depends on qualified date and his accounts.')
     amount = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Sum to be paid to lead')
     amount_moved = models.DecimalField(default=decimal.Decimal('0.00'), max_digits=6, decimal_places=2, help_text='Amount moved from next month')
@@ -50,6 +51,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         self.days_offline = 0
         self.days_online = 0
         self.days_wrong_password = 0
+        self.days_sec_checkpoint = 0
         lead_histories = LeadHistory.objects.filter(
             lead=self.lead,
             date__gte=self.get_first_day(),
@@ -66,6 +68,10 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             lead_history.amount = amount
             lead_history.note = note
             total_amount += amount
+            if lead_history.is_wrong_password():
+                self.days_wrong_password += 1
+            if lead_history.is_sec_checkpoint():
+                self.days_sec_checkpoint += 1
             if lead_history.is_online():
                 self.days_online += 1
             else:

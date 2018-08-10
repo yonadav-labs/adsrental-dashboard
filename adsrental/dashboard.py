@@ -148,10 +148,10 @@ class CustomIndexDashboard(Dashboard):
             deletable=False,
             collapsible=False,
             children=[
-                [_('Admin Documentation'), '/app/admin/doc/', ],
-                [_('FAQ: Lead documentation'), '/app/admin/doc/models/adsrental.lead/', ],
-                [_('FAQ: RaspberryPi documentation'), '/app/admin/doc/models/adsrental.raspberrypi/', ],
-                [_('FAQ: EC2 Instance documentation'), '/app/admin/doc/models/adsrental.ec2instance/', ],
+                [_('Admin Documentation'), '/admin/doc/', ],
+                [_('FAQ: Lead documentation'), '/admin/doc/models/adsrental.lead/', ],
+                [_('FAQ: RaspberryPi documentation'), '/admin/doc/models/adsrental.raspberrypi/', ],
+                [_('FAQ: EC2 Instance documentation'), '/admin/doc/models/adsrental.ec2instance/', ],
             ]
         ))
 

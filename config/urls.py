@@ -8,11 +8,12 @@ from adsrental.views.errors import Error404View, Error500View
 admin.site.site_header = 'Adsrental Administration'
 
 urlpatterns = [
-    path('app/admin_tools/', include('admin_tools.urls')),
-    path('', include('adsrental.urls')),
+    path('admin/tools/', include('admin_tools.urls')),
+    path('admin/', admin.site.urls),
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('app/admin/', admin.site.urls),
-    path('app/', include('adsrental.urls')),
-    path('app/admin/doc/', include('django.contrib.admindocs.urls')),
+    path('', include('adsrental.urls')),
+    path('app/', include(('adsrental.urls', 'adsrental'), namespace='old_schema')),
     path('__debug__/', include(debug_toolbar.urls)),
 ]
 

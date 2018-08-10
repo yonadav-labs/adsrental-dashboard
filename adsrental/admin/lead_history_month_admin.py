@@ -42,6 +42,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'lead_address',
         'days_online',
         'days_offline',
+        'days_wrong_password',
+        'days_sec_checkpoint',
         'amount_current_field',
         'amount_moved_field',
         'amount_field',
