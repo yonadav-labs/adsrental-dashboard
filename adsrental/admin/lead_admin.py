@@ -1,6 +1,3 @@
-
-from __future__ import unicode_literals
-
 import html
 
 from django.contrib import admin

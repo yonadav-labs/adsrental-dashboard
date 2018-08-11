@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 
 from adsrental.admin.lead_admin import LeadAdmin, ReadOnlyLeadAdmin, ReportLeadAdmin

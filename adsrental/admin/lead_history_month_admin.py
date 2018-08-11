@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 from urllib.parse import urlencode
 import unicodecsv as csv

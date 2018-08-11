@@ -1,6 +1,3 @@
-
-from __future__ import unicode_literals
-
 import datetime
 from dateutil.relativedelta import relativedelta
 

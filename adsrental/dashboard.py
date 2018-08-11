@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from urllib.parse import urlencode
 import datetime
 from dateutil.relativedelta import relativedelta
