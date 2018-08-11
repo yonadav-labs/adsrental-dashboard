@@ -13,7 +13,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
-from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm
+from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_change import LeadChange
@@ -159,6 +159,7 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'sync_to_adsdb_facebook',
         'sync_to_adsdb_google',
+        'delete_leads',
     )
     readonly_fields = (
         'created',
@@ -568,6 +569,26 @@ class LeadAdmin(admin.ModelAdmin):
             lead.clear_ping_cache()
             messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
+    def delete_leads(self, request, queryset):
+        if 'do_action' in request.POST:
+            form = AdminLeadDeleteForm(request.POST)
+            if form.is_valid():
+                for lead in queryset:
+                    lead.delete()
+                    messages.success(request, 'Lead {} was deleted.'.format(lead.email))
+
+                return None
+        else:
+            form = AdminLeadDeleteForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'delete_leads',
+            'title': 'Delete leads',
+            'button': 'Delete',
+            'objects': queryset,
+            'form': form,
+        })
+
     def prepare_for_testing(self, request, queryset):
         if 'do_action' in request.POST:
             form = AdminPrepareForReshipmentForm(request.POST)
@@ -971,6 +992,8 @@ class LeadAdmin(admin.ModelAdmin):
 
     usps_field.short_description = 'USPS'
     usps_field.admin_order_field = 'shipstation_order_status'
+
+    delete_leads.short_description = 'DEBUG: Delete leads'
 
 
 class ReportLeadAdmin(LeadAdmin):

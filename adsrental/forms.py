@@ -264,6 +264,18 @@ class AdminLeadAccountBanForm(forms.Form):
     reason = forms.ChoiceField(choices=LeadAccount.BAN_REASON_CHOICES)
 
 
+class AdminLeadDeleteForm(forms.Form):
+    CHECK_CORRECT = 'DELETE'
+
+    check = forms.CharField(label='Password')
+
+    def clean_check(self):
+        value = self.cleaned_data['check']
+        if value != self.CHECK_CORRECT:
+            raise forms.ValidationError("Invalid password, you cannot delete leads")
+
+        return value
+
 class AdminLeadAccountPasswordForm(forms.Form):
     old_password = forms.CharField(label='Old password', widget=forms.TextInput(attrs=dict(readonly=True)), required=False)
     new_password = forms.CharField(label='New password')
