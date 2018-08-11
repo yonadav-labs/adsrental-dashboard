@@ -43,6 +43,10 @@ class BundlerLeaderboardView(View):
             primary=True,
         )
 
+        name_field = 'lead__bundler__utm_source'
+        if request.user.is_superuser:
+            name_field = 'lead__bundler__name'
+
         month_start, _ = get_month_boundaries_for_dt(now)
         last_month_start, last_month_end = get_month_boundaries_for_dt(month_start - datetime.timedelta(days=1))
         lead_accounts_last_month = (
@@ -51,10 +55,10 @@ class BundlerLeaderboardView(View):
                 qualified_date__gt=last_month_start,
                 qualified_date__lt=last_month_end,
             )
-            .values('lead__bundler__utm_source')
+            .values(name_field)
             .annotate(count=Count('id'))
-            .order_by('lead__bundler__utm_source')
-            .values_list('lead__bundler__utm_source', 'count')
+            .order_by(name_field)
+            .values_list(name_field, 'count')
         )
 
         last_week_start, last_week_end = get_week_boundaries_for_dt(now - datetime.timedelta(days=7))
@@ -64,19 +68,19 @@ class BundlerLeaderboardView(View):
                 qualified_date__gt=last_week_start,
                 qualified_date__lt=last_week_end,
             )
-            .values('lead__bundler__utm_source')
+            .values(name_field)
             .annotate(count=Count('id'))
-            .order_by('lead__bundler__utm_source')
-            .values_list('lead__bundler__utm_source', 'count')
+            .order_by(name_field)
+            .values_list(name_field, 'count')
         )
 
         lead_accounts_today = (
             lead_accounts
             .filter(qualified_date__gt=now.replace(hour=0, minute=0, second=0))
-            .values('lead__bundler__utm_source')
+            .values(name_field)
             .annotate(count=Count('id'))
-            .order_by('lead__bundler__utm_source')
-            .values_list('lead__bundler__utm_source', 'count')
+            .order_by(name_field)
+            .values_list(name_field, 'count')
         )
 
         lead_accounts_yesterday = (
@@ -85,10 +89,10 @@ class BundlerLeaderboardView(View):
                 qualified_date__lt=now.replace(hour=0, minute=0, second=0),
                 qualified_date__gt=now.replace(hour=0, minute=0, second=0) - datetime.timedelta(days=1),
             )
-            .values('lead__bundler__utm_source')
+            .values(name_field)
             .annotate(count=Count('id'))
-            .order_by('lead__bundler__utm_source')
-            .values_list('lead__bundler__utm_source', 'count')
+            .order_by(name_field)
+            .values_list(name_field, 'count')
         )
 
         lead_accounts_today_total = 0
