@@ -46,7 +46,7 @@ class AdminBundlerBonusesView(View):
             if start_date + datetime.timedelta(days=7 * i) < now:
                 dates_list.append(dict(
                     start_date=start_date + datetime.timedelta(days=7 * i),
-                    end_date=end_date + datetime.timedelta(days=7 * i),
+                    end_date=end_date + datetime.timedelta(days=6 * i),
                 ))
 
         bundler_stats = LeadAccount.objects.filter(
@@ -93,6 +93,6 @@ class AdminBundlerBonusesView(View):
             bundler_stats=bundler_stats,
             parent_bundler_stats=parent_bundler_stats,
             start_date=start_date,
-            end_date=end_date,
+            end_date=end_date - datetime.timedelta(days=1),
             dates_list=dates_list,
         ))
