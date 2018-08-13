@@ -11,4 +11,4 @@
 */10 * * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/cron/check_ec2/ >> /root/logs/cron_check_ec2.log
 */2 * * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/cron/update_ping/ >> /root/logs/cron_update_ping.log
 0 * * * * /usr/bin/curl -w "\n\n\n" https://adsrental.com/cron/bundler_lead_stat/ >> /root/logs/cron_bundler_lead_stat.log
-*/10 * * * * bash /root/dashboard/scripts/webconnect_keepalive.sh
+*/10 * * * * bash /root/dashboard/scripts/webconnect_keepalive.sh >> /root/logs/cron_webconnect_keepalive.log
