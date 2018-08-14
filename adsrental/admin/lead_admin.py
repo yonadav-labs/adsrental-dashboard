@@ -167,7 +167,7 @@ class LeadAdmin(admin.ModelAdmin):
         'shipstation_order_number',
         'raspberry_pi',
     )
-    exclude = ('tracking_info', )
+    exclude = ('tracking_info', 'utm_source', )
     raw_id_fields = ('raspberry_pi', )
 
     def __init__(self, *args, **kwargs):
