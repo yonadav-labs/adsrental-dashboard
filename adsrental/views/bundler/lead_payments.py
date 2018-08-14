@@ -26,7 +26,7 @@ class BundlerLeadPaymentsView(View):
         lead_accounts = LeadAccount.objects.filter(lead__bundler=bundler, account_type=account_type, active=True).prefetch_related('lead')
         for lead_account in lead_accounts:
             chargeback = lead_account.charge_back
-            amount = decimal.Decimal('0.00')
+            total_amount = decimal.Decimal('0.00')
             start_date = lead_account.bundler_paid_date
             lead_histories = LeadHistory.objects.filter(lead=lead_account.lead, date__lte=end_date)
             if lead_account.bundler_paid_date:
@@ -38,12 +38,13 @@ class BundlerLeadPaymentsView(View):
             for lead_history in lead_histories:
                 if start_date is None or start_date > lead_history.date:
                     start_date = lead_history.date
-                amount += lead_history.get_amount()
+                amount, _ = lead_history.get_amount_with_note()
+                total_amount += amount
 
             entry = dict(
                 name=str(lead_account),
                 lead=lead_account.lead.name(),
-                amount=amount,
+                amount=total_amount,
                 chargeback=chargeback,
                 start_date=start_date,
             )
