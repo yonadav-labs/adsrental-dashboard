@@ -1,3 +1,5 @@
+# TODO: OBSOLETE
+
 import datetime
 import io
 import decimal
@@ -23,7 +25,7 @@ class BundlerLeadPaymentsView(View):
         final_total = 0
         chargeback_total = 0
 
-        lead_accounts = LeadAccount.objects.filter(lead__bundler=bundler, account_type=account_type, active=True).prefetch_related('lead')
+        lead_accounts = LeadAccount.objects.filter(lead__bundler=bundler, account_type=account_type, active=True)[:10].prefetch_related('lead')
         for lead_account in lead_accounts:
             chargeback = lead_account.charge_back
             total_amount = decimal.Decimal('0.00')

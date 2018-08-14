@@ -117,7 +117,7 @@ class CustomIndexDashboard(Dashboard):
                     )),
                 )],
                 [_('Bundler payments report preview'), '{}'.format(
-                    reverse('bundler_lead_payments'),
+                    reverse('bundler_payments'),
                 )],
                 [_('Banned lead accounts last 30 days'), '{}?{}'.format(
                     reverse('admin:adsrental_leadaccount_changelist'),
