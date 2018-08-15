@@ -289,6 +289,7 @@ class Lead(models.Model, FulltextSearchMixin):
         old_value = self.pi_delivered
         self.shipstation_order_number = None
         self.shipstation_order_status = None
+        self.usps_tracking_code = None
         self.pi_delivered = False
         now = timezone.localtime(timezone.now())
         extra_note = 'Prepared for reshipment by {} on {}'.format(
