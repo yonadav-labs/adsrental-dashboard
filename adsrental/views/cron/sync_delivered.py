@@ -44,34 +44,35 @@ class SyncDeliveredView(View):
                 status__in=Lead.STATUSES_ACTIVE,
                 usps_tracking_code__isnull=False,
                 ship_date__gte=timezone.now() - datetime.timedelta(days=days_ago),
-            )
+            ).prefetch_related('raspberry_pi')
         else:
             leads = Lead.objects.filter(
                 status__in=Lead.STATUSES_ACTIVE,
                 usps_tracking_code__isnull=False,
                 pi_delivered=False,
                 ship_date__gte=timezone.now() - datetime.timedelta(days=days_ago),
-            )
+            ).prefetch_related('raspberry_pi')
         pool = ThreadPool(processes=threads)
         results = pool.map(self.get_tracking_info, leads)
         results_map = dict(results)
         for lead in leads:
+            label = lead.raspberry_pi.rpid if lead.raspberry_pi else lead.email
             tracking_info_xml = results_map.get(lead.email)
             pi_delivered = lead.get_pi_delivered_from_xml(tracking_info_xml)
             if pi_delivered is None:
-                errors.append(lead.email)
+                errors.append(label)
                 continue
             lead.tracking_info = tracking_info_xml
             if pi_delivered is not None and pi_delivered != lead.pi_delivered:
-                changed.append(lead.email)
+                changed.append(label)
                 if not test and pi_delivered:
                     CustomerIOClient().send_lead_event(lead, CustomerIOClient.EVENT_DELIVERED, tracking_code=lead.usps_tracking_code)
             lead.update_pi_delivered(pi_delivered, tracking_info_xml)
 
             if pi_delivered:
-                delivered.append(lead.email)
+                delivered.append(label)
             else:
-                not_delivered.append(lead.email)
+                not_delivered.append(label)
 
         if not test:
             bulk_update(leads, update_fields=['tracking_info', 'pi_delivered', 'delivery_date'])
