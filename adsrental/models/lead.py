@@ -380,6 +380,8 @@ class Lead(models.Model, FulltextSearchMixin):
 
         if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
             self.usps_tracking_code = data.get('trackingNumber')
+            self.tracking_info = None
+            self.pi_delivered = False
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_SHIPPED, tracking_code=self.usps_tracking_code)
             # self.pi_delivered = True
             self.save()
