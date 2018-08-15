@@ -84,7 +84,16 @@ class SyncFromShipStationView(View):
             last_page = len(response['orders']) < 100
             for row in response['orders']:
                 order_number = row['orderNumber']
+                rpid = order_number.split('__')[0]
                 lead = Lead.objects.filter(shipstation_order_number=order_number).first()
+
+                if find and not lead:
+                    lead = Lead.objects.filter(shipstation_order_number=None, raspberry_pi__rpid=rpid).first()
+                    if lead:
+                        lead.shipstation_order_number = order_number
+                        lead.save()
+                        orders_found.append(order_number)
+
                 if not lead:
                     orders_not_found.append(order_number)
                     continue
