@@ -23,6 +23,7 @@ class SyncFromShipStationView(View):
         order_numbers = []
         orders_new = []
         orders_not_found = []
+        orders_found = []
         orders_status_updated = []
         days_ago = int(request.GET.get('days_ago', '1'))
         force = request.GET.get('force')
@@ -45,7 +46,15 @@ class SyncFromShipStationView(View):
 
             for row in response['shipments']:
                 order_number = row['orderNumber']
+                rpid = order_number.split('__')[0]
                 lead = Lead.objects.filter(shipstation_order_number=order_number).first()
+                if not lead:
+                    lead = Lead.objects.filter(shipstation_order_number=None, raspberry_pi__rpid=rpid).first()
+                    if lead:
+                        lead.shipstation_order_number = order_number
+                        lead.save()
+                        orders_found.append(order_number)
+                
                 if not lead:
                     orders_not_found.append(order_number)
                     continue
@@ -87,6 +96,7 @@ class SyncFromShipStationView(View):
             'result': True,
             'order_numbers': order_numbers,
             'orders_new': orders_new,
+            'orders_found': orders_found,
             'orders_not_found': orders_not_found,
             'orders_status_updated': orders_status_updated,
             'days_ago': days_ago,
