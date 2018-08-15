@@ -26,7 +26,8 @@ class SyncFromShipStationView(View):
         orders_found = []
         orders_status_updated = []
         days_ago = int(request.GET.get('days_ago', '1'))
-        force = request.GET.get('force')
+        force = request.GET.get('force', '') == 'true'
+        find = request.GET.get('find', '') == 'true'
         request_params = {}
         date_start = timezone.now() - datetime.timedelta(days=days_ago)
         request_params['shipDateStart'] = date_start.strftime(settings.SYSTEM_DATE_FORMAT)
@@ -48,13 +49,14 @@ class SyncFromShipStationView(View):
                 order_number = row['orderNumber']
                 rpid = order_number.split('__')[0]
                 lead = Lead.objects.filter(shipstation_order_number=order_number).first()
-                if not lead:
+
+                if find and not lead:
                     lead = Lead.objects.filter(shipstation_order_number=None, raspberry_pi__rpid=rpid).first()
                     if lead:
                         lead.shipstation_order_number = order_number
                         lead.save()
                         orders_found.append(order_number)
-                
+
                 if not lead:
                     orders_not_found.append(order_number)
                     continue
