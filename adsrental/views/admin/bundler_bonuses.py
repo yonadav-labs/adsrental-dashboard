@@ -32,7 +32,7 @@ class AdminBundlerBonusesView(View):
         if not request.user.is_superuser:
             raise Http404
 
-        now = timezone.now()
+        now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
         date = request.GET.get('date')
         if date:
             date = parser.parse(date).replace(tzinfo=timezone.get_current_timezone())
