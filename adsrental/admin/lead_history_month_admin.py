@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.lead import Lead
@@ -241,7 +243,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     date_field.short_description = 'Date'
     lead_link.short_description = 'Lead'
-    lead_link.admin_order_field = 'lead__first_name'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     aggregate.short_description = 'DEBUG: Aggregate'
 
