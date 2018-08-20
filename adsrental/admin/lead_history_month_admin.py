@@ -2,12 +2,11 @@ import datetime
 from urllib.parse import urlencode
 import unicodecsv as csv
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse
 from django.conf import settings
-from django.contrib import messages
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
@@ -146,6 +145,13 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         field_names = [i[0] for i in self.csv_fields]
         field_titles = [i[1] for i in self.csv_fields]
         date = (datetime.datetime.strptime(request.GET.get('date'), settings.SYSTEM_DATE_FORMAT) if request.GET.get('date') else timezone.now()).date()
+        queryset = LeadHistoryMonth.objects.filter(
+            date=date,
+            move_to_next_month=False,
+        ).prefetch_related(
+            'lead',
+            'lead__raspberry_pi',
+        ).order_by('lead__first_name', 'lead__last_name')
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=check_report__{month}_{year}.csv'.format(
@@ -235,6 +241,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     date_field.short_description = 'Date'
     lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = 'lead__first_name'
+
     aggregate.short_description = 'DEBUG: Aggregate'
 
     amount_field.short_description = 'Amount Total'
