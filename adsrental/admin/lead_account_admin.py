@@ -5,6 +5,8 @@ from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
@@ -306,7 +308,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
     lead_link.short_description = 'Lead'
-    lead_link.admin_order_field = 'lead__leadid'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     status_field.short_description = 'Status'
     status_field.admin_order_field = 'status'
@@ -404,6 +406,6 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
         return obj.lead.raspberry_pi
 
     lead_link.short_description = 'Lead'
-    lead_link.admin_order_field = 'lead__leadid'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     raspberry_pi_field.short_description = 'Raspberry Pi'

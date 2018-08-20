@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_account import LeadAccount
@@ -175,6 +177,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
         )))
 
     lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     amount_field.short_description = 'Amount'
 

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.lead_change import LeadChange
 
@@ -9,7 +11,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
     model = LeadChange
     list_display = (
         'id',
-        'lead_field',
+        'lead_link',
         'lead_account_field',
         'field',
         'value',
@@ -24,7 +26,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
     )
     search_fields = ('lead__email', 'lead__raspberry_pi__rpid', )
 
-    def lead_field(self, obj):
+    def lead_link(self, obj):
         lead = obj.lead
         if not lead:
             return None
@@ -44,6 +46,8 @@ class LeadChangeAdmin(admin.ModelAdmin):
             q=lead_account.username,
         ))
 
-    lead_field.short_description = 'Lead'
+    lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     lead_account_field.short_description = 'Lead Account'
+    lead_account_field.admin_order_field = 'lead_account__username'

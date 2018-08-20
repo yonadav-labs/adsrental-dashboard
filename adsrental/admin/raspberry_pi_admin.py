@@ -5,6 +5,8 @@ from django.utils import timezone, timesince
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
@@ -133,6 +135,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         return mark_safe(', '.join(links))
 
     lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     ec2_instance_link.short_description = 'EC2 Instance'
 

@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
+from django.db.models import Value
+from django.db.models.functions import Concat
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
@@ -234,6 +236,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
                 messages.success(request, 'Essential EC2 {} status is okay: {}'.format(ec2.rpid, statuses))
 
     lead_link.short_description = 'Lead'
+    lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
 
     raspberry_pi_link.short_description = 'RaspberryPi'
 

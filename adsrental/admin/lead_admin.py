@@ -13,7 +13,6 @@ from django.template.loader import render_to_string
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
-from adsrental.models.lead_change import LeadChange
 from adsrental.admin.list_filters import \
     StatusListFilter, \
     RaspberryPiOnlineListFilter, \
@@ -42,24 +41,6 @@ class LeadAccountInline(admin.StackedInline):
         'active',
     )
     raw_id_fields = ('lead', )
-
-
-class LeadChangeInline(admin.TabularInline):
-    model = LeadChange
-    max_num = 2
-    readonly_fields = (
-        'field',
-        'value',
-        'old_value',
-        'created',
-        'edited_by',
-    )
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 
 class LeadAdmin(admin.ModelAdmin):
@@ -113,7 +94,6 @@ class LeadAdmin(admin.ModelAdmin):
         'lead_account__charge_back_billed',
     )
     inlines = (
-        # LeadChangeInline,
         LeadAccountInline,
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
