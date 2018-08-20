@@ -59,7 +59,11 @@
                                     {{ lead_account.get_account_type_display }}
                                     {{ lead_account.get_status_display }}
                                     {% if lead_account.ban_reason %}
-                                        ({{lead_account.get_ban_reason_display}}) 
+                                        {% if lead_account.ban_reason in lead_account.POLICY_BAN_REASONS %}
+                                            (Ads completed)
+                                        {% else %}
+                                            ({{lead_account.get_ban_reason_display}}) 
+                                        {% endif %}
                                     {% endif %}
                                 </p>
                             {% endfor %}

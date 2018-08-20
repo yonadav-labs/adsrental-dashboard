@@ -57,6 +57,19 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_AUTO_NOT_USED = 'auto_not_used'
     BAN_REASON_FACEBOOK_UNRESPONSIVE_USER = 'Facebook - Unresponsive User'
     BAN_REASON_GOOGLE_UNRESPONSIVE_USER = 'Google - Unresponsive User'
+    BAN_REASON_GOOGLE_POLICY = 'Google - Policy'
+    BAN_REASON_GOOGLE_BILLING = 'Google - Billing'
+    BAN_REASON_FACEBOOK_POLICY = 'Facebook - Policy'
+    BAN_REASON_FACEBOOK_BILLING = 'Facebook - Suspicious'
+    BAN_REASON_FACEBOOK_LOCKOUT = 'Facebook - Lockout'
+
+    POLICY_BAN_REASONS = (
+        BAN_REASON_GOOGLE_POLICY,
+        BAN_REASON_GOOGLE_BILLING,
+        BAN_REASON_FACEBOOK_POLICY,
+        BAN_REASON_FACEBOOK_BILLING,
+        BAN_REASON_FACEBOOK_LOCKOUT,
+    )
 
     AUTO_BAN_REASONS = (
         BAN_REASON_AUTO_OFFLINE,
@@ -66,12 +79,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     )
 
     BAN_REASON_CHOICES = (
-        ('Google - Policy', 'Google - Policy', ),
-        ('Google - Billing', 'Google - Billing', ),
+        (BAN_REASON_GOOGLE_POLICY, 'Google - Policy', ),
+        (BAN_REASON_GOOGLE_BILLING, 'Google - Billing', ),
         (BAN_REASON_GOOGLE_UNRESPONSIVE_USER, 'Google - Unresponsive User', ),
-        ('Facebook - Policy', 'Facebook - Policy', ),
-        ('Facebook - Suspicious', 'Facebook - Suspicious', ),
-        ('Facebook - Lockout', 'Facebook - Lockout', ),
+        (BAN_REASON_FACEBOOK_POLICY, 'Facebook - Policy', ),
+        (BAN_REASON_FACEBOOK_BILLING, 'Facebook - Suspicious', ),
+        (BAN_REASON_FACEBOOK_LOCKOUT, 'Facebook - Lockout', ),
         (BAN_REASON_FACEBOOK_UNRESPONSIVE_USER, 'Facebook - Unresponsive User', ),
         ('Duplicate', 'Duplicate', ),
         ('Bad ad account', 'Bad ad account', ),
