@@ -53,7 +53,17 @@
                         <td>{{ entry.raspberry_pi.rpid }}</td>
                         <td>{{ entry.created|date:'d M Y H:i' }}</td>
                         <td>{{ entry.utm_source }}</td>
-                        <td>{{ entry.status }}</td>
+                        <td>
+                            {% for lead_account in entry.lead_accounts.all %}
+                                <p>
+                                    {{ lead_account.get_account_type_display }}
+                                    {{ lead_account.get_status_display }}
+                                    {% if lead_account.ban_reason %}
+                                        ({{lead_account.get_ban_reason_display}}) 
+                                    {% endif %}
+                                </p>
+                            {% endfor %}
+                        </td>
                         <td>{{ entry.phone }}</td>
                         <td>
                             {{ entry.get_address }}

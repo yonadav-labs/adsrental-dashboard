@@ -147,6 +147,7 @@ class DashboardHomeView(View):
                     entries = entries.filter(shipstation_order_status=value)
 
             order = request.GET.get('order', '-raspberry_pi__last_seen')
+            entries = entries.prefetch_related('lead_accounts')
             entries = entries.order_by(order)
 
             page = request.GET.get('page', 1)
@@ -157,6 +158,7 @@ class DashboardHomeView(View):
                 entries = paginator.page(1)
             except EmptyPage:
                 entries = paginator.page(paginator.num_pages)
+
 
         return render(request, 'dashboard/home.html', dict(
             utm_source=request.user.bundler and request.user.bundler.utm_source,
