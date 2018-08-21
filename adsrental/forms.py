@@ -36,10 +36,11 @@ class DashboardForm(forms.Form):
     )
     LEAD_STATUS_CHOICES = (
         ('', 'All'),
-        ('Available', 'Available'),
-        ('Banned', 'Banned'),
-        ('Qualified', 'Qualified'),
-        ('In-Progress', 'In-Progress'),
+        (Lead.STATUS_AVAILABLE, 'Available'),
+        (Lead.STATUS_BANNED, 'Banned'),
+        (Lead.STATUS_QUALIFIED, 'Qualified'),
+        (Lead.STATUS_DISQUALIFIED, 'Disualified'),
+        (Lead.STATUS_IN_PROGRESS, 'In-Progress'),
     )
     BANNED_CHOICES = (
         ('', 'All'),
