@@ -328,3 +328,6 @@ class UserFixPasswordForm(forms.Form):
             id=data.get('lead_account_id'),
             lead=lead,
         ).first()
+
+class DisqualifyLeadAccountForm(forms.Form):
+    next = forms.CharField(widget=forms.HiddenInput())

@@ -125,6 +125,7 @@ for i in instances:
     print(i, i.state['Name'])
     if i.state['Name'] == 'running':
         instance = i
+        break
 
 print('Connecting to instance', instance.id, instance.tags, instance.public_dns_name, instance.state['Name'])
 

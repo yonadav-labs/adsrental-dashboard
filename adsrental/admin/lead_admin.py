@@ -447,8 +447,8 @@ class LeadAdmin(admin.ModelAdmin):
     def mark_as_disqualified(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.all():
-                if lead_account.status != LeadAccount.STATUS_AVAILABLE:
-                    messages.warning(request, 'You can disqualify only Availalbe leads. Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
+                if lead_account.is_banned():
+                    messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
                     continue
 
                 lead_account.disqualify(request.user)
@@ -1039,7 +1039,7 @@ class ReadOnlyLeadAdmin(LeadAdmin):
         # 'update_from_shipstation',
         # 'mark_facebook_as_qualified',
         # 'mark_google_as_qualified',
-        'mark_as_disqualified',
+        # 'mark_as_disqualified',
         # 'ban_google_account',
         # 'unban_google_account',
         # 'ban_facebook_account',
