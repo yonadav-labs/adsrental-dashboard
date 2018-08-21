@@ -12,6 +12,7 @@ from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
+from adsrental.utils import get_week_boundaries_for_dt, get_month_boundaries_for_dt
 
 
 class LeadStatusListFilter(SimpleListFilter):
@@ -181,120 +182,99 @@ class LeadRaspberryPiOnlineListFilter(OnlineListFilter):
     filter_field = 'lead__raspberry_pi__last_seen'
 
 
-class ShipDateListFilter(SimpleListFilter):
-    title = 'Shipped date'
-    parameter_name = 'shipped_date'
+
+class AbstractDateListFilter(SimpleListFilter):
+    title = 'Date'
+    parameter_name = 'date'
+    field_name = 'date'
+
+    CHOICES_TODAY = 'today'
+    CHOICES_YESTERDAY = 'yesterday'
+    CHOICES_LAST_30_DAYS = 'last_30_days'
+    CHOICES_CURRENT_WEEK = 'current_week'
+    CHOICES_PREVIOUS_WEEK = 'previous_week'
+    CHOICES_CURRENT_MONTH = 'current_month'
+    CHOICES_PREVIOUS_MONTH = 'previus_month'
 
     def lookups(self, request, model_admin):
         return (
-            ('current_week', 'Current week', ),
-            ('previus_week', 'Previous week', ),
-            ('current_month', 'Current month', ),
-            ('previus_month', 'Previous month', ),
+            (self.CHOICES_TODAY, 'Today', ),
+            (self.CHOICES_YESTERDAY, 'Yesterday', ),
+            (self.CHOICES_LAST_30_DAYS, 'Last 30 days', ),
+            (self.CHOICES_CURRENT_WEEK, 'Current week', ),
+            (self.CHOICES_PREVIOUS_WEEK, 'Previous week', ),
+            (self.CHOICES_CURRENT_MONTH, 'Current month', ),
+            (self.CHOICES_PREVIOUS_MONTH, 'Previous month', ),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'current_week':
-            now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            return queryset.filter(
-                ship_date__gte=current_week_start.date(),
-            )
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            prev_week_end = current_week_start - datetime.timedelta(days=1)
-            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
-            return queryset.filter(
-                ship_date__gte=prev_week_start.date(),
-                ship_date__lte=prev_week_end.date(),
-            )
-        if self.value() == 'current_month':
-            now = timezone.now()
-            current_month_start = now - datetime.timedelta(days=now.day - 1)
-            return queryset.filter(
-                ship_date__gte=current_month_start.date(),
-            )
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            current_month_start = now - datetime.timedelta(days=now.day - 1)
-            prev_month_end = current_month_start - datetime.timedelta(days=1)
-            prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
-            return queryset.filter(
-                ship_date__gte=prev_month_start.date(),
-                ship_date__lte=prev_month_end.date(),
-            )
-        return None
-
-
-class QualifiedDateListFilter(SimpleListFilter):
-    title = 'Qualified date'
-    parameter_name = 'qualified_date'
-    field_name = 'qualified_date'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('today', 'Today', ),
-            ('yesterday', 'Yesterday', ),
-            ('last_30_days', 'Last 30 days', ),
-            ('current_week', 'Current week', ),
-            ('previus_week', 'Previous week', ),
-            ('current_month', 'Current month', ),
-            ('previus_month', 'Previous month', ),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'today':
-            now = timezone.now()
+        if self.value() == self.CHOICES_TODAY:
+            now = timezone.localtime(timezone.now())
             date_start = now.replace(hour=0, minute=0, second=0)
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
             })
-        if self.value() == 'yesterday':
-            now = timezone.now()
+        if self.value() == self.CHOICES_YESTERDAY:
+            now = timezone.localtime(timezone.now())
             date_end = now.replace(hour=0, minute=0, second=0)
             date_start = date_end - datetime.timedelta(days=1)
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
                 '{}__lte'.format(self.field_name): date_end,
             })
-        if self.value() == 'last_30_days':
-            now = timezone.now()
+        if self.value() == self.CHOICES_LAST_30_DAYS:
+            now = timezone.localtime(timezone.now())
             date_start = now - datetime.timedelta(days=30)
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
             })
-        if self.value() == 'current_week':
-            now = timezone.now()
-            date_start = now - datetime.timedelta(days=now.weekday())
+        if self.value() == self.CHOICES_CURRENT_WEEK:
+            now = timezone.localtime(timezone.now())
+            date_start, _ = get_week_boundaries_for_dt(now)
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
             })
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            prev_week_end = current_week_start - datetime.timedelta(days=1)
-            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
+        if self.value() == self.CHOICES_PREVIOUS_WEEK:
+            now = timezone.localtime(timezone.now())
+            date_start, date_end = get_week_boundaries_for_dt(now - datetime.timedelta(days=7))
             return queryset.filter(**{
-                '{}__gte'.format(self.field_name): prev_week_start,
-                '{}__lte'.format(self.field_name): prev_week_end,
+                '{}__gte'.format(self.field_name): date_start,
+                '{}__lte'.format(self.field_name): date_end,
             })
-        if self.value() == 'current_month':
-            now = timezone.now()
-            current_month_start = now - datetime.timedelta(days=now.day - 1)
+        if self.value() == self.CHOICES_CURRENT_MONTH:
+            now = timezone.localtime(timezone.now())
+            date_start, _ = get_month_boundaries_for_dt(now)
             return queryset.filter(**{
-                '{}__gte'.format(self.field_name): current_month_start,
+                '{}__gte'.format(self.field_name): date_start,
             })
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            current_month_start = now - datetime.timedelta(days=now.day - 1)
-            prev_month_end = current_month_start - datetime.timedelta(days=1)
-            prev_month_start = prev_month_end - datetime.timedelta(days=prev_month_end.day - 1)
+        if self.value() == self.CHOICES_PREVIOUS_MONTH:
+            now = timezone.localtime(timezone.now())
+            current_date_start, _ = get_month_boundaries_for_dt(now)
+            date_start, date_end = get_month_boundaries_for_dt(current_date_start - datetime.timedelta(days=1))
+
             return queryset.filter(**{
-                '{}__gte'.format(self.field_name): prev_month_start,
-                '{}__lte'.format(self.field_name): prev_month_end,
+                '{}__gte'.format(self.field_name): date_start,
+                '{}__lte'.format(self.field_name): date_end,
             })
         return None
+
+
+class ShipDateListFilter(AbstractDateListFilter):
+    title = 'Shipped date'
+    field_name = 'ship_date'
+    parameter_name = 'shipped_date'
+
+
+class QualifiedDateListFilter(AbstractDateListFilter):
+    title = 'Qualified date'
+    field_name = 'qualified_date'
+    parameter_name = 'qualified_date'
+
+
+class InProgressDateListFilter(AbstractDateListFilter):
+    title = 'In-Progress date'
+    parameter_name = 'in_progress_date'
+    field_name = 'in_progress_date'
 
 
 class AutoBanListFilter(SimpleListFilter):
@@ -321,57 +301,10 @@ class AutoBanListFilter(SimpleListFilter):
         return None
 
 
-class BannedDateListFilter(SimpleListFilter):
+class BannedDateListFilter(AbstractDateListFilter):
     title = 'Banned date'
+    field_name = 'banned_date'
     parameter_name = 'banned_date'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('current_week', 'Current week', ),
-            ('previus_week', 'Previous week', ),
-            ('current_month', 'Current month', ),
-            ('previous_month', 'Previous month', ),
-            ('last_30_days', 'Last 30 days', ),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'current_week':
-            now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            return queryset.filter(
-                banned_date__gte=current_week_start,
-            )
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            current_week_start = now - datetime.timedelta(days=now.weekday())
-            prev_week_end = current_week_start - datetime.timedelta(days=1)
-            prev_week_start = prev_week_end - datetime.timedelta(days=prev_week_end.weekday())
-            return queryset.filter(
-                banned_date__gte=prev_week_start,
-                banned_date__lte=prev_week_end,
-            )
-        if self.value() == 'current_month':
-            now = timezone.now()
-            current_month_start = now - datetime.timedelta(days=now.day - 1)
-            return queryset.filter(
-                banned_date__gte=current_month_start,
-            )
-        if self.value() == 'previous_month':
-            now = timezone.now()
-            now = timezone.now()
-            end_date = now.replace(day=1, hour=0, minute=0, second=0)
-            start_date = (end_date - datetime.timedelta(hours=1)).replace(day=1, hour=0, minute=0, second=0)
-            return queryset.filter(
-                banned_date__gte=start_date,
-                banned_date__lte=end_date,
-            )
-        if self.value() == 'last_30_days':
-            now = timezone.now()
-            date_30_days_ago = now - datetime.timedelta(days=30)
-            return queryset.filter(
-                banned_date__gte=date_30_days_ago,
-            )
-        return None
 
 
 class AccountTypeListFilter(SimpleListFilter):
