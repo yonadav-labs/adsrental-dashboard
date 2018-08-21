@@ -10,7 +10,24 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, QualifiedDateListFilter, InProgressDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
+from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
+
+
+class QualifiedDateListFilter(AbstractDateListFilter):
+    title = 'Qualified date'
+    field_name = 'qualified_date'
+    parameter_name = 'qualified_date'
+
+class DisqualifiedDateListFilter(AbstractDateListFilter):
+    title = 'Disqualified date'
+    field_name = 'disqualified_date'
+    parameter_name = 'disqualified_date'
+
+
+class InProgressDateListFilter(AbstractDateListFilter):
+    title = 'In-Progress date'
+    parameter_name = 'in_progress_date'
+    field_name = 'in_progress_date'
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
@@ -52,6 +69,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         WrongPasswordListFilter,
         SecurityCheckpointListFilter,
         QualifiedDateListFilter,
+        DisqualifiedDateListFilter,
         InProgressDateListFilter,
         BannedDateListFilter,
         AutoBanListFilter,

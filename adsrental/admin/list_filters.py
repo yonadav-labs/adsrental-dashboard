@@ -265,18 +265,6 @@ class ShipDateListFilter(AbstractDateListFilter):
     parameter_name = 'shipped_date'
 
 
-class QualifiedDateListFilter(AbstractDateListFilter):
-    title = 'Qualified date'
-    field_name = 'qualified_date'
-    parameter_name = 'qualified_date'
-
-
-class InProgressDateListFilter(AbstractDateListFilter):
-    title = 'In-Progress date'
-    parameter_name = 'in_progress_date'
-    field_name = 'in_progress_date'
-
-
 class AutoBanListFilter(SimpleListFilter):
     title = 'Auto-ban'
     parameter_name = 'auto_ban'
