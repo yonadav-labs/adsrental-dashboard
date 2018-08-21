@@ -554,6 +554,9 @@ class EC2Instance(models.Model):
         if self.is_essential:
             tags.append({'Key': 'Essential', 'Value': 'true'})
         boto_resource = BotoResource().get_resource('ec2')
+        boto_instance = self.get_boto_instance()
+        if boto_instance:
+            boto_instance.delete_tags()
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
 
     def assign_essential(self, rpid, lead):
