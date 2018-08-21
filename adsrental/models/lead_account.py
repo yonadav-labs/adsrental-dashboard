@@ -107,6 +107,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     url = models.CharField(max_length=255, blank=True, null=True)
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
     qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
+    disqualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as disqualified for the last time.')
     in_progress_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as in-progress.')
     banned_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
     bundler_paid_date = models.DateField(blank=True, null=True, help_text='Date when bundler got his payment for this lead for the last time.')
@@ -328,6 +329,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         'Set lead account status as disqualified.'
         result = self.set_status(LeadAccount.STATUS_DISQUALIFIED, edited_by)
         if result:
+            self.disqualified_date = timezone.now()
             if not LeadAccount.get_active_lead_accounts(self.lead):
                 self.lead.disqualify(edited_by)
         return result
