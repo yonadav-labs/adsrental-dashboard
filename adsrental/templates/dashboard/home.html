@@ -65,9 +65,6 @@
                                             ({{lead_account.get_ban_reason_display}}) 
                                         {% endif %}
                                     {% endif %}
-                                    {% if lead_account.status == lead_account.STATUS_AVAILABLE %}
-                                        <a href="{% url 'dashboard_disqualify' lead_account_id=lead_account.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
-                                    {% endif %}
                                 </p>
                             {% endfor %}
                         </td>
@@ -86,7 +83,10 @@
                             {% for lead_account in entry.lead_accounts.all %}
                                 {{ lead_account }}
                                 {% if lead_account.url %}
-                                    (<a href="{{ lead_account.url }}">URL</a>) 
+                                    <a href="{{ lead_account.url }}">URL</a>
+                                {% endif %}
+                                {% if lead_account.status == lead_account.STATUS_AVAILABLE %}
+                                    <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=lead_account.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
                                 {% endif %}
                             {% endfor %}
                         </td>
