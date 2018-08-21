@@ -194,7 +194,8 @@ class AbstractDateListFilter(SimpleListFilter):
     CHOICES_CURRENT_WEEK = 'current_week'
     CHOICES_PREVIOUS_WEEK = 'previous_week'
     CHOICES_CURRENT_MONTH = 'current_month'
-    CHOICES_PREVIOUS_MONTH = 'previus_month'
+    CHOICES_PREVIOUS_MONTH = 'previous_month'
+    CHOICES_ANY = 'any'
 
     def lookups(self, request, model_admin):
         return (
@@ -205,6 +206,7 @@ class AbstractDateListFilter(SimpleListFilter):
             (self.CHOICES_PREVIOUS_WEEK, 'Previous week', ),
             (self.CHOICES_CURRENT_MONTH, 'Current month', ),
             (self.CHOICES_PREVIOUS_MONTH, 'Previous month', ),
+            (self.CHOICES_ANY, 'Any', ),
         )
 
     def queryset(self, request, queryset):
@@ -255,6 +257,10 @@ class AbstractDateListFilter(SimpleListFilter):
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
                 '{}__lte'.format(self.field_name): date_end,
+            })
+        if self.value() == self.CHOICES_ANY:
+            return queryset.filter(**{
+                '{}__isnull'.format(self.field_name): False,
             })
         return None
 
