@@ -331,4 +331,12 @@ class UserFixPasswordForm(forms.Form):
         ).first()
 
 class DisqualifyLeadAccountForm(forms.Form):
+    ACTION_SUBMIT = 'submit'
+
     next = forms.CharField(widget=forms.HiddenInput())
+    action = forms.CharField(widget=forms.HiddenInput())
+
+    def clean_action(self):
+        value = self.cleaned_data['action']
+        if value != self.ACTION_SUBMIT:
+            raise forms.ValidationError("Submit cancelled")
