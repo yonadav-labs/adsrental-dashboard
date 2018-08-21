@@ -60,14 +60,14 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_GOOGLE_POLICY = 'Google - Policy'
     BAN_REASON_GOOGLE_BILLING = 'Google - Billing'
     BAN_REASON_FACEBOOK_POLICY = 'Facebook - Policy'
-    BAN_REASON_FACEBOOK_BILLING = 'Facebook - Suspicious'
+    BAN_REASON_FACEBOOK_SUSPICIOUS = 'Facebook - Suspicious'
     BAN_REASON_FACEBOOK_LOCKOUT = 'Facebook - Lockout'
 
     POLICY_BAN_REASONS = (
         BAN_REASON_GOOGLE_POLICY,
         BAN_REASON_GOOGLE_BILLING,
         BAN_REASON_FACEBOOK_POLICY,
-        BAN_REASON_FACEBOOK_BILLING,
+        BAN_REASON_FACEBOOK_SUSPICIOUS,
         BAN_REASON_FACEBOOK_LOCKOUT,
     )
 
@@ -83,7 +83,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (BAN_REASON_GOOGLE_BILLING, 'Google - Billing', ),
         (BAN_REASON_GOOGLE_UNRESPONSIVE_USER, 'Google - Unresponsive User', ),
         (BAN_REASON_FACEBOOK_POLICY, 'Facebook - Policy', ),
-        (BAN_REASON_FACEBOOK_BILLING, 'Facebook - Suspicious', ),
+        (BAN_REASON_FACEBOOK_SUSPICIOUS, 'Facebook - Suspicious', ),
         (BAN_REASON_FACEBOOK_LOCKOUT, 'Facebook - Lockout', ),
         (BAN_REASON_FACEBOOK_UNRESPONSIVE_USER, 'Facebook - Unresponsive User', ),
         ('Duplicate', 'Duplicate', ),

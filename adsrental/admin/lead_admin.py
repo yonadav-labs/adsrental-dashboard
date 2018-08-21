@@ -447,7 +447,7 @@ class LeadAdmin(admin.ModelAdmin):
     def mark_as_disqualified(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.all():
-                if lead_account.is_banned():
+                if lead_account.status != LeadAccount.STATUS_AVAILABLE:
                     messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
                     continue
 
