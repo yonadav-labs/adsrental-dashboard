@@ -56,7 +56,7 @@ class RaspberryPi(models.Model):
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
     online_since_date = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
-    is_mla = models.BooleanField(default=False, help_text='If True - RPi gets latest firmwares')
+    is_proxy_tunnel = models.BooleanField(default=False, help_text='If True - RPi works as an HTTP proxy')
     tunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a tunnel to proxykeeper')
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
     restart_required = models.BooleanField(default=False)

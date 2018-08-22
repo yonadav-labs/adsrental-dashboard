@@ -23,7 +23,7 @@ class ConnectionDataView(View):
                 'result': False,
             })
 
-        if not raspberry_pi.is_mla:
+        if not raspberry_pi.is_proxy_tunnel:
             ec2_instance = raspberry_pi.get_ec2_instance()
             return JsonResponse({
                 'rpid': raspberry_pi.rpid,
@@ -31,7 +31,7 @@ class ConnectionDataView(View):
                 'user': 'Administrator',
                 'tunnel_port': 2046,
                 'rtunnel_port': 3808,
-                'is_mla': raspberry_pi.is_mla,
+                'is_proxy_tunnel': False,
                 'result': True,
             })
 
@@ -41,6 +41,6 @@ class ConnectionDataView(View):
             'user': raspberry_pi.TUNNEL_USER,
             'tunnel_port': raspberry_pi.tunnel_port,
             'rtunnel_port': raspberry_pi.rtunnel_port,
-            'is_mla': raspberry_pi.is_mla,
+            'is_proxy_tunnel': True,
             'result': True,
         })

@@ -32,7 +32,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'links',
         'online',
         'uptime',
-        'is_mla',
+        'is_proxy_tunnel',
         'rtunnel_port',
         'tunnel_online',
         'new_config_required',
@@ -48,7 +48,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'update_config',
         'reset_cache',
         'show_cache',
-        'make_mla',
+        'make_proxy_tunnel',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -130,9 +130,9 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.save()
         messages.info(request, 'New config successfully requested. Tunnel should be online in two minutes.')
 
-    def make_mla(self, request, queryset):
+    def make_proxy_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
-            raspberry_pi.is_mla = True
+            raspberry_pi.is_proxy_tunnel = True
             raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.assign_tunnel_ports()

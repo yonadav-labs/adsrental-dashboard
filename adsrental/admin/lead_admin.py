@@ -323,11 +323,13 @@ class LeadAdmin(admin.ModelAdmin):
         result = []
         if obj.raspberry_pi:
             result.append('<a target="_blank" href="{log_url}">Logs</a>'.format(log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid})))
-            result.append('<a target="_blank" href="{url}">RDP</a>'.format(
-                url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
-            ))
+        
             result.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
+            ))
+        if obj.raspberry_pi and not obj.raspberry_pi.is_proxy_tunnel:
+            result.append('<a target="_blank" href="{url}">RDP</a>'.format(
+                url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
             ))
 
         result.append('<a href="{url}">Fix address</a>'.format(
