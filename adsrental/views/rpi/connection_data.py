@@ -12,16 +12,16 @@ class ConnectionDataView(View):
     def get(self, request, rpid):
         raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
         if not raspberry_pi:
-            raise Http404
+            return JsonResponse({'error': 'Not found'})
 
         lead = raspberry_pi.get_lead()
         if not lead or not lead.is_active():
-            raise Http404
+            return JsonResponse({'error': 'Not available'})
 
         return JsonResponse({
             'hostname': raspberry_pi.TUNNEL_HOST,
             'user': raspberry_pi.TUNNEL_USER if raspberry_pi.is_mla else 'Administrator',
-            'tunnel_host': raspberry_pi.tunnel_host or '',
-            'rtunnel_host': raspberry_pi.rtunnel_host or '',
+            'tunnel_port': raspberry_pi.tunnel_port or '',
+            'rtunnel_port': raspberry_pi.rtunnel_port or '',
             'is_mla': raspberry_pi.is_mla,
         })

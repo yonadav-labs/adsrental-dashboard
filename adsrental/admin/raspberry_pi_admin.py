@@ -32,6 +32,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'links',
         'online',
         'uptime',
+        'is_mla',
+        'rtunnel_port',
         'tunnel_online',
     )
     search_fields = ('leadid', 'rpid', )
@@ -42,6 +44,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
         'restart_tunnel',
+        'make_mla',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -114,6 +117,12 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.restart_required = True
             raspberry_pi.save()
         messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
+
+    def make_mla(self, request, queryset):
+        for raspberry_pi in queryset:
+            raspberry_pi.is_mla = True
+            raspberry_pi.assign_tunnel_ports()
+            raspberry_pi.save()
 
     def links(self, obj):
         links = []
