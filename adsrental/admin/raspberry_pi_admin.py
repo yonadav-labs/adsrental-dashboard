@@ -12,12 +12,24 @@ from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
 
 
+PROXY_TUNNEL_MESSAGE = '''<b>Success!</b> To use <b>{rpid}</b>, find <b>"{rpid} {lead_name}"</b> in MultiloginApp. If it does not exist:<br />
+1) create a new profile in MultiloginApp, name it <b>"{rpid} {lead_name}"</b>.<br />
+2) go to Edit, proxy settings<br />
+3) select <b>Socks 5 proxy</b> connection type<br />
+4) Set Address to <b>{host}</b><br />
+5) Set Port to <b>{rtunnel_port}</b><br />
+6) Set Login to <b>{user}</b><br />
+7) Set Password to <b>{password}</b><br />
+8) Save and launch your new profile.<br />'''
+
+
 class RaspberryPiAdmin(admin.ModelAdmin):
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
         }
 
+    change_list_template = 'admin/custom_change_list.html'
     model = RaspberryPi
     list_display = (
         'rpid',
@@ -143,6 +155,15 @@ class RaspberryPiAdmin(admin.ModelAdmin):
                 ec2_instance.unassign_essential()
                 messages.info(request, 'Unassigned EC2.')
 
+            messages.success(request, PROXY_TUNNEL_MESSAGE.format(
+                rpid=raspberry_pi.rpid,
+                lead_name=raspberry_pi.get_lead().name() if raspberry_pi.get_lead() else '',
+                rtunnel_port=raspberry_pi.rtunnel_port,
+                host=raspberry_pi.TUNNEL_HOST,
+                user=raspberry_pi.TUNNEL_USER,
+                password=raspberry_pi.TUNNEL_PASSWORD,
+            ), extra_tags='safe')
+
     def reset_cache(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
@@ -155,9 +176,10 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
-        links.append('<a target="_blank" href="{url}">RDP</a>'.format(
-            url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
-        ))
+        if not obj.is_proxy_tunnel:
+            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+                url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
+            ))
         links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
             url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
         ))

@@ -42,6 +42,7 @@ class RaspberryPi(models.Model):
 
     TUNNEL_HOST = 'adsrental.com'
     TUNNEL_USER = 'proxykeeper'
+    TUNNEL_PASSWORD = 'keepitsecret'
     TUNNEL_PORT_START = 20000
     TUNNEL_PORT_END = 65000
 
