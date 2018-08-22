@@ -583,6 +583,8 @@ class PingCacheHelper():
         else:
             if ping_data.get('restart_required'):
                 ping_data['restart_required'] = False
+            if ping_data.get('new_config_required'):
+                ping_data['new_config_required'] = False
 
         ping_data['ip_address'] = ip_address
         ping_data['reported_hostname'] = reported_hostname
