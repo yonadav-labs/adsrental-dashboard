@@ -331,7 +331,7 @@ class Lead(models.Model, FulltextSearchMixin):
         if self.raspberry_pi:
             return False
 
-        self.raspberry_pi = RaspberryPi.create()
+        self.raspberry_pi = RaspberryPi.create_with_rpid()
         self.save()
         self.raspberry_pi.leadid = self.leadid
         self.raspberry_pi.first_seen = None

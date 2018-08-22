@@ -71,10 +71,10 @@ class RaspberryPi(models.Model):
         if free_item:
             return free_item
 
-        return cls.create()
+        return cls.create_with_rpid()
 
     @classmethod
-    def create(cls):
+    def create_with_rpid(cls):
         next_rpid_numeric = 1
         last_rpi = RaspberryPi.objects.filter(rpid_numeric__isnull=False).order_by('-created').first()
         if last_rpi:
