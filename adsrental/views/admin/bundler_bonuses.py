@@ -54,7 +54,7 @@ class AdminBundlerBonusesView(View):
             lead__bundler__isnull=False,
             primary=True,
             qualified_date__gt=start_date,
-            qualified_date__lt=end_date + datetime.timedelta(days=1),
+            qualified_date__lt=end_date,
         ).values(
             'lead__bundler_id',
             'lead__bundler__parent_bundler_id',
