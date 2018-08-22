@@ -47,6 +47,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'restart_tunnel',
         'update_config',
         'reset_cache',
+        'show_cache',
         'make_mla',
     )
     readonly_fields = ('created', 'updated', )
