@@ -70,6 +70,7 @@ class UpdatePingView(View):
         ip_address = ping_data['ip_address']
         version = ping_data['raspberry_pi_version']
         restart_required = ping_data['restart_required']
+        new_config_required = ping_data['new_config_required']
         lead_status = ping_data.get('lead_status')
         last_ping = ping_data.get('last_ping')
         last_troubleshoot = ping_data.get('last_troubleshoot')
@@ -83,6 +84,8 @@ class UpdatePingView(View):
             raspberry_pi.version = version
         if restart_required:
             raspberry_pi.restart_required = False
+        if new_config_required:
+            raspberry_pi.new_config_required = False
         raspberry_pi.version = version
 
         if ec2_instance and last_troubleshoot:

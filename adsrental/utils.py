@@ -482,12 +482,16 @@ class PingCacheHelper():
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
         restart_required = data.get('restart_required', False)
+        new_config_required = data.get('new_config_required', False)
         created = data.get('created')
 
         if not created:
             return False
 
         if restart_required != raspberry_pi.restart_required:
+            return False
+
+        if new_config_required != raspberry_pi.new_config_required:
             return False
 
         if not cls.is_ec2_instance_data_consistent(data, ec2_instance):
@@ -530,6 +534,11 @@ class PingCacheHelper():
             raspberry_pi.restart_required = False
             raspberry_pi.save()
 
+        new_config_required = raspberry_pi and raspberry_pi.new_config_required
+        if new_config_required:
+            raspberry_pi.new_config_required = False
+            raspberry_pi.save()
+
         data = {
             'v': self.CACHE_VERSION,
             'created': timezone.now(),
@@ -537,6 +546,7 @@ class PingCacheHelper():
             'lead_status': lead and lead.status,
             'wrong_password': lead.is_wrong_password() if lead else False,
             'restart_required': restart_required,
+            'new_config_required': new_config_required,
             'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
             'ec2_instance_status': ec2_instance and ec2_instance.status,
             'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,

@@ -59,6 +59,7 @@ class RaspberryPi(models.Model):
     tunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a tunnel to proxykeeper')
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
     restart_required = models.BooleanField(default=False)
+    new_config_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
