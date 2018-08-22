@@ -1,5 +1,4 @@
 from django.views import View
-from django.shortcuts import Http404
 from django.http import JsonResponse
 
 from adsrental.models.raspberry_pi import RaspberryPi
