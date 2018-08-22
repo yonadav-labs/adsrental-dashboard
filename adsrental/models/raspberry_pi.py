@@ -60,7 +60,7 @@ class RaspberryPi(models.Model):
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
     restart_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
 
     objects = BulkUpdateManager()
@@ -78,10 +78,13 @@ class RaspberryPi(models.Model):
         next_rpid_numeric = 1
         last_rpi = RaspberryPi.objects.filter(rpid_numeric__isnull=False).order_by('-created').first()
         if last_rpi:
-            next_rpid_numeric = last_rpi.rpid_numeric
+            next_rpid_numeric = last_rpi.rpid_numeric + 1
 
         next_rpid = 'RP%08d' % next_rpid_numeric
-        item = cls(rpid=next_rpid, rpid_numeric=next_rpid_numeric)
+        item = cls(
+            rpid=next_rpid,
+            rpid_numeric=next_rpid_numeric,
+        )
         item.save()
         return item
 
