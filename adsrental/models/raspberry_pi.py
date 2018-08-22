@@ -39,6 +39,9 @@ class RaspberryPi(models.Model):
     first_tested_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
+    TUNNEL_PORT_START = 20000
+    TUNNEL_PORT_END = 65000
+
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
     rpid = models.CharField(primary_key=True, max_length=255, unique=True)
     rpid_numeric = models.PositiveIntegerField(null=True, blank=True)
@@ -51,8 +54,8 @@ class RaspberryPi(models.Model):
     online_since_date = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
     is_mla = models.BooleanField(default=False, help_text='If True - RPi gets latest firmwares')
-    tunnel_port = models.PositiveIntegerField(null=True, blank=True, help_text='Port to create a tunnel to proxykeeper')
-    rtunnel_port = models.PositiveIntegerField(null=True, blank=True, help_text='Port to create a reverse tunnel from proxykeeper')
+    tunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a tunnel to proxykeeper')
+    rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
     restart_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -93,6 +96,21 @@ class RaspberryPi(models.Model):
             return None
 
         return lead.get_ec2_instance()
+
+    def find_tunnel_ports(self):
+        tunnel_ports = [i[0] for i in RaspberryPi.objects.filter(tunnel_port__isnull=False).exclude(rpid=self.rpid).values_list('tunnel_port')]
+        for check_tunnel_port in range(RaspberryPi.TUNNEL_PORT_START, RaspberryPi.TUNNEL_PORT_END, 2):
+            if check_tunnel_port in tunnel_ports:
+                continue
+            return (check_tunnel_port, check_tunnel_port + 1)
+
+        raise ValueError('No free port found')
+
+    def assign_tunnel_ports(self):
+        self.tunnel_port, self.rtunnel_port = self.find_tunnel_ports()
+
+    def unassign_tunnel_ports(self):
+        self.tunnel_port, self.rtunnel_port = None, None
 
     def report_offline(self):
         self.last_offline_reported = timezone.now()
