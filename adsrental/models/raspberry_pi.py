@@ -70,10 +70,13 @@ class RaspberryPi(models.Model):
 
     @classmethod
     def create(cls):
-        max_rpid = RaspberryPi.objects.filter(rpid__startswith='RP0').order_by('-rpid').first().rpid
-        max_rpid_number = int(''.join([i for i in max_rpid if i.isdigit()]))
-        next_rpid = 'RP%08d' % (max_rpid_number + 1)
-        item = cls(rpid=next_rpid, rpid_numeric=max_rpid_number)
+        next_rpid_numeric = 1
+        last_rpi = RaspberryPi.objects.filter(rpid_numeric__isnull=False).order_by('-created').first()
+        if last_rpi:
+            next_rpid_numeric = last_rpi.rpid_numeric
+
+        next_rpid = 'RP%08d' % next_rpid_numeric
+        item = cls(rpid=next_rpid, rpid_numeric=next_rpid_numeric)
         item.save()
         return item
 
