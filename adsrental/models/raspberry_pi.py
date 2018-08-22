@@ -41,6 +41,7 @@ class RaspberryPi(models.Model):
 
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
     rpid = models.CharField(primary_key=True, max_length=255, unique=True)
+    rpid_numeric = models.PositiveIntegerField(null=True, blank=True)
     leadid = models.CharField(max_length=255, blank=True, null=True)
     first_seen = models.DateTimeField(blank=True, null=True)
     first_tested = models.DateTimeField(blank=True, null=True)
@@ -49,6 +50,9 @@ class RaspberryPi(models.Model):
     tunnel_last_tested = models.DateTimeField(blank=True, null=True)
     online_since_date = models.DateTimeField(blank=True, null=True)
     last_offline_reported = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    is_mla = models.BooleanField(default=False, help_text='If True - RPi gets latest firmwares')
+    tunnel_port = models.PositiveIntegerField(null=True, blank=True, help_text='Port to create a tunnel to proxykeeper')
+    rtunnel_port = models.PositiveIntegerField(null=True, blank=True, help_text='Port to create a reverse tunnel from proxykeeper')
     restart_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -69,7 +73,7 @@ class RaspberryPi(models.Model):
         max_rpid = RaspberryPi.objects.filter(rpid__startswith='RP0').order_by('-rpid').first().rpid
         max_rpid_number = int(''.join([i for i in max_rpid if i.isdigit()]))
         next_rpid = 'RP%08d' % (max_rpid_number + 1)
-        item = cls(rpid=next_rpid)
+        item = cls(rpid=next_rpid, rpid_numeric=max_rpid_number)
         item.save()
         return item
 
