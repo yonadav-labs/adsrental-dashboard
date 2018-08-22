@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from django_bulk_update.helper import bulk_update
 
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.utils import PingCacheHelper
 
@@ -67,30 +66,13 @@ class UpdatePingView(View):
         })
 
     def process_ping_data(self, ping_data, raspberry_pi, ec2_instance):
-        ip_address = ping_data['ip_address']
-        version = ping_data['raspberry_pi_version']
-        restart_required = ping_data['restart_required']
-        new_config_required = ping_data.get('new_config_required', False)
-        lead_status = ping_data.get('lead_status')
-        last_ping = ping_data.get('last_ping')
+        raspberry_pi.process_ping_data(ping_data)
+
         last_troubleshoot = ping_data.get('last_troubleshoot')
-
-        if last_ping and Lead.is_status_active(lead_status):
-            raspberry_pi.update_ping(last_ping)
-
-        if raspberry_pi.ip_address != ip_address:
-            raspberry_pi.ip_address = ip_address
-        if raspberry_pi.version != version and version:
-            raspberry_pi.version = version
-        if restart_required:
-            raspberry_pi.restart_required = False
-        if new_config_required:
-            raspberry_pi.new_config_required = False
-        raspberry_pi.version = version
-
+        tunnel_up = ping_data.get('tunnel_up')
         if ec2_instance and last_troubleshoot:
             if not ec2_instance.last_troubleshoot or ec2_instance.last_troubleshoot < last_troubleshoot:
                 ec2_instance.last_troubleshoot = last_troubleshoot
-                if ping_data.get('tunnel_up'):
+                if tunnel_up:
                     ec2_instance.tunnel_up_date = last_troubleshoot
                     ec2_instance.tunnel_up = True

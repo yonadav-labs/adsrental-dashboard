@@ -7,6 +7,7 @@ from django.conf import settings
 from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
+from adsrental.utils import PingCacheHelper
 
 
 class RaspberryPi(models.Model):
@@ -210,6 +211,30 @@ class RaspberryPi(models.Model):
             return date1
 
         return date2
+
+    def reset_cache(self):
+        ping_cache_helper = PingCacheHelper()
+        ping_data = ping_cache_helper.get(self.rpid)
+
+        if ping_data:
+            self.process_ping_data(ping_data)
+            ping_cache_helper.delete(self.rpid)
+
+    def process_ping_data(self, ping_data):
+        ip_address = ping_data['ip_address']
+        version = ping_data['raspberry_pi_version']
+        last_ping = ping_data.get('last_ping')
+
+        self.update_ping(last_ping)
+
+        if self.ip_address != ip_address:
+            self.ip_address = ip_address
+        if self.version != version and version:
+            self.version = version
+
+        self.restart_required = False
+        self.new_config_required = False
+        self.version = version
 
     class Meta:
         db_table = 'raspberry_pi'

@@ -11,11 +11,17 @@ class ConnectionDataView(View):
     def get(self, request, rpid):
         raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
         if not raspberry_pi:
-            return JsonResponse({'error': 'Not found'})
+            return JsonResponse({
+                'error': 'Not found',
+                'result': False,
+            })
 
         lead = raspberry_pi.get_lead()
         if not lead or not lead.is_active():
-            return JsonResponse({'error': 'Not available'})
+            return JsonResponse({
+                'error': 'Not available',
+                'result': False,
+            })
 
         if not raspberry_pi.is_mla:
             ec2_instance = raspberry_pi.get_ec2_instance()
@@ -26,6 +32,7 @@ class ConnectionDataView(View):
                 'tunnel_port': 2046,
                 'rtunnel_port': 3808,
                 'is_mla': raspberry_pi.is_mla,
+                'result': True,
             })
 
         return JsonResponse({
@@ -35,4 +42,5 @@ class ConnectionDataView(View):
             'tunnel_port': raspberry_pi.tunnel_port,
             'rtunnel_port': raspberry_pi.rtunnel_port,
             'is_mla': raspberry_pi.is_mla,
+            'result': True,
         })

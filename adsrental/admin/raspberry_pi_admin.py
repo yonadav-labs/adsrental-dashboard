@@ -46,6 +46,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     actions = (
         'restart_tunnel',
         'update_config',
+        'reset_cache',
         'make_mla',
     )
     readonly_fields = ('created', 'updated', )
@@ -116,12 +117,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def restart_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
+            raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
             raspberry_pi.save()
         messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
     def update_config(self, request, queryset):
         for raspberry_pi in queryset:
+            raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
         messages.info(request, 'New config successfully requested. Tunnel should be online in two minutes.')
@@ -129,8 +132,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def make_mla(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.is_mla = True
+            raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.assign_tunnel_ports()
+            raspberry_pi.save()
+
+    def reset_cache(self, request, queryset):
+        for raspberry_pi in queryset:
+            raspberry_pi.reset_cache()
             raspberry_pi.save()
 
     def links(self, obj):
