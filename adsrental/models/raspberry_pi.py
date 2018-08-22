@@ -39,6 +39,8 @@ class RaspberryPi(models.Model):
     first_tested_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
+    TUNNEL_HOST = 'adsrental.com'
+    TUNNEL_USER = 'proxykeeper'
     TUNNEL_PORT_START = 20000
     TUNNEL_PORT_END = 65000
 

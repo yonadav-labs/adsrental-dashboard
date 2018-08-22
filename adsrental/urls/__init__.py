@@ -10,11 +10,9 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.rpi import EC2DataView
 from adsrental.views.landing import LandingView, TermsView
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.robots import RobotsView
-from adsrental.views.pi_config import PiConfigView
 
 
 urlpatterns = [
@@ -40,14 +38,13 @@ urlpatterns = [
     path('start_reverse_tunnel/<rpid>/', StartReverseTunnelView.as_view(), name='start_reverse_tunnel'),
     path('ec2_ssh/start_reverse_tunnel/<rpid>/', StartReverseTunnelView.as_view(), name='ec2_ssh_start_reverse_tunnel'),
     path('ec2_ssh/get_netstat/<rpid>/', GetNetstatView.as_view(), name='ec2_ssh_get_netstat'),
-    path('rpi/ec2_data/<rpid>/', EC2DataView.as_view(), name='rpi_ec2_data'),
-    path('rpi/config/<rpid>/', PiConfigView.as_view(), name='pi_config'),
     path('adsdb/lead/', ADSDBLeadView.as_view(), name='adsdb_lead'),
     path('rdp/', include('adsrental.urls.rdp')),
     path('bundler/', include('adsrental.urls.bundler')),
     path('cron/', include('adsrental.urls.cron')),
     path('user/', include('adsrental.urls.user')),
     path('dashboard/', include('adsrental.urls.dashboard')),
+    path('rpi/', include('adsrental.urls.rpi')),
     path('bookkeeper/', include('adsrental.urls.bookkeeper')),
     path('admin_helpers/', include(('adsrental.urls.admin_helpers', 'adsrental'), namespace='admin_helpers')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
