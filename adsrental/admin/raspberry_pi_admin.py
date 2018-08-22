@@ -35,6 +35,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'is_mla',
         'rtunnel_port',
         'tunnel_online',
+        'new_config_required',
     )
     search_fields = ('leadid', 'rpid', )
     list_filter = (
