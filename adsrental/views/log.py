@@ -161,7 +161,7 @@ class LogView(View):
         update_required = self._get_update_required(ping_data)
 
         if new_config_required:
-            self.add_log(request, rpid, 'Hostname changed, restarting')
+            self.add_log(request, rpid, 'Sending info about config update')
             response_data['new_config'] = new_config_required
 
         if restart_required:
