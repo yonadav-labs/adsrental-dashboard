@@ -23,4 +23,5 @@ class ConnectionDataView(View):
             'user': raspberry_pi.TUNNEL_USER if raspberry_pi.is_mla else 'Administrator',
             'tunnel_host': raspberry_pi.tunnel_host or '',
             'rtunnel_host': raspberry_pi.rtunnel_host or '',
+            'is_mla': raspberry_pi.is_mla,
         })
