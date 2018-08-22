@@ -27,7 +27,7 @@ class ConnectionDataView(View):
             ec2_instance = raspberry_pi.get_ec2_instance()
             return JsonResponse({
                 'rpid': raspberry_pi.rpid,
-                'hostname': ec2_instance.hostname,
+                'hostname': ec2_instance.hostname if ec2_instance else '',
                 'user': 'Administrator',
                 'tunnel_port': 2046,
                 'rtunnel_port': 3808,
