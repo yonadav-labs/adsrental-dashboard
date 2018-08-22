@@ -142,6 +142,11 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.reset_cache()
             raspberry_pi.save()
 
+    def show_cache(self, request, queryset):
+        for raspberry_pi in queryset:
+            cache_data = raspberry_pi.get_cache()
+            messages.info(request, '{} cache: {}'.format(raspberry_pi.rpid, cache_data))
+
     def links(self, obj):
         links = []
         links.append('<a target="_blank" href="{url}">RDP</a>'.format(

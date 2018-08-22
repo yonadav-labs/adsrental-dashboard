@@ -220,6 +220,11 @@ class RaspberryPi(models.Model):
             self.process_ping_data(ping_data)
             ping_cache_helper.delete(self.rpid)
 
+    def get_cache(self):
+        ping_cache_helper = PingCacheHelper()
+        ping_data = ping_cache_helper.get(self.rpid)
+        return ping_data
+
     def process_ping_data(self, ping_data):
         ip_address = ping_data['ip_address']
         version = ping_data['raspberry_pi_version']
