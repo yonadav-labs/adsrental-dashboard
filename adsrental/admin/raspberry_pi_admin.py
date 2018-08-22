@@ -129,6 +129,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def make_mla(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.is_mla = True
+            raspberry_pi.new_config_required = True
             raspberry_pi.assign_tunnel_ports()
             raspberry_pi.save()
 
