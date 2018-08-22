@@ -70,7 +70,7 @@ class UpdatePingView(View):
         ip_address = ping_data['ip_address']
         version = ping_data['raspberry_pi_version']
         restart_required = ping_data['restart_required']
-        new_config_required = ping_data['new_config_required']
+        new_config_required = ping_data.get('new_config_required', False)
         lead_status = ping_data.get('lead_status')
         last_ping = ping_data.get('last_ping')
         last_troubleshoot = ping_data.get('last_troubleshoot')
