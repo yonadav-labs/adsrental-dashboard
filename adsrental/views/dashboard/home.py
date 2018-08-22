@@ -17,7 +17,7 @@ from adsrental.forms import DashboardForm
 class DashboardHomeView(View):
     items_per_page = 100
 
-    def get_entries(self, user):
+    def get_entries(self, user, bundler_id=None):
         queryset = Lead.objects.all()
         if user.bundler:
             queryset = queryset.filter(bundler=user.bundler)
@@ -26,15 +26,18 @@ class DashboardHomeView(View):
             raspberry_pis = user.allowed_raspberry_pis.all()
             queryset = queryset.filter(raspberry_pi__in=raspberry_pis)
 
+        if bundler_id:
+            queryset = queryset.filter(bundler_id=bundler_id)
+
         return queryset.prefetch_related('raspberry_pi', 'lead_accounts')
 
     @method_decorator(login_required)
-    def get(self, request):
+    def get(self, request, bundler_id=None):
         form = DashboardForm(request.GET)
         now = timezone.localtime(timezone.now())
         entries = []
         if form.is_valid():
-            entries = self.get_entries(request.user)
+            entries = self.get_entries(request.user, bundler_id)
             if form.cleaned_data['raspberry_pi_status']:
                 value = form.cleaned_data['raspberry_pi_status']
                 entries = entries.filter(pi_delivered=True).exclude(status=Lead.STATUS_BANNED)

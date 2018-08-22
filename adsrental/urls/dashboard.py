@@ -10,6 +10,7 @@ from adsrental.views.dashboard.photo_id import PhotoIDVIew
 
 urlpatterns = [
     path('', DashboardHomeView.as_view(), name='dashboard'),
+    path('bundler/<int:bundler_id>/', DashboardHomeView.as_view(), name='dashboard_as_bundler'),
     path('set_password/<int:lead_account_id>/', ChangePasswordView.as_view(), name='dashboard_set_password'),
     path('change_address/<lead_id>/', ChangeAddressView.as_view(), name='dashboard_change_address'),
     path('disqualify/<lead_account_id>/', DisqualifyLeadAccountView.as_view(), name='dashboard_disqualify'),
