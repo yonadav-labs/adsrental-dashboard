@@ -138,6 +138,11 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.assign_tunnel_ports()
             raspberry_pi.save()
 
+            ec2_instance = raspberry_pi.get_ec2_instance()
+            if ec2_instance:
+                ec2_instance.unassign_essential()
+                messages.info(request, 'Unassigned EC2.')
+
     def reset_cache(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
