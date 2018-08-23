@@ -153,6 +153,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             ec2_instance = raspberry_pi.get_ec2_instance()
             if ec2_instance:
                 ec2_instance.unassign_essential()
+                ec2_instance.stop()
                 messages.info(request, 'Unassigned EC2.')
 
             messages.success(request, PROXY_TUNNEL_MESSAGE.format(
