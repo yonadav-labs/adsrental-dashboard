@@ -26,17 +26,18 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' 'first_name' %}">Lead</a></th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' 'raspberry_pi__rpid' %}">RPID</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'lead__first_name' %}">Lead</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'username' %}">Username</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'lead__raspberry_pi__rpid' %}">RPID</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' '-created' %}">Created</a></th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' 'utm_source' %}">UTM</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'lead__bundler__utm_source' %}">UTM</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'account_type' %}">Type</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' 'status' %}">Status</a></th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' 'phone' %}">Phone</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' 'lead__phone' %}">Phone</a></th>
                     <th>Address</th>
-                    <th>Accounts</th>
                     <th>Online</th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__first_seen' %}">First Seen</a></th>
-                    <th><a href="{% relative_url request.GET.urlencode 'order' '-raspberry_pi__last_seen' %}">Last Seen</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' '-lead__raspberry_pi__first_seen' %}">First Seen</a></th>
+                    <th><a href="{% relative_url request.GET.urlencode 'order' '-lead__raspberry_pi__last_seen' %}">Last Seen</a></th>
                     <th><a href="{% relative_url request.GET.urlencode 'order' '-qualified_date' %}">Qualified</a></th>
                     <th>Bundler Paid</th>
                     <th>Wrong Password</th>
@@ -49,68 +50,56 @@
                 <tbody>
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{entry.first_name}} {{entry.last_name}}</td>
-                        <td>{{ entry.raspberry_pi.rpid }}</td>
+                        <td>{{ entry.lead.name }}</td>
+                        <td>{{ entry.username }}</td>
+                        <td>{{ entry.lead.raspberry_pi.rpid }}</td>
                         <td>{{ entry.created|date:'d M Y H:i' }}</td>
-                        <td>{{ entry.utm_source }}</td>
+                        <td>{{ entry.lead.bundler.utm_source }}</td>
+                        <td>{{ entry.get_account_type_display }}</td>
                         <td>
-                            {% for lead_account in entry.lead_accounts.all %}
-                                <p>
-                                    {{ lead_account.get_account_type_display }}
-                                    {{ lead_account.get_status_display }}
-                                    {% if lead_account.ban_reason %}
-                                        {% if lead_account.ban_reason in lead_account.POLICY_BAN_REASONS %}
-                                            (Ads completed)
-                                        {% else %}
-                                            ({{lead_account.get_ban_reason_display}}) 
-                                        {% endif %}
-                                    {% endif %}
-                                </p>
-                            {% endfor %}
+                            {{ entry.get_status_display }}
+                            {% if lead_account.ban_reason %}
+                                {% if lead_account.ban_reason in lead_account.POLICY_BAN_REASONS %}
+                                    (Ads completed)
+                                {% else %}
+                                    ({{lead_account.get_ban_reason_display}}) 
+                                {% endif %}
+                            {% endif %}
+                            {% if entry.url %}
+                                <a href="{{ entry.url }}">URL</a>
+                            {% endif %}
+                            {% if entry.status == entry.STATUS_AVAILABLE %}
+                                <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=entry.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
+                            {% endif %}
                         </td>
-                        <td>{{ entry.phone }}</td>
+                        <td>{{ entry.lead.phone }}</td>
                         <td>
-                            {{ entry.get_address }}
-                            {% if entry.usps_tracking_code %}
+                            {{ entry.lead.get_address }}
+                            {% if entry.lead.usps_tracking_code %}
                                 <br />    
-                                USPS: {{entry.usps_tracking_code}}
+                                USPS: {{entry.lead.usps_tracking_code}}
                             {% endif %}
-                            {% if entry.is_order_on_hold %}
-                                <a href="{% url 'dashboard_change_address' lead_id=entry.leadid %}">Fix</a>
+                            {% if entry.lead.is_order_on_hold %}
+                                <a href="{% url 'dashboard_change_address' lead_id=entry.lead.leadid %}">Fix</a>
                             {% endif %}
                         </td>
                         <td>
-                            {% for lead_account in entry.lead_accounts.all %}
-                                {{ lead_account }}
-                                {% if lead_account.url %}
-                                    <a href="{{ lead_account.url }}">URL</a>
-                                {% endif %}
-                                {% if lead_account.status == lead_account.STATUS_AVAILABLE %}
-                                    <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=lead_account.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% if entry.raspberry_pi.online %}
+                            {% if entry.lead.raspberry_pi.online %}
                                 <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
                             {% else %}
                                 <span class="glyphicon glyphicon-remove" style="color: red;"></span>
                             {% endif %}
                         </td>
-                        <td title="{{ entry.raspberry_pi.get_first_seen }}">{{entry.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
-                        <td title="{{ entry.raspberry_pi.get_last_seen }}">{{entry.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
-                        <td title="{{ entry.get_qualified_date }}">{{entry.get_qualified_date|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.lead.raspberry_pi.get_first_seen }}">{{entry.lead.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.lead.raspberry_pi.get_last_seen }}">{{entry.lead.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
+                        <td title="{{ entry.qualified_date }}">{{entry.qualified_date|naturaltime|default:"Never"}}</td>
                         <td>
                             {% if entry.is_bundler_paid %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}   
                         </td>
                         <td>
                             {% if entry.is_wrong_password %}
-                                {% for lead_account in entry.lead_accounts.all %}
-                                    {% if lead_account.is_wrong_password %}
-                                        <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                                        <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=lead_account.id %}">Fix</a>
-                                    {% endif %}
-                                {% endfor %}
+                                <span class="glyphicon glyphicon-ok" style="color: red;"></span>
+                                <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
                             {% else %}
                                 <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
                             {% endif %}   
@@ -123,11 +112,15 @@
                             {% endif %}   
                         </td>
                         <td>
-                            {% if entry.pi_delivered %}<span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>{% else %}<span class="glyphicon glyphicon-remove" style="color: red;"></span>{% endif %}           
+                            {% if entry.lead.pi_delivered %}
+                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                            {% endif %}           
                         </td>
                         <td>
-                            {% if entry.ship_date %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.ship_date|default:"Never"}}"></span>
+                            {% if entry.lead.ship_date %}
+                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|default:"Never"}}"></span>
                             {% else %}
                                 <span class="glyphicon glyphicon-remove" style="color: red;"</span>
                             {% endif %}
