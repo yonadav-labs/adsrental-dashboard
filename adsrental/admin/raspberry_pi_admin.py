@@ -133,14 +133,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
             raspberry_pi.save()
-        messages.info(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
+        messages.success(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
 
     def update_config(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
-        messages.info(request, 'New config successfully requested. Tunnel should be online in two minutes.')
+        messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
 
     def make_proxy_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
@@ -177,7 +177,11 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
-        if not obj.is_proxy_tunnel:
+        if obj.is_proxy_tunnel:
+            links.append('<a target="_blank" href="{url}">Proxy tunnel</a>'.format(
+                url=reverse('rpi_proxy_tunnel_info', kwargs=dict(rpid=obj.rpid)),
+            ))
+        else:
             links.append('<a target="_blank" href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))

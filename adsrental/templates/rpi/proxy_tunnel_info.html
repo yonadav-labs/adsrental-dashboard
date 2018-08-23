@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title_extra %}| Proxy tunnel info{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ raspberry_pi.rpid }}  proxy tunnel info</h1>
+        <p>
+            To use <b>{{ raspberry_pi.rpid }}</b>, find <b>"{{ raspberry_pi.rpid }} {{ lead.name }}"</b> in MultiloginApp.
+        </p>
+        <p>
+            If it does not exist:
+            <ol>
+                <li>Create a new profile in MultiloginApp, name it <b>"{{ raspberry_pi.rpid }} {{ lead.name }}"</b></li>
+                <li>Go to Edit, proxy settings</li>
+                <li>Select <b>Socks 5 proxy</b> connection type</li>
+                <li>Set Address to <b>{{ raspberry_pi.TUNNEL_HOST }}</b></li>
+                <li>Set Port to <b>{{ raspberry_pi.rtunnel_port }}</b></li>
+                <li>Set Login to <b>{{ raspberry_pi.TUNNEL_USER }}</b></li>
+                <li>Set Password to <b>{{ raspberry_pi.TUNNEL_PASSWORD }}</b></li>
+                <li>Save and launch your new profile.</li>
+            </ol>
+        </p>
+        <h3>Actions</h3>
+        {% if is_online %}
+            <p>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {% if not raspberry_pi.is_proxy_tunnel %}
+                        <button class="btn btn-primary" name="action" value="make_proxy_tunnel">Make proxy tunnel</button>
+                    {% endif %}
+                    <button class="btn btn-default" name="action" value="new_config">Restart tunnels</button>
+                    <button class="btn btn-default" name="action" value="restart">Restart device</button>
+                </form>
+            </p>
+        {% endif %}
+        <p>
+            <a target="_blank" href="{% url 'show_log' rpid=raspberry_pi.rpid  filename=today_log_filename %}" class="btn btn-default">Today log</a>
+        </p>
+        <div class="alert alert-info">
+            <p>
+                <strong>SSH</strong> ssh {{ raspberry_pi.TUNNEL_USER }}@{{ raspberry_pi.TUNNEL_HOST }} -p {{ raspberry_pi.rtunnel_port }}
+            </p>
+        </div>
+        
+    </div>
+{% endblock %}
