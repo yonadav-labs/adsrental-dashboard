@@ -20,7 +20,7 @@
         <tr>
             <td>
                 {% if show_links %}
-                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?q={{ entry.lead.email }}">{{ entry.lead_account.lead.name }}</a>
+                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?leadid={{ entry.lead_account.lead.leadid|urlencode }}">{{ entry.lead_account.lead.name }}</a>
                 {% else %}
                     {{ entry.lead_account.lead.name }}
                 {% endif %}

@@ -20,7 +20,7 @@
             <tr>
                 <td>
                     {% if show_bundler_name and not pdf %}
-                        <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?q={{ entry.lead.email }}">{{ entry.lead.name }}</a>
+                        <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?leadid={{ entry.lead.leadid|urlencode }}">{{ entry.lead.name }}</a>
                     {% else %}
                         {{ entry.lead.name }}
                     {% endif %}

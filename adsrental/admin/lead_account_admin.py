@@ -10,13 +10,14 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
+from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractUIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
     title = 'Qualified date'
     field_name = 'qualified_date'
     parameter_name = 'qualified_date'
+
 
 class DisqualifiedDateListFilter(AbstractDateListFilter):
     title = 'Disqualified date'
@@ -77,6 +78,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'primary',
         'ban_reason',
         LeadBundlerListFilter,
+        AbstractUIDListFilter,
     )
     search_fields = ('lead__leadid', 'lead__email', 'username', )
     actions = (
@@ -132,28 +134,28 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
-            lead=lead.leadid,
-            q=lead.leadid,
+            lead=lead.name(),
+            leadid=obj.lead.leadid,
         ))
 
     def raspberry_pi_field(self, obj):
         if not obj.lead.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
-            rpid=obj.lead.raspberry_pi,
+            rpid=obj.lead.raspberry_pi.rpid,
         ))
 
     def status_field(self, obj):
         title = 'Show changes'
         if obj.ban_reason:
             title = 'Banned for {}'.format(obj.ban_reason)
-        return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
-            q=obj.lead.leadid,
+            q=obj.id,
             title=title,
             status=obj.status if obj.status != LeadAccount.STATUS_BANNED else '{} ({})'.format(obj.status, obj.ban_reason),
         ))
@@ -412,10 +414,10 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_readonlylead_changelist'),
-            lead=lead.leadid,
-            q=lead.leadid,
+            lead=lead.name(),
+            leadid=lead.leadid,
         ))
 
     def raspberry_pi_field(self, obj):

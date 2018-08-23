@@ -14,6 +14,7 @@ from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentFo
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.admin.list_filters import \
+    AbstractUIDListFilter, \
     StatusListFilter, \
     RaspberryPiOnlineListFilter, \
     AccountTypeListFilter, \
@@ -23,6 +24,10 @@ from adsrental.admin.list_filters import \
     BundlerListFilter, \
     ShipDateListFilter, \
     LeadAccountSecurityCheckpointListFilter
+
+
+class LeadidListFIlter(AbstractUIDListFilter):
+    parameter_name = 'leadid'
 
 
 class LeadAccountInline(admin.StackedInline):
@@ -205,9 +210,9 @@ class LeadAdmin(admin.ModelAdmin):
 
     def status_field(self, obj):
         title = 'Show changes'
-        return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?lead__leadid={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
-            q=obj.email,
+            q=obj.leadid,
             title=title,
             status=obj.status,
         ))
@@ -314,9 +319,9 @@ class LeadAdmin(admin.ModelAdmin):
         if not obj.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?q={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
-            rpid=obj.raspberry_pi,
+            rpid=obj.raspberry_pi.rpid,
         ))
 
     def links(self, obj):
@@ -339,7 +344,7 @@ class LeadAdmin(admin.ModelAdmin):
             url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
         ))
 
-        result.append('<a target="_blank" href="{url}?q={q}">History</a>'.format(
+        result.append('<a target="_blank" href="{url}?lead__leadid={q}">History</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
         ))
@@ -371,12 +376,12 @@ class LeadAdmin(admin.ModelAdmin):
     def accounts_field(self, obj):
         result = []
         for lead_account in obj.lead_accounts.all():
-            result.append('<a href="{}?q={}&account_type__exact={}">{} ({})</a>'.format(
-                reverse('admin:adsrental_leadaccount_changelist'),
-                obj.email,
-                lead_account.account_type,
-                lead_account.account_type,
-                lead_account.status,
+            result.append('<a href="{url}?id={id}">{type} {username} ({status})</a>'.format(
+                url=reverse('admin:adsrental_leadaccount_changelist'),
+                type=lead_account.get_account_type_display(),
+                username=lead_account.username,
+                status=lead_account.status,
+                id=lead_account.id,
             ))
 
         return mark_safe(', '.join(result))

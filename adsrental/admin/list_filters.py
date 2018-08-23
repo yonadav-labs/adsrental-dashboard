@@ -725,3 +725,31 @@ class LeadBundlerListFilter(SimpleListFilter):
         if self.value():
             return queryset.filter(lead__bundler_id__in=self.value())
         return None
+
+
+class AbstractUIDListFilter(SimpleListFilter):
+    parameter_name = 'id'
+    title = 'ID'
+    template = 'admin/hidden_filter.html'
+
+    def lookups(self, request, model_admin):
+        # Dummy, required to show the filter.
+        return ((),)
+
+    def choices(self, changelist):
+        # Grab only the "all" option.
+        all_choice = next(super().choices(changelist))
+        all_choice['query_parts'] = (
+            (k, v)
+            for k, v in changelist.get_filters_params().items()
+            if k != self.parameter_name
+        )
+        yield all_choice
+
+    def queryset(self, request, queryset):
+        if self.value():
+            value = self.value()
+            return queryset.filter(**{
+                self.parameter_name: value,
+            })
+        return None

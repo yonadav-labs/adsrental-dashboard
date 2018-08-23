@@ -6,6 +6,18 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_change import LeadChange
 
+from adsrental.admin.list_filters import AbstractUIDListFilter
+
+
+class LeadLeadidListFilter(AbstractUIDListFilter):
+    parameter_name = 'lead__leadid'
+    title = 'Lead ID'
+
+
+class LeadAccountIDListFilter(AbstractUIDListFilter):
+    parameter_name = 'lead_account_id'
+    title = 'LeadAccount ID'
+
 
 class LeadChangeAdmin(admin.ModelAdmin):
     model = LeadChange
@@ -23,6 +35,8 @@ class LeadChangeAdmin(admin.ModelAdmin):
     list_select_related = ('lead', )
     list_filter = (
         'field',
+        LeadLeadidListFilter,
+        LeadAccountIDListFilter,
     )
     search_fields = ('lead__email', 'lead__raspberry_pi__rpid', )
 
@@ -30,20 +44,22 @@ class LeadChangeAdmin(admin.ModelAdmin):
         lead = obj.lead
         if not lead:
             return None
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{text}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{text}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             text=lead.name(),
-            q=lead.email,
+            q=lead.leadid,
         ))
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
         if not lead_account:
             return None
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{text}</a>'.format(
+        return mark_safe('<a href="{url}?id={id}">{type} {username} ({status})</a>'.format(
             url=reverse('admin:adsrental_leadaccount_changelist'),
-            text=lead_account.username,
-            q=lead_account.username,
+            type=lead_account.get_account_type_display(),
+            username=lead_account.username,
+            status=lead_account.status,
+            id=lead_account.id,
         ))
 
     lead_link.short_description = 'Lead'

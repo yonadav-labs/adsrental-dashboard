@@ -9,7 +9,7 @@ from django.db.models import Value
 from django.db.models.functions import Concat
 
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
+from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter
 
 
 PROXY_TUNNEL_MESSAGE = '''<b>Your device should be updated in a couple of minutes!<br />
@@ -22,6 +22,11 @@ PROXY_TUNNEL_MESSAGE = '''<b>Your device should be updated in a couple of minute
 7) Set Password to <b>{password}</b><br />
 8) Save and launch your new profile.<br />
 9) Ping @vlad if something is not working.<br />'''
+
+
+class RpidListFilter(AbstractUIDListFilter):
+    parameter_name = 'rpid'
+    title = 'RPID'
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
@@ -54,6 +59,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     list_filter = (
         OnlineListFilter,
         VersionListFilter,
+        RpidListFilter,
     )
     list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
@@ -69,7 +75,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         lead = obj.get_lead()
         if lead is None:
             return obj.leadid
-        return mark_safe('<a target="_blank" href="{url}?q={q}">{lead}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.email,
             q=lead.leadid,

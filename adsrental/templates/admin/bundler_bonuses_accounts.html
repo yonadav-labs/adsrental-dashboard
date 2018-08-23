@@ -37,7 +37,7 @@
                 {% for lead_account in lead_accounts %}
                     <tr>
                         <th>
-                            <a href="{% url 'admin:adsrental_lead_changelist'%}?q={{ lead_account.lead.email|urlencode }}">
+                            <a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{ lead_account.lead.leadid|urlencode }}">
                                 {{ lead_account.lead.name }}
                             </a>
                         </th>
