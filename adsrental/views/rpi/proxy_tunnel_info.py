@@ -23,7 +23,7 @@ class ProxyTunnelInfoView(View):
             raspberry_pi=raspberry_pi,
             lead=raspberry_pi.get_lead(),
             is_online=raspberry_pi.online(),
-            today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT)),
+            today_log_filename='{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT)),
         ))
 
     @method_decorator(login_required)
