@@ -4,7 +4,7 @@ cd /home/pi/new-pi/
 
 sudo apt install jq
 
-
+RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
 IS_PROXY_TUNNEL=`echo "$CONNECTION_DATA" | jq -r '.is_proxy_tunnel'`
 ${HOME}/new-pi/client_log.sh "Response: $CONNECTION_DATA $IS_PROXY_TUNNEL"
