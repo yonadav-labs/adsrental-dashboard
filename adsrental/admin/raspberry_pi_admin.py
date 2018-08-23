@@ -60,6 +60,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         OnlineListFilter,
         VersionListFilter,
         RpidListFilter,
+        'is_proxy_tunnel',
     )
     list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
