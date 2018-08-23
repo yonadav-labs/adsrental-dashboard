@@ -10,19 +10,17 @@
     <div class="container">
         <h1>{{ raspberry_pi.rpid }}  proxy tunnel info</h1>
         <p>
-            To use <b>{{ raspberry_pi.rpid }}</b>, find <b>"{{ raspberry_pi.rpid }} {{ lead.name }}"</b> in MultiloginApp.
-        </p>
-        <p>
-            If it does not exist:
+            Check <b>{{ raspberry_pi.rpid }} {{ lead.name }}</b> profile in MultiloginApp:
             <ol>
-                <li>Create a new profile in MultiloginApp, name it <b>"{{ raspberry_pi.rpid }} {{ lead.name }}"</b></li>
-                <li>Go to Edit, proxy settings</li>
+                <li>Create a new profile in MultiloginApp, name it <b>{{ raspberry_pi.rpid }} {{ lead.name }}</b>, if it does not exist yet.</li>
+                <li>Go to Edit, check proxy settings</li>
                 <li>Select <b>Socks 5 proxy</b> connection type</li>
                 <li>Set Address to <b>{{ raspberry_pi.TUNNEL_HOST }}</b></li>
                 <li>Set Port to <b>{{ raspberry_pi.rtunnel_port }}</b></li>
                 <li>Set Login to <b>{{ raspberry_pi.TUNNEL_USER }}</b></li>
                 <li>Set Password to <b>{{ raspberry_pi.TUNNEL_PASSWORD }}</b></li>
                 <li>Save and launch your new profile.</li>
+                <li>Ping @vlad if something is not working.</li>
             </ol>
         </p>
         <h3>Actions</h3>
