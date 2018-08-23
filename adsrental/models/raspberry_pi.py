@@ -231,7 +231,9 @@ class RaspberryPi(models.Model):
         version = ping_data['raspberry_pi_version']
         last_ping = ping_data.get('last_ping')
 
-        self.update_ping(last_ping)
+        lead = self.get_lead()
+        if lead and lead.is_active():
+            self.update_ping(last_ping)
 
         if self.ip_address != ip_address:
             self.ip_address = ip_address

@@ -36,7 +36,7 @@ class UpdatePingView(View):
 
         rpids = []
         invalidated_rpids = []
-        raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys())
+        raspberry_pis = RaspberryPi.objects.filter(rpid__in=rpids_ping_map.keys()).prefetch_related('lead')
         ec2_instances = EC2Instance.objects.filter(rpid__in=rpids_ping_map.keys()).select_related('lead')
         ec2_instances_map = {}
         for ec2_instance in ec2_instances:
