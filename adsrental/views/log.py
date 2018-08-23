@@ -102,8 +102,8 @@ class LogView(View):
             return True
 
         # FIXME: remove this
-        # if ping_data.get('is_proxy_tunnel') and StrictVersion(version) < StrictVersion('2.0.0'):
-        #     return True
+        if ping_data.get('is_proxy_tunnel') and StrictVersion(version) < StrictVersion('2.0.0'):
+            return True
 
         return False
 
