@@ -5,7 +5,7 @@ RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 
 ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 
-sudo apt install jq
+sudo apt-get install -y jq
 
 # CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
 # IS_PROXY_TUNNEL=`echo "$CONNECTION_DATA" | jq -r '.is_proxy_tunnel'`
