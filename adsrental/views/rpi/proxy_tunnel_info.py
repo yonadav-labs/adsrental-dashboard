@@ -52,6 +52,6 @@ class ProxyTunnelInfoView(View):
                 ec2_instance.unassign_essential()
                 ec2_instance.stop()
                 messages.info(request, 'Unassigned EC2.')
-            messages.success(request, 'Device can now be used as a proxy tunnel.')
+            messages.success(request, 'Device can be used as a proxy tunnel in a couple of minutes!')
 
         return redirect('rpi_proxy_tunnel_info', rpid=raspberry_pi.rpid)

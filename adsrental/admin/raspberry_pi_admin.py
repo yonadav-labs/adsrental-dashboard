@@ -12,7 +12,7 @@ from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter
 
 
-PROXY_TUNNEL_MESSAGE = '''<b>Success!</b> To use <b>{rpid}</b>, find <b>"{rpid} {lead_name}"</b> in MultiloginApp. If it does not exist:<br />
+PROXY_TUNNEL_MESSAGE = '''<b>Your device should be updated in a couple of minutes!</b> To use <b>{rpid}</b>, find <b>"{rpid} {lead_name}"</b> in MultiloginApp. If it does not exist:<br />
 1) create a new profile in MultiloginApp, name it <b>"{rpid} {lead_name}"</b>.<br />
 2) go to Edit, proxy settings<br />
 3) select <b>Socks 5 proxy</b> connection type<br />
@@ -20,7 +20,8 @@ PROXY_TUNNEL_MESSAGE = '''<b>Success!</b> To use <b>{rpid}</b>, find <b>"{rpid} 
 5) Set Port to <b>{rtunnel_port}</b><br />
 6) Set Login to <b>{user}</b><br />
 7) Set Password to <b>{password}</b><br />
-8) Save and launch your new profile.<br />'''
+8) Save and launch your new profile.<br />
+9) Ping @vlad if something is not working.<br />'''
 
 
 class RaspberryPiAdmin(admin.ModelAdmin):
