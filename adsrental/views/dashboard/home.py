@@ -151,7 +151,7 @@ class DashboardHomeView(View):
             order = request.GET.get('order', '-lead__raspberry_pi__last_seen')
             # entries = entries.prefetch_related('lead', 'lead__raspberry_pi', 'lead__bundler')
             entries = entries.order_by(order)
-
+            total = entries.count()
             page = request.GET.get('page', 1)
             paginator = Paginator(entries, self.items_per_page)
             try:
@@ -167,4 +167,5 @@ class DashboardHomeView(View):
             preset=request.GET.get('preset'),
             entries=entries,
             form=form,
+            total=total,
         ))
