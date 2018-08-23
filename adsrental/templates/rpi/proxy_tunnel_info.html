@@ -41,7 +41,7 @@
         </p>
         <div class="alert alert-info">
             <p>
-                <strong>SSH</strong> ssh {{ raspberry_pi.TUNNEL_USER }}@{{ raspberry_pi.TUNNEL_HOST }} -p {{ raspberry_pi.rtunnel_port }}
+                <strong>SSH</strong> ssh -oStrictHostKeyChecking=no root@{{ raspberry_pi.TUNNEL_HOST }} -p {{ raspberry_pi.tunnel_port }}
             </p>
         </div>
         
