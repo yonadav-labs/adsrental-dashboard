@@ -547,6 +547,7 @@ class PingCacheHelper():
             'wrong_password': lead.is_wrong_password() if lead else False,
             'restart_required': restart_required,
             'new_config_required': new_config_required,
+            'is_proxy_tunnel': raspberry_pi.is_proxy_tunnel if raspberry_pi else False,
             'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
             'ec2_instance_status': ec2_instance and ec2_instance.status,
             'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,

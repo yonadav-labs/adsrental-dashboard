@@ -101,6 +101,10 @@ class LogView(View):
         if version and settings.RASPBERRY_PI_VERSION != version and StrictVersion(settings.RASPBERRY_PI_VERSION) > StrictVersion(version):
             return True
 
+        # FIXME: remove this
+        # if ping_data.get('is_proxy_tunnel') and StrictVersion(version) < StrictVersion('2.0.0'):
+        #     return True
+
         return False
 
     def _get_new_config_required(self, ping_data):
