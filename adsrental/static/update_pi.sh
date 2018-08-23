@@ -2,7 +2,7 @@
 
 cd /home/pi/new-pi/
 
-sudo apt-get install jq
+sudo apt-get install -y jq
 
 RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
