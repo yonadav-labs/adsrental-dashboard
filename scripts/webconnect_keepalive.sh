@@ -7,5 +7,5 @@ echo "${DATE} Status: ${OUTPUT}"
 if ! [ "$OUTPUT" = "200" ]; then
     echo "${DATE} Restarting..."
     cd /root/dashboard/
-    docker-compose -f docker-compose.prod.yml restart rdpclient
+    /usr/local/bin/docker-compose -f docker-compose.prod.yml restart rdpclient
 fi
