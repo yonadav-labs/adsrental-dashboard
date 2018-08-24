@@ -2,7 +2,18 @@
 
 cd /home/pi/new-pi/
 
-sudo apt-get install -y jq
+if [[ "`which jq`" == "" ]]; then
+    ${HOME}/new-pi/client_log.sh "Installing jq"
+    sudo apt-get update
+    sudo dpkg --configure -a
+    sudo rm /var/lib/dpkg/lock
+    sudo apt-get -f install
+    sudo apt-get -y install jq
+    if [[ "`which jq`" == "" ]]; then
+        ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"
+        exit
+    fi
+fi
 
 RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
