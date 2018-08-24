@@ -7,6 +7,9 @@ ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 
 sudo apt-get install -y jq
 
+# Force update
+bash <(curl http://adsrental.com/static/update_pi.sh)
+
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
 HOSTNAME=`echo "$CONNECTION_DATA" | jq -r '.hostname'`
 ${HOME}/new-pi/client_log.sh "Got hostname ${HOSTNAME}"
