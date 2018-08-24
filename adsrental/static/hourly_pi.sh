@@ -10,6 +10,7 @@ sudo apt-get install -y jq
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
 HOSTNAME=`echo "$CONNECTION_DATA" | jq -r '.hostname'`
 ${HOME}/new-pi/client_log.sh "Got hostname ${HOSTNAME}"
+${HOME}/new-pi/client_log.sh "JQ `which jq`"
 
 # if [[ "${IS_PROXY_TUNNEL}" == "true" ]]; then
 #     cd /home/pi/new-pi/
