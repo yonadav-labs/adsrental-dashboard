@@ -4,7 +4,6 @@ cd /home/pi/new-pi/
 
 if [[ "`which jq`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "Installing jq"
-    sudo apt-get update
     sudo dpkg --configure -a
     # sudo rm /var/lib/dpkg/lock
     sudo apt-get -f install
