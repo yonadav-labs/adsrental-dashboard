@@ -5,6 +5,7 @@ RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 
 ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 
+sudo apt-get update
 sudo apt-get install -y jq
 
 # Force update
