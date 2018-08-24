@@ -5,12 +5,22 @@ RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 
 ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 
-sudo apt-get update
 sudo apt-get install -y jq
 
+if [[ "`which jq`" == "" ]]; then
+    sudo apt-get update
+    sudo dpkg --configure -a
+    sudo rm /var/lib/dpkg/lock
+    sudo apt-get -f install
+    sudo apt-get -y install jq
+    if [[ "`which jq`" == "" ]]; then
+        ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"
+    fi
+fi
+
 # Force update
-${HOME}/new-pi/client_log.sh "FOrce update!"
-bash <(curl http://adsrental.com/static/update_pi.sh)
+# ${HOME}/new-pi/client_log.sh "FOrce update!"
+# bash <(curl http://adsrental.com/static/update_pi.sh)
 
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
 HOSTNAME=`echo "$CONNECTION_DATA" | jq -r '.hostname'`
