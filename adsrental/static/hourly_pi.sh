@@ -7,8 +7,9 @@ ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 
 sudo apt-get install -y jq
 
-# CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
-# IS_PROXY_TUNNEL=`echo "$CONNECTION_DATA" | jq -r '.is_proxy_tunnel'`
+CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
+HOSTNAME=`echo "$CONNECTION_DATA" | jq -r '.hostname'`
+${HOME}/new-pi/client_log.sh "Got hostname ${HOSTNAME}"
 
 # if [[ "${IS_PROXY_TUNNEL}" == "true" ]]; then
 #     cd /home/pi/new-pi/

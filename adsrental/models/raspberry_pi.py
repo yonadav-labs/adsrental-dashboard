@@ -248,7 +248,7 @@ class RaspberryPi(models.Model):
 
         if self.ip_address != ip_address:
             self.ip_address = ip_address
-        if self.version != version and version:
+        if version and self.version != version:
             self.version = version
 
         self.restart_required = False
