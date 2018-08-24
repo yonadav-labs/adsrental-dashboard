@@ -98,11 +98,13 @@ class LogView(View):
 
     def _get_update_required(self, ping_data):
         version = ping_data.get('raspberry_pi_version')
-        if version and settings.RASPBERRY_PI_VERSION != version and StrictVersion(settings.RASPBERRY_PI_VERSION) > StrictVersion(version):
+        if not version:
+            return False
+
+        if StrictVersion(version) < StrictVersion(settings.RASPBERRY_PI_VERSION):
             return True
 
-        # FIXME: remove this
-        if ping_data.get('is_proxy_tunnel') and StrictVersion(version) < StrictVersion('2.0.0'):
+        if ping_data.get('is_beta') and StrictVersion(version) < StrictVersion(settings.BETA_RASPBERRY_PI_VERSION):
             return True
 
         return False
