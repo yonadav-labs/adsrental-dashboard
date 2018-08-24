@@ -32,6 +32,7 @@ class ConnectionDataView(View):
                 'tunnel_port': 2046,
                 'rtunnel_port': 3808,
                 'is_proxy_tunnel': False,
+                'is_beta': raspberry_pi.is_proxy_tunnel or raspberry_pi.is_beta,
                 'result': True,
             })
 
@@ -42,5 +43,6 @@ class ConnectionDataView(View):
             'tunnel_port': raspberry_pi.tunnel_port,
             'rtunnel_port': raspberry_pi.rtunnel_port,
             'is_proxy_tunnel': True,
+            'is_beta': raspberry_pi.is_proxy_tunnel or raspberry_pi.is_beta,
             'result': True,
         })
