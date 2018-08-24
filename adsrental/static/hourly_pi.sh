@@ -8,7 +8,7 @@ ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
 if [[ "`which jq`" == "" ]]; then
     sudo dpkg --configure -a
     # sudo rm /var/lib/dpkg/lock
-    sudo apt-get -f install
+    sudo apt-get -f -y install
     sudo apt-get -y install jq
     if [[ "`which jq`" == "" ]]; then
         ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"

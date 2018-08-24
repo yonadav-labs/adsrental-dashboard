@@ -6,7 +6,7 @@ if [[ "`which jq`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "Installing jq"
     sudo dpkg --configure -a
     # sudo rm /var/lib/dpkg/lock
-    sudo apt-get -f install
+    sudo apt-get -f -y install
     sudo apt-get -y install jq
     if [[ "`which jq`" == "" ]]; then
         ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"
