@@ -101,10 +101,12 @@ class LogView(View):
         if not version:
             return False
 
-        if not ping_data.get('is_beta') and version != settings.RASPBERRY_PI_VERSION:
+        is_beta = ping_data.get('is_beta')
+
+        if not is_beta and version != settings.RASPBERRY_PI_VERSION:
             return True
 
-        if ping_data.get('is_beta') and StrictVersion(version) < StrictVersion(settings.BETA_RASPBERRY_PI_VERSION):
+        if is_beta and StrictVersion(version) < StrictVersion(settings.BETA_RASPBERRY_PI_VERSION):
             return True
 
         return False
