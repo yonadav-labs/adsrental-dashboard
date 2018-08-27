@@ -58,11 +58,11 @@
                         <td>{{ entry.get_account_type_display }}</td>
                         <td>
                             {{ entry.get_status_display }}
-                            {% if lead_account.ban_reason %}
-                                {% if lead_account.ban_reason in lead_account.POLICY_BAN_REASONS %}
+                            {% if entry.ban_reason %}
+                                {% if entry.ban_reason in entry.POLICY_BAN_REASONS %}
                                     (Ads completed)
                                 {% else %}
-                                    ({{lead_account.get_ban_reason_display}}) 
+                                    ({{entry.get_ban_reason_display}}) 
                                 {% endif %}
                             {% endif %}
                             {% if entry.url %}
