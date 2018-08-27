@@ -38,6 +38,7 @@ class LeadAccountsWeeklyView(View):
 
         new_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=True).count()
         secondary_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count()
+        total_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).count()
         qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).count()
         disqualified_lead_accounts_count = lead_accounts.filter(disqualified_date__gte=start_dt, disqualified_date__lt=end_dt).count()
         wrong_pw_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).count()
@@ -48,10 +49,11 @@ class LeadAccountsWeeklyView(View):
         awaiting_shipment_lead_accounts_count = lead_accounts.filter(lead__shipstation_order_status=Lead.SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT).count()
 
         qualified_lead_accounts_by_bundler_list = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
+        new_online_lead_accounts_by_bundler_list = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
         wrong_pw_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
         sec_checkpoint_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
         offline_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl)).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
-        chargeback_lead_accounts_by_bundler_list = lead_accounts.filter(charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
+        chargeback_lead_accounts_by_bundler_list = lead_accounts.filter(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
 
         context = dict(
             select_account_types=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
@@ -60,6 +62,7 @@ class LeadAccountsWeeklyView(View):
             account_type=account_type,
             new_online_lead_accounts_count=new_online_lead_accounts_count,
             secondary_online_lead_accounts_count=secondary_online_lead_accounts_count,
+            total_online_lead_accounts_count=total_online_lead_accounts_count,
             qualified_lead_accounts_count=qualified_lead_accounts_count,
             disqualified_lead_accounts_count=disqualified_lead_accounts_count,
             wrong_pw_lead_accounts_count=wrong_pw_lead_accounts_count,
@@ -69,6 +72,7 @@ class LeadAccountsWeeklyView(View):
             shipped_lead_accounts_count=shipped_lead_accounts_count,
             awaiting_shipment_lead_accounts_count=awaiting_shipment_lead_accounts_count,
             qualified_lead_accounts_by_bundler_list=qualified_lead_accounts_by_bundler_list,
+            new_online_lead_accounts_by_bundler_list=new_online_lead_accounts_by_bundler_list,
             wrong_pw_lead_accounts_by_bundler_list=wrong_pw_lead_accounts_by_bundler_list,
             sec_checkpoint_lead_accounts_by_bundler_list=sec_checkpoint_lead_accounts_by_bundler_list,
             offline_lead_accounts_by_bundler_list=offline_lead_accounts_by_bundler_list,

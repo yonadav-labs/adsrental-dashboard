@@ -1,10 +1,7 @@
 
 <h2>Stats</h2>
 <p>
-    New online: <strong>{{ new_online_lead_accounts_count }}</strong>
-</p>
-<p>
-    Secondary online: <strong>{{ secondary_online_lead_accounts_count }}</strong>
+    New online: <strong>{{ total_online_lead_accounts_count }}</strong> (<strong>{{ new_online_lead_accounts_count }}</strong> primary, <strong>{{ secondary_online_lead_accounts_count }}</strong> secondary)
 </p>
 <p>
     Qualified: <strong>{{ qualified_lead_accounts_count }}</strong>
@@ -31,6 +28,24 @@
     Awaiting shipment: <strong>{{ awaiting_shipment_lead_accounts_count }}</strong>
 </p>
 <h2>Stats by bundler</h2>
+<h3>New in progress</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Bundler</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in new_online_lead_accounts_by_bundler_list %}
+            <tr>
+                <th>{{ row.0 }}</th>
+                <td>{{ row.1 }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <h3>Qualified</h3>
 <table class="table table-striped">
     <thead>
