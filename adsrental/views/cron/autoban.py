@@ -18,10 +18,6 @@ class AutoBanView(View):
     Parameters:
 
     * execute - ban accounts, dry run otherwise
-    * days_wrong_password - set  days wrong password after which account is banned, 14 by default
-    * days_offline - set days offline after which account is banned, 14 by default
-    * days_offline - set days security_checkpoint reported after which account is banned, 14 by default
-    * days_delivered - set days delivered after which account is banned if not used, 14 by default
     '''
     def get(self, request):
         admin_user = User.objects.get(email=settings.ADMIN_USER_EMAIL)
@@ -31,10 +27,10 @@ class AutoBanView(View):
         banned_not_used = []
         now = timezone.localtime(timezone.now())
         execute = request.GET.get('execute', '') == 'true'
-        days_wrong_password = int(request.GET.get('days_wrong_password', 14))
-        days_offline = int(request.GET.get('days_offline', 14))
-        days_checkpoint = int(request.GET.get('days_checkpoint', 14))
-        days_delivered = int(request.GET.get('days_delivered', 14))
+        days_wrong_password = LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD
+        days_offline = LeadAccount.AUTO_BAN_DAYS_OFFLINE
+        days_checkpoint = LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT
+        days_delivered = LeadAccount.AUTO_BAN_DAYS_NOT_USED
         for lead_account in LeadAccount.objects.filter(
                 wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
                 status=LeadAccount.STATUS_IN_PROGRESS,

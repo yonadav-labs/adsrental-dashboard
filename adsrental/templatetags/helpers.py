@@ -24,3 +24,46 @@ def ordinal(value):
         return '{}rd'.format(value)
 
     return '{}th'.format(value)
+
+@register.filter()
+def humanize_timedelta(timedeltaobj):
+    secs = timedeltaobj.total_seconds()
+    timetot = ""
+    if secs < 60:
+        return 'Now'
+
+    if secs > 86400: # 60sec * 60min * 24hrs
+        days = secs // 86400
+        timetot += "{} days".format(int(days))
+        secs = secs - days*86400
+
+    if secs > 3600:
+        hrs = secs // 3600
+        timetot += " {} hours".format(int(hrs))
+        secs = secs - hrs*3600
+
+    if secs > 60:
+        mins = secs // 60
+        timetot += " {} minutes".format(int(mins))
+        secs = secs - mins*60
+
+    return timetot
+
+@register.filter()
+def humanize_timedelta_hours(timedeltaobj):
+    secs = timedeltaobj.total_seconds()
+    timetot = ""
+    if secs < 3600:
+        return 'Now'
+
+    if secs > 86400: # 60sec * 60min * 24hrs
+        days = secs // 86400
+        timetot += "{} days".format(int(days))
+        secs = secs - days*86400
+
+    if secs > 3600:
+        hrs = secs // 3600
+        timetot += " {} hours".format(int(hrs))
+        secs = secs - hrs*3600
+
+    return timetot

@@ -128,8 +128,8 @@ class CustomIndexDashboard(Dashboard):
                 [_('Bundler bonuses'), '{}'.format(
                     reverse('admin_helpers:bundler_bonuses'),
                 )],
-                [_('Lead Accounts weekly report'), '{}'.format(
-                    reverse('report:lead_accounts_weekly'),
+                [_('Auto Ban Soon report'), '{}'.format(
+                    reverse('report:auto_ban'),
                 )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
