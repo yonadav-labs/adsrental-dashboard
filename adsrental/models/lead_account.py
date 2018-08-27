@@ -1,5 +1,6 @@
 'LeadAccount model'
 import decimal
+import datetime
 
 import requests
 from django.utils import timezone
@@ -26,6 +27,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         )
 
     LAST_SECURITY_CHECKPOINT_REPORTED_HOURS_TTL = 48
+    CHARGE_BACK_DAYS_OLD = 61
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
@@ -294,8 +296,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def ban(self, edited_by, reason=None):
         'Mark lead account as banned, send cutomer.io event.'
+        now = timezone.localtime(timezone.now())
         self.ban_reason = reason
-        self.banned_date = timezone.now()
+        self.banned_date = now
+        if self.in_progress_date and self.in_progress_date > now - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
+            self.charge_back = True
+
         self.save()
 
         result = self.set_status(LeadAccount.STATUS_BANNED, edited_by)

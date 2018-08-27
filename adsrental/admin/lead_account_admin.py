@@ -101,6 +101,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'qualified_date',
         'bundler_paid',
         'bundler_paid_date',
+        'charge_back',
         'primary',
         'active',
     )
