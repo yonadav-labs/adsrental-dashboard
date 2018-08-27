@@ -5,7 +5,6 @@ from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView
-from adsrental.views.report import ReportView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
@@ -22,7 +21,6 @@ urlpatterns = [
     path('thankyou.php', ThankyouView.as_view(), name='thankyou'),
     path('thankyou/<leadid>/', ThankyouView.as_view(), name='thankyou_email'),
     path('home/', MainView.as_view(), name='main'),
-    path('report/', ReportView.as_view(), name='report'),
     path('log.php', LogView.as_view(), name='old_log'),
     path('rlog.php', LogView.as_view(), name='old_rlog'),
     path('keepalive.php', StubView.as_view(), name='old_keepalive'),
@@ -47,5 +45,6 @@ urlpatterns = [
     path('rpi/', include('adsrental.urls.rpi')),
     path('bookkeeper/', include('adsrental.urls.bookkeeper')),
     path('admin_helpers/', include(('adsrental.urls.admin_helpers', 'adsrental'), namespace='admin_helpers')),
+    path('report/', include(('adsrental.urls.report', 'adsrental'), namespace='report')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
 ]

@@ -24,8 +24,16 @@ fi
 # bash <(curl http://adsrental.com/static/update_pi.sh)
 
 CONNECTION_DATA=$(curl -s "http://adsrental.com/rpi/${RASPBERRYPI_ID}/connection_data/")
+${HOME}/new-pi/client_log.sh "Got connection data ${CONNECTION_DATA}"
 HOSTNAME=`echo "$CONNECTION_DATA" | jq -r '.hostname'`
-${HOME}/new-pi/client_log.sh "Got hostname ${HOSTNAME}"
+SHUTDOWN=`echo "$CONNECTION_DATA" | jq -r '.shutdown'`
+
+if [[ "${SHUTDOWN}" == "true" ]]; then
+    ${HOME}/new-pi/client_log.sh "Shutdown on demand"
+    sudo poweroff
+fi
+
+
 ${HOME}/new-pi/client_log.sh "JQ `which jq`"
 
 # if [[ "${IS_PROXY_TUNNEL}" == "true" ]]; then

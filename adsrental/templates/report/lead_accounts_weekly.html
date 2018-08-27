@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Lead accounts Report{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{account_type}} lead accounts weekly report {{ start_date|date:"d M" }} - {{ end_date|date:"d M" }}</h1>
+        <div class="btn-group" role="group">
+            {% for select_account_type in select_account_types %}
+                <a href="?account_type={{ select_account_type|urlencode }}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type }}</a>
+            {% endfor %}
+        </div>
+
+        {% include "include/report/lead_accounts_weekly.html" %}
+    </div>
+{% endblock %}

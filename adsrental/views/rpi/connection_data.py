@@ -13,6 +13,7 @@ class ConnectionDataView(View):
         if not raspberry_pi:
             return JsonResponse({
                 'error': 'Not found',
+                'shutdown': True,
                 'result': False,
             })
 
@@ -20,6 +21,7 @@ class ConnectionDataView(View):
         if not lead or not lead.is_active():
             return JsonResponse({
                 'error': 'Not available',
+                'shutdown': True,
                 'result': False,
             })
 

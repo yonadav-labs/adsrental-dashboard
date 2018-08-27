@@ -10,7 +10,7 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.forms import ReportForm
 
 
-class ReportView(View):
+class HistoryMonthlyView(View):
     items_per_page = 3000
 
     def get_entries(self, user, year, month, search):
