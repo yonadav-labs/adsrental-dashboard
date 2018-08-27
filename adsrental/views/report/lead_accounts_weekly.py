@@ -48,9 +48,9 @@ class LeadAccountsWeeklyView(View):
         awaiting_shipment_lead_accounts_count = lead_accounts.filter(lead__shipstation_order_status=Lead.SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT).count()
 
         qualified_lead_accounts_by_bundler_list = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
-        wrong_pw_lead_accounts_by_bundler_list = lead_accounts.filter(wrong_password_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
-        sec_checkpoint_lead_accounts_by_bundler_list = lead_accounts.filter(security_checkpoint_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
-        offline_lead_accounts_by_bundler_list = lead_accounts.filter(lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl)).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
+        wrong_pw_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
+        sec_checkpoint_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
+        offline_lead_accounts_by_bundler_list = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl)).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
         chargeback_lead_accounts_by_bundler_list = lead_accounts.filter(charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).values(bundler_field).annotate(count=Count('id')).order_by('-count').values_list(bundler_field, 'count')
 
         context = dict(
