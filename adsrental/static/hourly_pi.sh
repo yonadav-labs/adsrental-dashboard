@@ -15,6 +15,14 @@ if [[ "`which jq`" == "" ]]; then
     sudo apt-get -y install jq
     if [[ "`which jq`" == "" ]]; then
         ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"
+        VERSION="`head -n 1 ${HOME}/new-pi/version.txt`"
+        if [[ "$VERSION" == "2.0.0" ]]; then
+            cd /home/pi/new-pi/
+            curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_1.1.10.zip > pi_patch.zip
+            unzip -o pi_patch.zip
+            sudo sync
+            ${HOME}/new-pi/client_log.sh "Downgraded to 1.1.10!"
+        fi
         exit
     fi
 fi
