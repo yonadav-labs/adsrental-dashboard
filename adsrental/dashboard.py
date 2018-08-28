@@ -128,6 +128,9 @@ class CustomIndexDashboard(Dashboard):
                 [_('Bundler bonuses'), '{}'.format(
                     reverse('admin_helpers:bundler_bonuses'),
                 )],
+                [_('Lead Accounts Weekly Report preview'), '{}'.format(
+                    reverse('report:lead_accounts_weekly'),
+                )],
                 [_('Auto Ban Soon report'), '{}'.format(
                     reverse('report:auto_ban'),
                 )],

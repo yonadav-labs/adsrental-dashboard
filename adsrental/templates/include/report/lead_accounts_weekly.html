@@ -28,126 +28,32 @@
     Awaiting shipment: <strong>{{ awaiting_shipment_lead_accounts_count }}</strong>
 </p>
 <h2>Stats by bundler</h2>
-<h3>New in progress</h3>
+
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Bundler</th>
-            <th>Count</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in new_online_lead_accounts_by_bundler_list %}
-            <tr>
-                <th>{{ row.0 }}</th>
-                <td>{{ row.1 }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<h3>Qualified</h3>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Bundler</th>
-            <th>Count</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in qualified_lead_accounts_by_bundler_list %}
-            <tr>
-                <th>{{ row.0 }}</th>
-                <td>{{ row.1 }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<h3>Wrong PW</h3>
-{% if wrong_pw_lead_accounts_by_bundler_list %}
-    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Bundler</th>
-                <th>Count</th>
+                <th>Total In-Progress</th>
+                <th>New In-Progress</th>
+                <th>Qualified</th>
+                <th>Wrong PW</th>
+                <th>Sec checkpoint</th>
+                <th>Offline</th>
+                <th>Chargeback</th>
             </tr>
         </thead>
         <tbody>
-            {% for row in wrong_pw_lead_accounts_by_bundler_list %}
+            {% for row in lead_accounts_by_bundler_list %}
                 <tr>
-                    <th>{{ row.0 }}</th>
-                    <td>{{ row.1 }}</td>
+                    <th>{{ row.lead__bundler__name }}</th>
+                    <td>{{ row.total_in_progress }}</td>
+                    <td>{{ row.new_online }}</td>
+                    <td>{{ row.qualified }}</td>
+                    <td>{{ row.wrong_pw }}</td>
+                    <td>{{ row.sec_checkpoint }}</td>
+                    <td>{{ row.offline }}</td>
+                    <td>{{ row.chargeback }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-{% else %}
-    <p>No wrong password accounts found</p>
-{% endif %}
-
-<h3>Security Checkpoint</h3>
-{% if sec_checkpoint_lead_accounts_by_bundler_list %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Bundler</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in sec_checkpoint_lead_accounts_by_bundler_list %}
-                <tr>
-                    <th>{{ row.0 }}</th>
-                    <td>{{ row.1 }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No security checkpoint accounts found</p>
-{% endif %}
-
-<h3>Offline</h3>
-{% if offline_lead_accounts_by_bundler_list %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Bundler</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in offline_lead_accounts_by_bundler_list %}
-                <tr>
-                    <th>{{ row.0 }}</th>
-                    <td>{{ row.1 }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No offline accounts found</p>
-{% endif %}
-
-<h3>Chargeback</h3>
-{% if chargeback_lead_accounts_by_bundler_list %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Bundler</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in chargeback_lead_accounts_by_bundler_list %}
-                <tr>
-                    <th>{{ row.0 }}</th>
-                    <td>{{ row.1 }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No changeback accounts found</p>
-{% endif %}
