@@ -142,12 +142,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_payment
                 result -= self.get_parent_bundler_payment(bundler)
+                result -= self.get_second_parent_bundler_payment(bundler)
             if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_payment
                 result -= self.get_parent_bundler_payment(bundler)
+                result -= self.get_second_parent_bundler_payment(bundler)
             if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_payment
                 result -= self.get_parent_bundler_payment(bundler)
+                result -= self.get_second_parent_bundler_payment(bundler)
 
         if bundler.enable_chargeback and self.charge_back and self.bundler_paid and not self.charge_back_billed:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
@@ -168,6 +171,18 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result += bundler.google_parent_payment
             if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_parent_payment
+
+        return result
+
+    def get_second_parent_bundler_payment(self, bundler):
+        result = decimal.Decimal('0.00')
+        if bundler.second_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                result += bundler.facebook_second_parent_payment
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                result += bundler.google_second_parent_payment
+            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+                result += bundler.amazon_second_parent_payment
 
         return result
 

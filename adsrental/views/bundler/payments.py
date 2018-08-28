@@ -3,6 +3,7 @@ import json
 import io
 import decimal
 
+from django.db.models import Q
 from django.shortcuts import render, Http404, redirect
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,7 @@ from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
 
 class BundlerPaymentsView(View):
-    def get_account_type_stats(self, bundler, end_date, account_type, child=False):
+    def get_account_type_stats(self, bundler, end_date, account_type, child=False, second_parent=False):
         total = decimal.Decimal('0.00')
         final_total = decimal.Decimal('0.00')
         chargeback_total = decimal.Decimal('0.00')
@@ -35,6 +36,8 @@ class BundlerPaymentsView(View):
         for lead_account in lead_accounts:
             payment = lead_account.get_bundler_payment(bundler)
             parent_payment = lead_account.get_parent_bundler_payment(bundler)
+            if second_parent:
+                parent_payment = lead_account.get_second_parent_bundler_payment(bundler)
             lead_account.parent_payment = parent_payment
             if child:
                 lead_account.payment = parent_payment
@@ -58,8 +61,12 @@ class BundlerPaymentsView(View):
                     entries.append(lead_account)
 
         children_stats = []
-        for child_bundler in Bundler.objects.filter(parent_bundler=bundler):
-            child_stats = self.get_account_type_stats(child_bundler, end_date, account_type, child=True)
+        for child_bundler in Bundler.objects.filter(Q(parent_bundler=bundler) | Q(second_parent_bundler=bundler)):
+            second_parent = False
+            if child_bundler.second_parent_bundler == bundler:
+                second_parent = True
+
+            child_stats = self.get_account_type_stats(child_bundler, end_date, account_type, child=True, second_parent=second_parent)
             children_stats.append(child_stats)
 
         children_stats.sort(key=lambda x: x['total'], reverse=True)
