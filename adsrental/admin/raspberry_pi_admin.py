@@ -186,6 +186,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         links = []
+        now = timezone.localtime(timezone.now())
         if obj.is_proxy_tunnel:
             links.append('<a target="_blank" href="{url}">Proxy tunnel</a>'.format(
                 url=reverse('rpi_proxy_tunnel_info', kwargs=dict(rpid=obj.rpid)),
@@ -197,7 +198,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
             url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
         ))
-        today_log_filename = '{}.log'.format(timezone.now().strftime(settings.LOG_DATE_FORMAT))
+        today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
         links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
             log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
         ))
