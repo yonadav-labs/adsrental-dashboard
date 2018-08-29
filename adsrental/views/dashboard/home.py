@@ -39,7 +39,6 @@ class DashboardHomeView(View):
             entries = self.get_entries(request.user, bundler_id)
             if form.cleaned_data['raspberry_pi_status']:
                 value = form.cleaned_data['raspberry_pi_status']
-                entries = entries.filter(lead__pi_delivered=True).exclude(status=LeadAccount.STATUS_BANNED)
                 if value == 'online':
                     entries = entries.filter(
                         lead__raspberry_pi__last_seen__gte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
@@ -71,7 +70,6 @@ class DashboardHomeView(View):
 
             if form.cleaned_data['wrong_password']:
                 value = form.cleaned_data['wrong_password']
-                entries = entries.filter(lead__pi_delivered=True).exclude(status=LeadAccount.STATUS_BANNED)
                 if value == 'no':
                     entries = entries.filter(
                         wrong_password_date__isnull=True)
