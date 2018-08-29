@@ -73,8 +73,11 @@ class EC2ConnectView(View):
                 is_ready=is_ready,
                 netstat_url='',
             ))
+        if lead.raspberry_pi and lead.raspberry_pi.is_proxy_tunnel:
+            return redirect('rpi_proxy_tunnel_info', rpid=rpid)
 
         ec2_instance = EC2Instance.get_by_rpid(rpid)
+
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_RUNNING).first()
             if not ec2_instance:
