@@ -123,6 +123,8 @@ class Lead(models.Model, FulltextSearchMixin):
         (SHIPSTATION_ORDER_STATUS_CANCELLED, 'Cancelled', ),
     )
 
+    ADSDB_SYNC_MIN_TOUCH_COUNT = 5
+
     leadid = models.CharField(primary_key=True, max_length=255, db_index=True, help_text='UUID is now used as a primary key for lead')
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)

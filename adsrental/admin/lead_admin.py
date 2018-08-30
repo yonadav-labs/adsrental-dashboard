@@ -139,8 +139,7 @@ class LeadAdmin(admin.ModelAdmin):
         'prepare_for_testing',
         'touch',
         'restart_raspberry_pi',
-        'sync_to_adsdb_facebook',
-        'sync_to_adsdb_google',
+        'sync_to_adsdb',
         'delete_leads',
     )
     readonly_fields = (
@@ -866,18 +865,19 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.touch()
                 messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
 
-    def sync_to_adsdb_facebook(self, request, queryset):
+    def sync_to_adsdb(self, request, queryset):
         for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
-                result = lead_account.sync_to_adsdb()
-                if result:
-                    messages.info(request, '{} is synced: {}'.format(lead_account, result))
-                else:
-                    messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
+            if not lead.is_active():
+                messages.warning(request, '{} is now {}, skipping.'.format(lead.email, lead.status))
+                continue
 
-    def sync_to_adsdb_google(self, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
+            if lead.touch_count < Lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
+                lead.touch_count = Lead.ADSDB_SYNC_MIN_TOUCH_COUNT
+                lead.last_touch_date = timezone.now()
+                lead.save()
+                messages.warning(request, '{} touch count has been increased to meet conditions.'.format(lead.email))
+
+            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 result = lead_account.sync_to_adsdb()
                 if result:
                     messages.info(request, '{} is synced: {}'.format(lead_account, result))

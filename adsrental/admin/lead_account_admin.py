@@ -318,6 +318,18 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def sync_to_adsdb(self, request, queryset):
         for lead_account in queryset:
+            lead = lead_account.get_lead()
+
+            if not lead.is_active():
+                messages.warning(request, '{} is now {}, skipping.'.format(lead.email, lead.status))
+                continue
+
+            if lead.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
+                lead.touch_count = lead.ADSDB_SYNC_MIN_TOUCH_COUNT
+                lead.last_touch_date = timezone.now()
+                lead.save()
+                messages.warning(request, '{} touch count has been increased to meet conditions.'.format(lead.email))
+
             result = lead_account.sync_to_adsdb()
             if result:
                 messages.info(request, '{} is synced: {}'.format(lead_account, result))

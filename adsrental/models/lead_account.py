@@ -189,6 +189,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def __str__(self):
         return '{} lead {}'.format(self.account_type, self.username)
 
+    def get_lead(self):
+        return self.lead
+
     def is_security_checkpoint_reported(self):
         return self.security_checkpoint_date is not None
 
@@ -207,16 +210,17 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def sync_to_adsdb(self):
         'Send lead account info to ADSDB'
-        # if not settings.ADSDB_SYNC_ENABLED:
-        #     return False
 
-        lead = self.lead
+        lead = self.get_lead()
         if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
             return False
         if self.account_type == self.ACCOUNT_TYPE_AMAZON:
             return False
-        if lead.status != lead.STATUS_IN_PROGRESS:
+        if self.status != self.STATUS_IN_PROGRESS:
             return False
+        if lead.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
+            return False
+
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
         data = dict(
