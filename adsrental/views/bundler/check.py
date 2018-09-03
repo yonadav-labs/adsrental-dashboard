@@ -1,13 +1,11 @@
-import datetime
 import decimal
+from dateutil import parser, relativedelta
 
 from django.shortcuts import render, Http404
 from django.views import View
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 
 from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.bundler import Bundler
@@ -20,10 +18,13 @@ class BundlerCheckView(View):
 
         select_dates = []
         for months_ago in range(3, 0, -1):
-            select_dates.append((now.replace(day=1) - relativedelta(months=months_ago)).date())
+            select_dates.append((now.replace(day=1) - relativedelta.relativedelta(months=months_ago)).date())
 
-        date_str = request.GET.get('date', select_dates[-1].strftime(settings.SYSTEM_DATE_FORMAT))
-        date = datetime.datetime.strptime(date_str, settings.SYSTEM_DATE_FORMAT).date()
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone()).date()
+        else:
+            date = select_dates[-1]
 
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         if not bundler:

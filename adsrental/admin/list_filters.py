@@ -1,5 +1,5 @@
 import datetime
-from dateutil.relativedelta import relativedelta
+from dateutil import relativedelta, parser
 
 from django.conf import settings
 from django.utils import timezone
@@ -490,7 +490,7 @@ class DateMonthListFilter(SimpleListFilter):
         month_start = datetime.date.today().replace(day=1)
         choices = []
         for i in range(6):
-            date_month = month_start - relativedelta(months=i)
+            date_month = month_start - relativedelta.relativedelta(months=i)
             choices.append((date_month.strftime(settings.SYSTEM_DATE_FORMAT), date_month.strftime('%b %Y')))
 
         return choices
@@ -502,7 +502,7 @@ class DateMonthListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            month_start = datetime.datetime.strptime(self.value(), settings.SYSTEM_DATE_FORMAT).date()
+            month_start = parser.parse(self.value()).date()
             month_end = self.get_month_end(month_start)
             return queryset.filter(
                 date__gte=month_start,

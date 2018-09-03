@@ -1,7 +1,8 @@
 import datetime
+from dateutil import parser
 
+from django.utils import timezone
 from django.views import View
-from django.conf import settings
 from django.shortcuts import render, redirect
 
 from adsrental.models.lead import Lead
@@ -20,7 +21,13 @@ class UserTimestampsView(View):
         if not lead:
             return redirect('user_login')
 
-        date = datetime.datetime.strptime(request.GET.get('date', '2018-01-01'), settings.SYSTEM_DATE_FORMAT)
+        now = timezone.localtime(timezone.now())
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
+        else:
+            date = now
+
         date_start = date.replace(day=1)
         date_end = self.last_day_of_month(date)
 

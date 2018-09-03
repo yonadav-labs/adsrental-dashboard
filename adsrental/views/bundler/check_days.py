@@ -1,13 +1,12 @@
 import datetime
 import decimal
+from dateutil import parser, relativedelta
 
 from django.shortcuts import render, Http404
 from django.views import View
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
-from dateutil.relativedelta import relativedelta
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.bundler import Bundler
@@ -17,11 +16,17 @@ from adsrental.models.lead import Lead
 class BundlerCheckDaysView(View):
     @method_decorator(login_required)
     def get(self, request, bundler_id, lead_id):
-        date_str = request.GET.get('date', timezone.now().strftime(settings.SYSTEM_DATE_FORMAT))
-        date = datetime.datetime.strptime(date_str, settings.SYSTEM_DATE_FORMAT).date()
+        now = timezone.localtime(timezone.now())
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
+        else:
+            date = now
 
-        start_date = date.replace(day=1) - relativedelta(months=1)
-        end_date = start_date + relativedelta(months=1) - datetime.timedelta(days=1)
+        date = date.date()
+
+        start_date = date.replace(day=1) - relativedelta.relativedelta(months=1)
+        end_date = start_date + relativedelta.relativedelta(months=1) - datetime.timedelta(days=1)
 
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         lead = Lead.objects.get(leadid=lead_id)

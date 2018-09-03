@@ -1,6 +1,6 @@
-import datetime
 from urllib.parse import urlencode
 import unicodecsv as csv
+from dateutil import parser
 
 from django.contrib import admin, messages
 from django.utils import timezone
@@ -146,7 +146,16 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def export_as_csv(self, request, queryset):
         field_names = [i[0] for i in self.csv_fields]
         field_titles = [i[1] for i in self.csv_fields]
-        date = (datetime.datetime.strptime(request.GET.get('date'), settings.SYSTEM_DATE_FORMAT) if request.GET.get('date') else timezone.now()).date()
+
+        now = timezone.localtime(timezone.now())
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
+        else:
+            date = now
+
+        date = date.date()
+
         queryset = LeadHistoryMonth.objects.filter(
             date=date,
             move_to_next_month=False,

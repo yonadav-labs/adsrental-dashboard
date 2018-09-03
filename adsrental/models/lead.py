@@ -1,8 +1,8 @@
 'Lead model'
-import datetime
 import re
-
 from xml.etree import ElementTree
+from dateutil import parser
+
 import requests
 from django.utils import timezone
 from django.db import models
@@ -377,7 +377,7 @@ class Lead(models.Model, FulltextSearchMixin):
             data = data[0] if data else {}
 
         if data and data.get('shipDate') and not self.ship_date:
-            self.ship_date = datetime.datetime.strptime(data.get('shipDate'), '%Y-%m-%d').date()
+            self.ship_date = parser.parse(data.get('shipDate')).date()
             self.save()
 
         if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
@@ -400,7 +400,7 @@ class Lead(models.Model, FulltextSearchMixin):
             dates = re.findall(r'\S+ \d{1,2}, \d{4}', tracking_info_xml)
             if dates:
                 try:
-                    self.delivery_date = datetime.datetime.strptime(dates[0], '%B %d, %Y').date()
+                    self.delivery_date = parser.parse(dates[0]).date()
                 except ValueError:
                     pass
         else:

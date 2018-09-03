@@ -1,5 +1,6 @@
 import os
 import datetime
+from dateutil import parser
 
 from django.views import View
 from django.http import JsonResponse
@@ -40,7 +41,7 @@ class LeadHistoryView(View):
                 'result': True,
             })
         if aggregate:
-            start_date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date() if date else datetime.date.today()
+            start_date = parser.parse(date).date() if date else datetime.date.today()
             start_date = start_date.replace(day=1)
             leads = Lead.objects.filter(raspberry_pi__last_seen__gte=start_date).prefetch_related('raspberry_pi')
             if rpid:
@@ -64,7 +65,7 @@ class LeadHistoryView(View):
             leads = Lead.objects.filter(status__in=Lead.STATUSES_ACTIVE, raspberry_pi__isnull=False).select_related('raspberry_pi')
             if rpid:
                 leads = leads.filter(raspberry_pi__rpid=rpid)
-            date = datetime.datetime.strptime(date, settings.SYSTEM_DATE_FORMAT).date()
+            date = parser.parse(date).date()
             if force:
                 LeadHistory.objects.filter(date=date, lead__raspberry_pi__rpid=rpid).delete()
             for lead in leads:

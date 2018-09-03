@@ -41,9 +41,9 @@ class AdminBundlerBonusesView(View):
             raise Http404
 
         now = timezone.localtime(timezone.now())
-        date = request.GET.get('date')
-        if date:
-            date = parser.parse(date).replace(tzinfo=timezone.get_current_timezone())
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
         else:
             date = now
 
