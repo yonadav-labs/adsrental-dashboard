@@ -11,6 +11,7 @@ from django.utils import timezone
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
+from adsrental.utils import get_month_boundaries_for_dt
 
 
 class BundlerCheckDaysView(View):
@@ -23,10 +24,8 @@ class BundlerCheckDaysView(View):
         else:
             date = now
 
-        date = date.date()
-
-        start_date = date.replace(day=1) - relativedelta.relativedelta(months=1)
-        end_date = start_date + relativedelta.relativedelta(months=1) - datetime.timedelta(days=1)
+        current_month_start, _ = get_month_boundaries_for_dt(date)
+        start_date, end_date = get_month_boundaries_for_dt(current_month_start - datetime.timedelta(days=1))
 
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         lead = Lead.objects.get(leadid=lead_id)
