@@ -1,6 +1,6 @@
 import datetime
 import decimal
-from dateutil import parser, relativedelta
+from dateutil import parser
 
 from django.shortcuts import render, Http404
 from django.views import View
