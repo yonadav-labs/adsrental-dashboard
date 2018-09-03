@@ -34,6 +34,7 @@ class Bundler(models.Model):
     amazon_chargeback = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for AMazon accounts.')
     parent_bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that gets part of the payment')
     second_parent_bundler = models.ForeignKey('adsrental.Bundler', related_name='second_child_bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Second Bundler that gets part of the payment')
+    bonus_receiver_bundler = models.ForeignKey('adsrental.Bundler', related_name='bonus_donor', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that receives weekly bonuses for qualified leads.')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

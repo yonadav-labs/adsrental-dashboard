@@ -5,6 +5,12 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
+from adsrental.admin.list_filters import AbstractUIDListFilter
+
+
+class IDListFilter(AbstractUIDListFilter):
+    parameter_name = 'id'
+    title = 'ID'
 
 
 class BundlerAdmin(admin.ModelAdmin):
@@ -34,6 +40,9 @@ class BundlerAdmin(admin.ModelAdmin):
         'disable_chargeback',
     )
     search_fields = ('utm_source', 'email', 'name', )
+    list_filter = (
+        IDListFilter,
+    )
 
     def get_queryset(self, request):
         queryset = super(BundlerAdmin, self).get_queryset(request)

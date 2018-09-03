@@ -1,4 +1,3 @@
-import decimal
 import datetime
 from dateutil import parser
 
@@ -12,23 +11,10 @@ from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.utils import get_week_boundaries_for_dt
 
-BONUSES = [
-    [100, decimal.Decimal(3000)],
-    [90, decimal.Decimal(2500)],
-    [80, decimal.Decimal(2000)],
-    [70, decimal.Decimal(1500)],
-    [60, decimal.Decimal(1000)],
-    [50, decimal.Decimal(500)],
-    [40, decimal.Decimal(400)],
-    [30, decimal.Decimal(300)],
-    [20, decimal.Decimal(200)],
-    [10, decimal.Decimal(100)],
-]
-
 
 class AdminBundlerBonusesAccountsView(View):
     @method_decorator(login_required)
-    def get(self, request, bundler_id):
+    def get(self, request, bundler_id, extra=False):
         if not request.user.is_superuser:
             raise Http404
 
@@ -36,7 +22,7 @@ class AdminBundlerBonusesAccountsView(View):
         if not bundler:
             raise Http404
 
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         date = request.GET.get('date')
         if date:
             date = parser.parse(date).replace(tzinfo=timezone.get_current_timezone())
@@ -61,8 +47,17 @@ class AdminBundlerBonusesAccountsView(View):
             qualified_date__lt=end_date,
         ).prefetch_related('lead').order_by('qualified_date')
 
+        extra_lead_accounts = LeadAccount.objects.filter(
+            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            lead__bundler__bonus_receiver_bundler=bundler,
+            primary=True,
+            qualified_date__gt=start_date,
+            qualified_date__lt=end_date,
+        ).prefetch_related('lead', 'lead__bundler').order_by('qualified_date')
+
         return render(request, 'admin/bundler_bonuses_accounts.html', dict(
             lead_accounts=lead_accounts,
+            extra_lead_accounts=extra_lead_accounts,
             bundler=bundler,
             start_date=start_date,
             end_date=end_date - datetime.timedelta(days=1),

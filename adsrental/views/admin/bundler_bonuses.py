@@ -27,12 +27,20 @@ BONUSES = [
 
 
 class AdminBundlerBonusesView(View):
+    @staticmethod
+    def get_bonus(lead_accounts_count):
+        for count, bonus in BONUSES:
+            if lead_accounts_count >= count:
+                return bonus
+
+        return decimal.Decimal('0.00')
+
     @method_decorator(login_required)
     def get(self, request):
         if not request.user.is_superuser:
             raise Http404
 
-        now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
+        now = timezone.localtime(timezone.now())
         date = request.GET.get('date')
         if date:
             date = parser.parse(date).replace(tzinfo=timezone.get_current_timezone())
@@ -57,41 +65,47 @@ class AdminBundlerBonusesView(View):
             qualified_date__lt=end_date,
         ).values(
             'lead__bundler_id',
-            'lead__bundler__parent_bundler_id',
-            'lead__bundler__parent_bundler__name',
+            'lead__bundler__bonus_receiver_bundler_id',
+            'lead__bundler__bonus_receiver_bundler__name',
             'lead__bundler__name',
         ).annotate(lead_accounts_count=Count('id')).order_by('-lead_accounts_count')
         # bundler_stats.sort(key=lambda x:x['lead_accounts_count'], reverse=True)
 
-        parent_bundler_stats = {}
+        final_bundler_stats = {}
+
 
         for bundler_stat in bundler_stats:
-            for lead_accounts_count, bonus in BONUSES:
-                bundler_stat['bonus'] = decimal.Decimal('0.00')
-                if bundler_stat['lead_accounts_count'] >= lead_accounts_count:
-                    bundler_stat['bonus'] = bonus
-                    break
+            bundler_id = bundler_stat['lead__bundler_id']
+            bundler_name = bundler_stat['lead__bundler__name']
+            bonus_lead_accounts = False
+            if bundler_stat['lead__bundler__bonus_receiver_bundler_id']:
+                bundler_id = bundler_stat['lead__bundler__bonus_receiver_bundler_id']
+                bundler_name = bundler_stat['lead__bundler__bonus_receiver_bundler__name']
+                bonus_lead_accounts = True
 
-        for bundler_stat in bundler_stats:
-            if bundler_stat['lead__bundler__parent_bundler_id']:
-                parent_bundler_id = bundler_stat['lead__bundler__parent_bundler_id']
-                if parent_bundler_id not in  parent_bundler_stats:
-                    parent_bundler_stats[parent_bundler_id] = {
-                        'bundler_id': parent_bundler_id,
-                        'bundler_name': bundler_stat['lead__bundler__parent_bundler__name'],
-                        'lead_accounts_count': 0,
-                        'bonus': decimal.Decimal('0.00'),
-                    }
+            if bundler_id not in final_bundler_stats:
+                final_bundler_stats[bundler_id] = {
+                    'bundler_id': bundler_id,
+                    'bundler_name': bundler_name,
+                    'lead_accounts_count': 0,
+                    'bonus_lead_accounts_count': 0,
+                    'bonus': decimal.Decimal('0.00'),
+                }
 
-                parent_bundler_stats[parent_bundler_id]['lead_accounts_count'] += bundler_stat['lead_accounts_count']
-                parent_bundler_stats[parent_bundler_id]['bonus'] += bundler_stat['bonus']
+            final_bundler_stats[bundler_id]['lead_accounts_count'] += bundler_stat['lead_accounts_count']
+            if bonus_lead_accounts:
+                final_bundler_stats[bundler_id]['bonus_lead_accounts_count'] += bundler_stat['lead_accounts_count']
 
-        parent_bundler_stats = list(parent_bundler_stats.values())
-        parent_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
+
+        for bundler_stat in final_bundler_stats:
+            bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
+
+        final_bundler_stats = list(final_bundler_stats.values())
+        final_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
 
         return render(request, 'admin/bundler_bonuses.html', dict(
             bundler_stats=bundler_stats,
-            parent_bundler_stats=parent_bundler_stats,
+            final_bundler_stats=final_bundler_stats,
             start_date=start_date,
             end_date=end_date - datetime.timedelta(days=1),
             dates_list=dates_list,
