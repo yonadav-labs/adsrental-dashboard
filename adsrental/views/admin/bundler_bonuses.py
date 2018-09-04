@@ -89,19 +89,21 @@ class AdminBundlerBonusesView(View):
                     'bundler_name': bundler_name,
                     'lead_accounts_count': 0,
                     'bonus_lead_accounts_count': 0,
+                    'own_lead_accounts_count': 0,
                     'bonus': decimal.Decimal('0.00'),
                 }
 
             final_bundler_stats[bundler_id]['lead_accounts_count'] += bundler_stat['lead_accounts_count']
             if bonus_lead_accounts:
                 final_bundler_stats[bundler_id]['bonus_lead_accounts_count'] += bundler_stat['lead_accounts_count']
-
-
-        for bundler_stat in final_bundler_stats:
-            bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
+            else:
+                final_bundler_stats[bundler_id]['own_lead_accounts_count'] += bundler_stat['lead_accounts_count']
 
         final_bundler_stats = list(final_bundler_stats.values())
         final_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
+
+        for bundler_stat in final_bundler_stats:
+            bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
 
         return render(request, 'admin/bundler_bonuses.html', dict(
             bundler_stats=bundler_stats,
