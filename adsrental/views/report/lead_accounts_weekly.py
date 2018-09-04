@@ -40,6 +40,8 @@ class LeadAccountsWeeklyView(View):
         secondary_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count()
         total_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).count()
         qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).count()
+        primary_qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=True).count()
+        secondary_qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=False).count()
         disqualified_lead_accounts_count = lead_accounts.filter(disqualified_date__gte=start_dt, disqualified_date__lt=end_dt).count()
         wrong_pw_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).count()
         sec_checkpoint_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).count()
@@ -76,6 +78,8 @@ class LeadAccountsWeeklyView(View):
             secondary_online_lead_accounts_count=secondary_online_lead_accounts_count,
             total_online_lead_accounts_count=total_online_lead_accounts_count,
             qualified_lead_accounts_count=qualified_lead_accounts_count,
+            primary_qualified_lead_accounts_count=primary_qualified_lead_accounts_count,
+            secondary_qualified_lead_accounts_count=secondary_qualified_lead_accounts_count,
             disqualified_lead_accounts_count=disqualified_lead_accounts_count,
             wrong_pw_lead_accounts_count=wrong_pw_lead_accounts_count,
             sec_checkpoint_lead_accounts_count=sec_checkpoint_lead_accounts_count,

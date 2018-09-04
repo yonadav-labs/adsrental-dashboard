@@ -1,10 +1,19 @@
 
 <h2>Stats</h2>
 <p>
-    New online: <strong>{{ total_online_lead_accounts_count }}</strong> (<strong>{{ new_online_lead_accounts_count }}</strong> primary, <strong>{{ secondary_online_lead_accounts_count }}</strong> secondary)
+    New online: <strong>{{ total_online_lead_accounts_count }}</strong>
+    (
+        <strong>{{ new_online_lead_accounts_count }}</strong> primary,
+        <strong>{{ secondary_online_lead_accounts_count }}</strong> secondary
+    )
 </p>
 <p>
     Qualified: <strong>{{ qualified_lead_accounts_count }}</strong>
+    (
+        <strong>{{ primary_qualified_lead_accounts_count }}</strong> primary,
+        <strong>{{ secondary_qualified_lead_accounts_count }}</strong> secondary
+    )
+    
 </p>
 <p>
     Disqualified: <strong>{{ disqualified_lead_accounts_count }}</strong>
