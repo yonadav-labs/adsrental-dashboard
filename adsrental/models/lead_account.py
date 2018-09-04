@@ -359,6 +359,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         result = self.set_status(LeadAccount.STATUS_DISQUALIFIED, edited_by)
         if result:
             self.disqualified_date = timezone.now()
+            self.save()
             if not LeadAccount.get_active_lead_accounts(self.lead):
                 self.lead.disqualify(edited_by)
         return result
