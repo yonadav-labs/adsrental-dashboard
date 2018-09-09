@@ -427,7 +427,7 @@ class PingCacheHelper():
     KEY_TEMPLATE = 'ping_{}'
     KEYS = 'ping_keys'
     TTL_SECONDS = 600
-    CACHE_VERSION = '1.0.1'
+    CACHE_VERSION = '1.0.2'
 
     def __init__(self):
         self.cache = cache
@@ -514,17 +514,17 @@ class PingCacheHelper():
         '''
         key = self.get_key(rpid)
         self.cache.set(key, data, self.TTL_SECONDS)
-        keys = cache.get(self.KEYS, [])
+        keys = self.cache.get(self.KEYS, [])
         if key not in keys:
             keys.append(key)
-            cache.set(self.KEYS, keys)
+            self.cache.set(self.KEYS, keys)
 
     def get_hostname(self, lead, raspberry_pi, ec2_instance):
         if not lead.is_active():
             return None
         if raspberry_pi.is_proxy_tunnel:
             return raspberry_pi.proxy_hostname
-        
+
         if ec2_instance and lead.is_active() and ec2_instance.is_running():
             return ec2_instance.hostname
 
@@ -574,10 +574,10 @@ class PingCacheHelper():
         '''Delete cache data for rpid'''
         key = self.get_key(rpid)
         self.cache.delete(key)
-        keys = cache.get(self.KEYS, [])
+        keys = self.cache.get(self.KEYS, [])
         if key in keys:
             keys = [i for i in keys if i != key]
-            cache.set(self.KEYS, keys)
+            self.cache.set(self.KEYS, keys)
 
     def get_data_for_request(self, request):
         '''Get data from cache or db using request.GET'''
@@ -590,8 +590,7 @@ class PingCacheHelper():
         reverse_tunnel_up = request.GET.get('reverse_tunnel_up', '1') == '1'
         now = timezone.localtime(timezone.now())
 
-        ping_key = self.get_key(rpid)
-        ping_data = cache.get(ping_key)
+        ping_data = self.get(rpid)
         if not ping_data:
             ping_data = self.get_actual_data(rpid)
         else:
