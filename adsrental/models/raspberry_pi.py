@@ -40,7 +40,7 @@ class RaspberryPi(models.Model):
     first_tested_hours_ttl = 1
     last_offline_reported_hours_ttl = 2 * 24
 
-    TUNNEL_HOST = 'adsrental.com'
+    TUNNEL_HOST = '178.128.1.68'
     TUNNEL_USER = 'proxykeeper'
     TUNNEL_PASSWORD = 'keepitsecret'
     TUNNEL_PORT_START = 20000
@@ -61,6 +61,8 @@ class RaspberryPi(models.Model):
     is_beta = models.BooleanField(default=False, help_text='If True - RPi gets beta firmwares')
     tunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a tunnel to proxykeeper')
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
+    proxy_hostname = models.CharField(max_length=50, default=TUNNEL_HOST, help_text='Hostname tunnel to proxykeeper')
+    proxy_password = models.CharField(max_length=50, default=TUNNEL_PASSWORD, help_text='Hostname password for proxykeeper user')
     restart_required = models.BooleanField(default=False)
     new_config_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)

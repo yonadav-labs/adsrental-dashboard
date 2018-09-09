@@ -15,10 +15,10 @@
                 <li>Create a new profile in MultiloginApp, name it <b>{{ raspberry_pi.rpid }} {{ lead.name }}</b>, if it does not exist yet.</li>
                 <li>Go to Edit, check proxy settings</li>
                 <li>Select <b>Socks 5 proxy</b> connection type</li>
-                <li>Set Address to <b>{{ raspberry_pi.TUNNEL_HOST }}</b></li>
+                <li>Set Address to <b>{{ raspberry_pi.proxy_hostname }}</b></li>
                 <li>Set Port to <b>{{ raspberry_pi.rtunnel_port }}</b></li>
                 <li>Set Login to <b>{{ raspberry_pi.TUNNEL_USER }}</b></li>
-                <li>Set Password to <b>{{ raspberry_pi.TUNNEL_PASSWORD }}</b></li>
+                <li>Set Password to <b>{{ raspberry_pi.proxy_password }}</b></li>
                 <li>Save and launch your new profile.</li>
                 <li>Ping @vlad if something is not working.</li>
             </ol>
@@ -41,7 +41,7 @@
         </p>
         <div class="alert alert-info">
             <p>
-                <strong>SSH</strong> ssh -oStrictHostKeyChecking=no pi@{{ raspberry_pi.TUNNEL_HOST }} -p {{ raspberry_pi.tunnel_port }}
+                <strong>SSH</strong> ssh -oStrictHostKeyChecking=no pi@{{ raspberry_pi.proxy_hostname }} -p {{ raspberry_pi.tunnel_port }}
             </p>
         </div>
         
