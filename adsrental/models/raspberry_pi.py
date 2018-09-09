@@ -134,7 +134,7 @@ class RaspberryPi(models.Model):
             self.proxy_hostname = RaspberryPi.TUNNEL_HOST
             return
 
-        self.proxy_hostname = hostname_count.first().proxy_hostname
+        self.proxy_hostname = hostname_count.first()['proxy_hostname']
         return
 
     def assign_tunnel_ports(self):
