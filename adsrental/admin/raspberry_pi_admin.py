@@ -157,7 +157,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.reset_cache()
             raspberry_pi.is_proxy_tunnel = True
             raspberry_pi.new_config_required = True
-            raspberry_pi.is_beta = True
+            raspberry_pi.assign_proxy_hostname()
             raspberry_pi.assign_tunnel_ports()
             raspberry_pi.save()
 

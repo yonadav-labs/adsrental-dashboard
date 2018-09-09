@@ -123,6 +123,15 @@ class RaspberryPi(models.Model):
 
         raise ValueError('No free port found')
 
+    def assign_proxy_hostname(self):
+        hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
+        if not hostname_count:
+            self.proxy_hostname = RaspberryPi.TUNNEL_HOST
+            return
+
+        self.proxy_hostname = hostname_count.first().proxy_hostname
+        return
+
     def assign_tunnel_ports(self):
         self.tunnel_port, self.rtunnel_port = self.find_tunnel_ports()
 

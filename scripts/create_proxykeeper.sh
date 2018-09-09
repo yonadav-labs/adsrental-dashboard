@@ -7,7 +7,9 @@ useradd proxykeeper -m -p keepitsecret
 su - proxykeeper
 
 mkdir -p ~/.ssh
-echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD2/FUH0n58G7Y7yLzrYHKfcqACuBcL37e8ft+SllLEJzsDTqAFoUja0xDzWSBpuqn5R7DOfayWsgId2HO9osoW4YwkvmG7KD84dDpUPtV6fNZPpc6qlXd3FcbVE94mdrYUYrGF8hZYZ0hh3Gmc04j0qaPq5e5Z7/mO1aZpY+Kkumseuzu1dkx/Bk0Tm5BakWb7q147bWKdFmbnnHPq8hH2YLcIjOfKs+gaK0yP4W96xASHEp0O3PJjZY40ik6ZFDaEd6NL1RS0wAknqtjwF8OLKG9348t2Uyqhp6X4rDAMt3bfR8Ix4NVYHbLA2Wa/5L0JszXHWfWRpr291SJvf9LX vlad@vlad-XPS-15-9560" >> ~/.ssh/autorized_keys
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFkT1asRXvYeKqpE+QLuLCnGsAjcmlSMV8ZDHv6FYH8Kgy98BxWbqrQWnTZRRE5Lnaf3bORmalG9+JCWtGnJzAQHlkZgUlmgiQL8l0gpYp0Ch4tT+4JL/TXih2JpWARbpf0iWDczmIQw/iQz7QKlz6oJBQ8H5ZS5W/fahw9WDjgByA7c6P8LVpjT850mPtfFWIxwqFKs9WICIssdtLBCfD4koMIZnxLSXQNMW6ACoyi1e79g1gQGLh/aPFqefegMHlRGRieBE7yJiV24jb3ro7DLgSjMLQEwdWQVt8YDuTG7QG6kmtbsapRy4l1YuF+22cSoFJ+bNu7HgoXfninx2d pi@NanoPi-NEO" > ~/.ssh/authorized_keys
+echo >> ~/.ssh/authorized_keys
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD2/FUH0n58G7Y7yLzrYHKfcqACuBcL37e8ft+SllLEJzsDTqAFoUja0xDzWSBpuqn5R7DOfayWsgId2HO9osoW4YwkvmG7KD84dDpUPtV6fNZPpc6qlXd3FcbVE94mdrYUYrGF8hZYZ0hh3Gmc04j0qaPq5e5Z7/mO1aZpY+Kkumseuzu1dkx/Bk0Tm5BakWb7q147bWKdFmbnnHPq8hH2YLcIjOfKs+gaK0yP4W96xASHEp0O3PJjZY40ik6ZFDaEd6NL1RS0wAknqtjwF8OLKG9348t2Uyqhp6X4rDAMt3bfR8Ix4NVYHbLA2Wa/5L0JszXHWfWRpr291SJvf9LX vlad@vlad-XPS-15-9560" >> ~/.ssh/authorized_keys
 
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABADoDa7+1N6TKE2Xw7M7i59Pz6XBvM9JunoA7VnTxbxxC5icd/KxLhn8tZZLJ2d4ly0Lx3zzhttfuoo2G/XDIEEQ+doEE56F3Qgso/SS/U2Xj/oqgk50ZNPnGhrZ9h9zVok5h0fy3nH7wzyQCoiiVL74PywniqVsbG8OxcfXANTu8+j8sM5azsX895rfBBdNfoJnmlB5LNgpeCjO6Sr6PzE2XjOe6XCG53hv3VTJNlSgPvr0XAtKyd76dfkaAF0FI3j1tcLgTjJ1w/uZ1oSieUjaNNKz3wHSD3aXt3SRVHu6/MJHbz0GP7DESZ+LRmdbQjibHJOahTotLNfndUp7UuXc= Administrator@EC2" >> ~/.ssh/id_rsa.pub
 
@@ -39,5 +41,6 @@ echo "cxg4QdyrrtQ3FTwlPu4KDuZoM28GOW6WA3X+tBHcfN/bRVqtj4GJsaFGC0qMt3mt" >> ~/.ss
 echo "DgUp2pyYhjUzFrAm1akbXivBSn17HoJ2bKY35wa+qJxfEB4=" >> ~/.ssh/id_rsa
 echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/id_rsa
 
+chmod 600 ~/.ssh/authorized_keys
 chmod 400 ~/.ssh/id_rsa
 chmod 644 ~/.ssh/id_rsa.pub
