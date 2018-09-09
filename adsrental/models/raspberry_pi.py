@@ -47,9 +47,9 @@ class RaspberryPi(models.Model):
     TUNNEL_PORT_END = 65000
 
     PROXY_HOSTNAME_CHOICES = (
-        ('Adsrental', 'adsrental.com'),
-        ('Proxykeeper', '178.128.1.68'),
-        ('Proxykeeper2', '138.197.219.240'),
+        ('adsrental.com', 'Adsrental', ),
+        ('178.128.1.68', 'Proxykeeper', ),
+        ('138.197.219.240', 'Proxykeeper2', ),
     )
 
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
