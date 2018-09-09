@@ -427,7 +427,6 @@ class PingCacheHelper():
     KEY_TEMPLATE = 'ping_{}'
     KEYS = 'ping_keys'
     TTL_SECONDS = 600
-    CACHE_VERSION = '1.0.2'
 
     def __init__(self):
         self.cache = cache
@@ -551,7 +550,7 @@ class PingCacheHelper():
             raspberry_pi.save()
 
         data = dict(
-            v=self.CACHE_VERSION,
+            v=settings.CACHE_VERSION,
             created=timezone.now(),
             rpid=rpid,
             lead_status=lead and lead.status,
