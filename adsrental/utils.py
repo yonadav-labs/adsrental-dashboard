@@ -502,7 +502,7 @@ class PingCacheHelper():
         if not cls.is_ec2_instance_data_consistent(data, ec2_instance):
             return False
 
-        lead=raspberry_pi.get_lead()
+        lead = raspberry_pi.get_lead()
         if lead and lead_status != lead.status:
             return False
 

@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django_bulk_update.manager import BulkUpdateManager
+from django.db.models import Count
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
 from adsrental.utils import PingCacheHelper
