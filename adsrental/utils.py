@@ -519,6 +519,17 @@ class PingCacheHelper():
             keys.append(key)
             cache.set(self.KEYS, keys)
 
+    def get_hostname(self, lead, raspberry_pi, ec2_instance):
+        if not lead.is_active():
+            return None
+        if raspberry_pi.is_proxy_tunnel:
+            return raspberry_pi.proxy_hostname
+        
+        if ec2_instance and lead.is_active() and ec2_instance.is_running():
+            return ec2_instance.hostname
+
+        return None
+
     def get_actual_data(self, rpid):
         '''
         Get data for rpid for DB
@@ -539,22 +550,23 @@ class PingCacheHelper():
             raspberry_pi.new_config_required = False
             raspberry_pi.save()
 
-        data = {
-            'v': self.CACHE_VERSION,
-            'created': timezone.now(),
-            'rpid': rpid,
-            'lead_status': lead and lead.status,
-            'wrong_password': lead.is_wrong_password() if lead else False,
-            'restart_required': restart_required,
-            'new_config_required': new_config_required,
-            'is_proxy_tunnel': raspberry_pi.is_proxy_tunnel if raspberry_pi else False,
-            'is_beta': raspberry_pi.is_beta if raspberry_pi else False,
-            'ec2_instance_id': ec2_instance and ec2_instance.instance_id,
-            'ec2_instance_status': ec2_instance and ec2_instance.status,
-            'ec2_hostname': ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
-            'ec2_ip_address': ec2_instance and ec2_instance.ip_address,
-            'last_ping': None,
-        }
+        data = dict(
+            v=self.CACHE_VERSION,
+            created=timezone.now(),
+            rpid=rpid,
+            lead_status=lead and lead.status,
+            wrong_password=lead.is_wrong_password() if lead else False,
+            restart_required=restart_required,
+            new_config_required=new_config_required,
+            is_proxy_tunnel=raspberry_pi.is_proxy_tunnel if raspberry_pi else False,
+            is_beta=raspberry_pi.is_beta if raspberry_pi else False,
+            ec2_instance_id=ec2_instance and ec2_instance.instance_id,
+            ec2_instance_status=ec2_instance and ec2_instance.status,
+            ec2_hostname=ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
+            hostname=self.get_hostname(lead, raspberry_pi, ec2_instance),
+            ec2_ip_address=ec2_instance and ec2_instance.ip_address,
+            last_ping=None,
+        )
 
         return data
 

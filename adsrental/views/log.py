@@ -113,15 +113,14 @@ class LogView(View):
 
     def _get_new_config_required(self, ping_data):
         reported_hostname = ping_data.get('reported_hostname')
-        ec2_hostname = ping_data.get('ec2_hostname')
-        ec2_ip_address = ping_data.get('ec2_ip_address')
+        hostname = ping_data.get('hostname') or ping_data.get('ec2_hostname')
         new_config_required = ping_data.get('new_config_required')
 
         if new_config_required:
             return True
 
-        if reported_hostname is not None and ec2_hostname:
-            if reported_hostname not in (ec2_hostname, ec2_ip_address):
+        if reported_hostname is not None and hostname is not None:
+            if reported_hostname != hostname:
                 return True
 
         return False
