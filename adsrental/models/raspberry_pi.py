@@ -99,6 +99,10 @@ class RaspberryPi(models.Model):
             rpid_numeric=next_rpid_numeric,
         )
         item.save()
+        item.is_proxy_tunnel = True
+        item.assign_proxy_hostname()
+        item.assign_tunnel_ports()
+        item.save()
         return item
 
     def get_lead(self):
