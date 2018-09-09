@@ -493,6 +493,12 @@ class PingCacheHelper():
         if new_config_required != raspberry_pi.new_config_required:
             return False
 
+        if raspberry_pi.is_proxy_tunnel:
+            reported_hostname = data.get('reported_hostname')
+            hostname = raspberry_pi.proxy_hostname
+            if reported_hostname != hostname:
+                return False
+
         if not cls.is_ec2_instance_data_consistent(data, ec2_instance):
             return False
 
