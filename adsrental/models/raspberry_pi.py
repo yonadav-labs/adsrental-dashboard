@@ -46,6 +46,12 @@ class RaspberryPi(models.Model):
     TUNNEL_PORT_START = 20000
     TUNNEL_PORT_END = 65000
 
+    PROXY_HOSTNAME_CHOICES = (
+        ('Adsrental', 'adsrental.com'),
+        ('Proxykeeper', '178.128.1.68'),
+        ('Proxykeeper2', '138.197.219.240'),
+    )
+
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
     rpid = models.CharField(primary_key=True, max_length=255, unique=True)
     rpid_numeric = models.PositiveIntegerField(null=True, blank=True)
@@ -61,7 +67,7 @@ class RaspberryPi(models.Model):
     is_beta = models.BooleanField(default=False, help_text='If True - RPi gets beta firmwares')
     tunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a tunnel to proxykeeper')
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
-    proxy_hostname = models.CharField(max_length=50, default=TUNNEL_HOST, help_text='Hostname tunnel to proxykeeper')
+    proxy_hostname = models.CharField(choices=PROXY_HOSTNAME_CHOICES, max_length=50, default=TUNNEL_HOST, help_text='Hostname tunnel to proxykeeper')
     proxy_password = models.CharField(max_length=50, default=TUNNEL_PASSWORD, help_text='Hostname password for proxykeeper user')
     restart_required = models.BooleanField(default=False)
     new_config_required = models.BooleanField(default=False)

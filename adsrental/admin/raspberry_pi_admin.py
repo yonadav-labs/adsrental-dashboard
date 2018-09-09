@@ -51,6 +51,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'online',
         'uptime',
         'is_proxy_tunnel',
+        'proxy_hostname',
         'rtunnel_port',
         'tunnel_online',
         'new_config_required',
