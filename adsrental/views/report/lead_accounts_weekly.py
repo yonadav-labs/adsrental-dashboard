@@ -65,6 +65,12 @@ class LeadAccountsWeeklyView(View):
             offline=Count('id', filter=Q(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl))),
             online=Count('id', filter=Q(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl))),
             chargeback=Count('id', filter=Q(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt)),
+            delivered=Count('id', filter=Q(lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(), lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date())),
+            delivered_online=Count('id', filter=Q(
+                lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(),
+                lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date(),
+                lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+            )),
         ).order_by('-total_in_progress').values(
             bundler_field,
             'total_in_progress',
@@ -76,6 +82,8 @@ class LeadAccountsWeeklyView(View):
             'online',
             'offline',
             'chargeback',
+            'delivered',
+            'delivered_online',
         )
 
         for lead_accounts_by_bundler_list_entry in lead_accounts_by_bundler_list:
@@ -83,6 +91,9 @@ class LeadAccountsWeeklyView(View):
             row['issues_percent'] = 0
             if row['total_in_progress']:
                 row['issues_percent'] = int((row['total_in_progress'] - row['no_issues']) / row['total_in_progress'] * 100)
+            row['delivered_online_percent'] = 0
+            if row['delivered']:
+                row['delivered_online_percent'] = int(row['delivered_online'] / row['delivered'] * 100)
 
         context = dict(
             select_account_types=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
