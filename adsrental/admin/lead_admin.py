@@ -283,7 +283,8 @@ class LeadAdmin(admin.ModelAdmin):
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, first_seen.strftime(settings.HUMAN_DATE_FORMAT)))
 
     def last_seen(self, obj):
-        if obj.raspberry_pi is None or obj.raspberry_pi.last_seen is None:
+        raspberry_pi = obj.raspberry_pi
+        if not raspberry_pi or not raspberry_pi.last_seen or not raspberry_pi.first_seen:
             return None
 
         last_seen = obj.raspberry_pi.get_last_seen()

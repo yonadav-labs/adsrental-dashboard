@@ -94,10 +94,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         return obj.lead and obj.lead.raspberry_pi and obj.lead.raspberry_pi.version
 
     def last_seen(self, obj):
-        if obj.lead is None or obj.lead.raspberry_pi is None or obj.lead.raspberry_pi.last_seen is None:
+        raspberry_pi = obj.get_raspberry_pi()
+        if not raspberry_pi or not raspberry_pi.last_seen or not raspberry_pi.first_seen:
             return None
 
-        date = obj.lead.raspberry_pi.last_seen
+        date = raspberry_pi.last_seen
         return mark_safe(u'<span title="{}">{}</span>'.format(date, naturaltime(date)))
 
     def last_rdp_session(self, obj):
