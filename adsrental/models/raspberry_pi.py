@@ -227,7 +227,7 @@ class RaspberryPi(models.Model):
         return '\n'.join([i.rstrip('\n') for i in lines])
 
     def get_last_seen(self):
-        if self.last_seen is None:
+        if self.last_seen is None or self.first_seen is None:
             return None
 
         return self.last_seen

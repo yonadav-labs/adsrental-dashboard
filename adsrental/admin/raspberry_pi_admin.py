@@ -131,11 +131,9 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         return mark_safe(u'<span title="{}">{}</span>'.format(first_seen, naturaltime(first_seen)))
 
     def last_seen_field(self, obj):
-        if not obj.last_seen or not obj.first_seen:
-            return None
-
         last_seen = obj.get_last_seen()
-
+        if not last_seen:
+            return None
         return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def restart_tunnel(self, request, queryset):
