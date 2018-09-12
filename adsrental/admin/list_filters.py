@@ -373,6 +373,8 @@ class LeadAccountWrongPasswordListFilter(SimpleListFilter):
         return (
             ('no', 'No'),
             ('yes', 'Yes'),
+            ('yes_facebook', 'Yes for Facebook'),
+            ('yes_google', 'Yes for Google'),
             ('yes_0_2days', 'Wrong for 0-2 days'),
             ('yes_3_5days', 'Wrong for 3-5 days'),
             ('yes_5days', 'Wrong for more than 5 days'),
@@ -383,6 +385,10 @@ class LeadAccountWrongPasswordListFilter(SimpleListFilter):
             return queryset.filter(lead_account__wrong_password_date__isnull=True)
         if self.value() == 'yes':
             return queryset.filter(lead_account__wrong_password_date__isnull=False)
+        if self.value() == 'yes_facebook':
+            return queryset.filter(lead_account__wrong_password_date__isnull=False, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+        if self.value() == 'yes_google':
+            return queryset.filter(lead_account__wrong_password_date__isnull=False, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'yes_0_2days':
             return queryset.filter(
                 lead_account__wrong_password_date__gte=timezone.now() - datetime.timedelta(hours=2 * 24),
