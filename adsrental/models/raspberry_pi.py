@@ -142,6 +142,14 @@ class RaspberryPi(models.Model):
     def unassign_tunnel_ports(self):
         self.tunnel_port, self.rtunnel_port = None, None
 
+    def is_in_testing(self):
+        if self.first_seen:
+            return False
+        if not self.first_tested:
+            return False
+
+        return True
+
     def report_offline(self):
         now = timezone.localtime(timezone.now())
         self.last_offline_reported = now
@@ -157,17 +165,20 @@ class RaspberryPi(models.Model):
 
         if self.online_since_date is None:
             self.online_since_date = now
-            RaspberryPiSession.start(self)
             if not self.first_tested:
                 self.first_tested = now
-                return True
-            else:
-                if not self.first_seen:
-                    self.first_seen = now
-                    self.last_seen = now
+
+            in_testing = self.is_in_testing()
+            if not in_testing and not self.first_seen:
+                self.first_seen = now
+            RaspberryPiSession.start(self, test=in_testing)
+
+        self.last_seen = now
+        if not self.first_seen:
+            return True
 
         lead = self.get_lead()
-        if lead and self.first_seen:
+        if lead:
             if lead.status == lead.STATUS_QUALIFIED:
                 lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
             for lead_account in lead.lead_accounts.filter(status=lead_account.STATUS_QUALIFIED):
@@ -177,7 +188,6 @@ class RaspberryPi(models.Model):
                     lead_account.save()
             # lead.sync_to_adsdb()
 
-        self.last_seen = now
         return True
 
     def online(self):
