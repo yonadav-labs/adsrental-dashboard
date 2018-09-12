@@ -48,7 +48,6 @@ class RaspberryPi(models.Model):
     TUNNEL_PORT_END = 65000
 
     PROXY_HOSTNAME_CHOICES = (
-        ('adsrental.com', 'Adsrental', ),
         ('178.128.1.68', 'Proxykeeper', ),
         ('138.197.219.240', 'Proxykeeper2', ),
     )
@@ -144,7 +143,8 @@ class RaspberryPi(models.Model):
         self.tunnel_port, self.rtunnel_port = None, None
 
     def report_offline(self):
-        self.last_offline_reported = timezone.now()
+        now = timezone.localtime(timezone.now())
+        self.last_offline_reported = now
         if self.online_since_date:
             self.online_since_date = None
 
@@ -155,37 +155,27 @@ class RaspberryPi(models.Model):
         if now is None:
             now = timezone.localtime(timezone.now())
 
-        if not self.first_tested:
-            self.first_tested = now
-            lead = self.get_lead()
-            if lead:
-                lead.tested = True
-                lead.save()
-            return True
-
-        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
-            return False
-
         if self.online_since_date is None:
             self.online_since_date = now
             RaspberryPiSession.start(self)
+            if not self.first_tested:
+                self.first_tested = now
+                return True
+            else:
+                if not self.first_seen:
+                    self.first_seen = now
+                    self.last_seen = now
 
         lead = self.get_lead()
-        if lead:
+        if lead and self.first_seen:
             if lead.status == lead.STATUS_QUALIFIED:
                 lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
-            for lead_account in lead.lead_accounts.all():
-                if lead_account.status == lead_account.STATUS_QUALIFIED:
-                    lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
-                    if not lead_account.in_progress_date:
-                        lead_account.in_progress_date = now
-                        lead_account.save()
+            for lead_account in lead.lead_accounts.filter(status=lead_account.STATUS_QUALIFIED):
+                lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
+                if not lead_account.in_progress_date:
+                    lead_account.in_progress_date = now
+                    lead_account.save()
             # lead.sync_to_adsdb()
-
-        if not self.first_seen:
-            self.first_seen = now
-            self.last_seen = now
-            return True
 
         self.last_seen = now
         return True

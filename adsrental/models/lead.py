@@ -143,7 +143,6 @@ class Lead(models.Model, FulltextSearchMixin):
     pi_delivered = models.BooleanField(default=False, help_text='Is RaspberryPi delivered to end user.')
     delivery_date = models.DateField(default=None, null=True, blank=True, help_text='When RaspberryPi delivered to end user.')
     billed = models.BooleanField(default=False, help_text='Account billed to Ads Inc.')
-    tested = models.BooleanField(default=False, help_text='Obsolete field. Use first_tested instead.')
     last_touch_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was touched for the last time.')
     ship_date = models.DateField(blank=True, null=True, help_text='Date when order was shipped. Populated from shipstation sync.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead.')
@@ -167,6 +166,13 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def __str__(self):
         return self.leadid
+
+    @property
+    def tested(self):
+        if not self.raspberry_pi or not self.raspberry_pi.first_tested:
+            return False
+
+        return True
 
     def is_wrong_password(self):
         'Is password reported as wrong now'
