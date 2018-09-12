@@ -166,9 +166,6 @@ class RaspberryPi(models.Model):
         if not self.first_tested:
             self.first_tested = now
             lead = self.get_lead()
-            if lead:
-                lead.tested = True
-                lead.save()
             return True
 
         if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
