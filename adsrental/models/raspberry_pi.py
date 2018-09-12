@@ -191,10 +191,11 @@ class RaspberryPi(models.Model):
         return True
 
     def online(self):
-        if self.last_seen is None:
+        last_seen = self.get_last_seen()
+        if last_seen is None:
             return False
 
-        return (timezone.now() - self.get_last_seen()).total_seconds() < self.online_minutes_ttl * 60
+        return (timezone.now() - last_seen).total_seconds() < self.online_minutes_ttl * 60
 
     @classmethod
     def get_objects_online(cls):
