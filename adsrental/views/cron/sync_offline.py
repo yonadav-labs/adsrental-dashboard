@@ -28,18 +28,20 @@ class SyncOfflineView(View):
         customerio_client = CustomerIOClient()
         for lead in Lead.objects.filter(
                 raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 60),
+                pi_delivered=True,
+                raspberry_pi__first_seen__isnull=False,
                 status__in=Lead.STATUSES_ACTIVE,
         ).exclude(
             raspberry_pi__last_offline_reported__gte=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
         ).select_related('raspberry_pi'):
-            if lead.status == Lead.STATUS_IN_PROGRESS:
-                offline_hours_ago = 1
-                if lead.raspberry_pi.last_seen:
-                    offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
+            offline_hours_ago = 1
+            if lead.raspberry_pi.last_seen:
+                offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
+            reported_offline_leads.append(lead.email)
+            if test:
+                continue
 
-                reported_offline_leads.append(lead.email)
-                customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
-
+            customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_OFFLINE, hours=offline_hours_ago)
             lead.raspberry_pi.report_offline()
 
         for lead_account in LeadAccount.objects.filter(
