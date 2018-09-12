@@ -307,17 +307,23 @@ class AccountTypeListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ('facebook', 'Facebook only'),
-            ('google', 'Google only'),
+            ('facebook_only', 'Facebook only'),
+            ('google_only', 'Google only'),
+            ('facebook', 'Facebook'),
+            ('google', 'Google'),
             ('amazon', 'Amazon'),
             ('many', 'Several accounts'),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'facebook':
+        if self.value() == 'facebook_only':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
-        if self.value() == 'google':
+        if self.value() == 'google_only':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_AMAZON])
+        if self.value() == 'facebook':
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+        if self.value() == 'google':
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'amazon':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
         if self.value() == 'many':
