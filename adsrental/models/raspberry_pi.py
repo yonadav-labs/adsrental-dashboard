@@ -181,7 +181,7 @@ class RaspberryPi(models.Model):
         if lead:
             if lead.status == lead.STATUS_QUALIFIED:
                 lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
-            for lead_account in lead.lead_accounts.filter(status=lead_account.STATUS_QUALIFIED):
+            for lead_account in lead.lead_accounts.filter(status=lead.STATUS_QUALIFIED):
                 lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
                 if not lead_account.in_progress_date:
                     lead_account.in_progress_date = now
