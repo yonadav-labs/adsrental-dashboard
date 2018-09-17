@@ -46,9 +46,15 @@ class LeadAccountsWeeklyView(View):
         wrong_pw_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).count()
         sec_checkpoint_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).count()
         offline_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl)).count()
-        chargeback_lead_accounts_count = lead_accounts.filter(charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).count()
+        chargeback_lead_accounts_count = lead_accounts.filter(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).count()
         shipped_lead_accounts_count = lead_accounts.filter(lead__ship_date__gte=start_dt, lead__ship_date__lt=end_dt).count()
         awaiting_shipment_lead_accounts_count = lead_accounts.filter(lead__shipstation_order_status=Lead.SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT).count()
+        delivered = lead_accounts.filter(lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(), lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7))).count()
+        delivered_online = lead_accounts.filter(
+            lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(),
+            lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date(),
+            in_progress_date__isnull=False,
+        ).count()
 
         lead_accounts_by_bundler_list = lead_accounts.values(bundler_field).annotate(
             total_in_progress=Count('id', filter=Q(status=LeadAccount.STATUS_IN_PROGRESS)),
@@ -69,7 +75,7 @@ class LeadAccountsWeeklyView(View):
             delivered_online=Count('id', filter=Q(
                 lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(),
                 lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date(),
-                lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+                in_progress_date__isnull=False,
             )),
         ).order_by('-total_in_progress').values(
             bundler_field,
@@ -114,6 +120,8 @@ class LeadAccountsWeeklyView(View):
             shipped_lead_accounts_count=shipped_lead_accounts_count,
             awaiting_shipment_lead_accounts_count=awaiting_shipment_lead_accounts_count,
             lead_accounts_by_bundler_list=lead_accounts_by_bundler_list,
+            delivered=delivered,
+            delivered_online=delivered_online,
         )
 
         if email:
