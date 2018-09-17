@@ -75,7 +75,7 @@
                     <td>{{ row.offline }}</td>
                     <td>{{ row.chargeback }}</td>
                     <td>{{ row.delivered }}</td>
-                    <td>{{ row.delivered_online_percent }}</td>
+                    <td>{% if row.delivered %}{{ row.delivered_online_percent }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
         </tbody>
