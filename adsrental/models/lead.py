@@ -91,6 +91,7 @@ class Lead(models.Model, FulltextSearchMixin):
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
+    STATUS_ACTIVE = 'Active'
     STATUS_CHOICES = [
         (STATUS_AVAILABLE, 'Available'),
         (STATUS_BANNED, 'Banned'),

@@ -38,6 +38,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
+    STATUS_ACTIVE = 'Active'
     STATUS_CHOICES = [
         (STATUS_AVAILABLE, 'Available'),
         (STATUS_BANNED, 'Banned'),
@@ -408,6 +409,14 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         Lead.objects.filter(Lead.get_online_filter())
         '''
         return cls.get_timedelta_filter('lead__raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
+
+
+class ReportProxyLeadAccount(LeadAccount):
+    'A proxy model to register LeadAccount in admin UI twice for Reports'
+    class Meta:
+        proxy = True
+        verbose_name = 'Report LeadAccount'
+        verbose_name_plural = 'Report LeadAccounts'
 
 
 class ReadOnlyLeadAccount(LeadAccount):

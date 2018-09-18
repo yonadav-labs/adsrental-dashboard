@@ -10,7 +10,7 @@ from adsrental.admin.raspberry_pi_session_admin import RaspberryPiSessionAdmin
 from adsrental.admin.lead_change_admin import LeadChangeAdmin
 from adsrental.admin.bundler_admin import BundlerAdmin
 from adsrental.admin.lead_history_admin import LeadHistoryAdmin
-from adsrental.admin.lead_account_admin import LeadAccountAdmin, ReadOnlyLeadAccountAdmin
+from adsrental.admin.lead_account_admin import LeadAccountAdmin, ReadOnlyLeadAccountAdmin, ReportLeadAccountAdmin
 from adsrental.admin.bundler_payments_report_admin import BundlerPaymentsReportAdmin
 from adsrental.admin.bundler_lead_stat_admin import BundlerLeadStatsAdmin
 from adsrental.admin.vultr_instance import VultrInstanceAdmin
@@ -28,6 +28,7 @@ admin.site.register(LeadHistoryMonthAdmin.model, LeadHistoryMonthAdmin)
 admin.site.register(LeadChangeAdmin.model, LeadChangeAdmin)
 admin.site.register(RaspberryPiSessionAdmin.model, RaspberryPiSessionAdmin)
 admin.site.register(LeadAccountAdmin.model, LeadAccountAdmin)
+admin.site.register(ReportLeadAccountAdmin.model, ReportLeadAccountAdmin)
 admin.site.register(ReadOnlyLeadAdmin.model, ReadOnlyLeadAdmin)
 admin.site.register(ReadOnlyLeadAccountAdmin.model, ReadOnlyLeadAccountAdmin)
 admin.site.register(BundlerPaymentsReportAdmin.model, BundlerPaymentsReportAdmin)

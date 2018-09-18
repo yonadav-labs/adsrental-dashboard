@@ -8,7 +8,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Value
 from django.db.models.functions import Concat
 
-from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount
+from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractUIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
@@ -77,6 +77,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'charge_back',
         'primary',
         'ban_reason',
+        'lead__company',
         LeadBundlerListFilter,
         AbstractUIDListFilter,
     )
@@ -205,6 +206,18 @@ class LeadAccountAdmin(admin.ModelAdmin):
             obj.security_checkpoint_date,
             naturaltime(obj.security_checkpoint_date),
         ))
+
+    def bundler_field(self, obj):
+        bundler = obj.lead.bundler
+        if bundler:
+            return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+                url=reverse('admin:adsrental_bundler_changelist'),
+                q=bundler.email,
+                title=bundler.utm_source,
+                text=bundler,
+            ))
+
+        return None
 
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:
@@ -372,6 +385,38 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     last_seen.empty_value_display = 'Never'
     last_seen.admin_order_field = 'lead__raspberry_pi__last_seen'
+
+
+class ReportLeadAccountAdmin(LeadAccountAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
+    model = ReportProxyLeadAccount
+    # admin_caching_enabled = True
+    list_per_page = 500
+    list_display = (
+        'id',
+        'name',
+        'lead_link',
+        'raspberry_pi_field',
+        'account_type',
+        'status_field',
+        'username',
+        'password',
+        'bundler_field',
+        'bundler_paid',
+        'first_seen',
+        'last_seen',
+        'online',
+        'last_touch',
+        'adsdb_account_id',
+        'wrong_password_date_field',
+        'security_checkpoint_date_field',
+        'sync_with_adsdb',
+        'billed',
+    )
 
 
 class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):

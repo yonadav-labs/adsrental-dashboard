@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from admin_tools.dashboard import modules, Dashboard, AppIndexDashboard
+from adsrental.models import LeadAccount, Lead
 
 
 class CustomIndexDashboard(Dashboard):
@@ -39,33 +40,33 @@ class CustomIndexDashboard(Dashboard):
             collapsible=False,
             children=[
                 [_('Master Report for Facebook Accounts'), '{}?{}'.format(
-                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type='facebook',
-                        status='Active',
-                        # company__exact='FBM',
+                        account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                        status=LeadAccount.STATUS_ACTIVE,
+                        # lead__company__exact=Lead.COMPANY_FBM,
                     )),
                 )],
                 [_('Master Report for Google Accounts'), '{}?{}'.format(
-                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type='google',
-                        status='Active',
+                        account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE,
+                        status=LeadAccount.STATUS_ACTIVE,
                     )),
                 )],
                 [_('Master Report for Amazon Accounts'), '{}?{}'.format(
-                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type='amazon',
-                        status='Active',
+                        account_type=LeadAccount.ACCOUNT_TYPE_AMAZON,
+                        status=LeadAccount.STATUS_ACTIVE,
                     )),
                 )],
                 [_('Master Report for ACM Google Accounts'), '{}?{}'.format(
-                    reverse('admin:adsrental_reportproxylead_changelist'),
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type='google',
-                        status='Active',
-                        company__exact='ACM',
+                        account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE,
+                        status=LeadAccount.STATUS_ACTIVE,
+                        lead__company__exact=Lead.COMPANY_ACM,
                     )),
                 )],
                 [_('Check Report for current month'), '{}?{}'.format(
