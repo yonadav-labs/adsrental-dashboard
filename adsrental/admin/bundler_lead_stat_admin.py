@@ -22,9 +22,9 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         'qualified_today_field',
         'qualified_yesterday_field',
         'qualified_last_30_days_field',
-        'qualified_total_field',
-        'delivered_not_connected',
-        'banned_from_qualified_last_30_days',
+        # 'qualified_total_field',
+        # 'delivered_not_connected',
+        # 'banned_from_qualified_last_30_days',
         'delivered_not_connected_last_30_days',
         'delivered_connected_last_30_days_percent',
     )
