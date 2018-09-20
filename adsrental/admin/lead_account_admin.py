@@ -81,7 +81,16 @@ class LeadAccountAdmin(admin.ModelAdmin):
         LeadBundlerListFilter,
         AbstractUIDListFilter,
     )
-    search_fields = ('lead__leadid', 'lead__email', 'username', )
+    search_fields = (
+        'lead__leadid',
+        'lead__account_name',
+        'lead__first_name',
+        'lead__last_name',
+        'lead__phone',
+        'lead__raspberry_pi__rpid',
+        'lead__email',
+        'username',
+    )
     actions = (
         'mark_as_qualified',
         'mark_as_disqualified',
