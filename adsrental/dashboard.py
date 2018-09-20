@@ -42,7 +42,7 @@ class CustomIndexDashboard(Dashboard):
                 [_('Master Report for Facebook Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
                         status=LeadAccount.STATUS_ACTIVE,
                         # lead__company__exact=Lead.COMPANY_FBM,
                     )),
@@ -50,21 +50,21 @@ class CustomIndexDashboard(Dashboard):
                 [_('Master Report for Google Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE,
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_GOOGLE,
                         status=LeadAccount.STATUS_ACTIVE,
                     )),
                 )],
                 [_('Master Report for Amazon Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type=LeadAccount.ACCOUNT_TYPE_AMAZON,
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_AMAZON,
                         status=LeadAccount.STATUS_ACTIVE,
                     )),
                 )],
                 [_('Master Report for ACM Google Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
-                        account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE,
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_GOOGLE,
                         status=LeadAccount.STATUS_ACTIVE,
                         lead__company__exact=Lead.COMPANY_ACM,
                     )),
