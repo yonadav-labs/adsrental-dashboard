@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Devices in testing{% endblock %}
+
+{% block content %}
+<div class="">
+    <div class="col-md-10">
+        <h3>Devices in testing</h3>
+        <table id="results" class="table table-striped" style="font-size: 60%;">
+            <thead>
+                <tr>
+                    <th>RPID</th>
+                    <th>Lead name</th>
+                    <th>Tested</th>
+                    <th>Online</th>
+                    <th>First ping</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            {% if entries %}
+                <tbody>
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ entry.rpid }}</td>
+                            <td>{{ entry.lead.name }}</td>
+                            <td>
+                                {% if entry.first_tested %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.online %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                {% endif %}
+                            </td>
+                            <td title="{{ entry.first_tested }}">{{entry.first_tested|naturaltime|default:"Never"}}</td>
+                            <td>
+                                {% if entry.online %}
+                                    Turn off device!
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {% else %}
+                <tfoot>
+                    <tr>
+                        <th colspan="100">No devices in testing</th>
+                    </tr>
+                </tfoot>
+            {% endif %}
+        </table>
+    </div>
+        
+{% endblock %}

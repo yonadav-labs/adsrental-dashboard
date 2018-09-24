@@ -46,98 +46,100 @@
                     <th>Sent</th>
                 </tr>
             </thead>
-            {% for entry in entries %}
+            {% if entries %}
                 <tbody>
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ entry.lead.name }}</td>
-                        <td>{{ entry.username }}</td>
-                        <td>{{ entry.lead.raspberry_pi.rpid }}</td>
-                        <td>{{ entry.created|date:'d M Y H:i' }}</td>
-                        <td>{{ entry.lead.bundler.utm_source }}</td>
-                        <td>{{ entry.get_account_type_display }}</td>
-                        <td>
-                            {{ entry.get_status_display }}
-                            {% if entry.ban_reason %}
-                                {% if entry.ban_reason in entry.POLICY_BAN_REASONS %}
-                                    (Ads completed)
-                                {% else %}
-                                    ({{entry.get_ban_reason_display}}) 
+                    {% for entry in entries %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ entry.lead.name }}</td>
+                            <td>{{ entry.username }}</td>
+                            <td>{{ entry.lead.raspberry_pi.rpid }}</td>
+                            <td>{{ entry.created|date:'d M Y H:i' }}</td>
+                            <td>{{ entry.lead.bundler.utm_source }}</td>
+                            <td>{{ entry.get_account_type_display }}</td>
+                            <td>
+                                {{ entry.get_status_display }}
+                                {% if entry.ban_reason %}
+                                    {% if entry.ban_reason in entry.POLICY_BAN_REASONS %}
+                                        (Ads completed)
+                                    {% else %}
+                                        ({{entry.get_ban_reason_display}}) 
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                            {% if entry.url %}
-                                <a href="{{ entry.url }}">URL</a>
-                            {% endif %}
-                            {% if entry.status == entry.STATUS_AVAILABLE %}
-                                <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=entry.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
-                            {% endif %}
-                        </td>
-                        <td>{{ entry.lead.phone }}</td>
-                        <td>
-                            {{ entry.lead.get_address }}
-                            {% if entry.lead.usps_tracking_code %}
-                                <br />    
-                                USPS: {{entry.lead.usps_tracking_code}}
-                            {% endif %}
-                            {% if entry.lead.is_order_on_hold %}
-                                <a href="{% url 'dashboard_change_address' lead_id=entry.lead.leadid %}">Fix</a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if entry.lead.raspberry_pi.online %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                            {% endif %}
-                        </td>
-                        <td title="{{ entry.lead.raspberry_pi.get_first_seen }}">{{entry.lead.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
-                        <td title="{{ entry.lead.raspberry_pi.get_last_seen }}">{{entry.lead.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
-                        <td title="{{ entry.qualified_date }}">{{entry.qualified_date|naturaltime|default:"Never"}}</td>
-                        <td>
-                            {% if entry.bundler_paid %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if entry.is_wrong_password %}
-                                <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                                <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
-                            {% endif %}   
-                        </td>
-                        <td>
-                            {% if entry.is_security_checkpoint_reported %}
-                                <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
-                            {% endif %}   
-                        </td>
-                        <td>
-                            {% if entry.lead.pi_delivered %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                            {% endif %}           
-                        </td>
-                        <td>
-                            {% if entry.lead.ship_date %}
-                                <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|default:"Never"}}"></span>
-                            {% else %}
-                                <span class="glyphicon glyphicon-remove" style="color: red;"</span>
-                            {% endif %}
-                        </td>
-                    </tr>
+                                {% if entry.url %}
+                                    <a href="{{ entry.url }}">URL</a>
+                                {% endif %}
+                                {% if entry.status == entry.STATUS_AVAILABLE %}
+                                    <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=entry.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
+                                {% endif %}
+                            </td>
+                            <td>{{ entry.lead.phone }}</td>
+                            <td>
+                                {{ entry.lead.get_address }}
+                                {% if entry.lead.usps_tracking_code %}
+                                    <br />    
+                                    USPS: {{entry.lead.usps_tracking_code}}
+                                {% endif %}
+                                {% if entry.lead.is_order_on_hold %}
+                                    <a href="{% url 'dashboard_change_address' lead_id=entry.lead.leadid %}">Fix</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.lead.raspberry_pi.online %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                {% endif %}
+                            </td>
+                            <td title="{{ entry.lead.raspberry_pi.get_first_seen }}">{{entry.lead.raspberry_pi.get_first_seen|naturaltime|default:"Never"}}</td>
+                            <td title="{{ entry.lead.raspberry_pi.get_last_seen }}">{{entry.lead.raspberry_pi.get_last_seen|naturaltime|default:"Never"}}</td>
+                            <td title="{{ entry.qualified_date }}">{{entry.qualified_date|naturaltime|default:"Never"}}</td>
+                            <td>
+                                {% if entry.bundler_paid %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.is_wrong_password %}
+                                    <span class="glyphicon glyphicon-ok" style="color: red;"></span>
+                                    <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
+                                {% endif %}   
+                            </td>
+                            <td>
+                                {% if entry.is_security_checkpoint_reported %}
+                                    <span class="glyphicon glyphicon-ok" style="color: red;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
+                                {% endif %}   
+                            </td>
+                            <td>
+                                {% if entry.lead.pi_delivered %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                {% endif %}           
+                            </td>
+                            <td>
+                                {% if entry.lead.ship_date %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|default:"Never"}}"></span>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
-            {% empty %}
+            {% else %}
                 <tfoot>
                     <tr>
                         <th colspan="100">No entries found</th>
                     </tr>
                 </tfoot>
-            {% endfor %}
+            {% endif %}
         </table>
         {% if entries.has_other_pages %}
           <ul class="pagination">
