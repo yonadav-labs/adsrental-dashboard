@@ -28,13 +28,19 @@ class LeadAccountsWeeklyView(View):
         email = request.GET.get('email')
         if 'start_date' in request.GET:
             start_dt = parser.parse(request.GET.get('start_date')).replace(tzinfo=timezone.get_current_timezone()).replace(hour=0, minute=0, second=0)
-            end_dt = (parser.parse(request.GET.get('end_date')).replace(tzinfo=timezone.get_current_timezone()) + datetime.timedelta(days=1)).replace(hour=0, minute=0, second=0)
+            if request.GET.get('end_date'):
+                end_dt = (parser.parse(request.GET.get('end_date')).replace(tzinfo=timezone.get_current_timezone()) + datetime.timedelta(days=1)).replace(hour=0, minute=0, second=0)
+            else:
+                end_dt = start_dt + datetime.timedelta(days=7)
         else:
             week_start, _ = get_week_boundaries_for_dt(now)
             start_dt, end_dt = get_week_boundaries_for_dt(week_start - datetime.timedelta(days=1))
 
         lead_accounts = LeadAccount.objects.filter(account_type=account_type)
         bundler_field = 'lead__bundler__name'
+
+        delivered_start_date = (start_dt - datetime.timedelta(days=14)).date()
+        delivered_end_date = (start_dt - datetime.timedelta(days=7)).date()
 
         new_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=True).count()
         secondary_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count()
@@ -49,10 +55,13 @@ class LeadAccountsWeeklyView(View):
         chargeback_lead_accounts_count = lead_accounts.filter(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).count()
         shipped_lead_accounts_count = lead_accounts.filter(lead__ship_date__gte=start_dt, lead__ship_date__lt=end_dt).count()
         awaiting_shipment_lead_accounts_count = lead_accounts.filter(lead__shipstation_order_status=Lead.SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT).count()
-        delivered = lead_accounts.filter(lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(), lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7))).count()
+        delivered = lead_accounts.filter(
+            lead__delivery_date__gte=delivered_start_date,
+            lead__delivery_date__lte=delivered_end_date,
+        ).count()
         delivered_online = lead_accounts.filter(
-            lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(),
-            lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date(),
+            lead__delivery_date__gte=delivered_start_date,
+            lead__delivery_date__lte=delivered_end_date,
             in_progress_date__isnull=False,
         ).count()
 
@@ -71,10 +80,13 @@ class LeadAccountsWeeklyView(View):
             offline=Count('id', filter=Q(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl))),
             online=Count('id', filter=Q(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl))),
             chargeback=Count('id', filter=Q(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt)),
-            delivered=Count('id', filter=Q(lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(), lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date())),
+            delivered=Count('id', filter=Q(
+                lead__delivery_date__gte=delivered_start_date,
+                lead__delivery_date__lte=delivered_end_date,
+            )),
             delivered_online=Count('id', filter=Q(
-                lead__delivery_date__gte=(start_dt - datetime.timedelta(days=7)).date(),
-                lead__delivery_date__lte=(start_dt + datetime.timedelta(days=7)).date(),
+                lead__delivery_date__gte=delivered_start_date,
+                lead__delivery_date__lte=delivered_end_date,
                 in_progress_date__isnull=False,
             )),
         ).order_by('-total_in_progress').values(
@@ -122,6 +134,8 @@ class LeadAccountsWeeklyView(View):
             lead_accounts_by_bundler_list=lead_accounts_by_bundler_list,
             delivered=delivered,
             delivered_online=delivered_online,
+            delivered_start_date=delivered_start_date,
+            delivered_end_date=delivered_end_date - datetime.timedelta(days=1),
         )
 
         if email:
