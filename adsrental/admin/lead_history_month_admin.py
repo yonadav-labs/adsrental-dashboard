@@ -208,11 +208,11 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
     def prepare_for_reshipment(self, request, queryset):
         for lead_history_month in queryset:
             lead = lead_history_month.lead
-            if lead.raspberry_pi:
-                lead.prepare_for_reshipment(request.user)
-                messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
-            else:
-                messages.warning(request, 'Lead {} has no assigned RaspberryPi. Assign a new one first.'.format(lead.email))
+            if lead.is_banned():
+                messages.info(request, 'Lead {} is banned, skipping.'.format(lead.email))
+                continue
+            lead.prepare_for_reshipment(request.user)
+            messages.info(request, 'Lead {} is prepared. You can now flash and test it.'.format(lead.email))
 
     def prepare_for_testing(self, request, queryset):
         if 'do_action' in request.POST:
@@ -222,8 +222,8 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
                 queryset = Lead.objects.filter(raspberry_pi__rpid__in=rpids)
                 for lead in queryset:
                     if lead.is_banned():
-                        lead.unban(request.user)
-                        messages.info(request, 'Lead {} is unbanned.'.format(lead.email))
+                        messages.info(request, 'Lead {} is banned, skipping.'.format(lead.email))
+                        continue
 
                     if lead.raspberry_pi.first_tested:
                         lead.prepare_for_reshipment(request.user)
