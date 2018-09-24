@@ -16,7 +16,7 @@ class InTestingView(View):
         raspberry_pis = RaspberryPi.objects.filter(
             first_seen__isnull=True,
             first_tested__isnull=False,
-            first_tested__gt=now - datetime.timedelta(days=3),
+            first_tested__gt=now - datetime.timedelta(days=7),
         ).select_related('lead').order_by('-first_tested')[:100]
         return render(request, 'dashboard/in_testing.html', dict(
             entries=raspberry_pis,
