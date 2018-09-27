@@ -10,7 +10,7 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractUIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
+from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -29,6 +29,12 @@ class InProgressDateListFilter(AbstractDateListFilter):
     title = 'In-Progress date'
     parameter_name = 'in_progress_date'
     field_name = 'in_progress_date'
+
+
+class AddressListFilter(AbstractFulltextFilter):
+    title = 'Address'
+    parameter_name = 'address'
+    field_names = ['lead__city', 'lead__country', 'lead__state', 'lead__postal_code', 'lead__street']
 
 
 class LeadAccountAdmin(admin.ModelAdmin):
@@ -63,6 +69,8 @@ class LeadAccountAdmin(admin.ModelAdmin):
     )
     list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
+        AbstractIntIDListFilter,
+        AddressListFilter,
         'account_type',
         LeadRaspberryPiOnlineListFilter,
         'bundler_paid',
@@ -79,7 +87,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'ban_reason',
         'lead__company',
         LeadBundlerListFilter,
-        AbstractUIDListFilter,
     )
     search_fields = (
         'lead__leadid',

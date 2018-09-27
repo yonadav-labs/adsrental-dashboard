@@ -23,11 +23,18 @@ from adsrental.admin.list_filters import \
     LeadAccountTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
+    AbstractFulltextFilter, \
     LeadAccountSecurityCheckpointListFilter
 
 
-class LeadidListFIlter(AbstractUIDListFilter):
+class LeadidListFilter(AbstractUIDListFilter):
     parameter_name = 'leadid'
+
+
+class AddressListFilter(AbstractFulltextFilter):
+    title = 'Address'
+    parameter_name = 'address'
+    field_names = ['city', 'country', 'state', 'postal_code', 'street']
 
 
 class LeadAccountInline(admin.StackedInline):
@@ -82,6 +89,8 @@ class LeadAdmin(admin.ModelAdmin):
         'google_billed',
     )
     list_filter = (
+        LeadidListFilter,
+        AddressListFilter,
         StatusListFilter,
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,

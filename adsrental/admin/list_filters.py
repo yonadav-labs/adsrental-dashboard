@@ -1,4 +1,5 @@
 import datetime
+import re
 from dateutil import relativedelta, parser
 
 from django.conf import settings
@@ -764,4 +765,53 @@ class AbstractUIDListFilter(SimpleListFilter):
             return queryset.filter(**{
                 self.parameter_name: value,
             })
+        return None
+
+
+class AbstractIntIDListFilter(AbstractUIDListFilter):
+    def queryset(self, request, queryset):
+        if self.value():
+            if self.value().isdigit():
+                value = self.value()
+                return queryset.filter(**{
+                    self.parameter_name: value,
+                })
+            else:
+                return queryset.none()
+        return None
+
+class AbstractFulltextFilter(AbstractUIDListFilter):
+    field_names = []
+    _findterms = re.compile(r'"([^"]+)"|(\S+)').findall
+    _normspace = re.compile(r'\s{2,}').sub
+
+    def _normalize_query(self, query_string):
+        '''
+        Splits the query string in invidual keywords, getting rid of unecessary spaces and grouping quoted words together.
+        Example:
+        >>> normalize_query('  some random  words "with   quotes  " and   spaces')
+            ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
+        '''
+
+        return [self._normspace('', (t[0] or t[1]).strip()) for t in self._findterms(query_string)]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            query = None
+            terms = self._normalize_query(self.value())
+            for term in terms:
+                or_query = None
+                for field_name in self.field_names:
+                    q = Q(**{
+                        "{}__icontains".format(field_name): term
+                    })
+                    if or_query is None:
+                        or_query = q
+                    else:
+                        or_query = or_query | q
+                if query is None:
+                    query = or_query
+                else:
+                    query = query & or_query
+            return queryset.filter(query)
         return None
