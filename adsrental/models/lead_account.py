@@ -1,6 +1,5 @@
 'LeadAccount model'
 import decimal
-import datetime
 
 import requests
 from django.utils import timezone
@@ -323,8 +322,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         now = timezone.localtime(timezone.now())
         self.ban_reason = reason
         self.banned_date = now
-        if self.in_progress_date and self.in_progress_date > now - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
-            self.charge_back = True
+        # if self.in_progress_date and self.in_progress_date > now - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
+        #     self.charge_back = True
 
         self.save()
 
