@@ -95,6 +95,7 @@
             {% endif %}
         {% endfor %}
 
+        <h5>Bonus: ${{ data.bonus|floatformat:2 }}</h5>
         <h4>Total: ${{ data.total|floatformat:2 }}</h4>
     {% endfor %}
     <h3>Total for all bundlers: ${{ total|floatformat:2 }}</h3>

@@ -107,6 +107,7 @@ class BundlerPaymentsView(View):
         total_facebook = decimal.Decimal('0.00')
         total_amazon = decimal.Decimal('0.00')
         total_chargeback = decimal.Decimal('0.00')
+        bonus = decimal.Decimal('0.00')
 
         for bundler in bundlers:
             facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
@@ -119,6 +120,10 @@ class BundlerPaymentsView(View):
                 bundler_total += child_stats['total']
             for child_stats in amazon_stats['children_stats']:
                 bundler_total += child_stats['total']
+
+            total_entries = len(facebook_stats['entries']) + len(google_stats['entries']) + len(amazon_stats['entries'])
+            bonus = decimal.Decimal(round((total_entries // 5) * 5 * 10, 2))
+            bundler_total += bonus
 
             bundlers_data.append(dict(
                 bundler=bundler,
@@ -140,6 +145,7 @@ class BundlerPaymentsView(View):
                 amazon_final_total=amazon_stats['final_total'],
                 amazon_children_stats=amazon_stats['children_stats'],
                 amazon_children_total=amazon_stats['children_total'],
+                bonus=bonus,
                 total=bundler_total,
             ))
 
