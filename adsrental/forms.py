@@ -175,10 +175,10 @@ class SignupForm(forms.Form):
     photo_id = forms.FileField(label='Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
     extra_photo_id = forms.FileField(label='Second Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=False)
     captcha = ReCaptchaField(widget=ReCaptchaWidget(), required=False)
-    apply_type = forms.RadioSelect(choices=(
-        (APPLY_TYPE_SPLASHTOP, 'Apply with Splashtop (Recommended) - This is our quickest and easiest way to get qualified', ),
-        (APPLY_TYPE_SCREENSHOT, 'Apply with Screenshots (More time consuming) - This method is only for people who have a router but do not own a computer. This method is more time consuming, pay is lower and you will be required to provide additional documentation.', ),
-    ))
+    apply_type = forms.ChoiceField(widget=forms.RadioSelect(), choices=(
+        (APPLY_TYPE_SPLASHTOP, 'Apply with Splashtop (Recommended)', ),
+        (APPLY_TYPE_SCREENSHOT, 'Apply with Screenshots (More time consuming)', ),
+    ), required=True)
     utm_source = forms.CharField(widget=forms.HiddenInput())
 
     def clean_phone(self):

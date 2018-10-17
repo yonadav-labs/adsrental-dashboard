@@ -89,6 +89,11 @@ textarea:focus,
     text-align: center
 }
 
+.content-wrapper ul {
+    text-align: left;
+    list-style: none;
+}
+
 .clearfix:before,
 .footer-widgets:before,
 .nav-primary:before,

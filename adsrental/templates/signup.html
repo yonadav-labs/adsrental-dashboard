@@ -190,6 +190,13 @@
                                 </tr>
 
                                 <tr>
+                                    <td class="form_label {% if form.apartment.field.required %}required{% endif %}">{{form.apartment.label}}</td>
+                                    <td>
+                                        {{ form.apartment }}
+                                    </td>
+                                </tr>
+
+                                <tr>
                                     <td class="form_label {% if form.city.field.required %}required{% endif %}">{{form.city.label}}</td>
                                     <td>
                                         {{ form.city }}
@@ -224,6 +231,14 @@
                                         {{ form.extra_photo_id }}
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td class="form_label {% if form.apply_type.field.required %}required{% endif %}">{{form.apply_type.label}}</td>
+                                    <td>
+                                        {{ form.apply_type }}
+                                    </td>
+                                </tr>
+
                                 <tr>
                                     <td colspan="2" align="left">
                                         {{ form.accept }}
