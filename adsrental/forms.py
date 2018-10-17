@@ -176,7 +176,7 @@ class SignupForm(forms.Form):
     captcha = ReCaptchaField(widget=ReCaptchaWidget(), required=False)
     apply_type = forms.RadioSelect(choices=(
         (APPLY_TYPE_SPLASHTOP, 'Apply with Splashtop (Recommended) - This is our quickest and easiest way to get qualified', ),
-        (APPLY_TYPE_SCREENSHOT, 'Apply with Screenshots (More time consuming) - This method is only for people who have a router but do not own a computer. This method is more time consuming, pay is lower and you will be required to provide additional documentation.', ),  
+        (APPLY_TYPE_SCREENSHOT, 'Apply with Screenshots (More time consuming) - This method is only for people who have a router but do not own a computer. This method is more time consuming, pay is lower and you will be required to provide additional documentation.', ),
     ))
     utm_source = forms.CharField(widget=forms.HiddenInput())
 
