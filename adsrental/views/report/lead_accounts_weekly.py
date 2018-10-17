@@ -114,7 +114,7 @@ class LeadAccountsWeeklyView(View):
                 row['delivered_online_percent'] = int(row['delivered_online'] / row['delivered'] * 100)
 
         context = dict(
-            select_account_types=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
+            select_account_types=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
             start_date=start_dt,
             end_date=end_dt - datetime.timedelta(days=1),
             account_type=account_type,

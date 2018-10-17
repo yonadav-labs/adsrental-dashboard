@@ -134,7 +134,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
                     base_payment = self.NEW_MAX_PAYMENT
                 else:
                     base_payment = self.MAX_PAYMENT
-            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                 if created_date > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
                     base_payment = self.NEW_MAX_PAYMENT
                 else:

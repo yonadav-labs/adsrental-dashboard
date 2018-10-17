@@ -318,11 +318,15 @@ class AccountTypeListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'facebook_only':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
+        if self.value() == 'facebook_screenshot_only':
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
         if self.value() == 'google_only':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_AMAZON])
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_AMAZON])
         if self.value() == 'facebook':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+        if self.value() == 'facebook_screenshot':
+            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
         if self.value() == 'google':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'amazon':

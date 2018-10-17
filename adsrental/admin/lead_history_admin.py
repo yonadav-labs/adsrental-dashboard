@@ -141,7 +141,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
             {
                 'label': 'Mark Facebook PW as correct',
                 'action': 'mark_as_correct_password_fb',
-                'enabled': obj.lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).count() and obj.is_wrong_password_facebook(),
+                'enabled': obj.lead.lead_accounts.filter(account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK).count() and obj.is_wrong_password_facebook(),
             },
             {
                 'label': 'Mark Google PW as correct',
@@ -156,7 +156,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
             {
                 'label': 'Mark Facebook PW as wrong',
                 'action': 'mark_as_wrong_password_fb',
-                'enabled': obj.lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).count() and not obj.is_wrong_password_facebook(),
+                'enabled': obj.lead.lead_accounts.filter(account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK).count() and not obj.is_wrong_password_facebook(),
             },
             {
                 'label': 'Mark Google PW as wrong',

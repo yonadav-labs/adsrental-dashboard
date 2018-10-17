@@ -65,7 +65,7 @@ class LeadHistory(models.Model):
                 if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                     self.checks_wrong_password_google += 1
                     self.checks_wrong_password += 1
-                if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                     self.checks_wrong_password_facebook += 1
                     self.checks_wrong_password += 1
                 if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
@@ -74,7 +74,7 @@ class LeadHistory(models.Model):
             if lead_account.security_checkpoint_date:
                 if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                     self.checks_sec_checkpoint_google += 1
-                if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+                if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                     self.checks_sec_checkpoint_facebook += 1
                 if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                     self.checks_sec_checkpoint_amazon += 1
@@ -175,7 +175,7 @@ class LeadHistory(models.Model):
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 checks_wrong_password = self.checks_wrong_password_google
                 checks_sec_checkpoint = self.checks_sec_checkpoint_google
-            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                 checks_wrong_password = self.checks_wrong_password_facebook
                 checks_sec_checkpoint = self.checks_sec_checkpoint_facebook
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
@@ -198,7 +198,7 @@ class LeadHistory(models.Model):
                     month_payment = self.NEW_MAX_PAYMENT
                 else:
                     month_payment = self.MAX_PAYMENT
-            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                 if lead_account.created > self.NEW_FACEBOOK_MAX_PAYMENT_DATE:
                     month_payment = self.NEW_MAX_PAYMENT
                 else:

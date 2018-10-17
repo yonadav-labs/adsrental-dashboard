@@ -38,7 +38,7 @@ class BundlerLeaderboardView(View):
         now = timezone.localtime(timezone.now())
         lead_accounts = LeadAccount.objects.filter(
             qualified_date__isnull=False,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
             lead__bundler__utm_source__isnull=False,
             primary=True,
         )
