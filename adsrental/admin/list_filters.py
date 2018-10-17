@@ -309,8 +309,10 @@ class AccountTypeListFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('facebook_only', 'Facebook only'),
+            ('facebook_screenshot_only', 'Facebook Screenshot only'),
             ('google_only', 'Google only'),
             ('facebook', 'Facebook'),
+            ('facebook_screenshot', 'Facebook Screenshot'),
             ('google', 'Google'),
             ('amazon', 'Amazon'),
             ('many', 'Several accounts'),
