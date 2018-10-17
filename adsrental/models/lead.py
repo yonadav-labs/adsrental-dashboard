@@ -157,6 +157,7 @@ class Lead(models.Model, FulltextSearchMixin):
     is_reimbursed = models.BooleanField(default=False, help_text='Lead is active for more than 5 months and gets pay checks.')
     photo_id = models.FileField(blank=True, null=True, help_text='Photo uploaded by user on registration.')
     extra_photo_id = models.FileField(blank=True, null=True, help_text='Extra photo uploaded by user on registration.')
+    isp = models.CharField(max_length=255, blank=True, null=True, help_text='Internet Service Provider')
     splashtop_id = models.CharField(max_length=255, blank=True, null=True, help_text='Splashtop ID reported by user.')
     tracking_info = models.TextField(blank=True, null=True, help_text='Raw response from secure.shippingapis.com')
     pi_sent = models.DateTimeField(null=True, blank=True)
