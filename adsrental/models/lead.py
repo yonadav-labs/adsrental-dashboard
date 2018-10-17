@@ -148,6 +148,7 @@ class Lead(models.Model, FulltextSearchMixin):
     ship_date = models.DateField(blank=True, null=True, help_text='Date when order was shipped. Populated from shipstation sync.')
     touch_count = models.IntegerField(default=0, help_text='Increased every time you do Touch action for this lead.')
     street = models.CharField(max_length=255, blank=True, null=True)
+    apartment = models.CharField(max_length=255, blank=True, null=True, help_text='Apartment/suite')
     city = models.CharField(max_length=50, blank=True, null=True)
     country = models.CharField(max_length=50, blank=True, null=True, default='United States')
     state = models.CharField(max_length=50, blank=True, null=True)
