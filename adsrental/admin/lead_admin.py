@@ -133,6 +133,8 @@ class LeadAdmin(admin.ModelAdmin):
         'unban_facebook_account',
         'ban_amazon_account',
         'unban_amazon_account',
+        'ban_facebook_screenshot_account',
+        'unban_facebook_screenshot_account',
         'report_wrong_google_password',
         'report_correct_google_password',
         'report_wrong_facebook_password',
@@ -526,6 +528,33 @@ class LeadAdmin(admin.ModelAdmin):
     def unban_facebook_account(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
+                if lead_account.unban(request.user):
+                    messages.info(request, '{} is unbanned.'.format(lead_account))
+
+    def ban_facebook_screenshot_account(self, request, queryset):
+        if 'do_action' in request.POST:
+            form = AdminLeadAccountBanForm(request.POST)
+            if form.is_valid():
+                reason = form.cleaned_data['reason']
+                for lead in queryset:
+                    for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT):
+                        lead_account.ban(request.user, reason)
+                        messages.info(request, '{} is banned.'.format(lead_account))
+                return None
+        else:
+            form = AdminLeadAccountBanForm()
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'ban_facebook_screenshot_account',
+            'title': 'Choose reason to ban Facebook account',
+            'button': 'Ban',
+            'objects': queryset,
+            'form': form,
+        })
+
+    def unban_facebook_screenshot_account(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT):
                 if lead_account.unban(request.user):
                     messages.info(request, '{} is unbanned.'.format(lead_account))
 
