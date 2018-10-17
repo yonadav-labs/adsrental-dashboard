@@ -166,6 +166,7 @@ class SignupForm(forms.Form):
     fb_secret = forms.CharField(label='Facebook Password', required=True, widget=forms.TextInput(attrs={'size': 40}))
     fb_friends = forms.IntegerField(label='Facebook Friends Count', required=True, widget=forms.NumberInput(attrs={'size': 40}))
     street = forms.CharField(label='Shipping Street', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    apartment = forms.CharField(label='Shipping Apartment/suite', required=True, widget=forms.TextInput(attrs={'size': 40}))
     city = forms.CharField(label='Shipping City', required=True, widget=forms.TextInput(attrs={'size': 40}))
     state = forms.ChoiceField(label='Shipping State', choices=STATE_CHOICES, required=True)
     postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40}))
