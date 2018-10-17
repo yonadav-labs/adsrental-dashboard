@@ -97,6 +97,10 @@ class SignupView(View):
         )
         lead.save()
 
+        account_type = LeadAccount.ACCOUNT_TYPE_FACEBOOK
+        if data['apply_type'] == SignupForm.APPLY_TYPE_SCREENSHOT:
+            account_type = LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT
+
         lead_account = LeadAccount(
             lead=lead,
             username=data['fb_email'],
@@ -105,7 +109,7 @@ class SignupView(View):
             url=data['facebook_profile_url'],
             status=LeadAccount.STATUS_AVAILABLE,
             primary=True,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type=account_type,
         )
         lead_account.save()
         # lead.send_web_to_lead()
