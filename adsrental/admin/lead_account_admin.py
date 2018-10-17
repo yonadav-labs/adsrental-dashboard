@@ -246,12 +246,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.success(
                     request, '{} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-            if lead_account.lead.add_shipstation_order():
-                messages.success(
-                    request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
-            else:
-                messages.info(
-                    request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
+            if lead_account.primary:
+                if lead_account.lead.add_shipstation_order():
+                    messages.success(
+                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+                else:
+                    messages.info(
+                        request, 'Lead {} order already exists: {}. If you want to ship another, clear shipstation_order_number field first'.format(lead_account, lead_account.lead.shipstation_order_number))
 
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
