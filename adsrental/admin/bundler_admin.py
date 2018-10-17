@@ -125,6 +125,25 @@ class BundlerAdmin(admin.ModelAdmin):
 
         return ' '.join(result)
 
+
+    def facebook_screenshotpayment_field(self, obj):
+        result = []
+        if obj.second_parent_bundler:
+            result.append('${} / ${} / ${}'.format(
+                obj.facebook_payment - obj.facebook_parent_payment - obj.facebook_screnshot_second_parent_payment,
+                obj.facebook_screnshot_parent_payment,
+                obj.facebook_screnshot_second_parent_payment,
+            ))
+        elif obj.parent_bundler:
+            result.append('${} / ${}'.format(obj.facebook_screnshot_payment - obj.facebook_screnshot_parent_payment, obj.facebook_screnshot_parent_payment))
+        else:
+            result.append('${}'.format(obj.facebook_screnshot_payment))
+
+        if obj.enable_chargeback and obj.facebook_screnshot_chargeback:
+            result.append('(CB ${})'.format(obj.facebook_screnshot_chargeback))
+
+        return ' '.join(result)
+
     def google_payment_field(self, obj):
         result = []
         if obj.second_parent_bundler:
