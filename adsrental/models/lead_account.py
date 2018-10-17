@@ -34,6 +34,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
+    STATUS_SCREENSHOT_DISQUALIFIED = 'Screenshot Disqualified'
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
@@ -44,15 +45,18 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
         (STATUS_DISQUALIFIED, 'Disqualified'),
+        (STATUS_SCREENSHOT_DISQUALIFIED, 'Screenshot Disqualified'),
     ]
 
     STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
 
     ACCOUNT_TYPE_FACEBOOK = 'Facebook'
+    ACCOUNT_TYPE_FACEBOOK_SCREENSHOT = 'Facebook Screenshot'
     ACCOUNT_TYPE_GOOGLE = 'Google'
     ACCOUNT_TYPE_AMAZON = 'Amazon'
     ACCOUNT_TYPE_CHOICES = [
         (ACCOUNT_TYPE_FACEBOOK, 'Facebook', ),
+        (ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, 'Facebook Screenshot', ),
         (ACCOUNT_TYPE_GOOGLE, 'Google', ),
         (ACCOUNT_TYPE_AMAZON, 'Amazon', ),
     ]
