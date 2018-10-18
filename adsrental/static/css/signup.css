@@ -92,6 +92,7 @@ textarea:focus,
 .content-wrapper ul {
     text-align: left;
     list-style: none;
+    width: 350px;
 }
 
 .clearfix:before,
