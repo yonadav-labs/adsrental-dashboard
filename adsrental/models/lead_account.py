@@ -265,18 +265,19 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             data['ad_manager_type_2'] = 7
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
+        request_data = [data]
 
         if not self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/create-s'
             response = requests.post(
                 url,
-                json=[data],
+                json=request_data,
                 auth=auth,
             )
             try:
                 response_json = response.json()
             except ValueError:
-                return {'error': True, 'text': response.text, 'status': response.status_code}
+                return {'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
@@ -286,19 +287,21 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 self.save()
             return response_json
 
+        request_data = {
+            'account_id': int(self.adsdb_account_id),
+            'data': data,
+        }
+
         url = 'https://www.adsdb.io/api/v1/accounts/update-s'
         response = requests.post(
             url,
-            json={
-                'account_id': int(self.adsdb_account_id),
-                'data': data,
-            },
+            json=request_data,
             auth=auth,
         )
         try:
             response_json = response.json()
         except ValueError:
-            return {'error': True, 'text': response.text, 'status': response.status_code}
+            return {'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}
 
         return response_json
 
