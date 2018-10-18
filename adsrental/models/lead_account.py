@@ -235,7 +235,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return False
         if self.status != self.STATUS_IN_PROGRESS:
             return False
-        if lead.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
+        if self.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
             return False
 
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
