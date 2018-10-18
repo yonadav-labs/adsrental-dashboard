@@ -23,6 +23,7 @@ from adsrental.admin.list_filters import \
     LeadAccountTouchCountListFilter, \
     BundlerListFilter, \
     ShipDateListFilter, \
+    LeadAccountStatusListFilter, \
     AbstractFulltextFilter, \
     LeadAccountSecurityCheckpointListFilter
 
@@ -92,6 +93,7 @@ class LeadAdmin(admin.ModelAdmin):
         LeadidListFilter,
         AddressListFilter,
         StatusListFilter,
+        LeadAccountStatusListFilter,
         RaspberryPiOnlineListFilter,
         AccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
@@ -124,6 +126,7 @@ class LeadAdmin(admin.ModelAdmin):
     actions = (
         # 'update_from_shipstation',
         'mark_facebook_as_qualified',
+        'mark_facebook_screenshot_as_qualified',
         'mark_google_as_qualified',
         'mark_amazon_as_qualified',
         'mark_as_disqualified',
@@ -131,20 +134,24 @@ class LeadAdmin(admin.ModelAdmin):
         'unban_google_account',
         'ban_facebook_account',
         'unban_facebook_account',
-        'ban_amazon_account',
-        'unban_amazon_account',
         'ban_facebook_screenshot_account',
         'unban_facebook_screenshot_account',
+        'ban_amazon_account',
+        'unban_amazon_account',
         'report_wrong_google_password',
         'report_correct_google_password',
         'report_wrong_facebook_password',
         'report_correct_facebook_password',
+        'report_wrong_facebook_screenshot_password',
+        'report_correct_facebook_screenshot_password',
         'report_wrong_amazon_password',
         'report_correct_amazon_password',
         'report_security_checkpoint_google',
         'report_security_checkpoint_google_resolved',
         'report_security_checkpoint_facebook',
         'report_security_checkpoint_facebook_resolved',
+        'report_security_checkpoint_facebook_screenshot',
+        'report_security_checkpoint_facebook_screenshot_resolved',
         'report_security_checkpoint_amazon',
         'report_security_checkpoint_amazon_resolved',
         'prepare_for_testing',
@@ -448,6 +455,25 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.info(
                         request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
 
+    def mark_facebook_screenshot_as_qualified(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT):
+                if lead_account.is_banned():
+                    messages.warning(request, 'Lead Account {} is {}, skipping'.format(lead_account, lead_account.status))
+                    continue
+
+                lead_account.qualify(request.user)
+                if lead_account.lead.assign_raspberry_pi():
+                    messages.success(
+                        request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
+
+                if lead_account.lead.add_shipstation_order():
+                    messages.success(
+                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+                else:
+                    messages.info(
+                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+
     def mark_amazon_as_qualified(self, request, queryset):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_AMAZON):
@@ -692,9 +718,41 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.save()
             messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
 
+    def report_security_checkpoint_facebook_screenshot(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = timezone.now()
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
+
     def report_security_checkpoint_facebook_resolved(self, request, queryset):
         for lead in queryset:
             lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
+
+            if not lead_account:
+                messages.info(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if not lead_account.is_security_checkpoint_reported():
+                messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
+                continue
+
+            lead_account.security_checkpoint_date = None
+            lead_account.save()
+            messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
+
+    def report_security_checkpoint_facebook_screenshot_resolved(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, active=True).first()
 
             if not lead_account:
                 messages.info(request, 'Lead {} has no active facebook account.'.format(lead.email))
@@ -808,6 +866,21 @@ class LeadAdmin(admin.ModelAdmin):
             lead_account.mark_wrong_password(request.user)
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
+    def report_wrong_facebook_screenshot_password(self, request, queryset):
+        for lead in queryset:
+            lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, active=True).first()
+
+            if not lead_account:
+                messages.error(request, 'Lead {} has no active facebook account.'.format(lead.email))
+                continue
+
+            if lead_account.is_wrong_password():
+                messages.info(request, 'Lead Account {} was already marked as wrong, skipping.'.format(lead_account))
+                continue
+
+            lead_account.mark_wrong_password(request.user)
+            messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+
     @staticmethod
     def report_correct_facebook_password(instance, request, queryset):
         if queryset.count() != 1:
@@ -817,6 +890,44 @@ class LeadAdmin(admin.ModelAdmin):
         lead = queryset.first()
 
         lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, active=True).first()
+        if not lead_account:
+            messages.error(request, 'Lead has no active facebook account.')
+            return None
+
+        if not lead_account.is_wrong_password():
+            messages.info(request, 'Lead Account {} is not marked as wrong, skipping.'.format(lead_account))
+            return None
+
+        if 'do_action' in request.POST:
+            form = AdminLeadAccountPasswordForm(request.POST)
+            if form.is_valid():
+                new_password = form.cleaned_data['new_password']
+                lead_account.set_correct_password(new_password, request.user)
+                messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
+                return None
+        else:
+            form = AdminLeadAccountPasswordForm(initial=dict(
+                old_password=lead_account.password,
+                new_password=lead_account.password,
+            ))
+
+        return render(request, 'admin/action_with_form.html', {
+            'action_name': 'report_correct_facebook_password',
+            'title': 'Set new pasword for {}'.format(lead_account),
+            'button': 'Save password',
+            'objects': queryset,
+            'form': form,
+        })
+
+    @staticmethod
+    def report_correct_facebook_screenshot_password(instance, request, queryset):
+        if queryset.count() != 1:
+            messages.error(request, 'Only one lead can be selected.')
+            return None
+
+        lead = queryset.first()
+
+        lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, active=True).first()
         if not lead_account:
             messages.error(request, 'Lead has no active facebook account.')
             return None
@@ -984,7 +1095,9 @@ class LeadAdmin(admin.ModelAdmin):
     id_field.short_description = 'ID'
 
     mark_facebook_as_qualified.short_description = 'Mark Facebook account as Qualified'
+    mark_facebook_screenshot_as_qualified.short_description = 'Mark Facebook Screenshot account as Qualified'
     mark_google_as_qualified.short_description = 'Mark Google account as Qualified'
+    mark_amazon_as_qualified.short_description = 'Mark Amazon account as Qualified'
 
     ec2_instance_link.short_description = 'EC2 instance'
 

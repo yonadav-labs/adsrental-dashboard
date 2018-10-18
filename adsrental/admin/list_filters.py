@@ -33,6 +33,23 @@ class LeadStatusListFilter(SimpleListFilter):
         return None
 
 
+class LeadAccountStatusListFilter(SimpleListFilter):
+    title = 'Lead Account Status'
+    parameter_name = 'lead_account_status'
+
+    def lookups(self, request, model_admin):
+        return LeadAccount.STATUS_CHOICES + [
+            ('Active', 'Active'),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Active':
+            return queryset.filter(lead_account__status__in=Lead.STATUSES_ACTIVE)
+        if self.value():
+            return queryset.filter(lead_account__status=self.value())
+        return None
+
+
 class StatusListFilter(SimpleListFilter):
     title = 'Status'
     parameter_name = 'status'

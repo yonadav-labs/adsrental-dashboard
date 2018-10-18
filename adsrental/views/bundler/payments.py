@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-import xhtml2pdf.pisa as pisa
+from xhtml2pdf import pisa
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
@@ -121,7 +121,7 @@ class BundlerPaymentsView(View):
             for child_stats in amazon_stats['children_stats']:
                 bundler_total += child_stats['total']
 
-            total_entries = facebook_stats['entries']
+            # total_entries = facebook_stats['entries']
             # bonus = decimal.Decimal(round((total_entries // 5) * 5 * 10, 2))
             bundler_total += bonus
 

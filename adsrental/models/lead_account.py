@@ -33,6 +33,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     AUTO_BAN_DAYS_NOT_USED = 14
 
     STATUS_QUALIFIED = 'Qualified'
+    STATUS_SCREENSHOT_QUALIFIED = 'Screenshot Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
     STATUS_SCREENSHOT_DISQUALIFIED = 'Screenshot Disqualified'
     STATUS_AVAILABLE = 'Available'
@@ -45,6 +46,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
         (STATUS_DISQUALIFIED, 'Disqualified'),
+        (STATUS_SCREENSHOT_QUALIFIED, 'Screenshot Qualified'),
         (STATUS_SCREENSHOT_DISQUALIFIED, 'Screenshot Disqualified'),
     ]
 
@@ -371,7 +373,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def disqualify(self, edited_by):
         'Set lead account status as disqualified.'
-        result = self.set_status(LeadAccount.STATUS_DISQUALIFIED, edited_by)
+        new_status = LeadAccount.STATUS_DISQUALIFIED
+        if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            new_status = LeadAccount.STATUS_SCREENSHOT_DISQUALIFIED
+        result = self.set_status(new_status, edited_by)
         if result:
             self.disqualified_date = timezone.now()
             self.save()
@@ -381,7 +386,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def qualify(self, edited_by):
         'Set lead account status as qualified.'
-        result = self.set_status(LeadAccount.STATUS_QUALIFIED, edited_by)
+        new_status = LeadAccount.STATUS_QUALIFIED
+        if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            new_status = LeadAccount.STATUS_SCREENSHOT_QUALIFIED
+        result = self.set_status(new_status, edited_by)
         if result:
             self.lead.qualify(edited_by)
             self.qualified_date = timezone.now()
