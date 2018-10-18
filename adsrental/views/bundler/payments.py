@@ -121,8 +121,8 @@ class BundlerPaymentsView(View):
             for child_stats in amazon_stats['children_stats']:
                 bundler_total += child_stats['total']
 
-            total_entries = len(facebook_stats['entries']) + len(google_stats['entries']) + len(amazon_stats['entries'])
-            bonus = decimal.Decimal(round((total_entries // 5) * 5 * 10, 2))
+            total_entries = facebook_stats['entries']
+            # bonus = decimal.Decimal(round((total_entries // 5) * 5 * 10, 2))
             bundler_total += bonus
 
             bundlers_data.append(dict(
