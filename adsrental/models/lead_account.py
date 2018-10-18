@@ -284,6 +284,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             if response.status_code == 409:
                 self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
                 self.save()
+            return response_json
 
         url = 'https://www.adsdb.io/api/v1/accounts/update-s'
         response = requests.post(
@@ -297,7 +298,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         try:
             response_json = response.json()
         except ValueError:
-            return {'error': True}
+            return {'error': True, 'text': response.text, 'status': response.status_code}
 
         return response_json
 
