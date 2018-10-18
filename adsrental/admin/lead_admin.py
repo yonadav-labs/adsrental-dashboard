@@ -1015,7 +1015,7 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
                 lead_account.touch()
-                messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
+                messages.info(request, '{} has been touched for {} times.'.format(lead_account, lead_account.touch_count))
                 result = lead_account.sync_to_adsdb()
                 if result:
                     messages.info(request, '{} is synced to AdsDB: {}'.format(lead_account, result))
