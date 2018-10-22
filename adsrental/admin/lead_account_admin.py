@@ -99,6 +99,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'username',
     )
     actions = (
+        'approve_facebook_screenshot',
         'mark_as_qualified',
         'mark_as_disqualified',
         'ban',
@@ -234,6 +235,12 @@ class LeadAccountAdmin(admin.ModelAdmin):
             ))
 
         return None
+
+    def approve_facebook_screenshot(self, request, queryset):
+        for lead_account in queryset:
+            if lead_account.status == LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL:
+                lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:

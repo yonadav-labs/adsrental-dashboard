@@ -36,6 +36,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     STATUS_SCREENSHOT_QUALIFIED = 'Screenshot Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
     STATUS_SCREENSHOT_DISQUALIFIED = 'Screenshot Disqualified'
+    STATUS_SCREENSHOT_NEEDS_APPROVAL = 'Needs approval'
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
@@ -48,9 +49,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (STATUS_DISQUALIFIED, 'Disqualified'),
         (STATUS_SCREENSHOT_QUALIFIED, 'Screenshot Qualified'),
         (STATUS_SCREENSHOT_DISQUALIFIED, 'Screenshot Disqualified'),
+        (STATUS_SCREENSHOT_NEEDS_APPROVAL, 'Needs approval'),
     ]
 
-    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
+    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS, STATUS_SCREENSHOT_QUALIFIED, STATUS_SCREENSHOT_NEEDS_APPROVAL]
 
     ACCOUNT_TYPE_FACEBOOK = 'Facebook'
     ACCOUNT_TYPE_FACEBOOK_SCREENSHOT = 'Facebook Screenshot'

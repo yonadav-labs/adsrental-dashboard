@@ -125,6 +125,7 @@ class LeadAdmin(admin.ModelAdmin):
     )
     actions = (
         # 'update_from_shipstation',
+        'approve_facebook_screenshot',
         'mark_facebook_as_qualified',
         'mark_facebook_screenshot_as_qualified',
         'mark_google_as_qualified',
@@ -812,6 +813,12 @@ class LeadAdmin(admin.ModelAdmin):
 
             lead_account.mark_wrong_password(request.user)
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
+
+    def approve_facebook_screenshot(self, request, queryset):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL, active=True):
+                lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     @staticmethod
     def report_correct_google_password(instance, request, queryset):
