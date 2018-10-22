@@ -40,7 +40,7 @@ class AdminBundlerBonusesAccountsView(View):
                 ))
 
         lead_accounts = LeadAccount.objects.filter(
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
             lead__bundler=bundler,
             primary=True,
             qualified_date__gt=start_date,

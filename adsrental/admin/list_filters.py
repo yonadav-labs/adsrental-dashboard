@@ -330,6 +330,7 @@ class AccountTypeListFilter(SimpleListFilter):
             ('google_only', 'Google only'),
             ('facebook', 'Facebook'),
             ('facebook_screenshot', 'Facebook Screenshot'),
+            ('facebook_types', 'Facebook and Facebook Screenshot'),
             ('google', 'Google'),
             ('amazon', 'Amazon'),
             ('many', 'Several accounts'),
@@ -346,6 +347,8 @@ class AccountTypeListFilter(SimpleListFilter):
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
         if self.value() == 'facebook_screenshot':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
+        if self.value() == 'facebook_types':
+            return queryset.filter(lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)
         if self.value() == 'google':
             return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
         if self.value() == 'amazon':
