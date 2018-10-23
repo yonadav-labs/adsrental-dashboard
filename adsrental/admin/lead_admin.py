@@ -1042,9 +1042,9 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.warning(request, '{} touch count has been increased to meet conditions.'.format(lead.email))
 
             for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
-                result = lead_account.sync_to_adsdb()
+                result, request_data = lead_account.sync_to_adsdb()
                 if result:
-                    messages.info(request, '{} is synced: {}'.format(lead_account, result))
+                    messages.info(request, '{} is synced: {} ({})'.format(lead_account, result, request_data))
                 else:
                     messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
 
