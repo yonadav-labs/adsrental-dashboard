@@ -232,13 +232,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         lead = self.get_lead()
         if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
-            return False
+            return False, {}
         if self.account_type == self.ACCOUNT_TYPE_AMAZON:
-            return False
+            return False, {}
         if self.status != self.STATUS_IN_PROGRESS:
-            return False
+            return False, {}
         if self.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
-            return False
+            return False, {}
 
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
@@ -283,11 +283,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
-                return response_json
+                return (response_json, request_data)
             if response.status_code == 409:
                 self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
                 self.save()
-            return response_json
+            return (response_json, request_data)
 
         request_data = {
             'account_id': int(self.adsdb_account_id),
@@ -305,7 +305,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         except ValueError:
             return {'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}
 
-        return response_json
+        return (response_json, request_data)
 
     def set_correct_password(self, new_password, edited_by):
         'Change password, marks as correct, create LeadChange instance.'
