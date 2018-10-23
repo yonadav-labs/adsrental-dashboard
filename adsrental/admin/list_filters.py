@@ -96,9 +96,12 @@ class LeadAccountTouchCountListFilter(SimpleListFilter):
         return (
             ('less5', 'Less than 5 only'),
             ('more5', '5 or more'),
+            ('zero', 'None'),
         )
 
     def queryset(self, request, queryset):
+        if self.value() == 'zero':
+            return queryset.filter(lead_account__touch_count=0)
         if self.value() == 'less5':
             return queryset.filter(lead_account__touch_count__lt=5)
         if self.value() == 'more5':
