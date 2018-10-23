@@ -279,7 +279,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             try:
                 response_json = response.json()
             except ValueError:
-                return {'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}
+                return ({'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}, request_data)
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
@@ -303,7 +303,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         try:
             response_json = response.json()
         except ValueError:
-            return {'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}
+            return ({'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}, request_data)
 
         return (response_json, request_data)
 
