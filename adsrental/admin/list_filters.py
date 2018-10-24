@@ -55,7 +55,7 @@ class StatusListFilter(SimpleListFilter):
     parameter_name = 'status'
 
     def lookups(self, request, model_admin):
-        return Lead.STATUS_CHOICES + [
+        return LeadAccount.STATUS_CHOICES + [
             ('Active', 'Active'),
         ]
 

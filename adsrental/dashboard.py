@@ -69,6 +69,14 @@ class CustomIndexDashboard(Dashboard):
                         lead__company__exact=Lead.COMPANY_ACM,
                     )),
                 )],
+                [_('Facebook Screenshot in Needs Approval status'), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
+                    urlencode(dict(
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT,
+                        status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL,
+                        online='online',
+                    )),
+                )],
                 [_('Check Report for current month'), '{}?{}'.format(
                     reverse('admin:adsrental_leadhistorymonth_changelist'),
                     urlencode(dict(
