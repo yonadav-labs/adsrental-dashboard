@@ -231,13 +231,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         'Send lead account info to ADSDB'
 
         lead = self.get_lead()
-        if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
-            return False, {}
+        # if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
+        #     return False, {}
         if self.account_type == self.ACCOUNT_TYPE_AMAZON:
             return False, {}
         if self.status != self.STATUS_IN_PROGRESS:
             return False, {}
-        if self.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
+        if self.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT and self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
             return False, {}
 
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id

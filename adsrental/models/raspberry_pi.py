@@ -185,10 +185,14 @@ class RaspberryPi(models.Model):
                     if not lead_account.in_progress_date:
                         lead_account.in_progress_date = now
                         lead_account.save()
+                        if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
+                            try:
+                                lead_account.sync_to_adsdb()
+                            except:
+                                pass
                 if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
                     lead_account.save()
-            # lead.sync_to_adsdb()
 
         if not self.first_seen:
             self.first_seen = now
