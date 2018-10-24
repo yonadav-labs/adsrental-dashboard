@@ -259,7 +259,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             data['fb_username'] = self.username
             data['fb_password'] = self.password
             data['category_id'] = 2
-            data['ad_manager_type_2'] = 3
+            data['ad_manager_type_2'] = 2
         if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
             data['google_username'] = self.username
             data['google_password'] = self.password
