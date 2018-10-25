@@ -134,6 +134,7 @@ class ShipStationClient():
             name=lead.safe_name(),
             # company=sf_lead.company,
             street1=lead.street,
+            street2=lead.apartment,
             city=lead.city,
             postal_code=lead.postal_code,
             # country=sf_lead.country,
