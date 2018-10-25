@@ -818,6 +818,9 @@ class LeadAdmin(admin.ModelAdmin):
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL, active=True):
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                if lead.status == Lead.STATUS_SCREENSHOT_NEEDS_APPROVAL:
+                    lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                    lead.save()
                 messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     @staticmethod

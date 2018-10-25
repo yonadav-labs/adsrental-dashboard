@@ -8,6 +8,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Value
 from django.db.models.functions import Concat
 
+from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
@@ -240,6 +241,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         for lead_account in queryset:
             if lead_account.status == LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL:
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                lead_account.save()
+                if lead_account.lead.status == Lead.STATUS_SCREENSHOT_NEEDS_APPROVAL:
+                    lead_account.lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                    lead_account.lead.save()
                 messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     def mark_as_qualified(self, request, queryset):

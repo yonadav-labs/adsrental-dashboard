@@ -91,6 +91,7 @@ class Lead(models.Model, FulltextSearchMixin):
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
+    STATUS_SCREENSHOT_NEEDS_APPROVAL = 'Needs approval'
     STATUS_ACTIVE = 'Active'
     STATUS_CHOICES = [
         (STATUS_AVAILABLE, 'Available'),
@@ -98,6 +99,7 @@ class Lead(models.Model, FulltextSearchMixin):
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
         (STATUS_DISQUALIFIED, 'Disqualified'),
+        (STATUS_SCREENSHOT_NEEDS_APPROVAL, 'Needs approval'),
     ]
 
     COMPANY_EMPTY = '[Empty]'
@@ -111,7 +113,7 @@ class Lead(models.Model, FulltextSearchMixin):
         (COMPANY_EMPTY, COMPANY_EMPTY),
     )
 
-    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS]
+    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS, STATUS_SCREENSHOT_NEEDS_APPROVAL]
 
     SHIPSTATION_ORDER_STATUS_SHIPPED = 'shipped'
     SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT = 'awaiting_shipment'

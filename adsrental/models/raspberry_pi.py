@@ -193,6 +193,8 @@ class RaspberryPi(models.Model):
                 if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
                     lead_account.save()
+                    lead.set_status(lead.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
+                    lead.save()
 
         if not self.first_seen:
             self.first_seen = now
