@@ -140,7 +140,7 @@ class ShipStationClient():
             # country=sf_lead.country,
             country='US',
             state=lead.state or '',
-            phone=lead.phone or lead.mobile_phone,
+            phone=lead.phone,
         )
         order.set_shipping_address(shipping_address)
         order.set_billing_address(shipping_address)
