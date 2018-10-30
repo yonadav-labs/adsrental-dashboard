@@ -9,7 +9,6 @@ from django.utils.decorators import method_decorator
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
-from adsrental.utils import get_week_boundaries_for_dt
 
 
 class AdminBundlerBonusesAccountsView(View):
@@ -23,13 +22,19 @@ class AdminBundlerBonusesAccountsView(View):
             raise Http404
 
         now = timezone.localtime(timezone.now())
-        date_str = request.GET.get('date')
-        if date_str:
-            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
+        start_date_str = request.GET.get('start_date')
+        if start_date_str:
+            start_date = parser.parse(start_date_str).replace(tzinfo=timezone.get_current_timezone())
         else:
-            date = now
+            start_date = now
+        end_date_str = request.GET.get('end_date')
+        if end_date_str:
+            end_date = parser.parse(end_date_str).replace(tzinfo=timezone.get_current_timezone())
+        else:
+            end_date = now
 
-        start_date, end_date = get_week_boundaries_for_dt(date)
+        start_date = start_date.replace(hour=0, minute=0, second=0)
+        end_date = end_date.replace(hour=0, minute=0, second=0) + datetime.timedelta(days=1)
 
         dates_list = []
         for i in range(-1, 2):

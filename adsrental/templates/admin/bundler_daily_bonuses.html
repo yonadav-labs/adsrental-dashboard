@@ -1,14 +1,14 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
-    <h1>Bundler bonuses for {{start_date|date:"d M"}} - {{end_date|date:"d M"}}</h1>
+    <h1>Bundler daily bonuses for {{start_date|date:"d M"}} - {{end_date|date:"d M"}}</h1>
 
     <h2>Select date</h2>
         {% for dates in dates_list %}
             {% if dates.start_date == start_date %}
                 {{dates.start_date|date:"d M"}} - {{dates.end_date|date:"d M"}}
             {% else %}
-                <a class="button" href="{% url 'admin_helpers:bundler_bonuses' %}?date={{dates.start_date|date:"Y-m-d"|urlencode }}">
+                <a class="button" href="{% url 'admin_helpers:bundler_daily_bonuses' %}?date={{dates.start_date|date:"Y-m-d"|urlencode }}">
                     {% if dates.start_date < start_date  %}
                         &lt;&lt;
                     {% else %}
