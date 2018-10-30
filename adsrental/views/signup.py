@@ -86,7 +86,7 @@ class SignupView(View):
             # fb_secret=data['fb_secret'],
             # fb_friends=data['fb_friends'],
             # fb_profile_url=data['facebook_profile_url'],
-            apartment=data['apartment'],
+            apartment=data.get('apartment'),
             street=data['street'],
             company=Lead.COMPANY_FBM,
             city=data['city'],
