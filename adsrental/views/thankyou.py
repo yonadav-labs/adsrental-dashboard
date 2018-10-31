@@ -20,3 +20,11 @@ class ThankyouView(View):
             lead.splashtop_id = request.POST.get('splashtop_id')
             lead.save()
         return redirect('thankyou')
+
+
+class ThankyouScreenshotView(View):
+    '''
+    Page with instructions for screenshot FB accounts.
+    '''
+    def get(self, request, leadid=None):
+        return render(request, 'thankyou_screenshot.html', dict())

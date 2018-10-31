@@ -118,4 +118,6 @@ class SignupView(View):
         customerio_client = CustomerIOClient()
         customerio_client.send_lead(lead)
         customerio_client.send_lead_event(lead, CustomerIOClient.EVENT_APPROVED, account_type='facebook')
+        if account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            return redirect('thankyou_screenshot')
         return redirect('thankyou_email', leadid=lead.leadid)

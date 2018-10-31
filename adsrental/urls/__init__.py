@@ -4,7 +4,7 @@ from django.urls import include, path
 from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
 from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
-from adsrental.views.thankyou import ThankyouView
+from adsrental.views.thankyou import ThankyouView, ThankyouScreenshotView
 from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
@@ -18,6 +18,7 @@ urlpatterns = [
     path('', LandingView.as_view(), name='home'),
     path('terms/', TermsView.as_view(), name='terms'),
     path('thankyou/', ThankyouView.as_view(), name='thankyou'),
+    path('thankyou_screenshot/', ThankyouScreenshotView.as_view(), name='thankyou_screenshot'),
     path('thankyou.php', ThankyouView.as_view(), name='thankyou'),
     path('thankyou/<leadid>/', ThankyouView.as_view(), name='thankyou_email'),
     path('home/', MainView.as_view(), name='main'),
