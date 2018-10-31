@@ -36,7 +36,7 @@
                             </a>
                         </th>
                         <td>
-                            <a href="{% url 'admin_helpers:bundler_bonuses_accounts' bundler_id=bundler_stat.bundler_id %}?start_date={{ start_date|urlencode }}?end_date={{ end_date|urlencode }}">
+                            <a href="{% url 'admin_helpers:bundler_bonuses_accounts' bundler_id=bundler_stat.bundler_id %}?start_date={{ start_date|date:"Y-m-d"|urlencode }}&amp;end_date={{ end_date|date:"Y-m-d"|urlencode }}">
                                 {{ bundler_stat.lead_accounts_count }}
                             </a>
                             {% if bundler_stat.bonus_lead_accounts_count %}
