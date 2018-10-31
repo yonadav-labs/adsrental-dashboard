@@ -231,6 +231,7 @@ class Lead(models.Model, FulltextSearchMixin):
         'Get address as a string.'
         return ', '.join([
             self.street or '',
+            self.apartment or '',
             self.city or '',
             self.state or '',
             self.postal_code or '',
