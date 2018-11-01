@@ -20,7 +20,7 @@ from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
 
 class BundlerPaymentsView(View):
-    def get_account_type_stats(self, bundler, end_date, account_type, child=False, second_parent=False):
+    def get_account_type_stats(self, bundler, end_date, account_types, child=False, second_parent=False):
         total = decimal.Decimal('0.00')
         final_total = decimal.Decimal('0.00')
         chargeback_total = decimal.Decimal('0.00')
@@ -28,7 +28,7 @@ class BundlerPaymentsView(View):
         lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
             pay_check=True,
-            account_type=account_type,
+            account_type__in=account_types,
             active=True,
         ).order_by('created').select_related('lead__bundler', 'lead', 'lead__raspberry_pi')
 
@@ -66,7 +66,7 @@ class BundlerPaymentsView(View):
             if child_bundler.second_parent_bundler == bundler:
                 second_parent = True
 
-            child_stats = self.get_account_type_stats(child_bundler, end_date, account_type, child=True, second_parent=second_parent)
+            child_stats = self.get_account_type_stats(child_bundler, end_date, account_types, child=True, second_parent=second_parent)
             children_stats.append(child_stats)
 
         children_stats.sort(key=lambda x: x['total'], reverse=True)
@@ -110,9 +110,9 @@ class BundlerPaymentsView(View):
         bonus = decimal.Decimal('0.00')
 
         for bundler in bundlers:
-            facebook_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_FACEBOOK)
-            google_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_GOOGLE)
-            amazon_stats = self.get_account_type_stats(bundler, yesterday, LeadAccount.ACCOUNT_TYPE_AMAZON)
+            facebook_stats = self.get_account_type_stats(bundler, yesterday, [LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT])
+            google_stats = self.get_account_type_stats(bundler, yesterday, [LeadAccount.ACCOUNT_TYPE_GOOGLE])
+            amazon_stats = self.get_account_type_stats(bundler, yesterday, [LeadAccount.ACCOUNT_TYPE_AMAZON])
             bundler_total = facebook_stats['final_total'] + google_stats['final_total'] + amazon_stats['final_total']
             for child_stats in facebook_stats['children_stats']:
                 bundler_total += child_stats['total']
