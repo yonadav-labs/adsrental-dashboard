@@ -1056,7 +1056,7 @@ class LeadAdmin(admin.ModelAdmin):
             {
                 'label': 'Touch',
                 'action': 'touch',
-                'enabled': [i for i in obj.lead_accounts.all() if i.account_type == i.ACCOUNT_TYPE_FACEBOOK],
+                'enabled': [i for i in obj.lead_accounts.all() if i.account_type in i.ACCOUNT_TYPES_FACEBOOK],
             },
         ]
 
