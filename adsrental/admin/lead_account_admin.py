@@ -11,7 +11,7 @@ from django.db.models.functions import Concat
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
+from adsrental.admin.list_filters import TouchCountListFilter, WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -88,6 +88,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'ban_reason',
         'lead__company',
         LeadBundlerListFilter,
+        TouchCountListFilter,
     )
     search_fields = (
         'lead__leadid',
