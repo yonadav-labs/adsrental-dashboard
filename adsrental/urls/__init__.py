@@ -9,7 +9,7 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.landing import LandingView, TermsView
+from adsrental.views.landing import LandingView, TermsView, FAQView, AboutView, ContactView, RequirementsView, JoinView
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.robots import RobotsView
 
@@ -17,6 +17,12 @@ from adsrental.views.robots import RobotsView
 urlpatterns = [
     path('', LandingView.as_view(), name='home'),
     path('terms/', TermsView.as_view(), name='terms'),
+    path('faq/', FAQView.as_view(), name='landing_faq'),
+    path('about/', AboutView.as_view(), name='landing_about'),
+    path('requirements/', RequirementsView.as_view(), name='landing_requirements'),
+    path('contact/', ContactView.as_view(), name='landing_contact'),
+    path('join/', JoinView.as_view(), name='landing_join'),
+
     path('thankyou/', ThankyouView.as_view(), name='thankyou'),
     path('thankyou_screenshot/', ThankyouScreenshotView.as_view(), name='thankyou_screenshot'),
     path('thankyou.php', ThankyouView.as_view(), name='thankyou'),

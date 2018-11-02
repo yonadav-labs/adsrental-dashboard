@@ -13,7 +13,14 @@ class TermsView(View):
         return render(request, 'terms.html')
 
 
+class FAQView(View):
+    def get(self, request):
+        return render(request, 'landing_v2/faq.html')
+
+
 class LandingView(View):
+    template_name = 'landing_v2/index.html'
+
     @https_required
     def get(self, request):
         if 'utm_source' in request.GET:
@@ -27,7 +34,7 @@ class LandingView(View):
                 return redirect('main')
             return redirect('user_login')
 
-        return render(request, 'landing.html', dict(
+        return render(request, self.template_name, dict(
             user=request.user,
             form=LandingForm(),
         ))
@@ -43,7 +50,24 @@ class LandingView(View):
             })
             return redirect('signup')
 
-        return render(request, 'landing.html', dict(
+        return render(request, self.template_name, dict(
             user=request.user,
             form=form,
         ))
+
+
+class ContactView(LandingView):
+    template_name = 'landing_v2/contact.html'
+
+
+class AboutView(LandingView):
+    template_name = 'landing_v2/about.html'
+
+
+class RequirementsView(LandingView):
+    template_name = 'landing_v2/requirements.html'
+
+
+class JoinView(View):
+    def get(self, request):
+        return render(request, 'landing_v2/join.html')
