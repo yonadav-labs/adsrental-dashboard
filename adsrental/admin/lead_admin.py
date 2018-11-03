@@ -278,7 +278,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def touch_count_field(self, obj):
         for lead_account in obj.lead_accounts.all():
-            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+            if lead_account.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
                 return lead_account.touch_count
 
         return None
@@ -1023,7 +1023,7 @@ class LeadAdmin(admin.ModelAdmin):
     @staticmethod
     def touch(instance, request, queryset):
         for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(active=True, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
+            for lead_account in lead.lead_accounts.filter(active=True, account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK):
                 lead_account.touch()
                 messages.info(request, '{} has been touched for {} times.'.format(lead_account, lead_account.touch_count))
                 result, request_data = lead_account.sync_to_adsdb()
