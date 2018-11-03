@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Value
 from django.db.models.functions import Concat
+from django.template.loader import render_to_string
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
@@ -64,6 +65,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'last_seen',
         'online',
         'touch_count_field',
+        'touch_button',
         'adsdb_account_id',
         'wrong_password_date_field',
         'security_checkpoint_date_field',
@@ -129,6 +131,15 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'active',
     )
     raw_id_fields = ('lead', )
+
+    def __init__(self, *args, **kwargs):
+        self._request = None
+        super(LeadAccountAdmin, self).__init__(*args, **kwargs)
+
+    def get_list_display(self, request):
+        self._request = request
+        list_display = super(LeadAccountAdmin, self).get_list_display(request)
+        return list_display
 
     def get_actions(self, request):
         actions = super(LeadAccountAdmin, self).get_actions(request)
@@ -210,6 +221,21 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def touch_count_field(self, obj):
         return obj.touch_count
+
+
+    def touch_button(self, obj):
+        row_actions = [
+            {
+                'label': 'Touch',
+                'action': 'touch',
+                'enabled': obj.account_type in obj.ACCOUNT_TYPES_FACEBOOK,
+            },
+        ]
+        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html', request=self._request, context=dict(
+            obj=obj,
+            items=row_actions,
+            model_name='LeadAccountAdmin',
+        )))
 
     def wrong_password_date_field(self, obj):
         if not obj.wrong_password_date:
@@ -382,7 +408,8 @@ class LeadAccountAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
 
-    def touch(self, request, queryset):
+    @staticmethod
+    def touch(instance, request, queryset):
         for lead_account in queryset:
             lead_account.touch()
             messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))

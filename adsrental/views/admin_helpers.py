@@ -4,12 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from adsrental.admin.lead_admin import LeadAdmin
+from adsrental.admin.lead_account_admin import LeadAccountAdmin
 from adsrental.admin.lead_history_admin import LeadHistoryAdmin
 
 
 class AdminActionView(View):
     admin_models = {
         'LeadAdmin': LeadAdmin,
+        'LeadAccountAdmin': LeadAccountAdmin,
         'LeadHistoryAdmin': LeadHistoryAdmin,
     }
 
