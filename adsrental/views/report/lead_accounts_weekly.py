@@ -36,12 +36,21 @@ class LeadAccountsWeeklyView(View):
             week_start, _ = get_week_boundaries_for_dt(now)
             start_dt, end_dt = get_week_boundaries_for_dt(week_start - datetime.timedelta(days=1))
 
+        dates_list = []
+        for i in range(-1, 2):
+            if start_dt + datetime.timedelta(days=7 * i) < now:
+                dates_list.append(dict(
+                    start_date=start_dt + datetime.timedelta(days=7 * i),
+                    end_date=end_dt + datetime.timedelta(days=7 * i) - datetime.timedelta(days=1),
+                ))
+
         lead_accounts = LeadAccount.objects.filter(account_type=account_type)
         bundler_field = 'lead__bundler__name'
 
         delivered_start_date = (start_dt - datetime.timedelta(days=14)).date()
         delivered_end_date = (start_dt - datetime.timedelta(days=7)).date()
 
+        total_in_progress = lead_accounts.filter(in_progress_date__lte=end_dt, status=LeadAccount.STATUS_IN_PROGRESS, in_progress_date__lt=end_dt, primary=True).count()
         new_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=True).count()
         secondary_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count()
         total_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).count()
@@ -114,10 +123,12 @@ class LeadAccountsWeeklyView(View):
                 row['delivered_online_percent'] = int(row['delivered_online'] / row['delivered'] * 100)
 
         context = dict(
+            dates_list=dates_list,
             select_account_types=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
             start_date=start_dt,
             end_date=end_dt - datetime.timedelta(days=1),
             account_type=account_type,
+            total_in_progress=total_in_progress,
             new_online_lead_accounts_count=new_online_lead_accounts_count,
             secondary_online_lead_accounts_count=secondary_online_lead_accounts_count,
             total_online_lead_accounts_count=total_online_lead_accounts_count,
