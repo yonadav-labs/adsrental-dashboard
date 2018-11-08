@@ -98,17 +98,17 @@ class ADSDBLeadView(View):
         #     self._update_field(lead_account.lead, 'first_name', data.get('first_name'), user)
         # if 'last_name' in data:
         #     self._update_field(lead_account.lead, 'last_name', data.get('last_name'), user)
-        if 'fb_username' in data:
-            self._update_lead_account_field(lead_account, 'username', data.get('fb_username'), user)
-        if 'fb_password' in data:
-            self._update_lead_account_field(lead_account, 'password', data.get('fb_password'), user)
-        if 'google_username' in data:
-            self._update_lead_account_field(lead_account, 'username', data.get('google_username'), user)
-        if 'google_password' in data:
-            self._update_lead_account_field(lead_account, 'password', data.get('google_password'), user)
-        if 'phone' in data:
-            phone = self._clean_phone(data.get('phone'))
-            self._update_field(lead_account.lead, 'phone', phone, user)
+        # if 'fb_username' in data:
+        #     self._update_lead_account_field(lead_account, 'username', data.get('fb_username'), user)
+        # if 'fb_password' in data:
+        #     self._update_lead_account_field(lead_account, 'password', data.get('fb_password'), user)
+        # if 'google_username' in data:
+        #     self._update_lead_account_field(lead_account, 'username', data.get('google_username'), user)
+        # if 'google_password' in data:
+        #     self._update_lead_account_field(lead_account, 'password', data.get('google_password'), user)
+        # if 'phone' in data:
+        #     phone = self._clean_phone(data.get('phone'))
+        #     self._update_field(lead_account.lead, 'phone', phone, user)
         if 'status' in data:
             if data.get('status') == '3':
                 lead_account.ban(user)
