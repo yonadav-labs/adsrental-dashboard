@@ -94,10 +94,10 @@ class ADSDBLeadView(View):
         return digits
 
     def _update_lead_account(self, lead_account, data, user):
-        if 'first_name' in data:
-            self._update_field(lead_account.lead, 'first_name', data.get('first_name'), user)
-        if 'last_name' in data:
-            self._update_field(lead_account.lead, 'last_name', data.get('last_name'), user)
+        # if 'first_name' in data:
+        #     self._update_field(lead_account.lead, 'first_name', data.get('first_name'), user)
+        # if 'last_name' in data:
+        #     self._update_field(lead_account.lead, 'last_name', data.get('last_name'), user)
         if 'fb_username' in data:
             self._update_lead_account_field(lead_account, 'username', data.get('fb_username'), user)
         if 'fb_password' in data:
