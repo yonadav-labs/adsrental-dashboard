@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
-from adsrental.admin.list_filters import TouchCountListFilter, \
+from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFilter, \
     WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, \
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
     LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter
@@ -77,7 +77,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     list_filter = (
         AbstractIntIDListFilter,
         AddressListFilter,
-        'account_type',
+        AccountTypeListFilter,
         LeadRaspberryPiOnlineListFilter,
         'bundler_paid',
         StatusListFilter,

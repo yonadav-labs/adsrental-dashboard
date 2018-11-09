@@ -17,7 +17,7 @@ from adsrental.admin.list_filters import \
     AbstractUIDListFilter, \
     StatusListFilter, \
     RaspberryPiOnlineListFilter, \
-    AccountTypeListFilter, \
+    LeadAccountAccountTypeListFilter, \
     LeadAccountWrongPasswordListFilter, \
     DeliveryDateListFilter, \
     LeadAccountTouchCountListFilter, \
@@ -95,7 +95,7 @@ class LeadAdmin(admin.ModelAdmin):
         StatusListFilter,
         LeadAccountStatusListFilter,
         RaspberryPiOnlineListFilter,
-        AccountTypeListFilter,
+        LeadAccountAccountTypeListFilter,
         LeadAccountWrongPasswordListFilter,
         LeadAccountTouchCountListFilter,
         'shipstation_order_status',

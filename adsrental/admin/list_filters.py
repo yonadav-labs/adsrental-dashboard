@@ -328,6 +328,7 @@ class BannedDateListFilter(AbstractDateListFilter):
 class AccountTypeListFilter(SimpleListFilter):
     title = 'Account type'
     parameter_name = 'account_type'
+    field_name = 'account_type'
 
     def lookups(self, request, model_admin):
         return (
@@ -344,21 +345,60 @@ class AccountTypeListFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == 'facebook_only':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_FACEBOOK
+            }).exclude(**{
+                f'{self.field_name}__in': [LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
+            })
         if self.value() == 'facebook_screenshot_only':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON])
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT
+            }).exclude(**{
+                f'{self.field_name}__in': [LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON]
+            })
         if self.value() == 'google_only':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).exclude(lead_account__account_type__in=[LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_AMAZON])
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_GOOGLE
+            }).exclude(**{
+                f'{self.field_name}__in': [LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, LeadAccount.ACCOUNT_TYPE_AMAZON]
+            })
         if self.value() == 'facebook':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_FACEBOOK
+            })
         if self.value() == 'facebook_screenshot':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT
+            })
         if self.value() == 'facebook_types':
-            return queryset.filter(lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)
+            return queryset.filter(**{
+                f'{self.field_name}__in': LeadAccount.ACCOUNT_TYPES_FACEBOOK
+            })
         if self.value() == 'google':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_GOOGLE
+            })
         if self.value() == 'amazon':
-            return queryset.filter(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
+            return queryset.filter(**{
+                self.field_name: LeadAccount.ACCOUNT_TYPE_AMAZON
+            })
+        return None
+
+class LeadAccountAccountTypeListFilter(AccountTypeListFilter):
+    title = 'Account type'
+    parameter_name = 'account_type'
+    field_name = 'lead_account__account_type'
+
+    def lookups(self, request, model_admin):
+        result = super(LeadAccountAccountTypeListFilter, self).lookups(request, model_admin)
+        return result + (
+            ('many', 'Several accounts'),
+        )
+
+    def queryset(self, request, queryset):
+        result = super(LeadAccountAccountTypeListFilter, self).queryset(request, queryset)
+        if result:
+            return result
         if self.value() == 'many':
             return queryset.annotate(lead_accounts_count=Count('lead_account')).filter(lead_accounts_count__gt=1)
         return None
