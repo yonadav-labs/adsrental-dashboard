@@ -206,6 +206,41 @@ class LeadRaspberryPiOnlineListFilter(OnlineListFilter):
     filter_field = 'lead__raspberry_pi__last_seen'
 
 
+class LastTouchDateListFilter(SimpleListFilter):
+    title = 'Last Touch Date'
+    parameter_name = 'last_touch_date'
+    field_name = 'last_touch_date'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('24_hours', 'Last 0-24 hours', ),
+            ('36_hours', 'Last 24-36 hours', ),
+            ('more', 'More than 36 hours ago', ),
+            ('never', 'Never', ),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == '24_hours':
+            now = timezone.localtime(timezone.now())
+            return queryset.filter(**{
+                f'{self.field_name}__gt': now - datetime.timedelta(hours=24)
+            })
+        if self.value() == '36_hours':
+            now = timezone.localtime(timezone.now())
+            return queryset.filter(**{
+                f'{self.field_name}__gt': now - datetime.timedelta(hours=36),
+                f'{self.field_name}__lt': now - datetime.timedelta(hours=24),
+            })
+        if self.value() == 'more':
+            now = timezone.localtime(timezone.now())
+            return queryset.filter(**{
+                f'{self.field_name}__lt': now - datetime.timedelta(hours=36),
+            })
+        if self.value() == 'never':
+            return queryset.filter(**{
+                f'{self.field_name}__isnull': True,
+            })
+
 
 class AbstractDateListFilter(SimpleListFilter):
     title = 'Date'
