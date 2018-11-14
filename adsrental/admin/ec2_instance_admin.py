@@ -61,7 +61,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'terminate',
         'update_password',
         'upgrade_to_large',
-        'launch_essential_ec2',
+        # 'launch_essential_ec2',
         'check_status',
     )
     raw_id_fields = ('lead', )

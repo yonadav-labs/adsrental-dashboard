@@ -86,13 +86,9 @@ class EC2ConnectView(View):
             stopped_essential_ec2 = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_STOPPED).first()
             if stopped_essential_ec2:
                 stopped_essential_ec2.start()
-            else:
-                EC2Instance.launch_essential()
 
             if not ec2_instance:
-                ec2_instance = EC2Instance.launch_essential()
-                messages.info(request, 'New Essential EC2 instance has been launched.')
-            ec2_instance.assign_essential(rpid, lead)
+                return redirect('rpi_proxy_tunnel_info', rpid=rpid)
 
         if ec2_instance.is_essential:
             messages.success(request, 'Using essential EC2.')
