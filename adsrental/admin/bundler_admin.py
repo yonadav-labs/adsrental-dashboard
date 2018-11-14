@@ -43,6 +43,7 @@ class BundlerAdmin(admin.ModelAdmin):
     search_fields = ('utm_source', 'email', 'name', )
     list_filter = (
         IDListFilter,
+        'is_active',
     )
 
     def get_queryset(self, request):

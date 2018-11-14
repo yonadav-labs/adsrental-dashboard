@@ -1,5 +1,3 @@
-# TODO: OBSOLETE
-
 import datetime
 import io
 import decimal
@@ -11,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-import xhtml2pdf.pisa as pisa
+import xhtml2pdf.pisa as pisa_document
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_history import LeadHistory
@@ -73,9 +71,9 @@ class BundlerLeadPaymentsView(View):
 
         if request.user.is_superuser:
             if bundler_id == 'all':
-                bundlers = Bundler.objects.all()
+                bundlers = Bundler.objects.filter(is_active=True)
             else:
-                bundlers = Bundler.objects.filter(id=bundler_id)
+                bundlers = Bundler.objects.filter(is_active=True).filter(id=bundler_id)
 
         if not bundlers:
             raise Http404
@@ -134,7 +132,7 @@ class BundlerLeadPaymentsView(View):
                 request=request,
             )
             response = io.BytesIO()
-            pisa.pisaDocument(io.BytesIO(html.encode('UTF-8')), response)
+            pisa_document.pisaDocument(io.BytesIO(html.encode('UTF-8')), response)
             return HttpResponse(response.getvalue(), content_type='application/pdf')
 
         return render(request, 'bundler_lead_payments.html', dict(

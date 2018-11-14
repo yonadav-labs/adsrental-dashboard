@@ -62,7 +62,7 @@ class BookkepperReportPreviewView(View):
                     entries.append(lead_account)
 
         children_stats = []
-        for child_bundler in Bundler.objects.filter(Q(parent_bundler=bundler) | Q(second_parent_bundler=bundler)):
+        for child_bundler in Bundler.objects.filter(is_active=True).filter(Q(parent_bundler=bundler) | Q(second_parent_bundler=bundler)):
             second_parent = False
             if child_bundler.second_parent_bundler == bundler:
                 second_parent = True

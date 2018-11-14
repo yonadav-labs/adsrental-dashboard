@@ -22,7 +22,7 @@ class BundlerLeaderboardView(View):
             bundler = request.user.bundler
 
         if request.user.is_superuser:
-            bundler = Bundler.objects.filter(id=bundler_id).first()
+            bundler = Bundler.objects.filter(is_active=True).filter(id=bundler_id).first()
 
         if not bundler:
             raise Http404

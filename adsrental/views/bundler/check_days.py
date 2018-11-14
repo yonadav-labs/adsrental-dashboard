@@ -27,7 +27,7 @@ class BundlerCheckDaysView(View):
         current_month_start, _ = get_month_boundaries_for_dt(date)
         start_date, end_date = get_month_boundaries_for_dt(current_month_start - datetime.timedelta(days=1))
 
-        bundler = Bundler.objects.filter(id=int(bundler_id)).first()
+        bundler = Bundler.objects.filter(is_active=True).filter(id=int(bundler_id)).first()
         lead = Lead.objects.get(leadid=lead_id)
         if not bundler:
             raise Http404
