@@ -90,7 +90,7 @@ class BookkepperReportPreviewView(View):
         if not request.user.is_bookkeeper():
             raise Http404
 
-        bundlers = Bundler.objects.all()
+        bundlers = Bundler.objects.filter(is_active=True)
 
         today = timezone.localtime(timezone.now()).date()
         yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
