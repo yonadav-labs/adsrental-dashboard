@@ -1,5 +1,4 @@
 from django.views import View
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.urls import reverse
