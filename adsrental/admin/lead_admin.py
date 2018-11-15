@@ -25,7 +25,8 @@ from adsrental.admin.list_filters import \
     ShipDateListFilter, \
     LeadAccountStatusListFilter, \
     AbstractFulltextFilter, \
-    LeadAccountSecurityCheckpointListFilter
+    LeadAccountSecurityCheckpointListFilter, \
+    titled_filter
 
 
 class LeadidListFilter(AbstractUIDListFilter):
@@ -103,6 +104,7 @@ class LeadAdmin(admin.ModelAdmin):
         'lead_account__bundler_paid',
         ShipDateListFilter,
         DeliveryDateListFilter,
+        ('bundler__is_active', titled_filter('Bundler active')),
         BundlerListFilter,
         'pi_delivered',
         LeadAccountSecurityCheckpointListFilter,

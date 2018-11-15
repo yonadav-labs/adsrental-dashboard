@@ -5,7 +5,7 @@ from dateutil import relativedelta, parser
 from django.conf import settings
 from django.utils import timezone
 from django.db.models import Q, Count
-from django.contrib.admin import SimpleListFilter
+from django.contrib.admin import SimpleListFilter, FieldListFilter
 from django.utils.translation import ugettext_lazy as _
 
 from adsrental.models.lead import Lead
@@ -922,3 +922,11 @@ class AbstractFulltextFilter(AbstractUIDListFilter):
                     query = query & or_query
             return queryset.filter(query)
         return None
+
+def titled_filter(title):
+    class Wrapper(FieldListFilter): # pylint: disable=W0223
+        def __new__(cls, *args, **kwargs):
+            instance = FieldListFilter.create(*args, **kwargs)
+            instance.title = title
+            return instance
+    return Wrapper
