@@ -66,7 +66,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     )
     list_select_related = ('lead', 'lead__ec2instance', )
     actions = (
-        'restart_tunnel',
+        'restart_device',
         'update_config',
         'reset_cache',
         'show_cache',
@@ -136,7 +136,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             return None
         return mark_safe(u'<span title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
-    def restart_tunnel(self, request, queryset):
+    def restart_device(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
