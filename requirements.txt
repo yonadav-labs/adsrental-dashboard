@@ -22,3 +22,7 @@ django-debug-toolbar==1.9.1
 xhtml2pdf==0.2.2
 django-anymail[mailgun]==4.1
 vultr==1.0.1
+django-filter==2.0.0
+djangorestframework==3.9.0
+markdown==3.0.1
+coreapi==2.3.3

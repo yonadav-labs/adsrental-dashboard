@@ -17,6 +17,7 @@ ADD ./cert /app/cert/
 ADD ./config/ /app/config/
 ADD ./scripts/ /app/scripts/
 ADD ./adsrental/ /app/adsrental/
+ADD ./restapi/ /app/restapi/
 ADD ./config/nginx/web.conf /etc/nginx/conf.d/nginx.conf
 ADD ./config/nginx/nginx.conf /etc/nginx/nginx.conf
 

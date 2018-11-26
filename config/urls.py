@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include('adsrental.urls')),
     path('app/', include(('adsrental.urls', 'adsrental'), namespace='old_schema')),
     path('__debug__/', include(debug_toolbar.urls)),
+    path('api/v1/', include('restapi.urls')),
 ]
 
 handler404 = Error404View.as_view()  # noqa: F811
