@@ -941,7 +941,7 @@ class LeadAdmin(admin.ModelAdmin):
 
         lead_account = lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, active=True).first()
         if not lead_account:
-            messages.error(request, 'Lead has no active facebook account.')
+            messages.error(request, 'Lead has no active facebook screenshot account.')
             return None
 
         if not lead_account.is_wrong_password():
@@ -962,7 +962,7 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'report_correct_facebook_password',
+            'action_name': 'report_correct_facebook_screenshot_password',
             'title': 'Set new pasword for {}'.format(lead_account),
             'button': 'Save password',
             'objects': queryset,
