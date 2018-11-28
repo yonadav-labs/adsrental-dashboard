@@ -50,7 +50,11 @@
                             <span class="glyphicon glyphicon-remove" style="color: green;"></span>
                         {% endif %}
                     </td>
-                    <td>${{ lead_history.amount }}</td>
+                    <td>
+                        <span class="has_note" title="{{ lead_history.get_amount_with_note.1 }}">
+                            ${{ lead_history.amount }}
+                        </span>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
