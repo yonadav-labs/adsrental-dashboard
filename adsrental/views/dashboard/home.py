@@ -140,6 +140,8 @@ class DashboardHomeView(View):
                     entries = entries.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
                 if value == 'google':
                     entries = entries.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
+                if value == 'amazon':
+                    entries = entries.filter(account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
                 if value == 'facebook_screenshot':
                     entries = entries.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
 
