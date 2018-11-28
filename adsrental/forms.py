@@ -56,6 +56,7 @@ class DashboardForm(forms.Form):
         ('', 'All'),
         ('facebook', 'Facebook', ),
         ('google', 'Google', ),
+        ('facebook_screenshot', 'Facebook Screenshot', ),
     )
     SHIPSTATION_ORDER_STATUS_CHOICES = (
         ('', 'All'),
