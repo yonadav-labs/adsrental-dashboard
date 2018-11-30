@@ -222,7 +222,7 @@ class SignupForm(forms.Form):
 
     def clean_facebook_profile_url(self):
         value = self.cleaned_data['facebook_profile_url'].lower()
-        lead_account = LeadAccount.objects.filter(url=value, active=True).first()
+        lead_account = LeadAccount.objects.filter(account_url=value, active=True).first()
         if lead_account:
             raise forms.ValidationError("This Facebook profile URL is already registered")
 
