@@ -12,11 +12,23 @@ class LeadViewSet(viewsets.ModelViewSet):
     serializer_class = LeadSerializer
     filter_fields = ('first_name', 'last_name', 'status', 'email', )
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'status' in request.data:
+            instance.set_status(request.data['status'])
+        return super(LeadViewSet, self).update(request, *args, **kwargs)
+
 
 class LeadAccountViewSet(viewsets.ModelViewSet):
     queryset = LeadAccount.objects.all()
     serializer_class = LeadAccountSerializer
     filter_fields = ('lead__first_name', 'lead__last_name', 'lead__email', 'adsdb_account_id', 'status', 'account_type', 'username', )
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'status' in request.data:
+            instance.set_status(request.data['status'])
+        return super(LeadAccountViewSet, self).update(request, *args, **kwargs)
 
 
 class RaspberryPiViewSet(viewsets.ModelViewSet):

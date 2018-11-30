@@ -6,25 +6,31 @@ from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.bundler import Bundler
 
 
-class LeadSerializer(serializers.HyperlinkedModelSerializer):
+class PatchModelSerializer(serializers.HyperlinkedModelSerializer):
+    def __init__(self, *args, **kwargs):
+        kwargs['partial'] = True
+        super(PatchModelSerializer, self).__init__(*args, **kwargs)
+
+
+class LeadSerializer(PatchModelSerializer):
     class Meta:
         model = Lead
         fields = '__all__'
 
 
-class LeadAccountSerializer(serializers.HyperlinkedModelSerializer):
+class LeadAccountSerializer(PatchModelSerializer):
     class Meta:
         model = LeadAccount
         fields = '__all__'
 
 
-class RaspberryPiSerializer(serializers.HyperlinkedModelSerializer):
+class RaspberryPiSerializer(PatchModelSerializer):
     class Meta:
         model = RaspberryPi
         fields = '__all__'
 
 
-class BundlerSerializer(serializers.HyperlinkedModelSerializer):
+class BundlerSerializer(PatchModelSerializer):
     class Meta:
         model = Bundler
         fields = '__all__'
