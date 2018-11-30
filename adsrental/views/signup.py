@@ -107,7 +107,7 @@ class SignupView(View):
             username=data['fb_email'],
             password=data['fb_secret'],
             friends=data['fb_friends'],
-            url=data['facebook_profile_url'],
+            account_url=data['facebook_profile_url'],
             status=LeadAccount.STATUS_AVAILABLE,
             primary=True,
             account_type=account_type,

@@ -119,7 +119,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     ban_reason = models.CharField(max_length=50, choices=BAN_REASON_CHOICES, null=True, blank=True, help_text='Populated from ban form')
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPE_CHOICES)
     friends = models.BigIntegerField(default=0)
-    url = models.CharField(max_length=255, blank=True, null=True)
+    account_url = models.CharField(max_length=255, blank=True, null=True)
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
     qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
     disqualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as disqualified for the last time.')
