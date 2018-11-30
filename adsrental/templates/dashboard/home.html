@@ -67,7 +67,7 @@
                                     {% endif %}
                                 {% endif %}
                                 {% if entry.url %}
-                                    <a href="{{ entry.url }}">URL</a>
+                                    <a href="{{ entry.account_url }}">URL</a>
                                 {% endif %}
                                 {% if entry.status == entry.STATUS_AVAILABLE %}
                                     <a class="btn btn-default btn-xs" href="{% url 'dashboard_disqualify' lead_account_id=entry.id %}?next={{ request.get_full_path|urlencode }}">Disqualify</a>
