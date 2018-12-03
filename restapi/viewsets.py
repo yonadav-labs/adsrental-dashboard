@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.response import Response
 
 from restapi.serializers import LeadAccountSerializer, LeadSerializer, RaspberryPiSerializer, BundlerSerializer
 from adsrental.models.lead_account import LeadAccount
@@ -15,8 +17,15 @@ class LeadViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         if 'status' in request.data:
-            instance.set_status(request.data['status'])
+            status = request.data['status']
+            if status == Lead.STATUS_BANNED:
+                instance.ban(edited_by=request.user)
+            else:
+                instance.set_status(request.data['status'])
         return super(LeadViewSet, self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class LeadAccountViewSet(viewsets.ModelViewSet):
@@ -27,8 +36,15 @@ class LeadAccountViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         if 'status' in request.data:
-            instance.set_status(request.data['status'])
+            status = request.data['status']
+            if status == LeadAccount.STATUS_BANNED:
+                instance.ban(edited_by=request.user, reason=LeadAccount.BAN_REASON_ADSDB)
+            else:
+                instance.set_status(status)
         return super(LeadAccountViewSet, self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class RaspberryPiViewSet(viewsets.ModelViewSet):
@@ -36,8 +52,14 @@ class RaspberryPiViewSet(viewsets.ModelViewSet):
     serializer_class = RaspberryPiSerializer
     filter_fields = ('rpid', )
 
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=HTTP_204_NO_CONTENT)
+
 
 class BundlerViewSet(viewsets.ModelViewSet):
     queryset = Bundler.objects.all()
     serializer_class = BundlerSerializer
     filter_fields = ('name', 'utm_source', 'adsdb_id', )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=HTTP_204_NO_CONTENT)
