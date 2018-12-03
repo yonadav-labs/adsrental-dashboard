@@ -27,23 +27,24 @@ class SyncAdsDBView(View):
         messages.append(f'Total accounts {len(accounts)}')
         user = User.objects.get(email='volshebnyi@gmail.com')
         for account in accounts:
-            if account['account_status'] == 'Dead':
-                if account.get('fb_username'):
-                    la = LeadAccount.objects.filter(username=account.get('fb_username'), account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).first()
-                    if not la:
-                        continue
-                    if la.status != LeadAccount.STATUS_BANNED:
-                        messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
-                        la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
-                        continue
-                if account.get('google_username'):
-                    la = LeadAccount.objects.filter(username=account.get('google_username'), account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).first()
-                    if not la:
-                        continue
-                    if la.status != LeadAccount.STATUS_BANNED:
-                        messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
-                        la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
-                        continue
+            if account['account_status'] != 'Dead':
+                continue
+            if account.get('fb_username'):
+                la = LeadAccount.objects.filter(username=account.get('fb_username'), account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).first()
+                if not la:
+                    continue
+                if la.status != LeadAccount.STATUS_BANNED:
+                    messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
+                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
+                    continue
+            if account.get('google_username'):
+                la = LeadAccount.objects.filter(username=account.get('google_username'), account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).first()
+                if not la:
+                    continue
+                if la.status != LeadAccount.STATUS_BANNED:
+                    messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
+                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
+                    continue
 
         return JsonResponse({
             'messages': messages,
