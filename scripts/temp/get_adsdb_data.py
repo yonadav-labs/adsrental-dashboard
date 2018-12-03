@@ -4,15 +4,6 @@ import requests
 from django.conf import settings
 from adsrental.models import *
 
-
-def process_account(account):
-    lead_account = LeadAccount.objects.filter(username=account['google_username'], password='').first()
-    if lead_account and account['google_password']:
-        lead_account.password = account['google_password']
-        lead_account.save()
-        print(lead_account.username, account['google_username'], account['google_password'])
-
-
 accounts = []
 auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
 for page in range(1, 1000):
@@ -21,17 +12,9 @@ for page in range(1, 1000):
         'https://www.adsdb.io/api/v1/accounts/get',
         auth=auth,
         json={
-            'limit      ': 100,
+            'limit': 200,
             'page': page,
-            'filters': {
-                'rules': [
-                    {
-                        'field': 'accounts.account_status',
-                        'data': 'Dead',
-                    },
-                ]
-            },
-        }
+        },
     ).json()
     if not data.get('success') or not data.get('data'):
         break
@@ -48,7 +31,7 @@ for account in accounts:
                 continue
             if la.status != LeadAccount.STATUS_BANNED:
                 print('FB will be banned', la.username, la.status)
-                # la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_FACEBOOK_POLICY)
+                la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_FACEBOOK_POLICY)
                 continue
         if account.get('google_username'):
             la = LeadAccount.objects.filter(username=account.get('google_username'), account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).first()
@@ -57,5 +40,5 @@ for account in accounts:
                 continue
             if la.status != LeadAccount.STATUS_BANNED:
                 print('Google will be banned', la.username, la.status)
-                # la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_GOOGLE_POLICY)
+                la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_GOOGLE_POLICY)
                 continue
