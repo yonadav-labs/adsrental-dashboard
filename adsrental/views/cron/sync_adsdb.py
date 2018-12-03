@@ -22,7 +22,10 @@ class SyncAdsDBView(View):
             ).json()
             if not data.get('success') or not data.get('data'):
                 break
-            accounts += data['data']
+            for account in data['data']:
+                if account['account_status'] != 'Dead':
+                    continue
+                accounts.append(account)
 
         messages.append(f'Total accounts {len(accounts)}')
         user = User.objects.get(email='volshebnyi@gmail.com')
