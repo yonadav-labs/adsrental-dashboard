@@ -31,6 +31,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     AUTO_BAN_DAYS_OFFLINE = 14
     AUTO_BAN_DAYS_SEC_CHECKPOINT = 14
     AUTO_BAN_DAYS_NOT_USED = 14
+    AUTO_BAN_DAYS_NO_ACTIVE_ACCOUNTS = 4
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_SCREENSHOT_QUALIFIED = 'Screenshot Qualified'
@@ -366,8 +367,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         else:
             CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED, account_type=self.account_type)
 
-        if not active_accounts:
-            self.lead.ban(edited_by)
+        # if not active_accounts:
+        #     self.lead.ban(edited_by)
         return result
 
     def unban(self, edited_by):
