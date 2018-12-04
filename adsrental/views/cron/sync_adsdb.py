@@ -38,7 +38,7 @@ class SyncAdsDBView(View):
                     continue
                 if la.status != LeadAccount.STATUS_BANNED:
                     messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
-                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
+                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_FACEBOOK_POLICY)
                     continue
             if account.get('google_username'):
                 la = LeadAccount.objects.filter(username=account.get('google_username'), account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE).first()
@@ -46,7 +46,7 @@ class SyncAdsDBView(View):
                     continue
                 if la.status != LeadAccount.STATUS_BANNED:
                     messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
-                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_ADSDB)
+                    la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_GOOGLE_POLICY)
                     continue
 
         return JsonResponse({
