@@ -21,7 +21,7 @@ class LeadViewSet(viewsets.ModelViewSet):
             if status == Lead.STATUS_BANNED:
                 instance.ban(edited_by=request.user)
             else:
-                instance.set_status(request.data['status'])
+                instance.set_status(status, edited_by=request.user)
         return super(LeadViewSet, self).update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
@@ -40,7 +40,7 @@ class LeadAccountViewSet(viewsets.ModelViewSet):
             if status == LeadAccount.STATUS_BANNED:
                 instance.ban(edited_by=request.user, reason=LeadAccount.BAN_REASON_ADSDB)
             else:
-                instance.set_status(status)
+                instance.set_status(status, edited_by=request.user)
         return super(LeadAccountViewSet, self).update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
