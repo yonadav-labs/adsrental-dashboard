@@ -13,14 +13,17 @@ class SyncAdsDBView(View):
         not_found_count = 0
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
         for page in range(1, 1000):
-            data = requests.post(
-                'https://www.adsdb.io/api/v1/accounts/get',
-                auth=auth,
-                json={
-                    'limit': 200,
-                    'page': page,
-                },
-            ).json()
+            try:
+                data = requests.post(
+                    'https://www.adsdb.io/api/v1/accounts/get',
+                    auth=auth,
+                    json={
+                        'limit': 200,
+                        'page': page,
+                    },
+                ).json()
+            except requests.RequestException:
+                continue
             if not data.get('success') or not data.get('data'):
                 break
             for account in data['data']:
