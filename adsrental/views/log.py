@@ -107,18 +107,18 @@ class LogView(View):
         new_config_required = ping_data.get('new_config_required')
 
         if new_config_required:
-            return True
+            return True, 'Requested by user'
 
         if reported_hostname is not None and hostname is not None:
             if reported_hostname != hostname:
-                return True
+                return True, 'Hostname changed'
 
         initial_ip_address = ping_data.get('initial_ip_address')
         ip_address = ping_data.get('ip_address')
         if initial_ip_address and initial_ip_address != ip_address:
-            return True
+            return True, 'Device IP address changed'
 
-        return False
+        return False, ''
 
     def get_ping_handler(self, request, rpid):
         ping_cache_helper = PingCacheHelper()
@@ -157,12 +157,13 @@ class LogView(View):
         }
 
         restart_required = self._get_restart_required(ping_data)
-        new_config_required = self._get_new_config_required(ping_data)
+        new_config_required, new_config_required_reason = self._get_new_config_required(ping_data)
         update_required = self._get_update_required(ping_data)
 
         if new_config_required:
-            self.add_log(request, rpid, 'Sending info about config update')
+            self.add_log(request, rpid, f'Sending info about config update: {new_config_required_reason}')
             response_data['new_config'] = new_config_required
+            response_data['new_config_reason'] = new_config_required_reason
 
         if restart_required:
             self.add_log(request, rpid, 'Restarting RaspberryPi')
