@@ -36,7 +36,6 @@ def basicauth_required(view_func):
 
 def https_required(function):
     def wrap(self, request, *args, **kwargs):
-        return function(self, request, *args, **kwargs)
         protocol = 'http'
         if request.is_secure():
             protocol = 'https'
