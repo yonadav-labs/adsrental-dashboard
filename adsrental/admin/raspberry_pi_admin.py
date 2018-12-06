@@ -41,7 +41,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'rpid',
         'lead_link',
         'lead_status',
-        'ec2_instance_link',
+        # 'ec2_instance_link',
         'version',
         'ip_address',
         'first_tested_field',
@@ -50,11 +50,11 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'links',
         'online',
         'uptime',
-        'is_proxy_tunnel',
-        'proxy_hostname',
-        'rtunnel_port',
-        'tunnel_online',
-        'new_config_required',
+        # 'is_proxy_tunnel',
+        # 'proxy_hostname',
+        # 'rtunnel_port',
+        # 'tunnel_online',
+        # 'new_config_required',
     )
     search_fields = ('leadid', 'rpid', )
     list_filter = (
