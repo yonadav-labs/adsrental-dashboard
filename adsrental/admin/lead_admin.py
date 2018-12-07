@@ -432,12 +432,19 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                if lead_account.lead.add_shipstation_order():
-                    messages.success(
-                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
-                else:
-                    messages.info(
-                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+                self._create_shipstation_order(request, lead_account)
+
+    def _create_shipstation_order(self, request, lead_account):
+        try:
+            create_order_result = lead_account.lead.add_shipstation_order()
+        except ValueError as e:
+            messages.error(request, '{} was not created: {}'.format(lead_account, e))
+            return
+
+        if create_order_result:
+            messages.success(request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+        else:
+            messages.info(request, '{} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
 
     def mark_facebook_as_qualified(self, request, queryset):
         for lead in queryset:
@@ -451,12 +458,7 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                if lead_account.lead.add_shipstation_order():
-                    messages.success(
-                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
-                else:
-                    messages.info(
-                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+                self._create_shipstation_order(request, lead_account)
 
     def mark_facebook_screenshot_as_qualified(self, request, queryset):
         for lead in queryset:
@@ -470,12 +472,7 @@ class LeadAdmin(admin.ModelAdmin):
                     messages.success(
                         request, 'Lead Account {} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
 
-                if lead_account.lead.add_shipstation_order():
-                    messages.success(
-                        request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
-                else:
-                    messages.info(
-                        request, 'Lead {} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+                self._create_shipstation_order(request, lead_account)
 
     def mark_amazon_as_qualified(self, request, queryset):
         for lead in queryset:
