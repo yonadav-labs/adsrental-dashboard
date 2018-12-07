@@ -454,28 +454,6 @@ class PingCacheHelper():
 
         return True
 
-    @staticmethod
-    def is_ec2_instance_data_consistent(data, ec2_instance):
-        ec2_ip_address = data['ec2_ip_address']
-        ec2_instance_status = data['ec2_instance_status']
-
-        if not ec2_instance:
-            if ec2_ip_address:
-                return False
-
-            return True
-
-        if ec2_instance_status != ec2_instance.status:
-            return False
-
-        if ec2_instance.is_status_temp():
-            return False
-
-        if ec2_ip_address != ec2_instance.ip_address:
-            return False
-
-        return True
-
     @classmethod
     def is_data_consistent(cls, data, ec2_instance, raspberry_pi):
         'Check if cache data is consistent against current DB state'
@@ -499,9 +477,6 @@ class PingCacheHelper():
             hostname = raspberry_pi.proxy_hostname
             if reported_hostname != hostname:
                 return False
-
-        if not cls.is_ec2_instance_data_consistent(data, ec2_instance):
-            return False
 
         lead = raspberry_pi.get_lead()
         if lead and lead_status != lead.status:
@@ -567,11 +542,8 @@ class PingCacheHelper():
             new_config_required=new_config_required,
             is_proxy_tunnel=raspberry_pi.is_proxy_tunnel if raspberry_pi else False,
             is_beta=raspberry_pi.is_beta if raspberry_pi else False,
-            ec2_instance_id=ec2_instance and ec2_instance.instance_id,
-            ec2_instance_status=ec2_instance and ec2_instance.status,
-            ec2_hostname=ec2_instance and lead.is_active() and ec2_instance.is_running() and ec2_instance.hostname,
+            initial_ip_address=raspberry_pi.ip_address if raspberry_pi else False,
             hostname=self.get_hostname(lead, raspberry_pi, ec2_instance),
-            ec2_ip_address=ec2_instance and ec2_instance.ip_address,
             last_ping=None,
         )
 

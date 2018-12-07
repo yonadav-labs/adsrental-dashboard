@@ -1,3 +1,5 @@
+from dateutil import parser
+
 import requests
 from django.conf import settings
 from django.views import View
@@ -11,6 +13,7 @@ class SyncAdsDBView(View):
         messages = []
         accounts = []
         not_found_count = 0
+        now = timezone.now()
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
         for page in range(1, 1000):
             try:
@@ -19,7 +22,7 @@ class SyncAdsDBView(View):
                     auth=auth,
                     json={
                         'limit': 200,
-                        'page': page,
+                        'page': 1,
                     },
                 ).json()
             except requests.RequestException:
@@ -29,6 +32,14 @@ class SyncAdsDBView(View):
             for account in data['data']:
                 if account['account_status'] != 'Dead':
                     continue
+                try:
+                    banned_date = parser.parse(account.get('dead_date'))
+                except:
+                    continue
+
+                if now - banned_date < datetime.timedelta(days=4):
+                    continue
+
                 accounts.append(account)
 
         messages.append(f'Total accounts {len(accounts)}')

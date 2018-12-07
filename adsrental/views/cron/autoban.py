@@ -85,25 +85,25 @@ class AutoBanView(View):
             if execute:
                 lead_account.ban(admin_user, reason=LeadAccount.BAN_REASON_AUTO_NOT_USED)
 
-        for lead_account in LeadAccount.objects.filter(
-                status=LeadAccount.STATUS_BANNED,
-                lead__status__in=Lead.STATUSES_ACTIVE,
-                active=True,
-                auto_ban_enabled=True,
-        ).exclude(
-            lead__lead_account__status__in=LeadAccount.STATUSES_ACTIVE,
-        ).exclude(
-            lead__lead_account__banned_date__gt=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NO_ACTIVE_ACCOUNTS),
-        ).select_related('lead'):
-            if LeadAccount.get_active_lead_accounts(lead_account.lead):
-                continue
-            banned_no_active_accounts.append({
-                'lead': str(lead_account.lead),
-                'lead_account': str(lead_account),
-                'last_seen': lead_account.lead.raspberry_pi.last_seen.date()
-            })
-            if execute:
-                lead_account.lead.ban(admin_user)
+        # for lead_account in LeadAccount.objects.filter(
+        #         status=LeadAccount.STATUS_BANNED,
+        #         lead__status__in=Lead.STATUSES_ACTIVE,
+        #         active=True,
+        #         auto_ban_enabled=True,
+        # ).exclude(
+        #     lead__lead_account__status__in=LeadAccount.STATUSES_ACTIVE,
+        # ).exclude(
+        #     lead__lead_account__banned_date__gt=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NO_ACTIVE_ACCOUNTS),
+        # ).select_related('lead'):
+        #     if LeadAccount.get_active_lead_accounts(lead_account.lead):
+        #         continue
+        #     banned_no_active_accounts.append({
+        #         'lead': str(lead_account.lead),
+        #         'lead_account': str(lead_account),
+        #         'last_seen': lead_account.lead.raspberry_pi.last_seen.date()
+        #     })
+        #     if execute:
+        #         lead_account.lead.ban(admin_user)
 
         return JsonResponse({
             'execute': execute,

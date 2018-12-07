@@ -60,30 +60,20 @@ class LogView(View):
                 message=message,
             ))
 
-    def fix_ec2_state(self, request, rpid, lead_status, ec2_instance_status):
-        if not Lead.is_status_active(lead_status) and EC2Instance.is_status_running(ec2_instance_status):
-            self.add_log(request, rpid, 'Stopping EC2')
-            ec2_instance = EC2Instance.get_by_rpid(rpid)
-            if ec2_instance and not ec2_instance.is_essential:
-                ec2_instance.stop()
-            return True
-
-        return False
-
     def get_old_client_log_handler(self, request, rpid):
         message = request.GET.get('m')
         self.add_log(request, rpid, 'Old Client >>> {}'.format(message))
         return JsonResponse({'result': True, 'source': 'client'})
 
-    def get_client_log_hadler(self, request, rpid):
+    def get_client_log_handler(self, request, rpid):
         message = request.GET.get('client_log')
         self.add_log(request, rpid, 'Client >>> {}'.format(message))
         return JsonResponse({'result': True, 'source': 'client'})
 
-    def get_hostname_hadler(self, request, rpid):
+    def get_hostname_handler(self, request, rpid):
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get_data_for_request(request)
-        return HttpResponse(ping_data.get('ec2_hostname') or '')
+        return HttpResponse(ping_data.get('hostname') or '')
 
     def _get_restart_required(self, ping_data):
         version = ping_data.get('raspberry_pi_version')
@@ -113,25 +103,28 @@ class LogView(View):
 
     def _get_new_config_required(self, ping_data):
         reported_hostname = ping_data.get('reported_hostname')
-        hostname = ping_data.get('hostname') or ping_data.get('ec2_hostname')
+        hostname = ping_data.get('hostname')
         new_config_required = ping_data.get('new_config_required')
 
         if new_config_required:
-            return True
+            return True, 'Requested by user'
 
         if reported_hostname is not None and hostname is not None:
             if reported_hostname != hostname:
-                return True
+                return True, 'Hostname changed'
 
-        return False
+        initial_ip_address = ping_data.get('initial_ip_address')
+        ip_address = ping_data.get('ip_address')
+        if initial_ip_address and initial_ip_address != ip_address:
+            return True, 'Device IP address changed'
+
+        return False, ''
 
     def get_ping_handler(self, request, rpid):
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get_data_for_request(request)
         ping_data['last_ping'] = timezone.now()
         ping_cache_helper.set(rpid, ping_data)
-
-        self.fix_ec2_state(request, rpid, lead_status=ping_data['lead_status'], ec2_instance_status=ping_data['ec2_instance_status'])
 
         self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
@@ -164,12 +157,13 @@ class LogView(View):
         }
 
         restart_required = self._get_restart_required(ping_data)
-        new_config_required = self._get_new_config_required(ping_data)
+        new_config_required, new_config_required_reason = self._get_new_config_required(ping_data)
         update_required = self._get_update_required(ping_data)
 
         if new_config_required:
-            self.add_log(request, rpid, 'Sending info about config update')
+            self.add_log(request, rpid, f'Sending info about config update: {new_config_required_reason}')
             response_data['new_config'] = new_config_required
+            response_data['new_config_reason'] = new_config_required_reason
 
         if restart_required:
             self.add_log(request, rpid, 'Restarting RaspberryPi')
@@ -190,10 +184,10 @@ class LogView(View):
             return self.get_old_client_log_handler(request, rpid)
 
         if 'client_log' in request.GET:
-            return self.get_client_log_hadler(request, rpid)
+            return self.get_client_log_handler(request, rpid)
 
         if 'h' in request.GET:
-            return self.get_hostname_hadler(request, rpid)
+            return self.get_hostname_handler(request, rpid)
 
         if 'p' in request.GET:
             return self.get_ping_handler(request, rpid)
