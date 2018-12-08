@@ -43,14 +43,15 @@ class BundlerLeadStat(models.Model):
             raspberry_pi = lead.raspberry_pi
             if lead_account.status == LeadAccount.STATUS_IN_PROGRESS:
                 obj.in_progress_total += 1
-                if not raspberry_pi.online():
-                    obj.in_progress_offline += 1
                 if lead_account.is_wrong_password():
                     obj.in_progress_wrong_pw += 1
                 if lead_account.is_security_checkpoint_reported():
                     obj.in_progress_security_checkpoint += 1
-                if not raspberry_pi.online() or lead_account.is_wrong_password() or lead_account.is_security_checkpoint_reported():
-                    obj.in_progress_total_issue += 1
+                if raspberry_pi:
+                    if not raspberry_pi.online():
+                        obj.in_progress_offline += 1
+                    if not raspberry_pi.online() or lead_account.is_wrong_password() or lead_account.is_security_checkpoint_reported():
+                        obj.in_progress_total_issue += 1
 
             if lead_account.ban_reason:
                 if lead_account.ban_reason in LeadAccount.AUTO_BAN_REASONS:
