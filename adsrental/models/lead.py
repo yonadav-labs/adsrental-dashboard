@@ -85,6 +85,9 @@ class Lead(models.Model, FulltextSearchMixin):
         permissions = (
             ("view", "Can access lead info"),
         )
+        unique_together = (
+            ('street', 'apartment', 'city', 'country', 'state', ),
+        )
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
