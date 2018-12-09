@@ -40,8 +40,11 @@ class LeadAccountViewSet(viewsets.ModelViewSet):
             if status == LeadAccount.STATUS_BANNED:
                 instance.ban(edited_by=request.user, reason=LeadAccount.BAN_REASON_ADSDB)
             elif status == LeadAccount.STATUS_IN_PROGRESS:
+                instance.qualify(request.user)
+                instance.lead.assign_raspberry_pi()
+                instance.lead.add_shipstation_order()
                 instance.set_status(status, edited_by=request.user)
-                lead.set_status(Lead.STATUS_IN_PROGRESS, edited_by=request.user)
+                instance.lead.set_status(Lead.STATUS_IN_PROGRESS, edited_by=request.user)
             else:
                 instance.set_status(status, edited_by=request.user)
         return super(LeadAccountViewSet, self).update(request, *args, **kwargs)
