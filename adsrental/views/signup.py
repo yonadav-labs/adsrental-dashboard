@@ -4,6 +4,7 @@ import json
 from django.views import View
 from django.shortcuts import render, redirect
 from django.shortcuts import Http404
+import django.db
 
 from adsrental.forms import SignupForm
 from adsrental.models.lead import Lead
@@ -96,7 +97,17 @@ class SignupView(View):
             photo_id=data['photo_id'],
             extra_photo_id=data['extra_photo_id'],
         )
-        lead.save()
+        try:
+            lead.save()
+        except django.db.Error:
+            form_errors = ['This account is already registered']
+            return render(request, 'signup.html', dict(
+                user=request.user,
+                isp='',
+                form_errors=form_errors,
+                remote_addr=request.META.get('REMOTE_ADDR'),
+                form=form,
+            ))
 
         account_type = LeadAccount.ACCOUNT_TYPE_FACEBOOK
         if data['apply_type'] == SignupForm.APPLY_TYPE_SCREENSHOT:
