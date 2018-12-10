@@ -14,7 +14,7 @@ class SyncAdsDBView(View):
         messages = []
         accounts = []
         not_found_count = 0
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
         for page in range(1, 1000):
             try:
