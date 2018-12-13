@@ -81,7 +81,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         self.amount = total_amount
 
-        prev_history = LeadHistoryMonth.objects.filter(lead=self.lead).order_by('-date').first()
+        prev_history = LeadHistoryMonth.objects.filter(lead=self.lead, date__lt=self.get_first_day()).order_by('-date').first()
         if prev_history and prev_history.move_to_next_month:
             self.amount += prev_history.amount
             self.amount_moved = prev_history.amount
@@ -103,8 +103,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         raspberry_pi = self.lead.raspberry_pi
 
         note = []
-        if not raspberry_pi or not raspberry_pi.first_seen:
-            return result, 'RaspberryPi does not exist or is not active ($0.00)'
+        if not raspberry_pi:
+            return result, 'RaspberryPi does not exist ($0.00)'
         for lead_account in self.lead.lead_accounts.filter(qualified_date__isnull=False, active=True):
             created_date = lead_account.created
             if lead_account.is_banned():
