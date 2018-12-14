@@ -129,7 +129,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'bundler_paid',
         'bundler_paid_date',
         'charge_back',
-        'primary',
         'active',
     )
     raw_id_fields = ('lead', )

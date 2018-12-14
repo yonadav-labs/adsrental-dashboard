@@ -51,7 +51,6 @@ class LeadAccountInline(admin.StackedInline):
         'qualified_date',
         'bundler_paid',
         'bundler_paid_date',
-        'primary',
         'active',
     )
     raw_id_fields = ('lead', )
