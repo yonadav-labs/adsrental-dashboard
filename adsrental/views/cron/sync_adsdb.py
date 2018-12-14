@@ -14,7 +14,7 @@ class SyncAdsDBView(View):
         messages = []
         accounts = []
         not_found_count = 0
-        today = datetime.date.today()
+        now = timezone.localtime(timezone.now())
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
         for page in range(1, 1000):
             try:
@@ -38,7 +38,7 @@ class SyncAdsDBView(View):
                 except ValueError:
                     continue
 
-                if today - banned_date >= datetime.timedelta(days=4):
+                if now - banned_date >= datetime.timedelta(days=4):
                     continue
 
                 accounts.append(account)
