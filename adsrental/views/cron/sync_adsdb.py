@@ -1,6 +1,7 @@
 import datetime
 from dateutil import parser
 
+import pytz
 import requests
 from django.conf import settings
 from django.views import View
@@ -35,7 +36,7 @@ class SyncAdsDBView(View):
                 if account['account_status'] != 'Dead':
                     continue
                 try:
-                    banned_date = parser.parse(account.get('dead_date'))
+                    banned_date = parser.parse(account.get('dead_date')).astimezone(pytz.timezone(settings.TIME_ZONE))
                 except ValueError:
                     continue
 
