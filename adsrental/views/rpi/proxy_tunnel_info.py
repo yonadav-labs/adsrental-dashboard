@@ -1,3 +1,4 @@
+import requests
 from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -23,10 +24,13 @@ class ProxyTunnelInfoView(View):
         if unique_ips_count > 9:
             messages.warning(request, f'This device is changing IP addresses to often, connection can be unstable. {unique_ips_count} IP changes detected.')
 
-        if raspberry_pi.is_proxy_working():
-            messages.success(request, 'Proxy tunnel is working correctly.')
-        else:
-            messages.error(request, 'Proxy tunnel is not working correctly.')
+        try:
+            if raspberry_pi.check_proxy_tunnel():
+                messages.success(request, 'Proxy tunnel is working correctly.')
+        except requests.ConnectionError:
+            messages.error(request, 'Proxy tunnel is not reachable.')
+        except requests.exceptions.ReadTimeout:
+            messages.error(request, 'Proxy tunnel did not respond in 5 seconds. User internet connection might be too slow.')
 
 
         return render(request, 'rpi/proxy_tunnel_info.html', dict(

@@ -297,18 +297,15 @@ class RaspberryPi(models.Model):
     def get_proxy_connection_string(self):
         return f'socks5://{self.TUNNEL_USER}:{self.TUNNEL_PASSWORD}@{self.proxy_hostname}:{self.rtunnel_port}'
 
-    def is_proxy_working(self):
-        try:
-            return requests.get(
-                'https://google.com',
-                proxies=dict(
-                    http=self.get_proxy_connection_string(),
-                    https=self.get_proxy_connection_string(),
-                ),
-                timeout=5,
-            ).ok
-        except (requests.ConnectionError, requests.exceptions.ReadTimeout):
-            return False
+    def check_proxy_tunnel(self):
+        return requests.get(
+            'https://google.com',
+            proxies=dict(
+                http=self.get_proxy_connection_string(),
+                https=self.get_proxy_connection_string(),
+            ),
+            timeout=5,
+        )
 
     def get_unique_ips(self):
         last_log = self.get_last_log(tail=1000)
