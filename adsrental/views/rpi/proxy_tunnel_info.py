@@ -29,7 +29,7 @@ class ProxyTunnelInfoView(View):
                 messages.success(request, 'Proxy tunnel is working correctly.')
         except requests.ConnectionError:
             messages.error(request, 'Proxy tunnel is not reachable.')
-        except Exception:
+        except requests.exceptions.RequestException:
             messages.error(request, 'Proxy tunnel did not respond in 5 seconds. User internet connection might be too slow.')
 
 
