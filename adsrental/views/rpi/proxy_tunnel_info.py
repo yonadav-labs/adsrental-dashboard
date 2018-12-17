@@ -1,3 +1,5 @@
+import re
+
 from django.views import View
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -18,6 +20,12 @@ class ProxyTunnelInfoView(View):
             messages.warning(request, 'This device cannot be used as a proxy tunnel. Use "Make proxy tunnel" action.')
         if not raspberry_pi.online():
             messages.warning(request, 'This device is currently offline.')
+        
+        last_log = raspberry_pi.get_last_log(tail=500)
+        unique_ips = list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log)))
+        if unique_ips > 9:
+            messages.warning(request, f'This device is changing IP addresses to often, connection can be unstable. {unique_ips} IP changes detected.')
+
         return render(request, 'rpi/proxy_tunnel_info.html', dict(
             user=request.user,
             raspberry_pi=raspberry_pi,
