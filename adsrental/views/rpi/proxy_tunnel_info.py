@@ -22,7 +22,7 @@ class ProxyTunnelInfoView(View):
             messages.warning(request, 'This device is currently offline.')
         
         last_log = raspberry_pi.get_last_log(tail=500)
-        unique_ips = list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log)))
+        unique_ips = len(list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log))))
         if unique_ips > 9:
             messages.warning(request, f'This device is changing IP addresses to often, connection can be unstable. {unique_ips} IP changes detected.')
 
