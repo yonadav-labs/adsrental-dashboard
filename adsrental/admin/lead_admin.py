@@ -813,9 +813,12 @@ class LeadAdmin(admin.ModelAdmin):
             messages.info(request, 'Lead Account {} password is marked as wrong.'.format(lead_account))
 
     def approve_facebook_screenshot(self, request, queryset):
+        now = timezone.localtime(timezone.now())
         for lead in queryset:
             for lead_account in lead.lead_accounts.filter(status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL, active=True):
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                lead_account.in_progress_date = now
+                lead_account.save()
                 if lead.status == Lead.STATUS_SCREENSHOT_NEEDS_APPROVAL:
                     lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                     lead.save()
