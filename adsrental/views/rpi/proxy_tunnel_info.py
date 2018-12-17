@@ -21,7 +21,7 @@ class ProxyTunnelInfoView(View):
             messages.warning(request, 'This device cannot be used as a proxy tunnel. Use "Make proxy tunnel" action.')
         if not raspberry_pi.online():
             messages.warning(request, 'This device is currently offline.')
-        
+
         last_log = raspberry_pi.get_last_log(tail=500)
         unique_ips_count = len(list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log))))
         if unique_ips_count > 9:
