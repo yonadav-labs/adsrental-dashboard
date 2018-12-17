@@ -300,7 +300,7 @@ class RaspberryPi(models.Model):
     def is_proxy_working(self):
         try:
             return requests.get(
-                'http://google.com',
+                'https://google.com',
                 proxies=dict(
                     http=self.get_proxy_connection_string(),
                     https=self.get_proxy_connection_string(),
