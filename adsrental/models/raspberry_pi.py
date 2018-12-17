@@ -184,14 +184,14 @@ class RaspberryPi(models.Model):
             for lead_account in lead.lead_accounts.all():
                 if lead_account.status == lead_account.STATUS_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
-                if not lead_account.in_progress_date:
-                    lead_account.in_progress_date = now
-                    lead_account.save()
-                    if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
-                        try:
-                            lead_account.sync_to_adsdb()
-                        except: # pylint: disable=bare-except
-                            pass
+                    if not lead_account.in_progress_date:
+                        lead_account.in_progress_date = now
+                        lead_account.save()
+                        if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
+                            try:
+                                lead_account.sync_to_adsdb()
+                            except: # pylint: disable=bare-except
+                                pass
                 if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
                     lead_account.save()
