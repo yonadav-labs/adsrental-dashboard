@@ -307,7 +307,7 @@ class RaspberryPi(models.Model):
                 ),
                 timeout=5,
             ).ok
-        except requests.ConnectionError:
+        except (requests.ConnectionError, requests.exceptions.ReadTimeout):
             return False
 
     def get_unique_ips(self):
