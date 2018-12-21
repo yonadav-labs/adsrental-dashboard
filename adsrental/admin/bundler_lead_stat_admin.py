@@ -25,8 +25,8 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         # 'qualified_total_field',
         # 'delivered_not_connected',
         # 'banned_from_qualified_last_30_days',
-        'delivered_not_connected_last_30_days',
-        'delivered_connected_last_30_days_percent',
+        'delivered_not_connected_last_14_days',
+        'delivered_connected_last_14_days_percent',
     )
     list_select_related = ('bundler', )
     actions = (
@@ -119,6 +119,11 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     def delivered_connected_last_30_days_percent(self, obj):
         return '%d%%' % (
             (obj.delivered_last_30_days - obj.delivered_not_connected_last_30_days) * 100 / max(obj.delivered_last_30_days, 1),
+        )
+
+    def delivered_connected_last_14_days_percent(self, obj):
+        return '%d%%' % (
+            (obj.delivered_last_14_days - obj.delivered_not_connected_last_14_days) * 100 / max(obj.delivered_last_14_days, 1),
         )
 
     def calculate(self, request, queryset):

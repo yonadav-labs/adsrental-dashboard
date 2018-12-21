@@ -23,6 +23,8 @@ class BundlerLeadStat(models.Model):
     delivered_not_connected = models.IntegerField(default=0)
     delivered_not_connected_last_30_days = models.IntegerField(default=0)
     delivered_last_30_days = models.IntegerField(default=0)
+    delivered_last_14_days = models.IntegerField(default=0)
+    delivered_not_connected_last_14_days = models.IntegerField(default=0)
     banned_from_qualified_last_30_days = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -38,6 +40,7 @@ class BundlerLeadStat(models.Model):
         lead_accounts = LeadAccount.objects.filter(lead__bundler=obj.bundler, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).prefetch_related('lead', 'lead__raspberry_pi')
         now = timezone.localtime(timezone.now())
         last_30_days_start = now - datetime.timedelta(days=30)
+        last_14_days_start = now - datetime.timedelta(days=14)
         for lead_account in lead_accounts:
             lead = lead_account.lead
             raspberry_pi = lead.raspberry_pi
@@ -81,5 +84,9 @@ class BundlerLeadStat(models.Model):
                         obj.delivered_last_30_days += 1
                         if not raspberry_pi.first_seen:
                             obj.delivered_not_connected_last_30_days += 1
+                    if lead.delivery_date >= last_14_days_start.date():
+                        obj.delivered_last_14_days += 1
+                        if not raspberry_pi.first_seen:
+                            obj.delivered_not_connected_last_14_days += 1
 
         obj.save()
