@@ -1,10 +1,12 @@
+import datetime
 from dateutil import parser
 
+import pytz
 import requests
-from django.utils import timezone
 from django.conf import settings
 from django.views import View
 from django.http import JsonResponse
+from django.utils import timezone
 
 from adsrental.models import LeadAccount, User
 
@@ -23,7 +25,7 @@ class SyncAdsDBView(View):
                     auth=auth,
                     json={
                         'limit': 200,
-                        'page': 1,
+                        'page': page,
                     },
                 ).json()
             except requests.RequestException:
@@ -34,11 +36,11 @@ class SyncAdsDBView(View):
                 if account['account_status'] != 'Dead':
                     continue
                 try:
-                    banned_date = parser.parse(account.get('dead_date'))
-                except:
+                    banned_date = parser.parse(account.get('dead_date')).astimezone(pytz.timezone(settings.TIME_ZONE))
+                except ValueError:
                     continue
 
-                if now - banned_date < datetime.timedelta(days=4):
+                if now - banned_date >= datetime.timedelta(days=4):
                     continue
 
                 accounts.append(account)

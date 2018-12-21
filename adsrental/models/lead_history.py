@@ -152,8 +152,8 @@ class LeadHistory(models.Model):
             return result, 'Account is offline (${})'.format(result)
 
         raspberry_pi = self.lead.raspberry_pi
-        if not raspberry_pi or not raspberry_pi.first_seen:
-            return result, 'RaspberryPi does not exist or is not active (${})'.format(result)
+        if not raspberry_pi:
+            return result, 'RaspberryPi does not exist (${})'.format(result)
 
         days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
         note = []

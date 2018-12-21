@@ -1,6 +1,8 @@
+import re
 import os
 import datetime
 
+import requests
 from django.utils import timezone
 from django.db import models
 from django.db.models import Count
@@ -291,6 +293,25 @@ class RaspberryPi(models.Model):
         self.restart_required = False
         self.new_config_required = False
         self.version = version
+
+    def get_proxy_connection_string(self):
+        return f'socks5://{self.TUNNEL_USER}:{self.TUNNEL_PASSWORD}@{self.proxy_hostname}:{self.rtunnel_port}'
+
+    def check_proxy_tunnel(self):
+        return requests.get(
+            'https://google.com',
+            proxies=dict(
+                http=self.get_proxy_connection_string(),
+                https=self.get_proxy_connection_string(),
+            ),
+            timeout=5,
+        )
+
+    def get_unique_ips(self):
+        last_log = self.get_last_log(tail=1000)
+        ips = list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log)))
+        ips = [i for i in ips if i != self.proxy_hostname]
+        return ips
 
     class Meta:
         db_table = 'raspberry_pi'

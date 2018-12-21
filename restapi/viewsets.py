@@ -38,7 +38,7 @@ class LeadAccountViewSet(viewsets.ModelViewSet):
         if 'status' in request.data:
             status = request.data['status']
             if status == LeadAccount.STATUS_BANNED:
-                instance.ban(edited_by=request.user, reason=LeadAccount.BAN_REASON_ADSDB)
+                instance.ban(edited_by=request.user, reason=LeadAccount.BAN_REASON_FACEBOOK_POLICY)
             elif status == LeadAccount.STATUS_IN_PROGRESS:
                 instance.qualify(request.user)
                 instance.lead.assign_raspberry_pi()
