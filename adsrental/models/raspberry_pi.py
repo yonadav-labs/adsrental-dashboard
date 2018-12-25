@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import re
 import os
 import datetime
+import typing
 
 import requests
 from django.utils import timezone
@@ -11,6 +14,14 @@ from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
 from adsrental.utils import PingCacheHelper
+
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.lead import Lead
+    from adsrental.models.ec2_instance import EC2Instance
+
+
+PingDataType = typing.Dict[str, typing.Any]
 
 
 class RaspberryPi(models.Model):
@@ -80,7 +91,7 @@ class RaspberryPi(models.Model):
     objects = BulkUpdateManager()
 
     @classmethod
-    def get_free_or_create(cls):
+    def get_free_or_create(cls) -> RaspberryPi:
         free_item = cls.objects.filter(lead__isnull=True, rpid__startswith='RP', first_seen__isnull=True).order_by('rpid').first()
         if free_item:
             return free_item
@@ -88,7 +99,7 @@ class RaspberryPi(models.Model):
         return cls.create_with_rpid()
 
     @classmethod
-    def create_with_rpid(cls):
+    def create_with_rpid(cls) -> RaspberryPi:
         next_rpid_numeric = 1
         last_rpi = RaspberryPi.objects.filter(rpid_numeric__isnull=False).order_by('-created').first()
         if last_rpi:
@@ -106,21 +117,21 @@ class RaspberryPi(models.Model):
         item.save()
         return item
 
-    def get_lead(self):
+    def get_lead(self) -> typing.Optional[Lead]:
         'Get linked Lead object'
         try:
             return self.lead # pylint: disable=E1101
         except RaspberryPi.lead.RelatedObjectDoesNotExist: # pylint: disable=E1101
             return None
 
-    def get_ec2_instance(self):
+    def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         lead = self.get_lead()
         if not lead:
             return None
 
         return lead.get_ec2_instance()
 
-    def find_tunnel_ports(self):
+    def find_tunnel_ports(self) -> typing.Tuple[int, int]:
         tunnel_ports = [i[0] for i in RaspberryPi.objects.filter(tunnel_port__isnull=False).exclude(rpid=self.rpid).values_list('tunnel_port')]
         for check_tunnel_port in range(RaspberryPi.TUNNEL_PORT_START, RaspberryPi.TUNNEL_PORT_END, 2):
             if check_tunnel_port in tunnel_ports:
@@ -129,7 +140,7 @@ class RaspberryPi(models.Model):
 
         raise ValueError('No free port found')
 
-    def assign_proxy_hostname(self):
+    def assign_proxy_hostname(self) -> None:
         hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
         if not hostname_count:
             self.proxy_hostname = RaspberryPi.TUNNEL_HOST
@@ -138,13 +149,13 @@ class RaspberryPi(models.Model):
         self.proxy_hostname = hostname_count.first()['proxy_hostname']
         return
 
-    def assign_tunnel_ports(self):
+    def assign_tunnel_ports(self) -> None:
         self.tunnel_port, self.rtunnel_port = self.find_tunnel_ports()
 
-    def unassign_tunnel_ports(self):
+    def unassign_tunnel_ports(self) -> None:
         self.tunnel_port, self.rtunnel_port = None, None
 
-    def is_in_testing(self):
+    def is_in_testing(self) -> bool:
         if self.first_seen:
             return False
         if not self.first_tested:
@@ -152,7 +163,7 @@ class RaspberryPi(models.Model):
 
         return True
 
-    def report_offline(self):
+    def report_offline(self) -> None:
         now = timezone.localtime(timezone.now())
         self.last_offline_reported = now
         if self.online_since_date:
@@ -161,20 +172,17 @@ class RaspberryPi(models.Model):
         self.save()
         RaspberryPiSession.end(self)
 
-    def update_ping(self, now=None):
-        if now is None:
-            now = timezone.localtime(timezone.now())
-
+    def _update_ping(self, ping_datetime: datetime.datetime) -> bool:
         if not self.first_tested:
-            self.first_tested = now
+            self.first_tested = ping_datetime
             lead = self.get_lead()
             return True
 
-        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > now:
+        if self.first_tested + datetime.timedelta(hours=self.first_tested_hours_ttl) > ping_datetime:
             return False
 
         if self.online_since_date is None:
-            self.online_since_date = now
+            self.online_since_date = ping_datetime
             RaspberryPiSession.start(self)
 
         lead = self.get_lead()
@@ -185,7 +193,7 @@ class RaspberryPi(models.Model):
                 if lead_account.status == lead_account.STATUS_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
                     if not lead_account.in_progress_date:
-                        lead_account.in_progress_date = now
+                        lead_account.in_progress_date = ping_datetime
                         lead_account.save()
                         if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
                             try:
@@ -199,14 +207,14 @@ class RaspberryPi(models.Model):
                     lead.save()
 
         if not self.first_seen:
-            self.first_seen = now
-            self.last_seen = now
+            self.first_seen = ping_datetime
+            self.last_seen = ping_datetime
             return True
 
-        self.last_seen = now
+        self.last_seen = ping_datetime
         return True
 
-    def online(self):
+    def online(self) -> bool:
         last_seen = self.get_last_seen()
         if last_seen is None:
             return False
@@ -214,22 +222,22 @@ class RaspberryPi(models.Model):
         return (timezone.now() - last_seen).total_seconds() < self.online_minutes_ttl * 60
 
     @classmethod
-    def get_objects_online(cls):
+    def get_objects_online(cls) -> models.query.QuerySet:
         now = timezone.localtime(timezone.now())
         return cls.objects.filter(last_seen__gte=now - datetime.timedelta(minutes=cls.online_minutes_ttl))
 
     @classmethod
-    def get_objects_offline(cls):
+    def get_objects_offline(cls) -> models.query.QuerySet:
         now = timezone.localtime(timezone.now())
         return cls.objects.all().exclude(last_seen__gte=now - datetime.timedelta(minutes=cls.online_minutes_ttl))
 
-    def get_first_seen(self):
+    def get_first_seen(self) -> typing.Optional[datetime.datetime]:
         if self.first_seen is None:
             return None
 
         return self.first_seen
 
-    def get_last_log(self, tail=1):
+    def get_last_log(self, tail: int = 1) -> str:
         log_dir = os.path.join(settings.RASPBERRY_PI_LOG_PATH, self.rpid)
         if not os.path.exists(log_dir):
             return ''
@@ -243,17 +251,17 @@ class RaspberryPi(models.Model):
         lines = open(last_log_path).readlines()[-tail:]
         return '\n'.join([i.rstrip('\n') for i in lines])
 
-    def get_last_seen(self):
+    def get_last_seen(self) -> typing.Optional[datetime.datetime]:
         if self.last_seen is None or self.first_seen is None:
             return None
 
         return self.last_seen
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.rpid
 
     @staticmethod
-    def get_max_datetime(date1, date2):
+    def get_max_datetime(date1: typing.Optional[datetime.datetime], date2: typing.Optional[datetime.datetime]) -> typing.Optional[datetime.datetime]:
         if not date1:
             return date2
         if not date2:
@@ -263,7 +271,7 @@ class RaspberryPi(models.Model):
 
         return date2
 
-    def reset_cache(self):
+    def reset_cache(self) -> None:
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get(self.rpid)
 
@@ -271,19 +279,19 @@ class RaspberryPi(models.Model):
             self.process_ping_data(ping_data)
             ping_cache_helper.delete(self.rpid)
 
-    def get_cache(self):
+    def get_cache(self) -> typing.Optional[PingDataType]:
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get(self.rpid)
         return ping_data
 
-    def process_ping_data(self, ping_data):
+    def process_ping_data(self, ping_data: PingDataType) -> None:
         ip_address = ping_data['ip_address']
         version = ping_data['raspberry_pi_version']
-        last_ping = ping_data.get('last_ping')
+        last_ping = ping_data.get('last_ping') or timezone.localtime(timezone.now())
 
         lead = self.get_lead()
         if lead and lead.is_active():
-            self.update_ping(last_ping)
+            self._update_ping(last_ping)
 
         if self.ip_address != ip_address:
             self.ip_address = ip_address
@@ -294,10 +302,10 @@ class RaspberryPi(models.Model):
         self.new_config_required = False
         self.version = version
 
-    def get_proxy_connection_string(self):
+    def get_proxy_connection_string(self) -> str:
         return f'socks5://{self.TUNNEL_USER}:{self.TUNNEL_PASSWORD}@{self.proxy_hostname}:{self.rtunnel_port}'
 
-    def check_proxy_tunnel(self):
+    def check_proxy_tunnel(self) -> requests.Response:
         return requests.get(
             'https://google.com',
             proxies=dict(
@@ -307,7 +315,7 @@ class RaspberryPi(models.Model):
             timeout=5,
         )
 
-    def get_unique_ips(self):
+    def get_unique_ips(self) -> typing.List[str]:
         last_log = self.get_last_log(tail=1000)
         ips = list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log)))
         ips = [i for i in ips if i != self.proxy_hostname]

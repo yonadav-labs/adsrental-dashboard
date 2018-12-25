@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import datetime
 import decimal
+import typing
 
 from django.utils import timezone
 from django.conf import settings
@@ -47,7 +50,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
-    def aggregate(self):
+    def aggregate(self) -> None:
         self.days_offline = 0
         self.days_online = 0
         self.days_wrong_password = 0
@@ -90,7 +93,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
             self.move_to_next_month = True
 
     @classmethod
-    def get_or_create(cls, lead, date):
+    def get_or_create(cls, lead: Lead, date: datetime.date) -> LeadHistoryMonth:
         date_month = date.replace(day=1)
         item = cls.objects.filter(date=date_month, lead=lead).first()
         if item:
@@ -98,7 +101,7 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         return cls(lead=lead, date=date_month)
 
-    def get_max_payment_with_note(self):
+    def get_max_payment_with_note(self) -> typing.Tuple[decimal.Decimal, str]:
         result = decimal.Decimal('0.00')
         raspberry_pi = self.lead.raspberry_pi
 
@@ -156,14 +159,14 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         ))
         return result, '\n'.join(note)
 
-    def get_last_day(self):
+    def get_last_day(self) -> datetime.date:
         next_month = self.date.replace(day=28) + datetime.timedelta(days=4)
         return next_month - datetime.timedelta(days=next_month.day)
 
-    def get_first_day(self):
+    def get_first_day(self) -> datetime.date:
         return self.date.replace(day=1)
 
-    def get_amount(self):
+    def get_amount(self) -> decimal.Decimal:
         if not self.days_online:
             return decimal.Decimal('0.00')
 
@@ -171,5 +174,5 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         days_online_valid = max(self.days_online - self.days_wrong_password, 0)
         return round(self.max_payment * days_online_valid / days_total, 2)
 
-    def get_remaining_amount(self):
+    def get_remaining_amount(self) -> decimal.Decimal:
         return self.amount - self.amount_paid

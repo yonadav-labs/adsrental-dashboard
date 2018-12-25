@@ -1,4 +1,5 @@
 import uuid
+import typing
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -29,21 +30,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
 
-    def get_short_name(self):
+    def get_short_name(self) -> str:
         return self.email
 
-    def get_full_name(self):
+    def get_full_name(self) -> str:
         return self.email
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         if not self.email:
             self.email = self.username
         if not self.username:
             self.username = self.email
         super(User, self).save(*args, **kwargs)
 
-    def is_bookkeeper(self):
+    def is_bookkeeper(self) -> bool:
         return self.groups.filter(name='Bookkeeper').exists()

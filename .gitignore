@@ -31,3 +31,5 @@ media/*
 !media/placeholder.txt
 
 dump_*
+
+.mypy_cache

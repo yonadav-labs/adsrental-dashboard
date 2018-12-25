@@ -8,7 +8,7 @@ if [ ! -d "venv" ]; then
 fi
 
 source venv/bin/activate
-pip install -U pip rope pylint pylint-django --upgrade-strategy=eager
+pip install -U pip rope pylint pylint-django mypy --upgrade-strategy=eager
 # pip install git+https://github.com/PyCQA/pylint.git
 # pip install git+https://github.com/PyCQA/pylint-django.git
 cat requirements.txt > requirements_temp.txt

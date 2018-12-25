@@ -1,8 +1,12 @@
 'Lead model'
+from __future__ import annotations
+
 import re
+import datetime
+import typing
+
 from xml.etree import ElementTree
 from dateutil import parser
-
 import requests
 from django.utils import timezone
 from django.db import models
@@ -13,6 +17,11 @@ from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.utils import CustomerIOClient, ShipStationClient, PingCacheHelper
+
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.user import User
+    from adsrental.models.ec2_instance import EC2Instance
 
 
 class Lead(models.Model, FulltextSearchMixin):
@@ -172,17 +181,17 @@ class Lead(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.leadid
 
     @property
-    def tested(self):
+    def tested(self) -> bool:
         if not self.raspberry_pi or not self.raspberry_pi.first_tested:
             return False
 
         return True
 
-    def is_wrong_password(self):
+    def is_wrong_password(self) -> bool:
         'Is password reported as wrong now'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.wrong_password_date:
@@ -190,7 +199,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def is_wrong_password_google(self):
+    def is_wrong_password_google(self) -> bool:
         'Is password reported as wrong now for google account'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE and lead_account.wrong_password_date:
@@ -198,15 +207,15 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def is_wrong_password_facebook(self):
-        'Is password reported as wrong nowc'
+    def is_wrong_password_facebook(self) -> bool:
+        'Is password reported as wrong for facebook account'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.account_type == lead_account.ACCOUNT_TYPE_FACEBOOK and lead_account.wrong_password_date:
                 return True
 
         return False
 
-    def is_security_checkpoint_reported(self):
+    def is_security_checkpoint_reported(self) -> bool:
         'Is password reported as wrong now'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.security_checkpoint_date:
@@ -214,7 +223,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def is_bundler_paid(self):
+    def is_bundler_paid(self) -> bool:
         'Is bundler paid for any account'
         for lead_account in self.lead_accounts.all():
             if lead_account.active and lead_account.bundler_paid:
@@ -222,7 +231,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def touch(self):
+    def touch(self) -> None:
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
         self.last_touch_date = timezone.now()
         self.touch_count += 1
@@ -230,7 +239,7 @@ class Lead(models.Model, FulltextSearchMixin):
         for lead_account in self.lead_accounts.all():
             lead_account.touch()
 
-    def get_address(self):
+    def get_address(self) -> str:
         'Get address as a string.'
         return ', '.join([
             self.street or '',
@@ -241,7 +250,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.country or '',
         ])
 
-    def get_phone_formatted(self):
+    def get_phone_formatted(self) -> typing.Optional[str]:
         'Get phone to show to end user.'
         if not self.phone:
             return None
@@ -252,7 +261,7 @@ class Lead(models.Model, FulltextSearchMixin):
         return '({}) {}-{}'.format(self.phone[0:3], self.phone[3:6], self.phone[6:])
 
     @classmethod
-    def get_online_filter(cls):
+    def get_online_filter(cls) -> models.query.QuerySet:
         '''
         Get online condition ty use as a filter like
 
@@ -260,17 +269,7 @@ class Lead(models.Model, FulltextSearchMixin):
         '''
         return cls.get_timedelta_filter('raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
-    def get_pi_sent_this_month(self):
-        'Obsolete.'
-        if not self.pi_sent:
-            return False
-        now = timezone.localtime(timezone.now())
-        if now.year == self.pi_sent.year and now.month == self.pi_sent.month:
-            return True
-
-        return False
-
-    def set_status(self, value, edited_by):
+    def set_status(self, value: str, edited_by: typing.Optional[User]) -> bool:
         'Change status, create LeadChangeinstance.'
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
@@ -290,7 +289,7 @@ class Lead(models.Model, FulltextSearchMixin):
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def is_ready_for_testing(self):
+    def is_ready_for_testing(self) -> bool:
         'Check if RaspberryPi is ready to be tested.'
         if not self.raspberry_pi:
             return False
@@ -301,7 +300,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return True
 
-    def prepare_for_reshipment(self, edited_by):
+    def prepare_for_reshipment(self, edited_by: User) -> None:
         'Clear timestamps, perepare for testing, create LeadChange.'
         old_value = self.pi_delivered
         self.shipstation_order_number = None
@@ -322,28 +321,24 @@ class Lead(models.Model, FulltextSearchMixin):
             raspberry_pi.first_seen = None
             raspberry_pi.save()
         LeadChange(lead=self, field='prepare_for_reshipment', value=False, old_value=old_value, edited_by=edited_by).save()
-        return True
 
-    def ban(self, edited_by):
+    def ban(self, edited_by: User) -> bool:
         'Mark lead as banned, send cutomer.io event.'
-        result = self.set_status(Lead.STATUS_BANNED, edited_by)
-        return result
+        return self.set_status(Lead.STATUS_BANNED, edited_by)
 
-    def unban(self, edited_by):
+    def unban(self, edited_by: User) -> bool:
         'Restores lead previous status before banned.'
-        result = self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
-        return result
+        return self.set_status(self.old_status or Lead.STATUS_QUALIFIED, edited_by)
 
-    def disqualify(self, edited_by):
+    def disqualify(self, edited_by: User) -> bool:
         'Set lead status as disqualified.'
         return self.set_status(Lead.STATUS_DISQUALIFIED, edited_by)
 
-    def qualify(self, edited_by):
+    def qualify(self, edited_by: User) -> bool:
         'Set lead status as qualified.'
-        result = self.set_status(Lead.STATUS_QUALIFIED, edited_by)
-        return result
+        return self.set_status(Lead.STATUS_QUALIFIED, edited_by)
 
-    def assign_raspberry_pi(self):
+    def assign_raspberry_pi(self) -> bool:
         'Assign new or existing RaspberryPi if does not exist, prepare it for testing.'
         if self.raspberry_pi:
             return False
@@ -357,7 +352,7 @@ class Lead(models.Model, FulltextSearchMixin):
         self.raspberry_pi.save()
         return True
 
-    def add_shipstation_order(self):
+    def add_shipstation_order(self) -> bool:
         'Create shipstation order if does not exist.'
         if not settings.MANAGE_SHIPSTATION:
             return False
@@ -368,19 +363,15 @@ class Lead(models.Model, FulltextSearchMixin):
         shipstation_client.add_lead_order(self)
         return True
 
-    def name(self):
+    def name(self) -> str:
         'get first and last name as a single string.'
         return '{} {}'.format(self.first_name, self.last_name)
 
-    def safe_name(self):
+    def safe_name(self) -> str:
         'Use only ascii characters for name to send to shipstation, for example.'
         return self.name().encode('ascii', errors='replace').decode()
 
-    def str(self):
-        'Obsolete.'
-        return 'Lead {} ({})'.format(self.name(), self.email)
-
-    def update_from_shipstation(self, data=None):
+    def update_from_shipstation(self, data: typing.Optional[typing.Dict] = None) -> None:
         'Set tracking number if item was sent, set ship_date if empty.'
         if data is None:
             data = requests.get(
@@ -391,19 +382,25 @@ class Lead(models.Model, FulltextSearchMixin):
             ).json().get('shipments')
             data = data[0] if data else {}
 
-        if data and data.get('shipDate') and not self.ship_date:
-            self.ship_date = parser.parse(data.get('shipDate')).date()
+        if not data:
+            return
+
+        new_ship_date = data.get('shipDate')
+        new_tracking_number = data.get('trackingNumber')
+
+        if not self.ship_date and isinstance(new_ship_date, str):
+            self.ship_date = parser.parse(new_ship_date).date()
             self.save()
 
-        if data and data.get('trackingNumber') and self.usps_tracking_code != data.get('trackingNumber'):
-            self.usps_tracking_code = data.get('trackingNumber')
+        if data and isinstance(new_tracking_number, str) and self.usps_tracking_code != new_tracking_number:
+            self.usps_tracking_code = new_tracking_number
             self.tracking_info = None
             self.pi_delivered = False
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_SHIPPED, tracking_code=self.usps_tracking_code)
             # self.pi_delivered = True
             self.save()
 
-    def update_pi_delivered(self, pi_delivered, tracking_info_xml):
+    def update_pi_delivered(self, pi_delivered: bool, tracking_info_xml: str) ->  None:
         'Set pi_delivered and tracking_info'
         if pi_delivered is None:
             return
@@ -421,7 +418,7 @@ class Lead(models.Model, FulltextSearchMixin):
         else:
             self.delivery_date = None
 
-    def get_shippingapis_tracking_info(self):
+    def get_shippingapis_tracking_info(self) -> typing.Optional[str]:
         'Get tracking info as XML string from secure.shippingapis.com'
         if not self.usps_tracking_code:
             return None
@@ -438,7 +435,7 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return response.text
 
-    def get_pi_delivered_from_xml(self, tracking_info_xml):
+    def get_pi_delivered_from_xml(self, tracking_info_xml: str) -> typing.Optional[bool]:
         'Check XML string secure.shippingapis.com if device had been delivered.'
         if tracking_info_xml is None:
             return None
@@ -463,45 +460,45 @@ class Lead(models.Model, FulltextSearchMixin):
 
         return False
 
-    def get_ec2_instance(self):
+    def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         'Get corresponding EC2 object.'
         try:
             return self.ec2instance # pylint: disable=E1101
         except Lead.ec2instance.RelatedObjectDoesNotExist: # pylint: disable=E1101
             return None
 
-    def is_active(self):
+    def is_active(self) -> bool:
         'Check if RaspberryPi is assigned and lead is not banned.'
         return self.status in Lead.STATUSES_ACTIVE and self.raspberry_pi is not None
 
     @classmethod
-    def is_status_active(cls, status):
+    def is_status_active(cls, status: str) -> bool:
         'Check if status is not banned.'
         return status in cls.STATUSES_ACTIVE
 
-    def is_banned(self):
+    def is_banned(self) -> bool:
         'Check if lead is banned.'
         return self.status == Lead.STATUS_BANNED
 
-    def clear_ping_cache(self):
+    def clear_ping_cache(self) -> None:
         'Remove ping cache for this lead. Obsolete.'
         if self.raspberry_pi:
             PingCacheHelper().delete(self.raspberry_pi.rpid)
 
-    def sync_to_adsdb(self):
+    def sync_to_adsdb(self) -> bool:
         result = False
         for lead_account in self.lead_accounts.filter(active=True):
             result = lead_account.sync_to_adsdb()
 
         return result
 
-    def get_qualified_date(self):
+    def get_qualified_date(self) -> typing.Optional[datetime.datetime]:
         for lead_account in self.lead_accounts.all():
             return lead_account.qualified_date
 
         return None
 
-    def is_order_on_hold(self):
+    def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
 
 

@@ -43,13 +43,13 @@ class Bundler(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     @classmethod
-    def get_by_utm_source(cls, utm_source):
+    def get_by_utm_source(cls, utm_source: str) -> 'Bundler':
         return cls.objects.filter(utm_source=utm_source).first()
 
     @classmethod
-    def get_by_adsdb_id(cls, adsdb_id):
+    def get_by_adsdb_id(cls, adsdb_id: str) -> 'Bundler':
         return cls.objects.filter(adsdb_id=adsdb_id).first()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
         # return '{} ({})'.format(self.name, self.utm_source)

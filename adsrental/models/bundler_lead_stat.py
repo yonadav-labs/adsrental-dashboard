@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 import datetime
+import typing
 
 from django.db import models
 from django.apps import apps
 from django.utils import timezone
+
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.bundler import Bundler
 
 
 class BundlerLeadStat(models.Model):
@@ -29,11 +36,11 @@ class BundlerLeadStat(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.bundler.name
 
     @classmethod
-    def calculate(cls, bundler):
+    def calculate(cls, bundler: Bundler) -> None:
         cls.objects.filter(bundler=bundler).delete()
         obj = cls(bundler=bundler)
         LeadAccount = apps.get_model('adsrental', 'LeadAccount')

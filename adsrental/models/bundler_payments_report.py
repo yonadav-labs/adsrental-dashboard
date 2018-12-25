@@ -1,12 +1,18 @@
+from __future__ import annotations
+
 import re
 import json
 import decimal
+import typing
 
 from django.db import models
 from django.conf import settings
 from django.core.mail import EmailMessage
 
 from adsrental.models.lead_account import LeadAccount
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.bundler import Bundler
 
 
 class BundlerPaymentsReport(models.Model):
@@ -21,7 +27,7 @@ class BundlerPaymentsReport(models.Model):
     data = models.TextField(default='')
     cancelled = models.BooleanField(default=False)
 
-    def get_usernames(self):
+    def get_usernames(self) -> typing.List[str]:
         regexp = r'<td>([^<]+@[^<]+)</td>'
         emails = re.findall(regexp, self.html)
 
@@ -30,12 +36,12 @@ class BundlerPaymentsReport(models.Model):
         usernames = phones + emails
         return usernames
 
-    def get_lead_accounts(self):
+    def get_lead_accounts(self) -> models.query.QuerySet:
         usernames = self.get_usernames()
         lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
         return lead_accounts
 
-    def get_html_for_bundler(self, bundler):
+    def get_html_for_bundler(self, bundler: Bundler) -> str:
         html = self.html
         html_parts = html.split('<h3>')
         result = []
@@ -49,7 +55,7 @@ class BundlerPaymentsReport(models.Model):
         # result.append('<h3>' + html_parts[-1])
         return ''.join(result)
 
-    def mark(self):
+    def mark(self) -> typing.Dict[str, int]:
         result = {
             'facebook_entries_ids': 0,
             'chargeback_facebook_entries_ids': 0,
@@ -86,7 +92,7 @@ class BundlerPaymentsReport(models.Model):
 
         return result
 
-    def unmark(self):
+    def unmark(self) -> typing.Dict[str, int]:
         result = {
             'facebook_entries_ids': 0,
             'chargeback_facebook_entries_ids': 0,
@@ -121,7 +127,7 @@ class BundlerPaymentsReport(models.Model):
         self.save()
         return result
 
-    def send_by_email(self):
+    def send_by_email(self) -> None:
         email = EmailMessage(
             'Payments report for {}'.format(self.date.strftime(settings.HUMAN_DATE_FORMAT)),
             'Payments report for {}'.format(self.date.strftime(settings.HUMAN_DATE_FORMAT)),

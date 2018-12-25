@@ -1,5 +1,8 @@
 'LeadAccount model'
+from __future__ import annotations
+
 import decimal
+import typing
 
 import requests
 from django.utils import timezone
@@ -13,6 +16,10 @@ from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.utils import CustomerIOClient
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.user import User
+    from adsrental.models.bundler import Bundler
 
 
 class LeadAccount(models.Model, FulltextSearchMixin):
@@ -148,7 +155,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
-    def get_bundler_payment(self, bundler):
+    def get_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
@@ -180,7 +187,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return result
 
-    def get_parent_bundler_payment(self, bundler):
+    def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
@@ -194,7 +201,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return result
 
-    def get_second_parent_bundler_payment(self, bundler):
+    def get_second_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if bundler.second_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
             if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
@@ -208,20 +215,20 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return result
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{} lead {}'.format(self.account_type, self.username)
 
-    def get_lead(self):
+    def get_lead(self) -> Lead:
         return self.lead
 
-    def is_security_checkpoint_reported(self):
+    def is_security_checkpoint_reported(self) -> bool:
         return self.security_checkpoint_date is not None
 
-    def is_wrong_password(self):
+    def is_wrong_password(self) -> bool:
         'Is password reported as wrong now'
         return self.wrong_password_date is not None
 
-    def _get_adsdb_api_id(self):
+    def _get_adsdb_api_id(self) -> int:
         if self.account_type in self.ACCOUNT_TYPES_FACEBOOK:
             return 146
 
@@ -230,18 +237,18 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         raise ValueError()
 
-    def sync_to_adsdb(self):
+    def sync_to_adsdb(self) -> typing.Tuple[typing.Optional[typing.Dict[str, typing.Any]], typing.Any]:
         'Send lead account info to ADSDB'
 
         lead = self.get_lead()
         # if self.account_type == self.ACCOUNT_TYPE_GOOGLE:
         #     return False, {}
         if self.account_type == self.ACCOUNT_TYPE_AMAZON:
-            return False, {}
+            return None, {}
         if self.status != self.STATUS_IN_PROGRESS:
-            return False, {}
+            return None, {}
         if self.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT and self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
-            return False, {}
+            return None, {}
 
         bundler_adsdb_id = lead.bundler and lead.bundler.adsdb_id
         ec2_instance = lead.get_ec2_instance()
@@ -270,27 +277,26 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             data['ad_manager_type_2'] = 7
 
         auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
-        request_data = [data]
 
         if not self.adsdb_account_id:
             url = 'https://www.adsdb.io/api/v1/accounts/create-s'
             response = requests.post(
                 url,
-                json=request_data,
+                json=[data],
                 auth=auth,
             )
             try:
                 response_json = response.json()
             except ValueError:
-                return ({'error': True, 'url': url, 'data': request_data, 'text': response.text, 'status': response.status_code}, request_data)
+                return ({'error': True, 'url': url, 'data': [data], 'text': response.text, 'status': response.status_code}, [data])
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
-                return (response_json, request_data)
+                return (response_json, [data])
             if response.status_code == 409:
                 self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
                 self.save()
-            return (response_json, request_data)
+            return (response_json, [data])
 
         request_data = {
             'account_id': int(self.adsdb_account_id),
@@ -310,7 +316,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return (response_json, request_data)
 
-    def set_correct_password(self, new_password, edited_by):
+    def set_correct_password(self, new_password: str, edited_by: User) -> None:
         'Change password, marks as correct, create LeadChange instance.'
         old_value = self.password
         self.password = new_password
@@ -318,12 +324,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
 
-    def mark_wrong_password(self, edited_by):
+    def mark_wrong_password(self, edited_by: User) -> None:
         self.wrong_password_date = timezone.now()
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='wrong_password', value=self.password, old_value=self.password, edited_by=edited_by).save()
 
-    def set_status(self, value, edited_by):
+    def set_status(self, value: str, edited_by: User) -> bool:
         'Change status, create LeadChange instance.'
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
@@ -343,7 +349,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         LeadChange(lead=self.lead, lead_account=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def ban(self, edited_by, reason=None):
+    def ban(self, edited_by: User, reason: typing.Optional[str] = None) -> bool:
         'Mark lead account as banned, send cutomer.io event.'
         now = timezone.localtime(timezone.now())
         self.ban_reason = reason
@@ -371,7 +377,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.lead.ban(edited_by)
         return result
 
-    def unban(self, edited_by):
+    def unban(self, edited_by: User) -> bool:
         'Restores lead account previous status before banned.'
         self.ban_reason = None
         self.save()
@@ -380,7 +386,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.lead.unban(edited_by)
         return result
 
-    def disqualify(self, edited_by):
+    def disqualify(self, edited_by: User) -> bool:
         'Set lead account status as disqualified.'
         new_status = LeadAccount.STATUS_DISQUALIFIED
         if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
@@ -393,7 +399,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 self.lead.disqualify(edited_by)
         return result
 
-    def qualify(self, edited_by):
+    def qualify(self, edited_by: User) -> bool:
         'Set lead account status as qualified.'
         new_status = LeadAccount.STATUS_QUALIFIED
         if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
@@ -406,23 +412,23 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return result
 
-    def is_active(self):
+    def is_active(self) -> bool:
         'Check if RaspberryPi is assigned and lead account is not banned.'
         return self.status in LeadAccount.STATUSES_ACTIVE and self.lead.raspberry_pi is not None
 
-    def is_banned(self):
+    def is_banned(self) -> bool:
         'Check if lead account is banned.'
         return self.status == LeadAccount.STATUS_BANNED
 
     @classmethod
-    def get_lead_accounts(cls, lead):
+    def get_lead_accounts(cls, lead: Lead) -> models.query.QuerySet:
         return cls.objects.filter(lead=lead, active=True)
 
     @classmethod
-    def get_active_lead_accounts(cls, lead):
+    def get_active_lead_accounts(cls, lead: Lead) -> models.query.QuerySet:
         return cls.objects.filter(lead=lead, active=True, status__in=cls.STATUSES_ACTIVE)
 
-    def touch(self):
+    def touch(self) -> None:
         'Update touch count and last touch date. Tries to sync to adsdb if conditions are met.'
         if self.account_type not in self.ACCOUNT_TYPES_FACEBOOK:
             return
@@ -433,7 +439,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.save()
 
     @classmethod
-    def get_online_filter(cls):
+    def get_online_filter(cls) -> models.query.QuerySet:
         '''
         Get online condition ty use as a filter like
 

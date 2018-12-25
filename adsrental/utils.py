@@ -1,4 +1,6 @@
 'Helper classes'
+from __future__ import annotations
+
 import json
 import time
 import uuid
@@ -6,10 +8,12 @@ import secrets
 import string
 import random
 import datetime
+import typing
 
 import requests
 import boto3
 from botocore.exceptions import ClientError
+from django.http.request import HttpRequest
 from django.utils import timezone
 from django.core.cache import cache
 from django.conf import settings
@@ -19,6 +23,10 @@ from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, S
 
 from adsrental.models.customerio_event import CustomerIOEvent
 
+if typing.TYPE_CHECKING:
+    from adsrental.models.lead import Lead
+    from adsrental.models.raspberry_pi import RaspberryPi
+    from adsrental.models.ec2_instance import EC2Instance
 
 class CustomerIOClient():
     '''Manages lead data ans send events for leads to customer.io'''
@@ -31,14 +39,14 @@ class CustomerIOClient():
     EVENT_BANNED_HAS_ACCOUNTS = 'banned_has_accounts'
     EVENT_SECURITY_CHECKPOINT = 'security_checkpoint'
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = None
         if not settings.CUSTOMERIO_ENABLED:
             return
         self.client = customerio.CustomerIO(
             settings.CUSTOMERIO_SITE_ID, settings.CUSTOMERIO_API_KEY)
 
-    def get_client(self):
+    def get_client(self) -> typing.Optional[customerio.CustomerIO]:
         '''
         Get customer.io client
 
@@ -47,7 +55,7 @@ class CustomerIOClient():
         '''
         return self.client
 
-    def send_lead(self, lead):
+    def send_lead(self, lead: Lead) -> None:
         '''
         Save lead info like email and phone to customer.io database.
 
@@ -74,7 +82,7 @@ class CustomerIOClient():
 
             )
 
-    def send_lead_event(self, lead, event, **kwargs):
+    def send_lead_event(self, lead: Lead, event: str, **kwargs: str) -> None:
         '''
         Create a new :model:`adsrental.Lead` event, like banned or approved.
 
@@ -95,25 +103,25 @@ class CustomerIOClient():
             sent=send,
             kwargs=json.dumps(kwargs),
         ).save()
-        if send:
+        if self.client and send:
             self.client.track(customer_id=lead.leadid, name=event, **kwargs)
 
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         'Check if client is initialized.'
         return self.client is not None
 
 
 class ShipStationClient():
     'Handles order creation and check on shipstation.'
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = ShipStation(
             key=settings.SHIPSTATION_API_KEY, secret=settings.SHIPSTATION_API_SECRET)
 
-    def get_client(self):
+    def get_client(self) -> ShipStation:
         'Get native shipstation client'
         return self.client
 
-    def add_lead_order(self, lead, status=None):
+    def add_lead_order(self, lead: Lead, status: typing.Optional[str] = None) -> ShipStationOrder:
         'Create order for given lead.'
         if not lead.shipstation_order_number:
             random_str = str(uuid.uuid4()).replace('-', '')[:10]
@@ -159,7 +167,7 @@ class ShipStationClient():
         self.submit_orders()
         return order
 
-    def submit_orders(self):
+    def submit_orders(self) -> None:
         'Submit all created or changed orders.'
         for order in self.client.orders:
             self.post(
@@ -167,7 +175,7 @@ class ShipStationClient():
                 data=json.dumps(order.as_dict())
             )
 
-    def post(self, endpoint='', data=None):
+    def post(self, endpoint: str = '', data: typing.Any = None) -> None:
         'Rewrite original shipstaion.post method to catch exceptions.'
         url = '{}{}'.format(self.client.url, endpoint)
         headers = {'content-type': 'application/json'}
@@ -181,7 +189,7 @@ class ShipStationClient():
             raise ValueError('Shipstation Error', response.status_code, response.text)
 
     @staticmethod
-    def get_lead_order_data(lead):
+    def get_lead_order_data(lead: Lead) -> typing.Optional[typing.Dict]:
         'Get order data for lead.'
         if not lead.shipstation_order_number:
             return None
@@ -197,14 +205,14 @@ class ShipStationClient():
 
 class BotoResource():
     'Handles AWS boto operations.'
-    def __init__(self):
+    def __init__(self) -> None:
         self.session = boto3.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
-        self.resources = {}
+        self.resources: typing.Dict[str, typing.Any] = {}
 
-    def get_resource(self, service='ec2'):
+    def get_resource(self, service: str = 'ec2') -> boto3.resource:
         'Get boto resource for given service. Chaches results.'
         if not self.resources.get(service):
             resource = self.session.resource(
@@ -213,10 +221,10 @@ class BotoResource():
 
         return self.resources[service]
 
-    def get_client(self, service):
+    def get_client(self, service: str) -> typing.Any:
         return self.session.client(service, region_name=settings.AWS_REGION)
 
-    def get_by_essential_key(self, key):
+    def get_by_essential_key(self, key: str) -> typing.Any:
         'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
@@ -230,7 +238,7 @@ class BotoResource():
         for instance in instances_list:
             return instance
 
-    def get_first_rpid_instance(self, rpid):
+    def get_first_rpid_instance(self, rpid: str) -> typing.Any:
         'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
@@ -269,7 +277,7 @@ class BotoResource():
         return False
 
     @staticmethod
-    def get_instance_tag(instance, key):
+    def get_instance_tag(instance: typing.Any, key: str) -> typing.Optional[str]:
         'Get instance tag value by key'
         if not instance.tags:
             return None
@@ -280,7 +288,7 @@ class BotoResource():
 
         return None
 
-    def set_instance_tag(self, instance, key, value):
+    def set_instance_tag(self, instance: typing.Any, key: str, value: str) -> None:
         'Set instance tag value by key'
         tags = instance.tags or []
         key_found = False
@@ -298,7 +306,7 @@ class BotoResource():
         except ClientError:
             pass
 
-    def create_r53_entry(self, ec2_instance):
+    def create_r53_entry(self, ec2_instance: EC2Instance) -> None:
         ec2_resource = self.get_resource('ec2')
         route53_client = boto3.client('route53')
         hostname = ec2_instance.get_r53_hostname()
@@ -329,7 +337,7 @@ class BotoResource():
             },
         )
 
-    def launch_instance(self, rpid, email):
+    def launch_instance(self, rpid: str, email: str) -> typing.Any:
         'Start otr create AWS EC2 instance for given RPID'
         instance = self.get_first_rpid_instance(rpid)
         if not instance:
@@ -374,10 +382,10 @@ class BotoResource():
         return instance
 
     @staticmethod
-    def generate_key():
+    def generate_key() -> str:
         return str(uuid.uuid4())
 
-    def launch_essential_instance(self, ec2_instance):
+    def launch_essential_instance(self, ec2_instance: EC2Instance) -> typing.Any:
         'Start or create AWS EC2 instance for given RPID'
         boto_instance = self.get_by_essential_key(ec2_instance.essential_key)
         if boto_instance:
@@ -429,14 +437,14 @@ class PingCacheHelper():
     KEYS = 'ping_keys'
     TTL_SECONDS = 600
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.cache = cache
 
-    def get_key(self, rpid):
+    def get_key(self, rpid: str) -> str:
         'Get keys string for given rpid'
         return self.KEY_TEMPLATE.format(rpid)
 
-    def get(self, rpid):
+    def get(self, rpid: str) -> typing.Optional[typing.Dict]:
         'Get data for rpid if it is valid'
         data = self.cache.get(self.get_key(rpid))
         if not self.is_data_valid(data):
@@ -444,7 +452,7 @@ class PingCacheHelper():
         return data
 
     @staticmethod
-    def is_data_valid(data):
+    def is_data_valid(data: typing.Dict[str, typing.Any]) -> bool:
         'Check if cache data is valid'
         if not data:
             return False
@@ -455,7 +463,7 @@ class PingCacheHelper():
         return True
 
     @classmethod
-    def is_data_consistent(cls, data, ec2_instance, raspberry_pi):
+    def is_data_consistent(cls, data: typing.Dict[str, typing.Any], raspberry_pi: RaspberryPi) -> bool:
         'Check if cache data is consistent against current DB state'
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
@@ -487,7 +495,7 @@ class PingCacheHelper():
 
         return True
 
-    def set(self, rpid, data):
+    def set(self, rpid: str, data: typing.Dict[str, typing.Any]) -> None:
         '''
         Create cache entry for rpid
 
@@ -501,7 +509,7 @@ class PingCacheHelper():
             keys.append(key)
             self.cache.set(self.KEYS, keys)
 
-    def get_hostname(self, lead, raspberry_pi, ec2_instance):
+    def get_hostname(self, lead: Lead, raspberry_pi: RaspberryPi, ec2_instance: EC2Instance) -> typing.Optional[str]:
         if not lead.is_active():
             return None
         if raspberry_pi.is_proxy_tunnel:
@@ -512,7 +520,7 @@ class PingCacheHelper():
 
         return None
 
-    def get_actual_data(self, rpid):
+    def get_actual_data(self, rpid: str) -> typing.Dict[str, typing.Any]:
         '''
         Get data for rpid for DB
 
@@ -553,7 +561,7 @@ class PingCacheHelper():
 
         return data
 
-    def delete(self, rpid):
+    def delete(self, rpid: str) -> None:
         '''Delete cache data for rpid'''
         key = self.get_key(rpid)
         self.cache.delete(key)
@@ -562,7 +570,7 @@ class PingCacheHelper():
             keys = [i for i in keys if i != key]
             self.cache.set(self.KEYS, keys)
 
-    def get_data_for_request(self, request):
+    def get_data_for_request(self, request: HttpRequest) -> typing.Dict[str, typing.Any]:
         '''Get data from cache or db using request.GET'''
         rpid = request.GET.get('rpid', '').strip()
         troubleshoot = request.GET.get('troubleshoot')
@@ -594,7 +602,7 @@ class PingCacheHelper():
         return ping_data
 
 
-def generate_password(length=12):
+def generate_password(length: int = 12) -> str:
     result = []
     for _ in range(2):
         result.append(secrets.choice(string.digits))
@@ -607,14 +615,14 @@ def generate_password(length=12):
     return ''.join(result)
 
 
-def get_week_boundaries_for_dt(d):
+def get_week_boundaries_for_dt(d: datetime.datetime) -> typing.Tuple[datetime.datetime, datetime.datetime]:
     d_midnight = d.replace(hour=0, minute=0, second=0)
     start = d_midnight - datetime.timedelta(days=d_midnight.weekday())
     end = start + datetime.timedelta(days=7)
     return start, end
 
 
-def get_month_boundaries_for_dt(d):
+def get_month_boundaries_for_dt(d: datetime.datetime) -> typing.Tuple[datetime.datetime, datetime.datetime]:
     d_midnight = d.replace(hour=0, minute=0, second=0)
     start = d_midnight.replace(day=1)
     next_month = start.replace(day=28) + datetime.timedelta(days=4)

@@ -1,8 +1,9 @@
 'LeadHistory class'
 import datetime
 import decimal
-from dateutil.relativedelta import relativedelta
+import typing
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -49,7 +50,7 @@ class LeadHistory(models.Model):
 
     objects = BulkUpdateManager()
 
-    def check_lead(self):
+    def check_lead(self) -> None:
         'Update stats for this entry'
         if not self.lead.is_active():
             self.checks_offline += 1
@@ -80,7 +81,7 @@ class LeadHistory(models.Model):
                     self.checks_sec_checkpoint_amazon += 1
 
     @classmethod
-    def upsert_for_lead(cls, lead):
+    def upsert_for_lead(cls, lead: Lead) -> None:
         'Create or update stats for this entry'
         today = datetime.date.today()
         lead_history = cls.objects.filter(lead=lead, date=today).first()
@@ -90,24 +91,24 @@ class LeadHistory(models.Model):
         lead_history.check_lead()
         lead_history.save()
 
-    def is_online(self):
+    def is_online(self) -> bool:
         'Check iff device was online for more than 12 checks.'
         return self.checks_online > self.ONLINE_CHECKS_MIN
 
-    def is_active(self):
+    def is_active(self) -> bool:
         'Check password was not reported as wrong and device was online'
         return not self.is_wrong_password() and self.is_online()
 
-    def is_wrong_password_facebook(self):
+    def is_wrong_password_facebook(self) -> bool:
         return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
 
-    def is_wrong_password_google(self):
+    def is_wrong_password_google(self) -> bool:
         return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
 
-    def is_wrong_password_amazon(self):
+    def is_wrong_password_amazon(self) -> bool:
         return self.checks_wrong_password_facebook >= self.WRONG_PASSWORD_CHECKS_MIN
 
-    def is_wrong_password(self):
+    def is_wrong_password(self) -> bool:
         'Check if password for this day was reported wrong at least 3 times.'
         if self.is_wrong_password_facebook():
             return True
@@ -118,7 +119,7 @@ class LeadHistory(models.Model):
 
         return False
 
-    def is_sec_checkpoint(self):
+    def is_sec_checkpoint(self) -> bool:
         'Check if security checkpoint for this day was reported at least 3 times.'
         if self.checks_sec_checkpoint_facebook >= self.SEC_CHECKPOINT_CHECKS_MIN:
             return True
@@ -130,7 +131,7 @@ class LeadHistory(models.Model):
         return False
 
     @classmethod
-    def get_queryset_for_month(cls, year, month, lead_ids=None):
+    def get_queryset_for_month(cls, year: int, month: int, lead_ids: typing.Optional[typing.List[str]] = None) -> models.query.QuerySet:
         'Get all entries for given year and month'
         date__gte = datetime.date(year, month, 1)
         date__lt = datetime.date(year, month, 1) + relativedelta(months=1)
@@ -139,14 +140,14 @@ class LeadHistory(models.Model):
             result = result.filter(lead_id__in=lead_ids)
         return result
 
-    def get_last_day(self):
+    def get_last_day(self) -> datetime.date:
         next_month = self.date.replace(day=28) + datetime.timedelta(days=4)
         return next_month - datetime.timedelta(days=next_month.day)
 
-    def get_first_day(self):
+    def get_first_day(self) -> datetime.date:
         return self.date.replace(day=1)
 
-    def get_amount_with_note(self):
+    def get_amount_with_note(self) -> typing.Tuple[decimal.Decimal, str]:
         result = decimal.Decimal('0.00')
         if not self.is_online():
             return result, 'Account is offline (${})'.format(result)

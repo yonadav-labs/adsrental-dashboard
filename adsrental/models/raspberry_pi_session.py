@@ -1,5 +1,13 @@
+from __future__ import annotations
+
+import typing
+
 from django.db import models
 from django.utils import timezone
+
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class RaspberryPiSession(models.Model):
@@ -14,9 +22,9 @@ class RaspberryPiSession(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     @classmethod
-    def start(cls, raspberry_pi, test=False):
+    def start(cls, raspberry_pi: RaspberryPi, test: bool = False) -> RaspberryPiSession:
         return cls(raspberry_pi=raspberry_pi, test=test).save()
 
     @classmethod
-    def end(cls, raspberry_pi):
+    def end(cls, raspberry_pi: RaspberryPi) -> typing.Union[models.query.QuerySet, typing.List[RaspberryPiSession]]:
         return cls.objects.filter(raspberry_pi=raspberry_pi, end_date__isnull=True).update(end_date=timezone.now())

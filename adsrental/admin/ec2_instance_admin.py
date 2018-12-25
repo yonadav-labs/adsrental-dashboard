@@ -197,7 +197,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
 
     def update_password(self, request, queryset):
         for ec2_instance in queryset:
-            ec2_instance.change_password()
+            ec2_instance.change_password(ec2_instance.password)
 
     def upgrade_to_large(self, request, queryset):
         client = BotoResource().get_client('ec2')

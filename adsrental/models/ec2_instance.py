@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import socket
 import datetime
 import time
 import re
 import logging
+import typing
 
 from django.db import models
 from django.conf import settings
@@ -12,6 +15,11 @@ from django_bulk_update.manager import BulkUpdateManager
 import paramiko
 
 from adsrental.utils import BotoResource, PingCacheHelper
+
+
+if typing.TYPE_CHECKING:
+    from adsrental.models.lead import Lead
+    from adsrental.models.raspberry_pi import RaspberryPi
 
 
 logging.getLogger("paramiko").setLevel(logging.CRITICAL)
@@ -144,12 +152,12 @@ class EC2Instance(models.Model):
     objects = BulkUpdateManager()
 
     @classmethod
-    def launch_for_lead(cls, lead):
+    def launch_for_lead(cls, lead: Lead) -> typing.Optional[EC2Instance]:
         '''
         Launch EC2, set tags if it does not exist. If it exists - make sure it is Running.
         '''
         if not settings.MANAGE_EC2:
-            return False
+            return None
 
         if not lead.raspberry_pi:
             return None
@@ -181,12 +189,12 @@ class EC2Instance(models.Model):
         return BotoResource().launch_instance(lead.raspberry_pi.rpid, lead.email)
 
     @classmethod
-    def launch_essential(cls):
+    def launch_essential(cls) -> typing.Optional[EC2Instance]:
         '''
         Launch essential EC2
         '''
         if not settings.MANAGE_EC2:
-            return False
+            return None
 
         boto_resource = BotoResource()
 
@@ -203,13 +211,13 @@ class EC2Instance(models.Model):
         return ec2_instance
 
     @classmethod
-    def get_by_rpid(cls, rpid):
+    def get_by_rpid(cls, rpid: str) -> EC2Instance:
         return cls.objects.filter(rpid=rpid, status__in=cls.STATUSES_ACTIVE).order_by('-created').first()
 
-    def get_raspberry_pi(self):
+    def get_raspberry_pi(self) -> typing.Optional[RaspberryPi]:
         return self.lead and self.lead.raspberry_pi
 
-    def get_boto_instance(self, boto_resource=None):
+    def get_boto_instance(self, boto_resource: typing.Any = None) -> typing.Any:
         '''
         Get dict with data from AWS about current instance.
 
@@ -228,45 +236,45 @@ class EC2Instance(models.Model):
         for instance in instances:
             return instance
 
-    def is_status_temp(self):
+    def is_status_temp(self) -> bool:
         '''
         Check if status is not *Stopping* or *Pending*
         '''
         return self.status in [self.STATUS_PENDING, self.STATUS_STOPPING]
 
     @classmethod
-    def is_status_active(cls, status):
+    def is_status_active(cls, status: str) -> bool:
         '''
         Check if status is not *Stopped* or *Terminated*
         '''
         return status in cls.STATUSES_ACTIVE
 
-    def is_active(self):
+    def is_active(self) -> bool:
         '''
         Check if instance status is not *Stopped* or *Terminated*
         '''
         return self.status in self.STATUSES_ACTIVE
 
-    def is_running(self):
+    def is_running(self) -> bool:
         '''
         Check if instance status is *Running*
         '''
         return self.status == self.STATUS_RUNNING
 
     @classmethod
-    def is_status_running(cls, status):
+    def is_status_running(cls, status: str) -> bool:
         '''
         Check if status is *Running*
         '''
         return status == cls.STATUS_RUNNING
 
-    def is_stopped(self):
+    def is_stopped(self) -> bool:
         '''
         Check if instance status is *Stopped*
         '''
         return self.status == self.STATUS_STOPPED
 
-    def is_tunnel_up(self):
+    def is_tunnel_up(self) -> bool:
         '''
         Check if tunnels were reported as UP in last 20 minutes.
         '''
@@ -275,7 +283,7 @@ class EC2Instance(models.Model):
         now = timezone.localtime(timezone.now())
         return self.tunnel_up_date > now - datetime.timedelta(seconds=self.TUNNEL_UP_TTL_SECONDS)
 
-    def update_from_boto(self, boto_instance=None):
+    def update_from_boto(self, boto_instance: typing.Any = None) -> EC2Instance:
         '''
         Update tags and state from AWS.
 
@@ -315,10 +323,10 @@ class EC2Instance(models.Model):
 
         return self
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.instance_id or str(self.id)
 
-    def get_ssh(self, timeout=20):
+    def get_ssh(self, timeout: int = 20) -> paramiko.SSHClient:
         '''
         Create SSH connection to EC2
         '''
@@ -333,13 +341,16 @@ class EC2Instance(models.Model):
 
         return ssh
 
-    def ssh_execute(self, cmd, input_list=None, ssh=None, blocking=True, timeout=20):
+    def ssh_execute(
+            self,
+            cmd: str,
+            input_list: typing.Optional[typing.List[str]] = None,
+            timeout: int = 20,
+    ) -> str:
         '''
         Safe execute SSH command on EC2 and get output.
         '''
-        if not ssh:
-            ssh = self.get_ssh(timeout)
-
+        ssh = self.get_ssh(timeout)
         try:
             ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd, timeout=timeout)
         except (paramiko.ssh_exception.SSHException, EOFError, socket.timeout, OSError, paramiko.ssh_exception.NoValidConnectionsError, ConnectionResetError):
@@ -348,19 +359,16 @@ class EC2Instance(models.Model):
             for line in input_list:
                 ssh_stdin.write('{}\n'.format(line))
                 ssh_stdin.flush()
-        if blocking:
-            try:
-                stderr = ssh_stderr.read()
-                stdout = ssh_stdout.read()
-            except socket.timeout:
-                return ''
-            ssh.close()
-            return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
-
-        return True
+        try:
+            stderr = ssh_stderr.read()
+            stdout = ssh_stdout.read()
+        except socket.timeout:
+            return ''
+        ssh.close()
+        return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
 
     @staticmethod
-    def get_tag(boto_instance, key):
+    def get_tag(boto_instance: typing.Any, key: str) -> typing.Optional[str]:
         '''
         Get AWS EC2 instance tag value.
         '''
@@ -374,7 +382,7 @@ class EC2Instance(models.Model):
         return None
 
     @classmethod
-    def upsert_from_boto(cls, boto_instance, instance=None):
+    def upsert_from_boto(cls, boto_instance: typing.Any, instance: typing.Optional[EC2Instance] = None) -> EC2Instance:
         '''
         Create or update instance from AWS using *instance_id* as a key.
         '''
@@ -387,7 +395,7 @@ class EC2Instance(models.Model):
 
         return instance.update_from_boto(boto_instance)
 
-    def terminate(self):
+    def terminate(self) -> bool:
         '''
         Terminate instance. Terminated instance can stay up for 24 hours in AWS.
         '''
@@ -403,7 +411,7 @@ class EC2Instance(models.Model):
         self.save()
         return True
 
-    def start(self, blocking=False):
+    def start(self, blocking: bool = False) -> bool:
         '''
         Start stopped EC2 instance.
 
@@ -430,7 +438,7 @@ class EC2Instance(models.Model):
 
         return True
 
-    def restart(self):
+    def restart(self) -> bool:
         'Restart instance. DO not use, as it can take up to 10 minutes.'
         if not settings.MANAGE_EC2:
             return False
@@ -438,7 +446,7 @@ class EC2Instance(models.Model):
         self.start(blocking=True)
         return True
 
-    def stop(self, blocking=False):
+    def stop(self, blocking: bool = False) -> bool:
         '''
         Stop running or pending EC2 instance.
 
@@ -468,13 +476,13 @@ class EC2Instance(models.Model):
 
         return True
 
-    def mark_as_missing(self):
+    def mark_as_missing(self) -> None:
         'Mark instance that not present in AWS.'
         self.status = self.STATUS_MISSING
         self.tunnel_up_date = None
         self.save()
 
-    def troubleshoot(self):
+    def troubleshoot(self) -> bool:
         'Run all troubleshoot at once.'
         self.last_troubleshoot = timezone.now()
         boto_instance = self.get_boto_instance()
@@ -489,7 +497,7 @@ class EC2Instance(models.Model):
         self.save()
         return True
 
-    def enable_proxy(self):
+    def enable_proxy(self) -> None:
         'Check and fix proxy settings. Makes sure that web can be reached only via proxy tunnel.'
         cmd_to_execute = 'reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyEnable'
         output = self.ssh_execute(cmd_to_execute)
@@ -505,7 +513,7 @@ class EC2Instance(models.Model):
         ssh.exec_command(cmd_to_execute)
         ssh.close()
 
-    def disable_proxy(self):
+    def disable_proxy(self) -> None:
         ssh = self.get_ssh()
         cmd_to_execute = 'reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings" /v ProxyServer /t REG_SZ /d socks=127.0.0.1:3808 /f'
         ssh.exec_command(cmd_to_execute)
@@ -515,7 +523,7 @@ class EC2Instance(models.Model):
         ssh.exec_command(cmd_to_execute)
         ssh.close()
 
-    def troubleshoot_old_pi_version(self):
+    def troubleshoot_old_pi_version(self) -> None:
         'Force update old version that do no support firmware update.'
         if not self.lead or not self.lead.raspberry_pi:
             return
@@ -530,11 +538,8 @@ class EC2Instance(models.Model):
             self.ssh_execute(cmd_to_execute)
             raspberry_pi.save()
 
-    def change_password(self, password=None):
+    def change_password(self, password: str) -> None:
         'Obsolete method. Was used to update all old non-human-friendly passwords.'
-        if password is None:
-            password = self.password
-
         output = self.ssh_execute('net user Administrator {password}'.format(password=password))
         if 'successfully' not in output:
             raise ValueError(output)
@@ -542,7 +547,7 @@ class EC2Instance(models.Model):
         self.password = password
         self.save()
 
-    def set_ec2_tags(self):
+    def set_ec2_tags(self) -> None:
         'Update RPID and email in EC2 metadata on AWS.'
         tags = []
         if self.is_duplicate:
@@ -562,14 +567,14 @@ class EC2Instance(models.Model):
 
         boto_resource.create_tags(Resources=[self.instance_id], Tags=tags)
 
-    def assign_essential(self, rpid, lead):
+    def assign_essential(self, rpid: str, lead: Lead) -> None:
         self.rpid = rpid
         self.lead = lead
         self.email = lead.email
         self.save()
         self.set_ec2_tags()
 
-    def unassign_essential(self):
+    def unassign_essential(self) -> None:
         # if self.rpid:
         #     self.ssh_execute('ssh pi@localhost -p 2046 killall ssh')
         self.rpid = None
@@ -579,20 +584,20 @@ class EC2Instance(models.Model):
         self.set_ec2_tags()
         # self.ssh_execute('ssh pi@localhost -p 2046 Taskkill /IM ssh.exe /F')
 
-    def clear_ping_cache(self):
+    def clear_ping_cache(self) -> None:
         'Delete cache for this instance RPID.'
         PingCacheHelper().delete(self.rpid)
 
-    def get_r53_hostname(self):
+    def get_r53_hostname(self) -> str:
         return '{}.{}'.format(self.rpid, self.R53_HOST)
 
-    def get_windows_rdp_uri(self):
+    def get_windows_rdp_uri(self) -> str:
         return 'rdp://{}:{}:{}:{}'.format(self.hostname, 23255, 'Administrator', self.password)
 
-    def get_rdp_uri(self):
+    def get_rdp_uri(self) -> str:
         return 'rdp://full%20address=s:{}:{}&username=s:{}'.format(self.hostname, 23255, 'Administrator')
 
-    def get_web_rdp_link(self):
+    def get_web_rdp_link(self) -> str:
         return 'http://{host}:{rdp_client_port}/#host={hostname}&user={user}&password={password}&rpid={rpid}&connect=true'.format(
             host=settings.HOSTNAME,
             rdp_client_port=9999,
@@ -602,7 +607,7 @@ class EC2Instance(models.Model):
             rpid=self.rpid,
         )
 
-    def is_rdp_session_active(self):
+    def is_rdp_session_active(self) -> bool:
         output = ''
         try:
             output = self.ssh_execute('netstat -an', timeout=20)
