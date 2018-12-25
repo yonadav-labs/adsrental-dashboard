@@ -2,14 +2,14 @@ from django.views import View
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http import FileResponse
+from django.http import FileResponse, HttpRequest
 
 from adsrental.models.vultr_instance import VultrInstance
 
 
 class VultrRDPFileView(View):
     @method_decorator(login_required)
-    def get(self, request, vultr_instance_id):
+    def get(self, request: HttpRequest, vultr_instance_id: int) -> FileResponse:
         vultr_instance = get_object_or_404(VultrInstance, id=vultr_instance_id)
 
         lines = []

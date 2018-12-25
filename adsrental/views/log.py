@@ -1,9 +1,10 @@
 import os
 import json
+import typing
 from distutils.version import StrictVersion  # pylint: disable=no-name-in-module,import-error
 
 from django.views import View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.utils import timezone
 from django.conf import settings
 from django.shortcuts import render
@@ -12,13 +13,12 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import Http404
 
 from adsrental.models.lead import Lead
-from adsrental.models.ec2_instance import EC2Instance
 from adsrental.utils import PingCacheHelper
 
 
 class ShowLogDirView(View):
     @method_decorator(login_required)
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> HttpResponse:
         path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid)
         if not os.path.exists(path):
             raise Http404
@@ -33,7 +33,7 @@ class ShowLogDirView(View):
 
 class ShowLogView(View):
     @method_decorator(login_required)
-    def get(self, request, rpid, filename):
+    def get(self, request: HttpRequest, rpid: str, filename: str) -> HttpResponse:
         log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid, filename)
         if not os.path.exists(log_path):
             raise Http404
@@ -43,7 +43,7 @@ class ShowLogView(View):
 class LogView(View):
     PING_DATA_TTL_SECONDS = 300
 
-    def add_log(self, request, rpid, message):
+    def add_log(self, request: HttpRequest, rpid: str, message: str) -> None:
         ip_address = request.META.get('REMOTE_ADDR')
         now = timezone.localtime(timezone.now())
         log_path = os.path.join(
@@ -60,22 +60,22 @@ class LogView(View):
                 message=message,
             ))
 
-    def get_old_client_log_handler(self, request, rpid):
+    def get_old_client_log_handler(self, request: HttpRequest, rpid: str) -> JsonResponse:
         message = request.GET.get('m')
         self.add_log(request, rpid, 'Old Client >>> {}'.format(message))
         return JsonResponse({'result': True, 'source': 'client'})
 
-    def get_client_log_handler(self, request, rpid):
+    def get_client_log_handler(self, request: HttpRequest, rpid: str) -> JsonResponse:
         message = request.GET.get('client_log')
         self.add_log(request, rpid, 'Client >>> {}'.format(message))
         return JsonResponse({'result': True, 'source': 'client'})
 
-    def get_hostname_handler(self, request, rpid):
+    def get_hostname_handler(self, request: HttpRequest, rpid: str) -> HttpResponse:
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get_data_for_request(request)
         return HttpResponse(ping_data.get('hostname') or '')
 
-    def _get_restart_required(self, ping_data):
+    def _get_restart_required(self, ping_data: typing.Dict[str, typing.Any]) -> bool:
         version = ping_data.get('raspberry_pi_version')
         restart_required = ping_data.get('restart_required')
         if version and StrictVersion(version) < StrictVersion('1.1.2'):
@@ -86,7 +86,7 @@ class LogView(View):
 
         return False
 
-    def _get_update_required(self, ping_data):
+    def _get_update_required(self, ping_data: typing.Dict[str, typing.Any]) -> bool:
         version = ping_data.get('raspberry_pi_version')
         if not version:
             return False
@@ -101,7 +101,7 @@ class LogView(View):
 
         return False
 
-    def _get_new_config_required(self, ping_data):
+    def _get_new_config_required(self, ping_data: typing.Dict[str, typing.Any]) -> typing.Tuple[bool, str]:
         reported_hostname = ping_data.get('reported_hostname')
         hostname = ping_data.get('hostname')
         new_config_required = ping_data.get('new_config_required')
@@ -120,7 +120,7 @@ class LogView(View):
 
         return False, ''
 
-    def get_ping_handler(self, request, rpid):
+    def get_ping_handler(self, request: HttpRequest, rpid: str) -> JsonResponse:
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get_data_for_request(request)
         ping_data['last_ping'] = timezone.now()
@@ -131,7 +131,7 @@ class LogView(View):
         response_data = self._get_ping_response_data(request, rpid, ping_data)
         return self.json_response(request, rpid, response_data)
 
-    def _get_ping_response_data(self, request, rpid, ping_data):
+    def _get_ping_response_data(self, request: HttpRequest, rpid: str, ping_data: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
         lead_status = ping_data['lead_status']
         wrong_password = ping_data.get('wrong_password')
 
@@ -175,7 +175,7 @@ class LogView(View):
 
         return response_data
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         rpid = request.GET.get('rpid', '').strip()
         if not rpid:
             return JsonResponse({'result': False, 'reason': 'RPID not found'})
@@ -194,6 +194,6 @@ class LogView(View):
 
         return JsonResponse({'result': False, 'reason': 'Unknown command'})
 
-    def json_response(self, request, rpid, data):
+    def json_response(self, request: HttpRequest, rpid: str, data: typing.Dict[str, typing.Any]) -> JsonResponse:
         self.add_log(request, rpid, 'Response: {}'.format(json.dumps(data)))
         return JsonResponse(data)

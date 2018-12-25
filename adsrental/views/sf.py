@@ -1,5 +1,5 @@
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.lead import Lead
 from adsrental.utils import ShipStationClient
@@ -9,7 +9,7 @@ from adsrental.models.ec2_instance import EC2Instance
 
 class SFToShipstationView(View):
     'Obsolete'
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         email = request.GET.get('email')
         lead = Lead.objects.filter(email=email).first()
         if not lead:
@@ -39,7 +39,7 @@ class SFToShipstationView(View):
 
 class SFLaunchRaspberryPiInstance(View):
     'Obsolete'
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         rpid = request.GET.get('rpid')
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
         if not lead:

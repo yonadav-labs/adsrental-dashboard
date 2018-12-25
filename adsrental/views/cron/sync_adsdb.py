@@ -5,14 +5,14 @@ import pytz
 import requests
 from django.conf import settings
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.utils import timezone
 
 from adsrental.models import LeadAccount, User
 
 
 class SyncAdsDBView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         messages = []
         accounts = []
         not_found_count = 0

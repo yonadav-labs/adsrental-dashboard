@@ -1,4 +1,5 @@
 import json
+import typing
 
 from django.db import models
 from django.conf import settings
@@ -26,11 +27,11 @@ class VultrInstance(models.Model):
     data = models.TextField(help_text='Full data from Vultr')
     objects = BulkUpdateManager()
 
-    def is_running(self):
+    def is_running(self) -> bool:
         return self.status == 'running'
 
     @classmethod
-    def update_all_from_vultr(cls, instance_id=None):
+    def update_all_from_vultr(cls, instance_id: typing.Optional[int] = None) -> None:
         vultr_client = vultr.Vultr(settings.VULTR_API_KEY)
         for tag in cls.TAGS:
             for new_instance_id, data in vultr_client.server.list(params=dict(tag=tag)).items():
@@ -48,16 +49,16 @@ class VultrInstance(models.Model):
                     data=json.dumps(data),
                 ))
 
-    def update_from_vultr(self):
+    def update_from_vultr(self) -> None:
         VultrInstance.update_all_from_vultr(self.instance_id)
 
-    def get_windows_rdp_uri(self):
+    def get_windows_rdp_uri(self) -> str:
         return 'rdp://{}:{}:{}:{}'.format(self.ip_address, self.RDP_PORT, self.USERNAME, self.password)
 
-    def get_rdp_uri(self):
+    def get_rdp_uri(self) -> str:
         return 'rdp://full%20address=s:{}:{}&username=s:{}'.format(self.ip_address, self.RDP_PORT, self.USERNAME)
 
-    def get_web_rdp_link(self):
+    def get_web_rdp_link(self) -> str:
         return 'http://{host}:{rdp_client_port}/#host={hostname}&port={port}&user={user}&password={password}&rpid={rpid}&connect=true'.format(
             host=settings.HOSTNAME,
             rdp_client_port=9999,

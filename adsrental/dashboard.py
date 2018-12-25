@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 import datetime
 from dateutil.relativedelta import relativedelta
+import typing
 
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -15,7 +16,7 @@ class CustomIndexDashboard(Dashboard):
     """
     Custom index dashboard for app.
     """
-    def init_with_context(self, context):
+    def init_with_context(self, context: typing.Dict[str, typing.Any]) -> None:
         # append a link list module for "quick links"
         request = context['request']
         now = timezone.localtime(timezone.now())
@@ -195,7 +196,7 @@ class CustomAppIndexDashboard(AppIndexDashboard):
     # we disable title because its redundant with the model list module
     title = ''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
         AppIndexDashboard.__init__(self, *args, **kwargs)
 
         # append a model list module and a recent actions module

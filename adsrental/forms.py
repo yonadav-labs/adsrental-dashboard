@@ -1,4 +1,5 @@
 import re
+import typing
 
 from django import forms
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
@@ -82,7 +83,7 @@ class SetPasswordForm(forms.Form):
     email = forms.CharField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
     new_password = forms.CharField(label='Password')
 
-    def update_lead_account(self, lead_account):
+    def update_lead_account(self, lead_account: LeadAccount) -> None:
         lead_account.password = self.cleaned_data['new_password']
         lead_account.wrong_password_date = None
         lead_account.save()
@@ -95,7 +96,7 @@ class ChangeAddressForm(forms.Form):
     state = forms.CharField(label='State')
     postal_code = forms.CharField(label='Postal code')
 
-    def update_lead(self, lead):
+    def update_lead(self, lead: Lead) -> None:
         lead.street = self.cleaned_data['street']
         lead.city = self.cleaned_data['city']
         lead.state = self.cleaned_data['state']
@@ -183,7 +184,7 @@ class SignupForm(forms.Form):
     ), required=True)
     utm_source = forms.CharField(widget=forms.HiddenInput())
 
-    def clean_phone(self):
+    def clean_phone(self) -> str:
         value = self.cleaned_data['phone']
         if value.startswith('+1'):
             value = value[2:]
@@ -197,15 +198,15 @@ class SignupForm(forms.Form):
             raise forms.ValidationError("This phone number is already registered")
         return digits
 
-    def clean_first_name(self):
+    def clean_first_name(self) -> str:
         value = self.cleaned_data['first_name'].title()
         return value
 
-    def clean_last_name(self):
+    def clean_last_name(self) -> str:
         value = self.cleaned_data['last_name'].title()
         return value
 
-    def clean_email(self):
+    def clean_email(self) -> str:
         value = self.cleaned_data['email'].lower()
         lead = Lead.objects.filter(email=value).first()
         if lead:
@@ -213,14 +214,14 @@ class SignupForm(forms.Form):
 
         return value
 
-    def clean_fb_friends(self):
+    def clean_fb_friends(self) -> int:
         value = self.cleaned_data['fb_friends']
         if value == 0:
             raise forms.ValidationError("Incorrect Facebook Friends Count")
 
         return value
 
-    def clean_facebook_profile_url(self):
+    def clean_facebook_profile_url(self) -> str:
         value = self.cleaned_data['facebook_profile_url'].lower()
         lead_account = LeadAccount.objects.filter(account_url=value, active=True).first()
         if lead_account:
@@ -228,7 +229,7 @@ class SignupForm(forms.Form):
 
         return value
 
-    def clean_fb_email(self):
+    def clean_fb_email(self) -> str:
         value = self.cleaned_data['fb_email'].lower()
         lead_account = LeadAccount.objects.filter(username=value, active=True).first()
         if lead_account:
@@ -253,7 +254,7 @@ class ReportForm(forms.Form):
     month = forms.ChoiceField(choices=MONTH_CHOICES, required=False)
     amount = forms.ChoiceField(choices=AMOUNT_CHOICES, required=False)
 
-    def clean_month(self):
+    def clean_month(self) -> str:
         value = self.cleaned_data['month'].lower()
         if not value:
             return self.MONTH_CURRENT
@@ -277,7 +278,7 @@ class AdminLeadDeleteForm(forms.Form):
 
     check = forms.CharField(label='Password')
 
-    def clean_check(self):
+    def clean_check(self) -> str:
         value = self.cleaned_data['check']
         if value != self.CHECK_CORRECT:
             raise forms.ValidationError("Invalid password, you cannot delete leads")
@@ -292,7 +293,7 @@ class AdminLeadAccountPasswordForm(forms.Form):
 class AdminPrepareForReshipmentForm(forms.Form):
     rpids = forms.CharField(widget=forms.Textarea())
 
-    def clean_rpids(self):
+    def clean_rpids(self) -> typing.List[str]:
         value = self.cleaned_data['rpids']
         return re.findall(r'RP\d+', value)
 
@@ -302,7 +303,7 @@ class UserLoginForm(forms.Form):
     last_name = forms.CharField(label='Last name', required=True)
     postal_code = forms.CharField(label='Zip code', required=True)
 
-    def get_lead(self, data):
+    def get_lead(self, data: typing.Dict[str, typing.Any]) -> typing.Optional[Lead]:
         leads = Lead.objects.filter(
             first_name__iexact=data.get('first_name'),
             last_name__iexact=data.get('last_name'),
@@ -320,7 +321,7 @@ class UserLoginForm(forms.Form):
         return first_lead
 
 
-    def clean(self):
+    def clean(self) -> None:
         cleaned_data = super().clean()
 
         lead = self.get_lead(cleaned_data)
@@ -333,7 +334,7 @@ class UserFixPasswordForm(forms.Form):
     lead_account_id = forms.CharField(widget=forms.HiddenInput())
     new_password = forms.CharField(label='New password', required=True)
 
-    def get_lead_account(self, data, lead):
+    def get_lead_account(self, data: typing.Dict[str, typing.Any], lead: Lead) -> LeadAccount:
         return LeadAccount.objects.filter(
             id=data.get('lead_account_id'),
             lead=lead,
@@ -345,7 +346,7 @@ class DisqualifyLeadAccountForm(forms.Form):
     next = forms.CharField(widget=forms.HiddenInput())
     action = forms.CharField(widget=forms.HiddenInput())
 
-    def clean_action(self):
+    def clean_action(self) -> None:
         value = self.cleaned_data['action']
         if value != self.ACTION_SUBMIT:
             raise forms.ValidationError("Submit cancelled")

@@ -1,10 +1,12 @@
+import datetime
+
 from django import template
 
 register = template.Library()
 
 
 @register.simple_tag
-def relative_url(urlencode, field_name, value):
+def relative_url(urlencode: str, field_name: str, value: str) -> str:
     url = '?{}={}'.format(field_name, value)
     querystring = urlencode.split('&')
     filtered_querystring = filter(lambda p: p.split('=')[0] != field_name, querystring)
@@ -15,7 +17,7 @@ def relative_url(urlencode, field_name, value):
 
 
 @register.filter
-def ordinal(value):
+def ordinal(value: int) -> str:
     if value % 10 == 1 and value != 11:
         return '{}st'.format(value)
     if value % 10 == 2 and value != 12:
@@ -26,7 +28,7 @@ def ordinal(value):
     return '{}th'.format(value)
 
 @register.filter()
-def humanize_timedelta(timedeltaobj):
+def humanize_timedelta(timedeltaobj: datetime.timedelta) -> str:
     secs = timedeltaobj.total_seconds()
     timetot = ""
     if secs < 60:
@@ -50,7 +52,7 @@ def humanize_timedelta(timedeltaobj):
     return timetot
 
 @register.filter()
-def humanize_timedelta_hours(timedeltaobj):
+def humanize_timedelta_hours(timedeltaobj: datetime.timedelta) -> str:
     secs = timedeltaobj.total_seconds()
     timetot = ""
     if secs < 3600:

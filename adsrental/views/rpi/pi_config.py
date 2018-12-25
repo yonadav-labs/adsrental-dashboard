@@ -1,5 +1,5 @@
 from django.views import View
-from django.http import FileResponse, HttpResponseRedirect
+from django.http import FileResponse, HttpResponseRedirect, HttpRequest
 from django.shortcuts import Http404
 from django.contrib import messages
 
@@ -8,7 +8,7 @@ from adsrental.models.lead import Lead
 
 class PiConfigView(View):
     'Get pi.conf file'
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> FileResponse:
         'Get pi.conf file'
         back = request.META.get('HTTP_REFERER')
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()

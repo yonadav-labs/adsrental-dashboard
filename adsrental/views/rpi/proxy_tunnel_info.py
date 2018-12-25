@@ -6,13 +6,14 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.contrib import messages
 from django.conf import settings
+from django.http import HttpRequest, HttpResponse
 
 from adsrental.models.raspberry_pi import RaspberryPi
 
 
 class ProxyTunnelInfoView(View):
     @method_decorator(login_required)
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> HttpResponse:
         now = timezone.localtime(timezone.now())
         raspberry_pi = RaspberryPi.objects.get(rpid=rpid)
         if not raspberry_pi.is_proxy_tunnel:
@@ -42,7 +43,7 @@ class ProxyTunnelInfoView(View):
         ))
 
     @method_decorator(login_required)
-    def post(self, request, rpid):
+    def post(self, request: HttpRequest, rpid: str) -> HttpResponse:
         raspberry_pi = RaspberryPi.objects.get(rpid=rpid)
         action = request.POST.get('action')
         if action == 'new_config':

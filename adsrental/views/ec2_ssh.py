@@ -2,7 +2,7 @@
 import time
 
 from django.views import View
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpRequest
 
 from adsrental.models.ec2_instance import EC2Instance, SSHConnectException
 
@@ -11,7 +11,7 @@ class StartReverseTunnelView(View):
     'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
     MAX_ATTEMPTS = 10
 
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> JsonResponse:
         'Start reverse tunnel from EC2. Used as a fallback if RaspberryPi cannot created it by itself'
         ec2_instance = EC2Instance.get_by_rpid(rpid)
         if not ec2_instance or not ec2_instance.is_running():
@@ -19,7 +19,7 @@ class StartReverseTunnelView(View):
 
         tunnel_up = False
         attempts = 0
-        netstat_output = True
+        netstat_output = 'True'
 
         while not tunnel_up and attempts < self.MAX_ATTEMPTS and netstat_output:
             attempts += 1
@@ -47,7 +47,7 @@ class StartReverseTunnelView(View):
 
 
 class GetNetstatView(View):
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> HttpResponse:
         'Get netstat output from EC2. Used as a fallback if RaspberryPi cannot get it by itself'
         rpid = rpid.strip()
         ec2_instance = EC2Instance.get_by_rpid(rpid)

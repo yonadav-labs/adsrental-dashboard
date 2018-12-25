@@ -1,13 +1,14 @@
 import base64
 from functools import wraps
+import typing
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.contrib.auth import authenticate
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
 
-def view_or_basicauth(view, request, *args, **kwargs):
+def view_or_basicauth(view: typing.Callable, request: HttpRequest, *args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
     # Check for valid basic auth header
     if 'HTTP_AUTHORIZATION' in request.META:
         auth = request.META['HTTP_AUTHORIZATION'].split()
@@ -28,14 +29,15 @@ def view_or_basicauth(view, request, *args, **kwargs):
     return response
 
 
-def basicauth_required(view_func):
+def basicauth_required(view_func: typing.Callable) -> HttpResponse:
     @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
+    def wrapper(request: HttpRequest, *args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
         return view_or_basicauth(view_func, request, *args, **kwargs)
     return wrapper
 
-def https_required(function):
-    def wrap(self, request, *args, **kwargs):
+
+def https_required(function: typing.Callable) -> HttpResponse:
+    def wrap(self: typing.Any, request: HttpRequest, *args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
         protocol = 'http'
         if request.is_secure():
             protocol = 'https'

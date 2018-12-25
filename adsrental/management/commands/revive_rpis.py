@@ -1,6 +1,8 @@
 from multiprocessing.pool import ThreadPool
 import datetime
 import logging
+import argparse
+import typing
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -13,15 +15,16 @@ from adsrental.models.ec2_instance import EC2Instance
 
 class Command(BaseCommand):
     help = 'Revive old EC2 EC2'
+    force = False
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument('--facebook', action='store_true')
         parser.add_argument('--google', action='store_true')
         parser.add_argument('--force', action='store_true')
         parser.add_argument('--test', action='store_true')
         parser.add_argument('--threads', type=int, default=10)
 
-    def revive(self, ec2_instance):
+    def revive(self, ec2_instance: EC2Instance) -> bool:
         info_str = '%s\t%s\t%s\t%s' % (
             ec2_instance.rpid,
             ec2_instance.lead.name(),
@@ -42,13 +45,13 @@ class Command(BaseCommand):
 
     def handle(
             self,
-            facebook,
-            google,
-            force,
-            threads,
-            test,
-            **kwargs
-    ):
+            facebook: bool,
+            google: bool,
+            force: bool,
+            threads: int,
+            test: bool,
+            **kwargs: typing.Any,
+    ) -> None:
         logging.raiseExceptions = False
         self.force = force
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))

@@ -1,5 +1,5 @@
 from django.views import View
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.raspberry_pi import RaspberryPi
 
@@ -8,7 +8,7 @@ class ConnectionDataView(View):
     '''
     Get data about EC2 by RPID. Should have been used by new python RaspberryPi firmware, but was not.
     '''
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> JsonResponse:
         raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
         if not raspberry_pi:
             return JsonResponse({

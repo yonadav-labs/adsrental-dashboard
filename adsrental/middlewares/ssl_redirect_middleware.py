@@ -1,5 +1,8 @@
+import typing
+
 from django.conf import settings
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect, HttpRequest, HttpResponse
+from django.views import View
 
 
 SSL_ON = getattr(settings, 'SSL_ON', True)
@@ -10,13 +13,13 @@ SSL_KW = 'SSL'
 
 
 class SSLRedirectMiddleware:
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request: HttpRequest, view_func: View, view_args: typing.List[typing.Any], view_kwargs: typing.Dict[str, typing.Any]) -> HttpResponse:
         response_is_secure = self._response_is_secure(
             request, view_func, view_args, view_kwargs)
         if response_is_secure != self._request_is_secure(request):
             return self._redirect(request, response_is_secure)
 
-    def _response_is_secure(self, request, view_func, view_args, view_kwargs):
+    def _response_is_secure(self, request: HttpRequest, view_func: View, view_args: typing.List[typing.Any], view_kwargs: typing.Dict[str, typing.Any]) -> bool:
         if not SSL_ON:
             return False
 
@@ -32,7 +35,7 @@ class SSLRedirectMiddleware:
 
         return False
 
-    def _request_is_secure(self, request):
+    def _request_is_secure(self, request: HttpRequest) -> bool:
         if request.is_secure():
             return True
 
@@ -45,7 +48,7 @@ class SSLRedirectMiddleware:
 
         return False
 
-    def _redirect(self, request, secure):
+    def _redirect(self, request: HttpRequest, secure: bool) -> HttpResponse:
         protocol = u'https' if secure else u'http'
         host = u'{protocol}://{domain}'.format(
             protocol=protocol,

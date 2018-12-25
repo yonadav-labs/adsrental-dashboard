@@ -1,6 +1,6 @@
 from django.views import View
 from django.shortcuts import Http404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.ec2_instance import EC2Instance
 
@@ -9,7 +9,7 @@ class EC2DataView(View):
     '''
     Get data about EC2 by RPID. Should have been used by new python RaspberryPi firmware, but was not.
     '''
-    def get(self, request, rpid):
+    def get(self, request: HttpRequest, rpid: str) -> JsonResponse:
         ec2_instance = EC2Instance.get_by_rpid(rpid)
         if not ec2_instance:
             raise Http404
