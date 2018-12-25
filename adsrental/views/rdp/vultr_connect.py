@@ -17,7 +17,7 @@ class VultrConnectView(View):
             messages.success(request, 'Instance state updated.')
 
     @method_decorator(login_required)
-    def get(self, request: HttpRequest, vultr_instance_id: int, action: typing.Optional[str]=None) -> HttpResponse:
+    def get(self, request: HttpRequest, vultr_instance_id: int, action: typing.Optional[str] = None) -> HttpResponse:
         vultr_instance = get_object_or_404(VultrInstance, id=vultr_instance_id)
 
         if action:

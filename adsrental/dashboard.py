@@ -1,8 +1,8 @@
 from urllib.parse import urlencode
 import datetime
-from dateutil.relativedelta import relativedelta
 import typing
 
+from dateutil.relativedelta import relativedelta
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.urls import reverse

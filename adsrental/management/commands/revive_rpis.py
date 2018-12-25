@@ -43,17 +43,13 @@ class Command(BaseCommand):
         print(info_str + '\t' + 'Attempted update')
         return True
 
-    def handle(
-            self,
-            facebook: bool,
-            google: bool,
-            force: bool,
-            threads: int,
-            test: bool,
-            **kwargs: typing.Any,
-    ) -> None:
+    def handle(self, *args: typing.Any, **options: typing.Any) -> None:
         logging.raiseExceptions = False
-        self.force = force
+        facebook = options['facebook']
+        google = options['google']
+        threads = options['threads']
+        test = options['test']
+        self.force = options['force']
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))
 
         if facebook:
