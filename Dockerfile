@@ -1,4 +1,4 @@
-FROM tiangolo/uwsgi-nginx:python3.6
+FROM tiangolo/uwsgi-nginx:python3.7
 
 ENV UWSGI_INI /app/config/nginx/uwsgi.ini
 ENV PYTHONUNBUFFERED 1

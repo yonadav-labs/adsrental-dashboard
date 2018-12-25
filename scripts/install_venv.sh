@@ -4,7 +4,7 @@ cd $ROOT_PATH
 
 
 if [ ! -d "venv" ]; then
-    virtualenv venv -p /usr/bin/python3.6
+    virtualenv venv -p /usr/bin/python3.7
 fi
 
 source venv/bin/activate
