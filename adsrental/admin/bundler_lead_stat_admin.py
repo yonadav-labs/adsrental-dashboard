@@ -25,7 +25,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         # 'qualified_total_field',
         # 'delivered_not_connected',
         # 'banned_from_qualified_last_30_days',
-        'delivered_not_connected_last_14_days',
+        'delivered_not_connected_last_14_days_field',
         'delivered_connected_last_14_days_percent',
     )
     list_select_related = ('bundler', )
@@ -116,10 +116,12 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
             obj.in_progress_total_issue * 100 / max(obj.in_progress_total, 1)
         )
 
-    def delivered_connected_last_30_days_percent(self, obj):
-        return '%d%%' % (
-            (obj.delivered_last_30_days - obj.delivered_not_connected_last_30_days) * 100 / max(obj.delivered_last_30_days, 1),
-        )
+    def delivered_not_connected_last_14_days_field(self, obj):
+        return mark_safe('<a href="{url}?account_type__exact=Facebook&status=Qualified&lead__delivery_date=last_14_days&bundler={bundler_id}">{value}</a>'.format(
+            url=reverse('admin:adsrental_leadaccount_changelist'),
+            bundler_id=obj.bundler_id,
+            value=obj.delivered_not_connected_last_14_days,
+        ))
 
     def delivered_connected_last_14_days_percent(self, obj):
         return '%d%%' % (
@@ -166,5 +168,5 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     qualified_total_field.short_description = 'Qualified total'
     qualified_total_field.admin_order_field = 'qualified_total'
 
-    delivered_connected_last_30_days_percent.short_description = 'Delivered and connected (last 30 days)'
-    delivered_connected_last_30_days_percent.admin_order_field = 'delivered_last_30_days'
+    delivered_not_connected_last_14_days_field.short_description = 'Delivered not connected (last 14 days)'
+    delivered_not_connected_last_14_days_field.admin_order_field = 'delivered_not_connected_last_14_days'

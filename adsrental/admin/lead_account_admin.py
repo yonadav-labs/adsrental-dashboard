@@ -15,7 +15,8 @@ from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordFor
 from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFilter, \
     WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, \
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
-    LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, titled_filter
+    LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, \
+    LeadDeliveryDateListFilter, titled_filter
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -89,6 +90,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         DisqualifiedDateListFilter,
         InProgressDateListFilter,
         BannedDateListFilter,
+        LeadDeliveryDateListFilter,
         AutoBanListFilter,
         'charge_back',
         'primary',

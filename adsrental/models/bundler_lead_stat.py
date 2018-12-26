@@ -84,16 +84,9 @@ class BundlerLeadStat(models.Model):
                     if lead_account.banned_date:
                         obj.banned_from_qualified_last_30_days += 1
 
-                if lead.delivery_date and lead.delivery_date < (now - datetime.timedelta(days=2)).date():
-                    if not raspberry_pi.first_seen:
-                        obj.delivered_not_connected += 1
-                    if lead.delivery_date >= last_30_days_start.date():
-                        obj.delivered_last_30_days += 1
-                        if not raspberry_pi.first_seen:
-                            obj.delivered_not_connected_last_30_days += 1
-                    if lead.delivery_date >= last_14_days_start.date():
-                        obj.delivered_last_14_days += 1
-                        if not raspberry_pi.first_seen:
-                            obj.delivered_not_connected_last_14_days += 1
+                if lead.delivery_date and lead.delivery_date >= last_14_days_start.date():
+                    obj.delivered_last_14_days += 1
+                    if not raspberry_pi.first_seen or raspberry_pi.first_seen.date() > lead.delivery_date + datetime.timedelta(days=2):
+                        obj.delivered_not_connected_last_14_days += 1
 
         obj.save()

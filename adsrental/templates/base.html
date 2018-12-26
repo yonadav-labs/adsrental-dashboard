@@ -47,6 +47,9 @@
                       <li><a href="{% url "bundler_report_check" bundler_id=user.bundler.id %}">Check Report</a></li>
                     {% endif %}
                     {% if user.is_authenticated %}
+                        {% if user.is_superuser %}
+                          <li><a href="{% url "admin:index" %}">Admin</a></li>
+                        {% endif %}
                         <li><a href="{% url "logout" %}">Logout</a></li>
                     {% endif %}
                 </ul>

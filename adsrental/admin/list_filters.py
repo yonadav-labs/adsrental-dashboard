@@ -109,43 +109,6 @@ class LeadAccountTouchCountListFilter(SimpleListFilter):
         return None
 
 
-class DeliveryDateListFilter(SimpleListFilter):
-    title = 'Delivery Date'
-    parameter_name = 'delivery_date'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('this_week', 'This week'),
-            ('previous_week', 'Previous week'),
-            ('this_month', 'This month'),
-            ('previous_month', 'Previous month'),
-            ('not', 'Not yet'),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == 'this_week':
-            end_date = timezone.now()
-            start_date = (end_date - datetime.timedelta(days=end_date.weekday())).replace(hour=0, minute=0, second=0)
-            return queryset.filter(delivery_date__gte=start_date, delivery_date__lte=end_date)
-        if self.value() == 'previous_week':
-            now = timezone.now()
-            end_date = (now - datetime.timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0)
-            start_date = end_date - datetime.timedelta(hours=24 * 7)
-            return queryset.filter(delivery_date__gte=start_date, delivery_date__lte=end_date)
-        if self.value() == 'this_month':
-            end_date = timezone.now()
-            start_date = end_date.replace(day=1, hour=0, minute=0, second=0)
-            return queryset.filter(delivery_date__gte=start_date, delivery_date__lte=end_date)
-        if self.value() == 'previous_month':
-            now = timezone.now()
-            end_date = now.replace(day=1, hour=0, minute=0, second=0)
-            start_date = (end_date - datetime.timedelta(hours=1)).replace(day=1, hour=0, minute=0, second=0)
-            return queryset.filter(delivery_date__gte=start_date, delivery_date__lte=end_date)
-        if self.value() == 'not':
-            return queryset.filter(delivery_date__isnull=True)
-        return None
-
-
 class OnlineListFilter(SimpleListFilter):
     title = 'RaspberryPi online state'
     parameter_name = 'online'
@@ -249,23 +212,27 @@ class AbstractDateListFilter(SimpleListFilter):
 
     CHOICES_TODAY = 'today'
     CHOICES_YESTERDAY = 'yesterday'
+    CHOICES_LAST_14_DAYS = 'last_14_days'
     CHOICES_LAST_30_DAYS = 'last_30_days'
     CHOICES_CURRENT_WEEK = 'current_week'
     CHOICES_PREVIOUS_WEEK = 'previous_week'
     CHOICES_CURRENT_MONTH = 'current_month'
     CHOICES_PREVIOUS_MONTH = 'previous_month'
     CHOICES_ANY = 'any'
+    CHOICES_NOT_SET = 'not_set'
 
     def lookups(self, request, model_admin):
         return (
             (self.CHOICES_TODAY, 'Today', ),
             (self.CHOICES_YESTERDAY, 'Yesterday', ),
+            (self.CHOICES_LAST_14_DAYS, 'Last 14 days', ),
             (self.CHOICES_LAST_30_DAYS, 'Last 30 days', ),
             (self.CHOICES_CURRENT_WEEK, 'Current week', ),
             (self.CHOICES_PREVIOUS_WEEK, 'Previous week', ),
             (self.CHOICES_CURRENT_MONTH, 'Current month', ),
             (self.CHOICES_PREVIOUS_MONTH, 'Previous month', ),
             (self.CHOICES_ANY, 'Any', ),
+            (self.CHOICES_NOT_SET, 'Not set', ),
         )
 
     def queryset(self, request, queryset):
@@ -282,6 +249,12 @@ class AbstractDateListFilter(SimpleListFilter):
             return queryset.filter(**{
                 '{}__gte'.format(self.field_name): date_start,
                 '{}__lte'.format(self.field_name): date_end,
+            })
+        if self.value() == self.CHOICES_LAST_14_DAYS:
+            now = timezone.localtime(timezone.now())
+            date_start = now - datetime.timedelta(days=14)
+            return queryset.filter(**{
+                '{}__gte'.format(self.field_name): date_start,
             })
         if self.value() == self.CHOICES_LAST_30_DAYS:
             now = timezone.localtime(timezone.now())
@@ -321,7 +294,23 @@ class AbstractDateListFilter(SimpleListFilter):
             return queryset.filter(**{
                 '{}__isnull'.format(self.field_name): False,
             })
+        if self.value() == self.CHOICES_NOT_SET:
+            return queryset.filter(**{
+                '{}__isnull'.format(self.field_name): True,
+            })
         return None
+
+
+class DeliveryDateListFilter(AbstractDateListFilter):
+    title = 'Delivery Date'
+    parameter_name = 'delivery_date'
+    field_name = 'delivery_date'
+
+
+class LeadDeliveryDateListFilter(AbstractDateListFilter):
+    title = 'Delivery Date'
+    parameter_name = 'lead__delivery_date'
+    field_name = 'lead__delivery_date'
 
 
 class ShipDateListFilter(AbstractDateListFilter):
