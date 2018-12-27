@@ -79,8 +79,9 @@ class EC2ConnectView(View):
 
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(lead=lead).first()
-            ec2_instance.rpid = rpid
-            ec2_instance.save()
+            if ec2_instance:
+                ec2_instance.rpid = rpid
+                ec2_instance.save()
 
         if not ec2_instance:
             ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_RUNNING).first()
