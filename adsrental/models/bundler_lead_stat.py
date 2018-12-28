@@ -6,6 +6,7 @@ import typing
 from django.db import models
 from django.apps import apps
 from django.utils import timezone
+from django.db.models import Q, F
 
 
 if typing.TYPE_CHECKING:
@@ -48,6 +49,16 @@ class BundlerLeadStat(models.Model):
         now = timezone.localtime(timezone.now())
         last_30_days_start = now - datetime.timedelta(days=30)
         last_14_days_start = now - datetime.timedelta(days=14)
+        delivered_last_14_days_lead_accounts = lead_accounts.filter(
+            qualified_date__isnull=False,
+            lead__delivery_date__isnull=False,
+            lead__delivery_date__gt=last_14_days_start.date(),
+        )
+        obj.delivered_last_14_days = delivered_last_14_days_lead_accounts.count()
+        obj.delivered_not_connected_last_14_days = delivered_last_14_days_lead_accounts.filter(
+            Q(lead__raspberry_pi__first_seen__isnull=True) |
+            Q(lead__raspberry_pi__first_seen__gt=F('lead__delivery_date') + datetime.timedelta(days=2))
+        ).count()
         for lead_account in lead_accounts:
             lead = lead_account.lead
             raspberry_pi = lead.raspberry_pi
@@ -79,14 +90,5 @@ class BundlerLeadStat(models.Model):
                     obj.qualified_today += 1
                 elif lead_account.qualified_date > now.replace(hour=0, minute=0, second=0) - datetime.timedelta(days=1):
                     obj.qualified_yesterday += 1
-                if lead_account.qualified_date >= last_30_days_start:
-                    obj.qualified_last_30_days += 1
-                    if lead_account.banned_date:
-                        obj.banned_from_qualified_last_30_days += 1
-
-                if lead.delivery_date and lead.delivery_date >= last_14_days_start.date():
-                    obj.delivered_last_14_days += 1
-                    if not raspberry_pi.first_seen or raspberry_pi.first_seen.date() > lead.delivery_date + datetime.timedelta(days=2):
-                        obj.delivered_not_connected_last_14_days += 1
 
         obj.save()
