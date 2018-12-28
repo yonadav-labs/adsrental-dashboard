@@ -934,6 +934,7 @@ class ConnectedInTwoDaysListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'yes':
             return queryset.filter(
+                qualified_date__isnull=False,
                 lead__delivery_date__isnull=False,
                 lead__raspberry_pi__first_seen__isnull=False,
             ).filter(
@@ -941,6 +942,7 @@ class ConnectedInTwoDaysListFilter(SimpleListFilter):
             )
         if self.value() == 'no':
             return queryset.filter(
+                qualified_date__isnull=False,
                 lead__delivery_date__isnull=False,
             ).filter(
                 Q(lead__raspberry_pi__first_seen__isnull=True) |
