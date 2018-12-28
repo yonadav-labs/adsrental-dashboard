@@ -117,7 +117,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         )
 
     def delivered_not_connected_last_14_days_field(self, obj):
-        return mark_safe('<a href="{url}?account_type__exact=Facebook&status=Qualified&lead__delivery_date=last_14_days&bundler={bundler_id}">{value}</a>'.format(
+        return mark_safe('<a href="{url}?account_type__exact=Facebook&connected_in_2_days=no&lead__delivery_date=last_14_days&bundler={bundler_id}">{value}</a>'.format(
             url=reverse('admin:adsrental_leadaccount_changelist'),
             bundler_id=obj.bundler_id,
             value=obj.delivered_not_connected_last_14_days,
