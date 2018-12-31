@@ -51,6 +51,7 @@ class UpdatePingView(View):
             if not ping_cache_helper.is_data_consistent(
                     ping_data,
                     raspberry_pi=raspberry_pi,
+                    ec2_instance=ec2_instance,
             ):
                 ping_cache_helper.delete(rpid)
                 invalidated_rpids.append(rpid)

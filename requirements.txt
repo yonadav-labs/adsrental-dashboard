@@ -27,3 +27,4 @@ unicodecsv==0.14.1
 vultr==1.0.1
 werkzeug==0.14.1
 xhtml2pdf==0.2.3
+paramiko==2.4.2
