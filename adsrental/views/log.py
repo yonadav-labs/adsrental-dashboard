@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import Http404
 
 from adsrental.models.lead import Lead
+from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.utils import PingCacheHelper
 
 
@@ -164,14 +165,23 @@ class LogView(View):
             self.add_log(request, rpid, f'Sending info about config update: {new_config_required_reason}')
             response_data['new_config'] = new_config_required
             response_data['new_config_reason'] = new_config_required_reason
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            if raspberry_pi:
+                raspberry_pi.reset_cache()
 
         if restart_required:
             self.add_log(request, rpid, 'Restarting RaspberryPi')
             response_data['restart'] = restart_required
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            if raspberry_pi:
+                raspberry_pi.reset_cache()
 
         if update_required:
             self.add_log(request, rpid, 'RaspberryPi image updated, updating...')
             response_data['update'] = update_required
+            raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+            if raspberry_pi:
+                raspberry_pi.reset_cache()
 
         return response_data
 
