@@ -4,7 +4,7 @@ from dateutil import relativedelta, parser
 
 from django.conf import settings
 from django.utils import timezone
-from django.db.models import Q, Count, F
+from django.db.models import Q, Count
 from django.contrib.admin import SimpleListFilter, FieldListFilter
 from django.utils.translation import ugettext_lazy as _
 
@@ -921,9 +921,9 @@ def titled_filter(title):
     return Wrapper
 
 
-class ConnectedInTwoDaysListFilter(SimpleListFilter):
-    parameter_name = 'connected_in_2_days'
-    title = 'Connected in 2 days'
+class DeliveredLastTwoDaysListFilter(SimpleListFilter):
+    parameter_name = 'delivered_last_2_days'
+    title = 'Delivered last 2 days'
 
     def lookups(self, request, model_admin):
         return (
@@ -934,18 +934,10 @@ class ConnectedInTwoDaysListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'yes':
             return queryset.filter(
-                qualified_date__isnull=False,
-                lead__delivery_date__isnull=False,
-                lead__raspberry_pi__first_seen__isnull=False,
-            ).filter(
-                lead__raspberry_pi__first_seen__lte=F('lead__delivery_date') + datetime.timedelta(days=2),
+                lead__delivery_date__gt=timezone.now() - datetime.timedelta(days=2),
             )
         if self.value() == 'no':
             return queryset.filter(
-                qualified_date__isnull=False,
-                lead__delivery_date__isnull=False,
-            ).filter(
-                Q(lead__raspberry_pi__first_seen__isnull=True) |
-                Q(lead__raspberry_pi__first_seen__gt=F('lead__delivery_date') + datetime.timedelta(days=2))
+                lead__delivery_date__lte=timezone.now() - datetime.timedelta(days=2),
             )
         return None

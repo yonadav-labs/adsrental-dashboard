@@ -16,7 +16,7 @@ from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFi
     WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, \
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
     LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, \
-    LeadDeliveryDateListFilter, ConnectedInTwoDaysListFilter, titled_filter
+    LeadDeliveryDateListFilter, DeliveredLastTwoDaysListFilter, titled_filter
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -98,7 +98,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'lead__company',
         ('lead__bundler__is_active', titled_filter('Lead Bundler active')),
         LeadBundlerListFilter,
-        ConnectedInTwoDaysListFilter,
+        DeliveredLastTwoDaysListFilter,
     )
     search_fields = (
         'lead__leadid',

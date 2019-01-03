@@ -6,7 +6,6 @@ import typing
 from django.db import models
 from django.apps import apps
 from django.utils import timezone
-from django.db.models import Q, F
 
 
 if typing.TYPE_CHECKING:
@@ -42,7 +41,6 @@ class BundlerLeadStat(models.Model):
 
     @classmethod
     def calculate(cls, bundler: Bundler) -> None:
-        cls.objects.filter(bundler=bundler).delete()
         obj = cls(bundler=bundler)
         LeadAccount = apps.get_model('adsrental', 'LeadAccount')
         lead_accounts = LeadAccount.objects.filter(lead__bundler=obj.bundler, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).prefetch_related('lead', 'lead__raspberry_pi')
@@ -50,14 +48,12 @@ class BundlerLeadStat(models.Model):
         last_30_days_start = now - datetime.timedelta(days=30)
         last_14_days_start = now - datetime.timedelta(days=14)
         delivered_last_14_days_lead_accounts = lead_accounts.filter(
-            qualified_date__isnull=False,
-            lead__delivery_date__isnull=False,
-            lead__delivery_date__gt=last_14_days_start.date(),
+            lead__delivery_date__lt=now - datetime.timedelta(days=2),
+            lead__delivery_date__gte=last_14_days_start.date(),
         )
         obj.delivered_last_14_days = delivered_last_14_days_lead_accounts.count()
         obj.delivered_not_connected_last_14_days = delivered_last_14_days_lead_accounts.filter(
-            Q(lead__raspberry_pi__first_seen__isnull=True) |
-            Q(lead__raspberry_pi__first_seen__gt=F('lead__delivery_date') + datetime.timedelta(days=2))
+            in_progress_date__isnull=True,
         ).count()
         for lead_account in lead_accounts:
             lead = lead_account.lead
@@ -91,4 +87,5 @@ class BundlerLeadStat(models.Model):
                 elif lead_account.qualified_date > now.replace(hour=0, minute=0, second=0) - datetime.timedelta(days=1):
                     obj.qualified_yesterday += 1
 
+        cls.objects.filter(bundler=bundler).delete()
         obj.save()
