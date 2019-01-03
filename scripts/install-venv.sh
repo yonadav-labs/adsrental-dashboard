@@ -2,6 +2,7 @@
 ROOT_PATH=$(dirname $(dirname $0))
 cd $ROOT_PATH
 
+PYTHON_VERSION=3.7
 FLAG_UPGRADE=0
 FLAG_DEV=0
 
@@ -33,7 +34,7 @@ done
 
 if [ ! -d "venv" ]; then
     echo "* Installing virtualenv"
-    virtualenv venv -p python3.7
+    virtualenv venv -p python${PYTHON_VERSION}
 fi
 
 echo "* Activating virtualenv"
