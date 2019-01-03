@@ -21,7 +21,7 @@ sudo chmod a+x /usr/local/bin/docker-compose
 ### Local development mode
 
 ```bash
-./scripts/install_venv.sh
+./scripts/install-venv.sh
 docker-compose up --build
 ```
 

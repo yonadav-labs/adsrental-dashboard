@@ -1,0 +1,4 @@
+mypy==0.650
+pylint==2.2.2
+rope==0.11.0
+pylint-django==2.0.5
