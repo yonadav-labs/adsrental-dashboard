@@ -182,8 +182,8 @@ class ShipStationClient():
         response = requests.post(
             url,
             auth=(self.client.key, self.client.secret),
-            data=data,
-            headers=headers
+            data=json.dumps(data),
+            headers=headers,
         )
         if response.status_code not in [200, 201]:
             raise ValueError('Shipstation Error', response.status_code, response.text)
