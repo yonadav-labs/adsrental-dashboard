@@ -186,7 +186,7 @@ class ShipStationClient():
             headers=headers,
         )
         if response.status_code not in [200, 201]:
-            raise ValueError('Shipstation Error', response.status_code, response.text)
+            raise ValueError('Shipstation Error', response.status_code, data, response.text)
 
     @staticmethod
     def get_lead_order_data(lead: Lead) -> typing.Optional[typing.Dict]:
