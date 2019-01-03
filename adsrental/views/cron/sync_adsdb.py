@@ -1,6 +1,7 @@
 import datetime
-from dateutil import parser
+import json
 
+from dateutil import parser
 import pytz
 import requests
 from django.conf import settings
@@ -28,7 +29,7 @@ class SyncAdsDBView(View):
                         'page': page,
                     },
                 ).json()
-            except requests.RequestException:
+            except (requests.RequestException, json.JSONDecodeError):
                 continue
             if not data.get('success') or not data.get('data'):
                 break
