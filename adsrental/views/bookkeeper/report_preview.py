@@ -31,6 +31,13 @@ class BookkepperReportPreviewView(View):
             pay_check=True,
             account_type__in=account_types,
             active=True,
+            in_progress_date__isnull=False,
+        ).exclude( 
+            bundler_paid=True,
+            charge_back=False,
+        ).exclude( 
+            charge_back_billed=True,
+            charge_back=True,
         ).order_by('created').select_related('lead__bundler', 'lead', 'lead__raspberry_pi')
 
         entries = []
