@@ -13,13 +13,13 @@ SSL_KW = 'SSL'
 
 
 class SSLRedirectMiddleware:
-    def process_view(self, request: HttpRequest, view_func: View, view_args: typing.List[typing.Any], view_kwargs: typing.Dict[str, typing.Any]) -> HttpResponse:
+    def process_view(self, request: HttpRequest, view_func: View, view_args: typing.List[str], view_kwargs: typing.Dict[str, str]) -> HttpResponse:
         response_is_secure = self._response_is_secure(
             request, view_func, view_args, view_kwargs)
         if response_is_secure != self._request_is_secure(request):
             return self._redirect(request, response_is_secure)
 
-    def _response_is_secure(self, request: HttpRequest, view_func: View, view_args: typing.List[typing.Any], view_kwargs: typing.Dict[str, typing.Any]) -> bool:
+    def _response_is_secure(self, request: HttpRequest, view_func: View, view_args: typing.List[str], view_kwargs: typing.Dict[str, str]) -> bool:
         if not SSL_ON:
             return False
 
@@ -27,7 +27,7 @@ class SSLRedirectMiddleware:
             return True
 
         if SSL_KW in view_kwargs:
-            return view_kwargs[SSL_KW]
+            return True if view_kwargs[SSL_KW] else False
 
         for path in HTTPS_PATHS:
             if request.path.startswith(u'/{}'.format(path)):

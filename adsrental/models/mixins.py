@@ -23,7 +23,7 @@ class FulltextSearchMixin():
         return [cls.normspace('', (t[0] or t[1]).strip()) for t in cls.findterms(query_string)]
 
     @classmethod
-    def get_timedelta_filter(cls, field_name: str, **kwargs: typing.Any) -> Q:
+    def get_timedelta_filter(cls, field_name: str, **kwargs: int) -> Q:
         now = timezone.localtime(timezone.now())
         return Q(**{
             field_name: now + datetime.timedelta(**kwargs),

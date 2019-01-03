@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
     from adsrental.models.ec2_instance import EC2Instance
 
 
-PingDataType = typing.Dict[str, typing.Any]
+PingDataType = typing.Dict
 
 
 class RaspberryPi(models.Model):

@@ -6,6 +6,7 @@ import time
 import re
 import logging
 import typing
+import boto3
 
 from django.db import models
 from django.conf import settings
@@ -14,7 +15,7 @@ from django.utils import timezone
 from django_bulk_update.manager import BulkUpdateManager
 import paramiko
 
-from adsrental.utils import BotoResource, PingCacheHelper
+from adsrental.utils import BotoResource
 
 
 if typing.TYPE_CHECKING:
@@ -217,7 +218,7 @@ class EC2Instance(models.Model):
     def get_raspberry_pi(self) -> typing.Optional[RaspberryPi]:
         return self.lead and self.lead.raspberry_pi
 
-    def get_boto_instance(self, boto_resource: typing.Any = None) -> typing.Any:
+    def get_boto_instance(self, boto_resource: typing.Optional[boto3.resources.base.ServiceResource] = None) -> boto3.resources.base.ServiceResource:
         '''
         Get dict with data from AWS about current instance.
 
@@ -283,7 +284,7 @@ class EC2Instance(models.Model):
         now = timezone.localtime(timezone.now())
         return self.tunnel_up_date > now - datetime.timedelta(seconds=self.TUNNEL_UP_TTL_SECONDS)
 
-    def update_from_boto(self, boto_instance: typing.Any = None) -> EC2Instance:
+    def update_from_boto(self, boto_instance: typing.Optional[boto3.resources.base.ServiceResource] = None) -> EC2Instance:
         '''
         Update tags and state from AWS.
 
@@ -368,7 +369,7 @@ class EC2Instance(models.Model):
         return 'OUT: {}\nERR: {}'.format(stdout.decode(), stderr.decode())
 
     @staticmethod
-    def get_tag(boto_instance: typing.Any, key: str) -> typing.Optional[str]:
+    def get_tag(boto_instance: boto3.resources.base.ServiceResource, key: str) -> typing.Optional[str]:
         '''
         Get AWS EC2 instance tag value.
         '''
@@ -382,7 +383,7 @@ class EC2Instance(models.Model):
         return None
 
     @classmethod
-    def upsert_from_boto(cls, boto_instance: typing.Any, instance: typing.Optional[EC2Instance] = None) -> EC2Instance:
+    def upsert_from_boto(cls, boto_instance: boto3.resources.base.ServiceResource, instance: typing.Optional[EC2Instance] = None) -> EC2Instance:
         '''
         Create or update instance from AWS using *instance_id* as a key.
         '''
@@ -583,10 +584,6 @@ class EC2Instance(models.Model):
         self.save()
         self.set_ec2_tags()
         # self.ssh_execute('ssh pi@localhost -p 2046 Taskkill /IM ssh.exe /F')
-
-    def clear_ping_cache(self) -> None:
-        'Delete cache for this instance RPID.'
-        PingCacheHelper().delete(self.rpid)
 
     def get_r53_hostname(self) -> str:
         return '{}.{}'.format(self.rpid, self.R53_HOST)

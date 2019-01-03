@@ -304,7 +304,7 @@ class UserLoginForm(forms.Form):
     last_name = forms.CharField(label='Last name', required=True)
     postal_code = forms.CharField(label='Zip code', required=True)
 
-    def get_lead(self, data: typing.Dict[str, typing.Any]) -> typing.Optional[Lead]:
+    def get_lead(self, data: typing.Dict) -> typing.Optional[Lead]:
         leads = Lead.objects.filter(
             first_name__iexact=data.get('first_name'),
             last_name__iexact=data.get('last_name'),
@@ -335,7 +335,7 @@ class UserFixPasswordForm(forms.Form):
     lead_account_id = forms.CharField(widget=forms.HiddenInput())
     new_password = forms.CharField(label='New password', required=True)
 
-    def get_lead_account(self, data: typing.Dict[str, typing.Any], lead: Lead) -> LeadAccount:
+    def get_lead_account(self, data: typing.Dict, lead: Lead) -> LeadAccount:
         return LeadAccount.objects.filter(
             id=data.get('lead_account_id'),
             lead=lead,

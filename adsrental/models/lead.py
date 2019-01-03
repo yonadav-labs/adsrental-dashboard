@@ -16,7 +16,7 @@ from django_bulk_update.manager import BulkUpdateManager
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
-from adsrental.utils import CustomerIOClient, ShipStationClient, PingCacheHelper
+from adsrental.utils import CustomerIOClient, ShipStationClient
 
 
 if typing.TYPE_CHECKING:
@@ -479,11 +479,6 @@ class Lead(models.Model, FulltextSearchMixin):
     def is_banned(self) -> bool:
         'Check if lead is banned.'
         return self.status == Lead.STATUS_BANNED
-
-    def clear_ping_cache(self) -> None:
-        'Remove ping cache for this lead. Obsolete.'
-        if self.raspberry_pi:
-            PingCacheHelper().delete(self.raspberry_pi.rpid)
 
     def sync_to_adsdb(self) -> bool:
         result = False

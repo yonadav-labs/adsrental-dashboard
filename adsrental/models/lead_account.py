@@ -237,7 +237,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         raise ValueError()
 
-    def sync_to_adsdb(self) -> typing.Tuple[typing.Optional[typing.Dict[str, typing.Any]], typing.Any]:
+    def sync_to_adsdb(self) -> typing.Tuple[typing.Optional[typing.Dict], typing.Dict]:
         'Send lead account info to ADSDB'
 
         lead = self.get_lead()
@@ -288,15 +288,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             try:
                 response_json = response.json()
             except ValueError:
-                return ({'error': True, 'url': url, 'data': [data], 'text': response.text, 'status': response.status_code}, [data])
+                return ({'error': True, 'url': url, 'data': [data], 'text': response.text, 'status': response.status_code}, data)
             if response.status_code == 200:
                 self.adsdb_account_id = response_json.get('account_data')[0]['id']
                 self.save()
-                return (response_json, [data])
+                return (response_json, data)
             if response.status_code == 409:
                 self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
                 self.save()
-            return (response_json, [data])
+            return (response_json, data)
 
         request_data = {
             'account_id': int(self.adsdb_account_id),

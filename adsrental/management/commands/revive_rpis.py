@@ -2,7 +2,6 @@ from multiprocessing.pool import ThreadPool
 import datetime
 import logging
 import argparse
-import typing
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -35,21 +34,21 @@ class Command(BaseCommand):
         if not netstat_out:
             return False
         if '1:2046' not in netstat_out and not self.force:
-            print(info_str + '\t' + 'Tunnel down')
+            print(f'{info_str}\tTunnel down')
             return False
 
         cmd_to_execute = '''ssh pi@localhost -p 2046 "curl http://adsrental.com/static/update_pi.sh | bash"'''
         ec2_instance.ssh_execute(cmd_to_execute)
-        print(info_str + '\t' + 'Attempted update')
+        print(f'{info_str}\tAttempted update')
         return True
 
-    def handle(self, *args: typing.Any, **options: typing.Any) -> None:
+    def handle(self, *args: str, **options: str) -> None:
         logging.raiseExceptions = False
         facebook = options['facebook']
         google = options['google']
-        threads = options['threads']
-        test = options['test']
-        self.force = options['force']
+        threads = int(options['threads'])
+        test = bool(options['test'])
+        self.force = bool(options['force'])
         ec2_instances = EC2Instance.objects.filter(lead__status__in=Lead.STATUSES_ACTIVE, lead__raspberry_pi__last_seen__gt=timezone.now() - datetime.timedelta(hours=1))
 
         if facebook:

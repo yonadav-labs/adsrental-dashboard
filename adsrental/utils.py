@@ -12,7 +12,7 @@ import typing
 
 import requests
 import boto3
-from botocore.exceptions import ClientError
+import botocore
 from django.http.request import HttpRequest
 from django.utils import timezone
 from django.core.cache import cache
@@ -172,10 +172,10 @@ class ShipStationClient():
         for order in self.client.orders:
             self.post(
                 endpoint='/orders/createorder',
-                data=json.dumps(order.as_dict())
+                data=order.as_dict()
             )
 
-    def post(self, endpoint: str = '', data: typing.Any = None) -> None:
+    def post(self, endpoint: str, data: typing.Dict) -> None:
         'Rewrite original shipstaion.post method to catch exceptions.'
         url = '{}{}'.format(self.client.url, endpoint)
         headers = {'content-type': 'application/json'}
@@ -210,7 +210,7 @@ class BotoResource():
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
-        self.resources: typing.Dict[str, typing.Any] = {}
+        self.resources: typing.Dict = {}
 
     def get_resource(self, service: str = 'ec2') -> boto3.resource:
         'Get boto resource for given service. Chaches results.'
@@ -221,10 +221,10 @@ class BotoResource():
 
         return self.resources[service]
 
-    def get_client(self, service: str) -> typing.Any:
+    def get_client(self, service: str) -> botocore.client.BaseClient:
         return self.session.client(service, region_name=settings.AWS_REGION)
 
-    def get_by_essential_key(self, key: str) -> typing.Any:
+    def get_by_essential_key(self, key: str) -> typing.Optional[boto3.resources.base.ServiceResource]:
         'Get first valid instnce for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
@@ -238,8 +238,10 @@ class BotoResource():
         for instance in instances_list:
             return instance
 
-    def get_first_rpid_instance(self, rpid: str) -> typing.Any:
-        'Get first valid instnce for given RPID.'
+        return None
+
+    def get_first_rpid_instance(self, rpid: str) -> typing.Optional[boto3.resources.base.ServiceResource]:
+        'Get first valid instance for given RPID.'
         instances = self.get_resource('ec2').instances.filter(
             Filters=[
                 {
@@ -274,10 +276,10 @@ class BotoResource():
                 continue
             return instance
 
-        return False
+        return None
 
     @staticmethod
-    def get_instance_tag(instance: typing.Any, key: str) -> typing.Optional[str]:
+    def get_instance_tag(instance: boto3.resources.base.ServiceResource, key: str) -> typing.Optional[str]:
         'Get instance tag value by key'
         if not instance.tags:
             return None
@@ -288,7 +290,7 @@ class BotoResource():
 
         return None
 
-    def set_instance_tag(self, instance: typing.Any, key: str, value: str) -> None:
+    def set_instance_tag(self, instance: boto3.resources.base.ServiceResource, key: str, value: str) -> None:
         'Set instance tag value by key'
         tags = instance.tags or []
         key_found = False
@@ -303,7 +305,7 @@ class BotoResource():
         try:
             self.get_resource('ec2').create_tags(
                 Resources=[instance.id], Tags=tags)
-        except ClientError:
+        except botocore.exceptions.ClientError:
             pass
 
     def create_r53_entry(self, ec2_instance: EC2Instance) -> None:
@@ -337,7 +339,7 @@ class BotoResource():
             },
         )
 
-    def launch_instance(self, rpid: str, email: str) -> typing.Any:
+    def launch_instance(self, rpid: str, email: str) -> boto3.resources.base.ServiceResource:
         'Start otr create AWS EC2 instance for given RPID'
         instance = self.get_first_rpid_instance(rpid)
         if not instance:
@@ -385,11 +387,11 @@ class BotoResource():
     def generate_key() -> str:
         return str(uuid.uuid4())
 
-    def launch_essential_instance(self, ec2_instance: EC2Instance) -> typing.Any:
+    def launch_essential_instance(self, ec2_instance: EC2Instance) -> boto3.resources.base.ServiceResource:
         'Start or create AWS EC2 instance for given RPID'
         boto_instance = self.get_by_essential_key(ec2_instance.essential_key)
         if boto_instance:
-            return ec2_instance
+            return boto_instance
 
         self.get_resource('ec2').create_instances(
             ImageId=settings.AWS_IMAGE_AMI_ESSENTIAL,
@@ -452,7 +454,7 @@ class PingCacheHelper():
         return data
 
     @staticmethod
-    def is_data_valid(data: typing.Dict[str, typing.Any]) -> bool:
+    def is_data_valid(data: typing.Dict) -> bool:
         'Check if cache data is valid'
         if not data:
             return False
@@ -463,7 +465,7 @@ class PingCacheHelper():
         return True
 
     @staticmethod
-    def is_ec2_instance_data_consistent(data, ec2_instance):
+    def is_ec2_instance_data_consistent(data: typing.Dict, ec2_instance: EC2Instance) -> bool:
         ec2_ip_address = data['ec2_ip_address']
         ec2_instance_status = data['ec2_instance_status']
 
@@ -482,8 +484,10 @@ class PingCacheHelper():
         if ec2_ip_address != ec2_instance.ip_address:
             return False
 
+        return True
+
     @classmethod
-    def is_data_consistent(cls, data: typing.Dict[str, typing.Any], raspberry_pi: RaspberryPi, ec2_instance: typing.Any) -> bool:
+    def is_data_consistent(cls, data: typing.Dict, raspberry_pi: RaspberryPi, ec2_instance: EC2Instance) -> bool:
         'Check if cache data is consistent against current DB state'
         wrong_password = data['wrong_password']
         lead_status = data['lead_status']
@@ -518,7 +522,7 @@ class PingCacheHelper():
 
         return True
 
-    def set(self, rpid: str, data: typing.Dict[str, typing.Any]) -> None:
+    def set(self, rpid: str, data: typing.Dict) -> None:
         '''
         Create cache entry for rpid
 
@@ -543,7 +547,7 @@ class PingCacheHelper():
 
         return None
 
-    def get_actual_data(self, rpid: str) -> typing.Dict[str, typing.Any]:
+    def get_actual_data(self, rpid: str) -> typing.Dict:
         '''
         Get data for rpid for DB
 
@@ -593,7 +597,7 @@ class PingCacheHelper():
             keys = [i for i in keys if i != key]
             self.cache.set(self.KEYS, keys)
 
-    def get_data_for_request(self, request: HttpRequest) -> typing.Dict[str, typing.Any]:
+    def get_data_for_request(self, request: HttpRequest) -> typing.Dict:
         '''Get data from cache or db using request.GET'''
         rpid = request.GET.get('rpid', '').strip()
         troubleshoot = request.GET.get('troubleshoot')

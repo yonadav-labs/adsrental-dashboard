@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadAccountPasswordForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
+from adsrental.utils import PingCacheHelper
 from adsrental.admin.list_filters import \
     AbstractUIDListFilter, \
     StatusListFilter, \
@@ -618,7 +619,8 @@ class LeadAdmin(admin.ModelAdmin):
 
             lead.raspberry_pi.restart_required = True
             lead.raspberry_pi.save()
-            lead.clear_ping_cache()
+            if lead.raspberry_pi:
+                PingCacheHelper().delete(lead.raspberry_pi.rpid)
             messages.info(request, 'Lead {} RPi restart successfully requested. RPi and tunnel should be online in two minutes.'.format(lead.email))
 
     def delete_leads(self, request, queryset):

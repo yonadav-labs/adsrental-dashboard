@@ -9,7 +9,7 @@ from django.db.models.functions import Concat
 
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
-from adsrental.utils import BotoResource
+from adsrental.utils import BotoResource, PingCacheHelper
 
 
 class EC2InstanceAdmin(admin.ModelAdmin):
@@ -185,11 +185,11 @@ class EC2InstanceAdmin(admin.ModelAdmin):
             if ec2_instance.lead and ec2_instance.lead.raspberry_pi:
                 ec2_instance.lead.raspberry_pi.restart_required = True
                 ec2_instance.lead.raspberry_pi.save()
-                ec2_instance.clear_ping_cache()
+                PingCacheHelper().delete(ec2_instance.rpid)
 
     def clear_ping_cache(self, request, queryset):
         for ec2_instance in queryset:
-            ec2_instance.clear_ping_cache()
+            PingCacheHelper().delete(ec2_instance.rpid)
 
     def terminate(self, request, queryset):
         for ec2_instance in queryset:

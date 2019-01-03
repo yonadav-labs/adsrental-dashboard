@@ -1,5 +1,4 @@
 import uuid
-import typing
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -39,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self) -> str:
         return self.email
 
-    def save(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+    def save(self, *args: str, **kwargs: str) -> None:
         if not self.email:
             self.email = self.username
         if not self.username:
