@@ -438,7 +438,7 @@ class LeadAdmin(admin.ModelAdmin):
         try:
             create_order_result = lead_account.lead.add_shipstation_order()
         except ValueError as e:
-            messages.error(request, '{} was not created: {}'.format(lead_account, e))
+            messages.error(request, '{} order was not created: {}'.format(lead_account, e))
             return
 
         if create_order_result:
