@@ -277,6 +277,7 @@ class RaspberryPi(models.Model):
 
         if ping_data:
             self.process_ping_data(ping_data)
+            self.save()
             ping_cache_helper.delete(self.rpid)
 
     def get_cache(self) -> typing.Optional[PingDataType]:
