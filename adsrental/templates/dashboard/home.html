@@ -20,8 +20,8 @@
             <a href="{% url 'dashboard' %}?lead_status=In-Progress&amp;preset=security_checkpoint&amp;security_checkpoint=yes" type="button" class="btn {% if preset == 'security_checkpoint' %}btn-primary{% else %} btn-default{% endif %}">
                 In-Progress with Security checkpoint reported
             </a>
-            <a href="{% url 'dashboard' %}?connected_in_2_days=false&amp;preset=not_connected_in_2_days" type="button" class="btn {% if preset == 'not_connected_in_2_days' %}btn-primary{% else %} btn-default{% endif %}">
-                Delivered not connected in 2 days
+            <a href="{% url 'dashboard' %}?pi_delivered=last_2_14_days&amp;pi_connected=false&amp;preset=not_connected_in_14_days" type="button" class="btn {% if preset == 'not_connected_in_14_days' %}btn-primary{% else %} btn-default{% endif %}">
+                Delivered not connected 2-14 days
             </a>
         </div>
         <h3>{{total}} Lead Account{{ total|pluralize }}</h3>

@@ -2,7 +2,7 @@ import datetime
 
 from django.views import View
 from django.shortcuts import render
-from django.db.models import Q, F
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -125,28 +125,25 @@ class DashboardHomeView(View):
 
             if form.cleaned_data['pi_delivered']:
                 value = form.cleaned_data['pi_delivered']
+                if value == 'last_2_14_days':
+                    entries = entries.filter(
+                        lead__delivery_date__lt=now - datetime.timedelta(days=2),
+                        lead__delivery_date__gte=now - datetime.timedelta(days=14),
+                    )
                 if value == 'false':
                     entries = entries.filter(lead__delivery_date__isnull=True)
                 if value == 'true':
                     entries = entries.filter(lead__delivery_date__isnull=False)
 
-            if form.cleaned_data['connected_in_2_days']:
-                value = form.cleaned_data['connected_in_2_days']
+            if form.cleaned_data['pi_connected']:
+                value = form.cleaned_data['pi_connected']
                 if value == 'true':
                     entries = entries.filter(
-                        qualified_date__isnull=False,
-                        lead__delivery_date__isnull=False,
-                        lead__raspberry_pi__first_seen__isnull=False,
-                    ).filter(
-                        lead__raspberry_pi__first_seen__lte=F('lead__delivery_date') + datetime.timedelta(days=2),
+                        in_progress_date__isnull=False,
                     )
                 if value == 'false':
                     entries = entries.filter(
-                        qualified_date__isnull=False,
-                        lead__delivery_date__isnull=False,
-                    ).filter(
-                        Q(lead__raspberry_pi__first_seen__isnull=True) |
-                        Q(lead__raspberry_pi__first_seen__gt=F('lead__delivery_date') + datetime.timedelta(days=2))
+                        in_progress_date__isnull=True,
                     )
 
             if form.cleaned_data['search']:

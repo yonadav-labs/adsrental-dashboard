@@ -48,7 +48,13 @@ class DashboardForm(forms.Form):
         ('true', 'Banned', ),
         ('false', 'Not banned', ),
     )
-    BOOLEAN_CHOICES = (
+    PI_DELIVERED_CHOICES = (
+        ('', 'All'),
+        ('last_2_14_days', 'Last 2-14 days', ),
+        ('true', 'Yes', ),
+        ('false', 'No', ),
+    )
+    PI_CONNECTED_CHOICES = (
         ('', 'All'),
         ('true', 'Yes', ),
         ('false', 'No', ),
@@ -73,8 +79,8 @@ class DashboardForm(forms.Form):
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
     security_checkpoint = forms.ChoiceField(label='Security Checkpoint', choices=SECURITY_CHECKPOINT_CHOICES, required=False)
     banned = forms.ChoiceField(label='Banned', choices=BANNED_CHOICES, required=False)
-    pi_delivered = forms.ChoiceField(label='Delivered', choices=BOOLEAN_CHOICES, required=False)
-    connected_in_2_days = forms.ChoiceField(label='Connected in 2 days', choices=BOOLEAN_CHOICES, required=False)
+    pi_delivered = forms.ChoiceField(label='Delivered', choices=PI_DELIVERED_CHOICES, required=False)
+    pi_connected = forms.ChoiceField(label='Connected', choices=PI_CONNECTED_CHOICES, required=False)
     account_type = forms.ChoiceField(label='Account Type', choices=ACCOUNT_TYPE_CHOICES, required=False)
     shipstation_order_status = forms.ChoiceField(label='Order status', choices=SHIPSTATION_ORDER_STATUS_CHOICES, required=False)
 
