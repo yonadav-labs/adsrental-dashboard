@@ -120,15 +120,19 @@
                                 {% endif %}   
                             </td>
                             <td>
-                                {% if entry.lead.pi_delivered %}
-                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>
+                                {% if entry.lead.delivery_date %}
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{ entry.lead.delivery_date|naturalday|default:"Never" }}"></span>
                                 {% else %}
-                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                    {% if entry.lead.pi_delivered %}
+                                        <span class="glyphicon glyphicon-remove" style="color: lightgreen;" title="No delivery date"></span>
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-remove" style="color: red;" title="Not delivered yet"></span>
+                                    {% endif %}
                                 {% endif %}           
                             </td>
                             <td>
                                 {% if entry.lead.ship_date %}
-                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|default:"Never"}}"></span>
+                                    <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|naturalday|default:"Never"}}"></span>
                                 {% else %}
                                     <span class="glyphicon glyphicon-remove" style="color: red;"</span>
                                 {% endif %}
