@@ -313,7 +313,7 @@ class RaspberryPi(models.Model):
                 http=self.get_proxy_connection_string(),
                 https=self.get_proxy_connection_string(),
             ),
-            timeout=5,
+            timeout=2,
         )
 
     def get_unique_ips(self) -> typing.List[str]:
