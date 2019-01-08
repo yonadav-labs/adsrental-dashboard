@@ -50,7 +50,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'links',
         'online',
         'uptime',
-        # 'is_proxy_tunnel',
+        'is_proxy_tunnel',
         # 'proxy_hostname',
         # 'rtunnel_port',
         # 'tunnel_online',
@@ -70,7 +70,8 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'update_config',
         'reset_cache',
         'show_cache',
-        'make_proxy_tunnel',
+        'convert_to_proxy_tunnel',
+        'convert_to_ec2',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -150,7 +151,19 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.save()
         messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
 
-    def make_proxy_tunnel(self, request, queryset):
+    def convert_to_ec2(self, request, queryset):
+        for raspberry_pi in queryset:
+            raspberry_pi.reset_cache()
+            raspberry_pi.is_proxy_tunnel = False
+            raspberry_pi.new_config_required = True
+            raspberry_pi.unassign_tunnel_ports()
+            raspberry_pi.save()
+
+            messages.success(request, 'Device {rpid} converted to EC2'.format(
+                rpid=raspberry_pi.rpid,
+            ))
+
+    def convert_to_proxy_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.is_proxy_tunnel = True
