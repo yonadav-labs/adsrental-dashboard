@@ -28,10 +28,10 @@ class ProxyTunnelInfoView(View):
         try:
             response = raspberry_pi.check_proxy_tunnel()
             response_seconds = response.elapsed.total_seconds()
-            if response.elapsed.total_seconds() < 2:
-                messages.success(request, f'Proxy tunnel responded in {response_seconds}')
+            if response_seconds < 3:
+                messages.success(request, f'Proxy tunnel responded in {round(response_seconds, 2)} seconds, so it is stable.')
             else:
-                messages.success(request, f'Proxy tunnel responded in {response_seconds}. MLA can reject this tunnel.')
+                messages.error(request, f'Proxy tunnel responded in {round(response_seconds, 2)} seconds. MLA can reject this tunnel.')
         except requests.ConnectionError:
             messages.error(request, 'Proxy tunnel is not reachable.')
         except requests.exceptions.RequestException:
