@@ -26,8 +26,12 @@ class ProxyTunnelInfoView(View):
             messages.warning(request, f'This device is changing IP addresses to often, connection can be unstable. {unique_ips_count} IP changes detected.')
 
         try:
-            if raspberry_pi.check_proxy_tunnel():
-                messages.success(request, 'Proxy tunnel is working correctly.')
+            response = raspberry_pi.check_proxy_tunnel_time()
+            response_seconds = response.elapsed.total_seconds()
+            if response.elapsed.total_seconds() < 2:
+                messages.success(request, f'Proxy tunnel responded in {response_seconds}')
+            else:
+                messages.success(request, f'Proxy tunnel responded in {response_seconds}. MLA can reject this tunnel.')
         except requests.ConnectionError:
             messages.error(request, 'Proxy tunnel is not reachable.')
         except requests.exceptions.RequestException:
