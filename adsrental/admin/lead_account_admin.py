@@ -343,8 +343,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def report_wrong_password(self, request, queryset):
         for lead_account in queryset:
             if lead_account.wrong_password_date is None:
-                lead_account.wrong_password_date = timezone.now()
-                lead_account.save()
+                lead_account.mark_wrong_password(edited_by=request.user)
                 messages.info(request, '{} password is marked as wrong.'.format(lead_account))
 
     def report_correct_password(self, request, queryset):
@@ -358,9 +357,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             form = AdminLeadAccountPasswordForm(request.POST)
             if form.is_valid():
                 new_password = form.cleaned_data['new_password']
-                lead_account.password = new_password
-                lead_account.wrong_password_date = None
-                lead_account.save()
+                lead_account.set_correct_password(new_password, edited_by=request.user)
                 messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
                 return None
         else:
