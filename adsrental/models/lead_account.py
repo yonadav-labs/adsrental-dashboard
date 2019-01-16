@@ -131,7 +131,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     friends = models.BigIntegerField(default=0)
     account_url = models.CharField(max_length=255, blank=True, null=True)
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
-    qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
+    qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the first time.')
     disqualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as disqualified for the last time.')
     in_progress_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as in-progress.')
     banned_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the last time.')
@@ -407,7 +407,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         result = self.set_status(new_status, edited_by)
         if result:
             self.lead.qualify(edited_by)
-            self.qualified_date = timezone.now()
+            if not self.qualified_date:
+                self.qualified_date = timezone.now()
             self.save()
 
         return result
