@@ -408,6 +408,7 @@ class AccountTypeListFilter(SimpleListFilter):
             })
         return None
 
+
 class LeadAccountAccountTypeListFilter(AccountTypeListFilter):
     title = 'Account type'
     parameter_name = 'account_type'
@@ -876,6 +877,7 @@ class AbstractIntIDListFilter(AbstractUIDListFilter):
                 return queryset.none()
         return None
 
+
 class AbstractFulltextFilter(AbstractUIDListFilter):
     field_names = []
     _findterms = re.compile(r'"([^"]+)"|(\S+)').findall
@@ -912,8 +914,9 @@ class AbstractFulltextFilter(AbstractUIDListFilter):
             return queryset.filter(query)
         return None
 
+
 def titled_filter(title):
-    class Wrapper(FieldListFilter): # pylint: disable=W0223
+    class Wrapper(FieldListFilter):  # pylint: disable=W0223
         def __new__(cls, *args, **kwargs):
             instance = FieldListFilter.create(*args, **kwargs)
             instance.title = title
@@ -939,5 +942,29 @@ class DeliveredLastTwoDaysListFilter(SimpleListFilter):
         if self.value() == 'no':
             return queryset.filter(
                 lead__delivery_date__lte=timezone.now() - datetime.timedelta(days=2),
+            )
+        return None
+
+
+class EditedByListFilter(SimpleListFilter):
+    parameter_name = 'edited_by'
+    title = 'Edited by'
+
+    def lookups(self, request, model_admin):
+        return (
+            (settings.ADSDB_USERNAME, 'Adsdb user'),
+            (settings.AUTOBAN_USER_EMAIL, 'Autoban bot'),
+            (settings.ADMIN_USER_EMAIL, 'One-time script'),
+            ('other', 'Other'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'other':
+            return queryset.exclude(
+                editer_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL],
+            )
+        if self.value():
+            return queryset.filter(
+                editer_by__email=self.value(),
             )
         return None

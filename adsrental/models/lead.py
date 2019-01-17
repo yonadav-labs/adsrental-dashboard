@@ -400,7 +400,7 @@ class Lead(models.Model, FulltextSearchMixin):
             # self.pi_delivered = True
             self.save()
 
-    def update_pi_delivered(self, pi_delivered: bool, tracking_info_xml: str) ->  None:
+    def update_pi_delivered(self, pi_delivered: bool, tracking_info_xml: str) -> None:
         'Set pi_delivered and tracking_info'
         if pi_delivered is None:
             return
@@ -463,8 +463,8 @@ class Lead(models.Model, FulltextSearchMixin):
     def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         'Get corresponding EC2 object.'
         try:
-            return self.ec2instance # pylint: disable=E1101
-        except Lead.ec2instance.RelatedObjectDoesNotExist: # pylint: disable=E1101
+            return self.ec2instance  # pylint: disable=E1101
+        except Lead.ec2instance.RelatedObjectDoesNotExist:  # pylint: disable=E1101
             return None
 
     def is_active(self) -> bool:
@@ -495,6 +495,18 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
+
+    def insert_note(self, message, event_datetime=None):
+        'Add a text message to note field'
+        if not event_datetime:
+            event_datetime = timezone.localtime(timezone.now())
+
+        line = f'{event_datetime.strftime(settings.SYSTEM_DATETIME_FORMAT)} {message}'
+
+        if not self.note:
+            self.note = line
+        else:
+            self.note = f'{self.note}\n{line}'
 
 
 class ReportProxyLead(Lead):

@@ -448,6 +448,18 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         '''
         return cls.get_timedelta_filter('lead__raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
+    def insert_note(self, message, event_datetime=None):
+        'Add a text message to note field'
+        if not event_datetime:
+            event_datetime = timezone.localtime(timezone.now())
+
+        line = f'{event_datetime.strftime(settings.SYSTEM_DATETIME_FORMAT)} {message}'
+
+        if not self.note:
+            self.note = line
+        else:
+            self.note = f'{self.note}\n{line}'
+
 
 class ReportProxyLeadAccount(LeadAccount):
     'A proxy model to register LeadAccount in admin UI twice for Reports'

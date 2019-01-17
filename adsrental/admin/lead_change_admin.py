@@ -6,7 +6,7 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_change import LeadChange
 
-from adsrental.admin.list_filters import AbstractUIDListFilter, AbstractIntIDListFilter
+from adsrental.admin.list_filters import AbstractUIDListFilter, AbstractIntIDListFilter, EditedByListFilter
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -35,6 +35,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
     list_select_related = ('lead', )
     list_filter = (
         'field',
+        EditedByListFilter,
         LeadLeadidListFilter,
         LeadAccountIDListFilter,
     )
