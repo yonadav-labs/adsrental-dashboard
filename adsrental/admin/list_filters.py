@@ -961,10 +961,10 @@ class EditedByListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'other':
             return queryset.exclude(
-                editer_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL],
+                edited_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL],
             )
         if self.value():
             return queryset.filter(
-                editer_by__email=self.value(),
+                edited_by__email=self.value(),
             )
         return None
