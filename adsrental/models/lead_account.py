@@ -321,13 +321,27 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         old_value = self.password
         self.password = new_password
         self.wrong_password_date = None
+        self.insert_note(f'Wrong password fixed by {edited_by.email}')
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='password', value=new_password, old_value=old_value, edited_by=edited_by).save()
 
     def mark_wrong_password(self, edited_by: User) -> None:
         self.wrong_password_date = timezone.now()
+        self.insert_note(f'Wrong password reported by {edited_by.email}')
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='wrong_password', value=self.password, old_value=self.password, edited_by=edited_by).save()
+
+    def mark_security_checkpoint(self, edited_by: User) -> None:
+        self.security_checkpoint_date = timezone.now()
+        self.insert_note(f'Security checkpoint reported by {edited_by.email}')
+        self.save()
+        LeadChange(lead=self.lead, lead_account=self, field='security_checkpoint', value='true', old_value='false', edited_by=edited_by).save()
+
+    def resolve_security_checkpoint(self, edited_by: User) -> None:
+        self.security_checkpoint_date = None
+        self.insert_note(f'Security checkpoint reported as resolved by {edited_by.email}')
+        self.save()
+        LeadChange(lead=self.lead, lead_account=self, field='security_checkpoint', value='false', old_value='true', edited_by=edited_by).save()
 
     def set_status(self, value: str, edited_by: User) -> bool:
         'Change status, create LeadChange instance.'

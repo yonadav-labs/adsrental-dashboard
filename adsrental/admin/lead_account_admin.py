@@ -226,7 +226,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def touch_count_field(self, obj):
         return obj.touch_count
 
-
     def touch_button(self, obj):
         row_actions = [
             {
@@ -379,15 +378,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
             'form': form,
         })
 
-
     def report_security_checkpoint(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_security_checkpoint_reported():
                 messages.info(request, '{} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_security_checkpoint(edited_by=request.user)
             messages.info(request, '{} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_resolved(self, request, queryset):
@@ -396,8 +393,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(request, '{} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = None
-            lead_account.save()
+            lead_account.resolve_security_checkpoint(edited_by=request.user)
             messages.info(request, '{} security checkpoint reported as resolved.'.format(lead_account))
 
     def sync_to_adsdb(self, request, queryset):

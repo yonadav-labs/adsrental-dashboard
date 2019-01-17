@@ -683,8 +683,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_google_resolved(self, request, queryset):
@@ -699,8 +698,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = None
-            lead_account.save()
+            lead_account.resolve_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
 
     def report_security_checkpoint_facebook(self, request, queryset):
@@ -715,8 +713,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_facebook_screenshot(self, request, queryset):
@@ -731,8 +728,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_facebook_resolved(self, request, queryset):
@@ -747,8 +743,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = None
-            lead_account.save()
+            lead_account.resolve_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
 
     def report_security_checkpoint_facebook_screenshot_resolved(self, request, queryset):
@@ -763,8 +758,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = None
-            lead_account.save()
+            lead_account.resolve_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
 
     def report_security_checkpoint_amazon(self, request, queryset):
@@ -779,8 +773,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is already reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = timezone.now()
-            lead_account.save()
+            lead_account.mark_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_amazon_resolved(self, request, queryset):
@@ -795,8 +788,7 @@ class LeadAdmin(admin.ModelAdmin):
                 messages.info(request, 'Lead Account {} security checkpoint is not reported, skipping.'.format(lead_account))
                 continue
 
-            lead_account.security_checkpoint_date = None
-            lead_account.save()
+            lead_account.resolve_security_checkpoint(edited_by=request.user)
             messages.info(request, 'Lead Account {} security checkpoint reported as resolved.'.format(lead_account))
 
     def report_wrong_google_password(self, request, queryset):
