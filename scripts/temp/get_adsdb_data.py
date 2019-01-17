@@ -21,7 +21,7 @@ for page in range(1, 1000):
     accounts += data['data']
     print('Total', len(accounts))
 
-user = User.objects.get(email='volshebnyi@gmail.com')
+user = User.objects.get(email=settings.ADSDBSYNC_USER_EMAIL)
 for account in accounts:
     if account['account_status'] == 'Dead':
         if account.get('fb_username'):

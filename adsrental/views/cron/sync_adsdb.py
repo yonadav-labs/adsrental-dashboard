@@ -47,7 +47,7 @@ class SyncAdsDBView(View):
                 accounts.append(account)
 
         messages.append(f'Total accounts {len(accounts)}')
-        user = User.objects.get(email='volshebnyi@gmail.com')
+        user = User.objects.get(email=settings.ADSDBSYNC_USER_EMAIL)
         for account in accounts:
             if account['account_status'] != 'Dead':
                 continue
