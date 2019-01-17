@@ -955,13 +955,14 @@ class EditedByListFilter(SimpleListFilter):
             (settings.ADSDB_USERNAME, 'Adsdb user'),
             (settings.AUTOBAN_USER_EMAIL, 'Autoban bot'),
             (settings.ADMIN_USER_EMAIL, 'One-time script'),
+            (settings.PING_USER_EMAIL, 'Ping bot'),
             ('other', 'Other'),
         )
 
     def queryset(self, request, queryset):
         if self.value() == 'other':
             return queryset.exclude(
-                edited_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL],
+                edited_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL, settings.PING_USER_EMAIL],
             )
         if self.value():
             return queryset.filter(

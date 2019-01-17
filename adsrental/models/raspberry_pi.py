@@ -14,6 +14,7 @@ from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
 from adsrental.utils import PingCacheHelper
+from adsrental.models.user import User
 
 
 if typing.TYPE_CHECKING:
@@ -186,12 +187,13 @@ class RaspberryPi(models.Model):
             RaspberryPiSession.start(self)
 
         lead = self.get_lead()
+        ping_user = User.objects.get(email=settings.PING_USER_EMAIL)
         if lead:
             if lead.status == lead.STATUS_QUALIFIED:
-                lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=None)
+                lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=ping_user)
             for lead_account in lead.lead_accounts.all():
                 if lead_account.status == lead_account.STATUS_QUALIFIED:
-                    lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
+                    lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=ping_user)
                     if not lead_account.in_progress_date:
                         lead_account.in_progress_date = ping_datetime
                         lead_account.insert_note('Set to in-progress after first ping')
@@ -202,9 +204,9 @@ class RaspberryPi(models.Model):
                             except:  # pylint: disable=bare-except
                                 pass
                 if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
-                    lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
+                    lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=ping_user)
                     lead_account.save()
-                    lead.set_status(lead.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)
+                    lead.set_status(lead.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=ping_user)
                     lead.save()
 
         if not self.first_seen:

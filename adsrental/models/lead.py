@@ -269,7 +269,7 @@ class Lead(models.Model, FulltextSearchMixin):
         '''
         return cls.get_timedelta_filter('raspberry_pi__last_seen__gt', minutes=-RaspberryPi.online_minutes_ttl)
 
-    def set_status(self, value: str, edited_by: typing.Optional[User]) -> bool:
+    def set_status(self, value: str, edited_by: User) -> bool:
         'Change status, create LeadChangeinstance.'
         if value not in dict(self.STATUS_CHOICES).keys():
             raise ValueError('Unknown status: {}'.format(value))
@@ -285,7 +285,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
-        self.insert_note(f'Status set to {self.status}')
+        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
         self.save()
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True

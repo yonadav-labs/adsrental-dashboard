@@ -345,7 +345,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
-        self.insert_note(f'Status set to {self.status}')
+        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
