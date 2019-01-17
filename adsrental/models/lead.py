@@ -285,6 +285,7 @@ class Lead(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
+        self.insert_note(f'Status set to {self.status}')
         self.save()
         LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True

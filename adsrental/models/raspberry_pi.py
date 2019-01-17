@@ -120,8 +120,8 @@ class RaspberryPi(models.Model):
     def get_lead(self) -> typing.Optional[Lead]:
         'Get linked Lead object'
         try:
-            return self.lead # pylint: disable=E1101
-        except RaspberryPi.lead.RelatedObjectDoesNotExist: # pylint: disable=E1101
+            return self.lead  # pylint: disable=E1101
+        except RaspberryPi.lead.RelatedObjectDoesNotExist:  # pylint: disable=E1101
             return None
 
     def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
@@ -194,11 +194,12 @@ class RaspberryPi(models.Model):
                     lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=None)
                     if not lead_account.in_progress_date:
                         lead_account.in_progress_date = ping_datetime
+                        lead_account.insert_note('Set to in-progress after first ping')
                         lead_account.save()
                         if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
                             try:
                                 lead_account.sync_to_adsdb()
-                            except: # pylint: disable=bare-except
+                            except:  # pylint: disable=bare-except
                                 pass
                 if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
                     lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=None)

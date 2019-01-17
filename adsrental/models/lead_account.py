@@ -345,6 +345,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
+        self.insert_note(f'Status set to {self.status}')
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
         return True
@@ -394,6 +395,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         result = self.set_status(new_status, edited_by)
         if result:
             self.disqualified_date = timezone.now()
+            self.insert_note('Disqualified')
             self.save()
             if not LeadAccount.get_active_lead_accounts(self.lead):
                 self.lead.disqualify(edited_by)
@@ -409,6 +411,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.lead.qualify(edited_by)
             if not self.qualified_date:
                 self.qualified_date = timezone.now()
+                self.insert_note('Qualified')
             self.save()
 
         return result
