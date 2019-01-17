@@ -65,7 +65,7 @@ class EC2ConnectView(View):
         lead = Lead.objects.filter(raspberry_pi__rpid=rpid).first()
         if not lead:
             messages.warning(request, 'This RPID has no assigned lead.')
-            return render(request, 'rdp_connect.html', dict(
+            return render(request, 'ec2_connect.html', dict(
                 rpid=rpid,
                 ec2_instance=None,
                 check_connection=False,
