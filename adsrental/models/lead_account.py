@@ -326,10 +326,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_PASSWORD, value=new_password, old_value=old_value, edited_by=edited_by).save()
 
     def mark_wrong_password(self, edited_by: User) -> None:
+        old_value = 'True' if self.wrong_password_date else 'False'
         self.wrong_password_date = timezone.now()
         self.insert_note(f'Wrong password reported by {edited_by.email}')
         self.save()
-        LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_WRONG_PASSWORD, value=self.password, old_value=self.password, edited_by=edited_by).save()
+        LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_WRONG_PASSWORD, value='True', old_value=old_value, edited_by=edited_by).save()
 
     def mark_security_checkpoint(self, edited_by: User) -> None:
         old_value = 'True' if self.security_checkpoint_date else 'False'
