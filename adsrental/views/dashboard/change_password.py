@@ -39,7 +39,7 @@ class ChangePasswordView(View):
             old_value = lead_account.password
             form.update_lead_account(lead_account)
             value = lead_account.password
-            LeadChange(lead=lead_account.lead, lead_account=lead_account, field='password', value=value, old_value=old_value, edited_by=request.user).save()
+            LeadChange(lead=lead_account.lead, lead_account=lead_account, field=LeadChange.FIELD_PASSWORD, value=value, old_value=old_value, edited_by=request.user).save()
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
                 urlencode(dict(

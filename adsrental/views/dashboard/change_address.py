@@ -39,7 +39,7 @@ class ChangeAddressView(View):
             old_value = lead.get_address()
             form.update_lead(lead)
             value = lead.get_address()
-            LeadChange(lead=lead, field='address', value=value, old_value=old_value, edited_by=request.user).save()
+            LeadChange(lead=lead, field=LeadChange.FIELD_ADDRESS, value=value, old_value=old_value, edited_by=request.user).save()
 
         messages.success(request, 'Lead address successfully changed')
 

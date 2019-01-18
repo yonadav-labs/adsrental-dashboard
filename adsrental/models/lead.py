@@ -287,7 +287,7 @@ class Lead(models.Model, FulltextSearchMixin):
         self.status = value
         self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
         self.save()
-        LeadChange(lead=self, field='status', value=value, old_value=old_value, edited_by=edited_by).save()
+        LeadChange(lead=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
     def is_ready_for_testing(self) -> bool:
@@ -321,7 +321,7 @@ class Lead(models.Model, FulltextSearchMixin):
             raspberry_pi.last_seen = None
             raspberry_pi.first_seen = None
             raspberry_pi.save()
-        LeadChange(lead=self, field='prepare_for_reshipment', value=False, old_value=old_value, edited_by=edited_by).save()
+        LeadChange(lead=self, field=LeadChange.FIELD_PREPARE_FOR_RESHIPMENT, value=False, old_value=old_value, edited_by=edited_by).save()
 
     def ban(self, edited_by: User) -> bool:
         'Mark lead as banned, send cutomer.io event.'
