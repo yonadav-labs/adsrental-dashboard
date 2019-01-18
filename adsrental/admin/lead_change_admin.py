@@ -26,8 +26,8 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'lead_link',
         'lead_account_field',
         'field',
-        'value',
-        'old_value',
+        'value_field',
+        'old_value_field',
         'edited_by',
         'data',
         'created',
@@ -40,6 +40,22 @@ class LeadChangeAdmin(admin.ModelAdmin):
         LeadAccountIDListFilter,
     )
     search_fields = ('lead__email', 'lead__raspberry_pi__rpid', )
+
+    def value_field(self, obj):
+        if not obj.value == 'False':
+            return mark_safe('<img src="/static/admin/img/icon-no.svg" title="False" alt="False">')
+        if not obj.value == 'True':
+            return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="True" alt="True">')
+
+        return obj.value
+
+    def old_value_field(self, obj):
+        if not obj.old_value == 'False':
+            return mark_safe('<img src="/static/admin/img/icon-no.svg" title="False" alt="False">')
+        if not obj.old_value == 'True':
+            return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="True" alt="True">')
+
+        return obj.old_value
 
     def lead_link(self, obj):
         lead = obj.lead
@@ -68,3 +84,6 @@ class LeadChangeAdmin(admin.ModelAdmin):
 
     lead_account_field.short_description = 'Lead Account'
     lead_account_field.admin_order_field = 'lead_account__username'
+
+    value_field.short_description = 'Value'
+    old_value_field.short_description = 'Old Value'
