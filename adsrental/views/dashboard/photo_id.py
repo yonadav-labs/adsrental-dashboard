@@ -19,7 +19,10 @@ class PhotoIDVIew(View):
         filename = lead.photo_id.name.split('/')[-1]
 
         mimetype = mimetypes.guess_type(filename)[0] or 'text/plain'
-        response = HttpResponse(lead.photo_id, content_type=mimetype)
+        try:
+            response = HttpResponse(lead.photo_id, content_type=mimetype)
+        except FileNotFoundError:
+            raise Http404
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
 
         return response
