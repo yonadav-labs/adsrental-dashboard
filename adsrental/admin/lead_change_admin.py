@@ -1,3 +1,5 @@
+import html
+
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -31,7 +33,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'edited_by',
         'created',
     )
-    list_select_related = ('lead', )
+    list_select_related = ('lead', 'lead_account', )
     list_filter = (
         'field',
         EditedByListFilter,
@@ -60,22 +62,23 @@ class LeadChangeAdmin(admin.ModelAdmin):
         lead = obj.lead
         if not lead:
             return None
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{text}</a>'.format(
+        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{text}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             text=lead.name(),
             q=lead.leadid,
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead.note)}" alt="?">' if lead.note else '',
         ))
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
         if not lead_account:
             return None
-        return mark_safe('<a href="{url}?id={id}">{type} {username} ({status})</a>'.format(
+        return mark_safe('<a href="{url}?id={id}">{type} {username}</a>{note}'.format(
             url=reverse('admin:adsrental_leadaccount_changelist'),
             type=lead_account.get_account_type_display(),
             username=lead_account.username,
-            status=lead_account.status,
             id=lead_account.id,
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead_account.note)}" alt="?">' if lead_account.note else '',
         ))
 
     lead_link.short_description = 'Lead'

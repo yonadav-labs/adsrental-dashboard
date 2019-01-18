@@ -206,12 +206,10 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.leadid
 
     def name(self, obj):
-        if obj.note:
-            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
-                html.escape(obj.note),
-                obj.name(),
-            ))
-        return obj.name()
+        return mark_safe('{name}{note}'.format(
+            name=html.escape(obj.name()),
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+        ))
 
     def usps_field(self, obj):
         if obj.pi_delivered:

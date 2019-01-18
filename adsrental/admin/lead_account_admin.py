@@ -1,3 +1,5 @@
+import html
+
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
@@ -164,12 +166,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         return queryset
 
     def name(self, obj):
-        if obj.note:
-            return mark_safe('<span class="has_note" title="{}">{}</span>'.format(
-                obj.note,
-                obj.lead.name(),
-            ))
-        return obj.lead.name()
+        return mark_safe('{name}{note}'.format(
+            name=html.escape(obj.lead.name()),
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+        ))
 
     def lead_link(self, obj):
         lead = obj.lead
