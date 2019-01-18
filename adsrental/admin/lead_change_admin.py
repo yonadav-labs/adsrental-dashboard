@@ -27,7 +27,7 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'lead_account_field',
         'field',
         'value_field',
-        'old_value_field',
+        # 'old_value_field',
         'edited_by',
         'created',
     )
