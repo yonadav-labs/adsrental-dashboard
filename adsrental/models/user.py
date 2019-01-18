@@ -30,13 +30,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     def __str__(self) -> str:
-        return self.email
+        return self.get_full_name()
 
     def get_short_name(self) -> str:
-        return self.email
+        return f'{self.first_name}'
 
     def get_full_name(self) -> str:
-        return self.email
+        return f'{self.first_name} {self.last_name}'
 
     def save(self, *args: str, **kwargs: str) -> None:
         if not self.email:

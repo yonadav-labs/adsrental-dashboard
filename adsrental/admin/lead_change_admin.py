@@ -29,7 +29,6 @@ class LeadChangeAdmin(admin.ModelAdmin):
         'value_field',
         'old_value_field',
         'edited_by',
-        'data',
         'created',
     )
     list_select_related = ('lead', )
