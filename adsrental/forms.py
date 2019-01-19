@@ -90,6 +90,14 @@ class SetPasswordForm(forms.Form):
     email = forms.CharField(label='Email', widget=forms.TextInput(attrs={'readonly': True}))
     new_password = forms.CharField(label='Password')
 
+    def clean_new_password(self):
+        lead_account = self.lead_account
+        new_password = self.cleaned_data['new_password']
+        if new_password == lead_account.password:
+            raise forms.ValidationError("Password cannot be the same as the old one")
+
+        return new_password
+
     def update_lead_account(self, lead_account: LeadAccount) -> None:
         lead_account.password = self.cleaned_data['new_password']
         lead_account.wrong_password_date = None
@@ -292,6 +300,7 @@ class AdminLeadDeleteForm(forms.Form):
 
         return value
 
+
 class AdminLeadAccountPasswordForm(forms.Form):
     old_password = forms.CharField(label='Old password', widget=forms.TextInput(attrs=dict(readonly=True)), required=False)
     new_password = forms.CharField(label='New password')
@@ -327,7 +336,6 @@ class UserLoginForm(forms.Form):
         first_lead = leads.first()
         return first_lead
 
-
     def clean(self) -> None:
         cleaned_data = super().clean()
 
@@ -346,6 +354,7 @@ class UserFixPasswordForm(forms.Form):
             id=data.get('lead_account_id'),
             lead=lead,
         ).first()
+
 
 class DisqualifyLeadAccountForm(forms.Form):
     ACTION_SUBMIT = 'submit'

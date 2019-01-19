@@ -35,6 +35,8 @@ class ChangePasswordView(View):
         lead_account = LeadAccount.objects.filter(id=lead_account_id, wrong_password_date__isnull=False).first()
         if not lead_account:
             raise Http404
+
+        form.lead_account = lead_account
         if form.is_valid():
             old_value = lead_account.password
             form.update_lead_account(lead_account)
