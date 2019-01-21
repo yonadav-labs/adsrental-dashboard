@@ -3,6 +3,7 @@
 {% load bootstrap %}
 {% load humanize %}
 {% load helpers %}
+{% load static %}
 
 {% block title %}Adsrental | Lead accounts Report{% endblock %}
 
@@ -38,3 +39,35 @@
         {% include "include/report/lead_accounts_weekly.html" %}
     </div>
 {% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link href="{% static 'css/jquery.dataTables.min.css' %}" rel="stylesheet">
+{% endblock styles %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'scripts/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'scripts/dataTables.bootstrap.min.js' %}"></script>
+    <script src="{% static 'scripts/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'scripts/jszip.min.js' %}"></script>
+    <script src="{% static 'scripts/buttons.html5.min.js' %}"></script>
+    <script>
+        $('#resultsTable').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            ordering: true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: 'Export as CSV',
+                    extend: 'csvHtml5',
+                    fieldSeparator: ',',
+                    extension: '.csv',
+                    className: 'btn btn-primary',
+                }
+            ],
+        });
+    </script>
+{% endblock scripts %}
