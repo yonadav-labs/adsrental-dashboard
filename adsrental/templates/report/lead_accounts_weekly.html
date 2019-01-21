@@ -17,7 +17,7 @@
             {% if dates.start_date == start_date %}
                 {{dates.start_date|date:"d M"}} - {{dates.end_date|date:"d M"}}
             {% else %}
-                <a class="button" href="{% url 'report:lead_accounts_weekly' %}?start_date={{dates.start_date|date:"Y-m-d"|urlencode }}">
+                <a class="button" href="{% url 'report:lead_accounts_weekly' %}?account_type={{account_type|urlencode}}&amp;start_date={{dates.start_date|date:"Y-m-d"|urlencode }}">
                     {% if dates.start_date < start_date  %}
                         &lt;&lt;
                     {% else %}
@@ -31,7 +31,7 @@
         <h3>Select account type</h3>
         <div class="btn-group" role="group">
             {% for select_account_type in select_account_types %}
-                <a href="?account_type={{ select_account_type|urlencode }}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type }}</a>
+                <a href="?account_type={{ select_account_type|urlencode }}&amp;start_date={{start_date|date:"Y-m-d"|urlencode}}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type }}</a>
             {% endfor %}
         </div>
 
