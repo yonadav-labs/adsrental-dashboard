@@ -87,6 +87,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_FACEBOOK_SUSPICIOUS = 'Facebook - Suspicious'
     BAN_REASON_FACEBOOK_LOCKOUT = 'Facebook - Lockout'
     BAN_REASON_ADSDB = 'ADSDB'
+    BAN_REASON_QUIT = 'Quit'
 
     POLICY_BAN_REASONS = (
         BAN_REASON_GOOGLE_POLICY,
@@ -118,6 +119,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (BAN_REASON_AUTO_CHECKPOINT, 'Auto: reported security checkpoint for 2 weeks', ),
         (BAN_REASON_AUTO_NOT_USED, 'Auto: not used for 2 weeks after delivery', ),
         (BAN_REASON_ADSDB, 'Banned by Adsdb sync'),
+        (BAN_REASON_QUIT, 'Quit'),
         ('Other', 'Other', ),
     )
 
