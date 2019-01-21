@@ -107,7 +107,9 @@
                             <td>
                                 {% if entry.is_wrong_password %}
                                     <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                                    <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
+                                    {% if entry.wrong_password_change_counter < entry.MAX_WRONG_PASSWORD_CHANGE_COUNTER %}
+                                        <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
+                                    {% endif %}
                                 {% else %}
                                     <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
                                 {% endif %}   

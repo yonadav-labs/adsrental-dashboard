@@ -39,6 +39,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     AUTO_BAN_DAYS_SEC_CHECKPOINT = 14
     AUTO_BAN_DAYS_NOT_USED = 14
     AUTO_BAN_DAYS_NO_ACTIVE_ACCOUNTS = 4
+    MAX_WRONG_PASSWORD_CHANGE_COUNTER = 3
 
     STATUS_QUALIFIED = 'Qualified'
     STATUS_SCREENSHOT_QUALIFIED = 'Screenshot Qualified'
@@ -131,6 +132,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     friends = models.BigIntegerField(default=0)
     account_url = models.CharField(max_length=255, blank=True, null=True)
     wrong_password_date = models.DateTimeField(blank=True, null=True, help_text='Date when password was reported as wrong.')
+    wrong_password_change_counter = models.IntegerField(default=0, help_text='How many times a password was changed by user.')
     qualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as qualified for the first time.')
     disqualified_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as disqualified for the last time.')
     in_progress_date = models.DateTimeField(blank=True, null=True, help_text='Date when lead was marked as in-progress.')
