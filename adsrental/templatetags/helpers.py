@@ -2,6 +2,9 @@ import datetime
 
 from django import template
 
+from adsrental import utils
+
+
 register = template.Library()
 
 
@@ -27,29 +30,11 @@ def ordinal(value: int) -> str:
 
     return '{}th'.format(value)
 
+
 @register.filter()
 def humanize_timedelta(timedeltaobj: datetime.timedelta) -> str:
-    secs = timedeltaobj.total_seconds()
-    timetot = ""
-    if secs < 60:
-        return 'Now'
+    return utils.humanize_timedelta(timedeltaobj)
 
-    if secs > 86400: # 60sec * 60min * 24hrs
-        days = secs // 86400
-        timetot += "{} days".format(int(days))
-        secs = secs - days*86400
-
-    if secs > 3600:
-        hrs = secs // 3600
-        timetot += " {} hours".format(int(hrs))
-        secs = secs - hrs*3600
-
-    if secs > 60:
-        mins = secs // 60
-        timetot += " {} minutes".format(int(mins))
-        secs = secs - mins*60
-
-    return timetot
 
 @register.filter()
 def humanize_timedelta_hours(timedeltaobj: datetime.timedelta) -> str:
@@ -58,7 +43,7 @@ def humanize_timedelta_hours(timedeltaobj: datetime.timedelta) -> str:
     if secs < 3600:
         return 'Now'
 
-    if secs > 86400: # 60sec * 60min * 24hrs
+    if secs > 86400:  # 60sec * 60min * 24hrs
         days = secs // 86400
         timetot += "{} days".format(int(days))
         secs = secs - days*86400

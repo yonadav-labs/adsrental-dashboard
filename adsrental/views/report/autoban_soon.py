@@ -28,21 +28,21 @@ class AutoBanSoonView(View):
 
         now = timezone.localtime(timezone.now())
         wrong_password_lead_accounts = lead_accounts.filter(
-            wrong_password_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD - 3),
+            wrong_password_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD - 14),
             status=LeadAccount.STATUS_IN_PROGRESS,
         ).order_by('wrong_password_date').select_related('lead', 'lead__bundler')
         for lead_account in wrong_password_lead_accounts:
             lead_account.ban_timedelta = lead_account.wrong_password_date + datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD) - now
 
         offline_lead_accounts = lead_accounts.filter(
-            lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_OFFLINE - 3),
+            lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_OFFLINE - 14),
             status=LeadAccount.STATUS_IN_PROGRESS,
         ).order_by('lead__raspberry_pi__last_seen').select_related('lead', 'lead__raspberry_pi', 'lead__bundler')
         for lead_account in offline_lead_accounts:
             lead_account.ban_timedelta = lead_account.lead.raspberry_pi.last_seen + datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_OFFLINE) - now
 
         sec_checkpoint_lead_accounts = lead_accounts.filter(
-            security_checkpoint_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT - 3),
+            security_checkpoint_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT - 14),
             status=LeadAccount.STATUS_IN_PROGRESS,
         ).order_by('security_checkpoint_date').select_related('lead', 'lead__bundler')
         for lead_account in sec_checkpoint_lead_accounts:
@@ -50,7 +50,7 @@ class AutoBanSoonView(View):
 
         not_used_lead_accounts = lead_accounts.filter(
             status=Lead.STATUS_QUALIFIED,
-            lead__delivery_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NOT_USED - 4),
+            lead__delivery_date__lte=now - datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NOT_USED - 14),
         ).order_by('lead__delivery_date').select_related('lead', 'lead__bundler')
         for lead_account in not_used_lead_accounts:
             lead_account.ban_timedelta = datetime.datetime.combine(lead_account.lead.delivery_date, datetime.datetime.min.time()).replace(tzinfo=timezone.get_default_timezone()) + datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NOT_USED + 1) - now

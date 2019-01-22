@@ -28,6 +28,7 @@ if typing.TYPE_CHECKING:
     from adsrental.models.raspberry_pi import RaspberryPi
     from adsrental.models.ec2_instance import EC2Instance
 
+
 class CustomerIOClient():
     '''Manages lead data ans send events for leads to customer.io'''
     EVENT_SHIPPED = 'shipped'
@@ -113,6 +114,7 @@ class CustomerIOClient():
 
 class ShipStationClient():
     'Handles order creation and check on shipstation.'
+
     def __init__(self) -> None:
         self.client = ShipStation(
             key=settings.SHIPSTATION_API_KEY, secret=settings.SHIPSTATION_API_SECRET)
@@ -205,6 +207,7 @@ class ShipStationClient():
 
 class BotoResource():
     'Handles AWS boto operations.'
+
     def __init__(self) -> None:
         self.session = boto3.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -655,3 +658,33 @@ def get_month_boundaries_for_dt(d: datetime.datetime) -> typing.Tuple[datetime.d
     next_month = start.replace(day=28) + datetime.timedelta(days=4)
     end = next_month - datetime.timedelta(days=next_month.day - 1)
     return start, end
+
+
+def humanize_timedelta(timedeltaobj: datetime.timedelta, short: bool = False) -> str:
+    secs = timedeltaobj.total_seconds()
+    timetot = ""
+    if secs < 60:
+        return 'Now'
+
+    if secs > 86400:  # 60sec * 60min * 24hrs
+        days = int(secs // 86400)
+        title = 'days' if days > 1 else 'day'
+        timetot += f'{days} {title}'
+        secs = secs - days * 86400
+        if short:
+            return timetot
+
+    if secs > 3600:
+        hours = int(secs // 3600)
+        title = 'hours' if hours > 1 else 'hour'
+        timetot += f'{hours} {title}'
+        secs = secs - hours * 3600
+        if short:
+            return timetot
+
+    if secs > 60:
+        minutes = int(secs // 60)
+        title = 'minutes' if minutes > 1 else 'minute'
+        timetot += f'{minutes} {title}'
+
+    return timetot

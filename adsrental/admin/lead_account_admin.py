@@ -12,6 +12,7 @@ from django.db.models.functions import Concat
 from django.template.loader import render_to_string
 
 from adsrental.models.lead import Lead
+from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFilter, \
@@ -191,12 +192,17 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def status_field(self, obj):
         title = 'Show changes'
         if obj.ban_reason:
-            title = 'Banned for {}'.format(obj.ban_reason)
+            title = f'Banned for {obj.get_ban_reason_display()}'
+
+        status = obj.status
+        if obj.status == LeadAccount.STATUS_BANNED:
+            dt = f'after {humanize_timedelta(obj.banned_date - obj.created, short=True)}' if obj.banned_date else ''
+            status = f'{obj.status} ({obj.get_ban_reason_display()}) {dt}'
         return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.id,
             title=title,
-            status=obj.status if obj.status != LeadAccount.STATUS_BANNED else '{} ({})'.format(obj.status, obj.ban_reason),
+            status=status,
         ))
 
     def online(self, obj):
