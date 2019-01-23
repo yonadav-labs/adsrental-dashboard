@@ -74,7 +74,15 @@ class CustomIndexDashboard(Dashboard):
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
                         account_type__exact=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT,
-                        status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL,
+                        status=LeadAccount.STATUS_NEEDS_APPROVAL,
+                        online='online',
+                    )),
+                )],
+                [_('Google accounts in Needs Approval status'), '{}?{}'.format(
+                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
+                    urlencode(dict(
+                        account_type__exact=LeadAccount.ACCOUNT_TYPE_GOOGLE,
+                        status=LeadAccount.STATUS_NEEDS_APPROVAL,
                         online='online',
                     )),
                 )],

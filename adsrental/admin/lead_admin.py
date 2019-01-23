@@ -128,6 +128,7 @@ class LeadAdmin(admin.ModelAdmin):
     actions = (
         # 'update_from_shipstation',
         'approve_facebook_screenshot',
+        'approve_google',
         'mark_facebook_as_qualified',
         'mark_facebook_screenshot_as_qualified',
         'mark_google_as_qualified',
@@ -807,13 +808,28 @@ class LeadAdmin(admin.ModelAdmin):
     def approve_facebook_screenshot(self, request, queryset):
         now = timezone.localtime(timezone.now())
         for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(status=LeadAccount.STATUS_SCREENSHOT_NEEDS_APPROVAL, active=True):
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, status=LeadAccount.STATUS_NEEDS_APPROVAL, active=True):
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                 if not lead_account.in_progress_date:
                     lead_account.in_progress_date = now
                     lead_account.insert_note('Set to in-progress after approval')
                     lead_account.save()
-                if lead.status == Lead.STATUS_SCREENSHOT_NEEDS_APPROVAL:
+                if lead.status == Lead.STATUS_NEEDS_APPROVAL:
+                    lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                    lead.insert_note('Set to in-progress after approval')
+                    lead.save()
+                messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
+
+    def approve_google(self, request, queryset):
+        now = timezone.localtime(timezone.now())
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, status=LeadAccount.STATUS_NEEDS_APPROVAL, active=True):
+                lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                if not lead_account.in_progress_date:
+                    lead_account.in_progress_date = now
+                    lead_account.insert_note('Set to in-progress after approval')
+                    lead_account.save()
+                if lead.status == Lead.STATUS_NEEDS_APPROVAL:
                     lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                     lead.insert_note('Set to in-progress after approval')
                     lead.save()

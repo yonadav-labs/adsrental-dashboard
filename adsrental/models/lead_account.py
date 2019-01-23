@@ -42,10 +42,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     MAX_WRONG_PASSWORD_CHANGE_COUNTER = 3
 
     STATUS_QUALIFIED = 'Qualified'
-    STATUS_SCREENSHOT_QUALIFIED = 'Screenshot Qualified'
     STATUS_DISQUALIFIED = 'Disqualified'
     STATUS_SCREENSHOT_DISQUALIFIED = 'Screenshot Disqualified'
-    STATUS_SCREENSHOT_NEEDS_APPROVAL = 'Needs approval'
+    STATUS_NEEDS_APPROVAL = 'Needs approval'
     STATUS_AVAILABLE = 'Available'
     STATUS_IN_PROGRESS = 'In-Progress'
     STATUS_BANNED = 'Banned'
@@ -56,12 +55,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (STATUS_QUALIFIED, 'Qualified'),
         (STATUS_IN_PROGRESS, 'In-Progress'),
         (STATUS_DISQUALIFIED, 'Disqualified'),
-        (STATUS_SCREENSHOT_QUALIFIED, 'Screenshot Qualified'),
         (STATUS_SCREENSHOT_DISQUALIFIED, 'Screenshot Disqualified'),
-        (STATUS_SCREENSHOT_NEEDS_APPROVAL, 'Needs approval'),
+        (STATUS_NEEDS_APPROVAL, 'Needs approval'),
     ]
 
-    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS, STATUS_SCREENSHOT_QUALIFIED, STATUS_SCREENSHOT_NEEDS_APPROVAL]
+    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS, STATUS_NEEDS_APPROVAL]
 
     ACCOUNT_TYPE_FACEBOOK = 'Facebook'
     ACCOUNT_TYPE_FACEBOOK_SCREENSHOT = 'Facebook Screenshot'
@@ -74,6 +72,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (ACCOUNT_TYPE_GOOGLE, 'Google', ),
         (ACCOUNT_TYPE_AMAZON, 'Amazon', ),
     ]
+    ACCOUNT_TYPES_NEED_APPROVAL = (ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, ACCOUNT_TYPE_GOOGLE)
 
     BAN_REASON_AUTO_OFFLINE = 'auto_offline'
     BAN_REASON_AUTO_WRONG_PASSWORD = 'auto_wrong_password'
@@ -425,8 +424,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def qualify(self, edited_by: User) -> bool:
         'Set lead account status as qualified.'
         new_status = LeadAccount.STATUS_QUALIFIED
-        if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
-            new_status = LeadAccount.STATUS_SCREENSHOT_QUALIFIED
         result = self.set_status(new_status, edited_by)
         if result:
             self.lead.qualify(edited_by)

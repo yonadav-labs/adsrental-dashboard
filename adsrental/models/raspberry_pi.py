@@ -191,23 +191,19 @@ class RaspberryPi(models.Model):
         if lead:
             if lead.status == lead.STATUS_QUALIFIED:
                 lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=ping_user)
-            for lead_account in lead.lead_accounts.all():
-                if lead_account.status == lead_account.STATUS_QUALIFIED:
-                    lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=ping_user)
-                    if not lead_account.in_progress_date:
-                        lead_account.in_progress_date = ping_datetime
-                        lead_account.insert_note('Set to in-progress after first ping')
-                        lead_account.save()
-                        if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
-                            try:
-                                lead_account.sync_to_adsdb()
-                            except:  # pylint: disable=bare-except
-                                pass
-                if lead_account.status == lead_account.STATUS_SCREENSHOT_QUALIFIED:
-                    lead_account.set_status(lead_account.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=ping_user)
+            for lead_account in lead.lead_accounts.filter(status='Qualified'):
+                if lead_account.account_type in lead_account.ACCOUNT_TYPES_NEED_APPROVAL:
+                    lead_account.set_status(lead_account.STATUS_NEEDS_APPROVAL, edited_by=ping_user)
                     lead_account.save()
-                    lead.set_status(lead.STATUS_SCREENSHOT_NEEDS_APPROVAL, edited_by=ping_user)
+                    lead.set_status(lead.STATUS_NEEDS_APPROVAL, edited_by=ping_user)
                     lead.save()
+                    continue
+
+                lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=ping_user)
+                if not lead_account.in_progress_date:
+                    lead_account.in_progress_date = ping_datetime
+                    lead_account.insert_note('Set to in-progress after first ping')
+                    lead_account.save()
 
         if not self.first_seen:
             self.first_seen = ping_datetime
