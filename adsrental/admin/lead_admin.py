@@ -534,25 +534,25 @@ class LeadAdmin(admin.ModelAdmin):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, action_name='ban_google_account')
 
     def unban_google_account(self, request, queryset):
-        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
+        return self.unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
     def ban_facebook_account(self, request, queryset):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, action_name='ban_facebook_account')
 
     def unban_facebook_account(self, request, queryset):
-        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
+        return self.unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
 
     def ban_facebook_screenshot_account(self, request, queryset):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, action_name='ban_facebook_screenshot_account')
 
     def unban_facebook_screenshot_account(self, request, queryset):
-        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
+        return self.unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
 
     def ban_amazon_account(self, request, queryset):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_AMAZON, action_name='ban_amazon_account')
 
     def unban_amazon_account(self, request, queryset):
-        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
+        return self.unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
