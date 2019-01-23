@@ -191,13 +191,11 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def status_field(self, obj):
         title = 'Show changes'
-        if obj.ban_reason:
-            title = f'Banned for {obj.get_ban_reason_display()}'
-
         status = obj.status
         if obj.status == LeadAccount.STATUS_BANNED:
             dt = f'after {humanize_timedelta(obj.banned_date - obj.created, short=True)}' if obj.banned_date else ''
             status = f'{obj.status} ({obj.get_ban_reason_display()}) {dt}'
+            title = obj.note if obj.note  else f'Banned for {obj.get_ban_reason_display()}'
         return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.id,
@@ -321,15 +319,16 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def ban(self, request, queryset):
         if 'do_action' in request.POST:
-            form = AdminLeadAccountBanForm(request.POST)
+            form = AdminLeadAccountBanForm(request.POST, request=request)
             if form.is_valid():
                 reason = form.cleaned_data['reason']
+                note = form.cleaned_data['note']
                 for lead_account in queryset:
-                    lead_account.ban(request.user, reason)
+                    lead_account.ban(edited_by=request.user, reason=reason, note=note)
                     messages.info(request, '{} is banned.'.format(lead_account))
                 return None
         else:
-            form = AdminLeadAccountBanForm()
+            form = AdminLeadAccountBanForm(request=request)
 
         return render(request, 'admin/action_with_form.html', {
             'action_name': 'ban',

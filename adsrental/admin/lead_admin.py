@@ -502,113 +502,57 @@ class LeadAdmin(admin.ModelAdmin):
                 lead_account.disqualify(request.user)
                 messages.info(request, 'Lead Account {} is disqualified.'.format(lead_account))
 
-    def ban_google_account(self, request, queryset):
+    def ban_lead_account(self, request, queryset, account_type, action_name):
         if 'do_action' in request.POST:
-            form = AdminLeadAccountBanForm(request.POST)
+            form = AdminLeadAccountBanForm(request.POST, request=request)
             if form.is_valid():
                 reason = form.cleaned_data['reason']
+                note = form.cleaned_data['note']
                 for lead in queryset:
-                    for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
-                        lead_account.ban(request.user, reason)
+                    for lead_account in lead.lead_accounts.filter(account_type=account_type):
+                        lead_account.ban(edited_by=request.user, reason=reason, note=note)
                         messages.info(request, '{} is banned.'.format(lead_account))
                 return None
         else:
-            form = AdminLeadAccountBanForm()
+            form = AdminLeadAccountBanForm(request=request)
 
         return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban_google_account',
-            'title': 'Choose reason to ban Google account',
+            'action_name': action_name,
+            'title': f'Choose reason to ban {account_type} account',
             'button': 'Ban',
             'objects': queryset,
             'form': form,
         })
+
+    def unban_lead_account(self, request, queryset, account_type):
+        for lead in queryset:
+            for lead_account in lead.lead_accounts.filter(account_type=account_type):
+                if lead_account.unban(request.user):
+                    messages.info(request, '{} is unbanned.'.format(lead_account))
+
+    def ban_google_account(self, request, queryset):
+        return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, action_name='ban_google_account')
 
     def unban_google_account(self, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE):
-                if lead_account.unban(request.user):
-                    messages.info(request, '{} is unbanned.'.format(lead_account))
+        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)
 
     def ban_facebook_account(self, request, queryset):
-        if 'do_action' in request.POST:
-            form = AdminLeadAccountBanForm(request.POST)
-            if form.is_valid():
-                reason = form.cleaned_data['reason']
-                for lead in queryset:
-                    for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
-                        lead_account.ban(request.user, reason)
-                        messages.info(request, '{} is banned.'.format(lead_account))
-                return None
-        else:
-            form = AdminLeadAccountBanForm()
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban_facebook_account',
-            'title': 'Choose reason to ban Facebook account',
-            'button': 'Ban',
-            'objects': queryset,
-            'form': form,
-        })
+        return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, action_name='ban_facebook_account')
 
     def unban_facebook_account(self, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK):
-                if lead_account.unban(request.user):
-                    messages.info(request, '{} is unbanned.'.format(lead_account))
+        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK)
 
     def ban_facebook_screenshot_account(self, request, queryset):
-        if 'do_action' in request.POST:
-            form = AdminLeadAccountBanForm(request.POST)
-            if form.is_valid():
-                reason = form.cleaned_data['reason']
-                for lead in queryset:
-                    for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT):
-                        lead_account.ban(request.user, reason)
-                        messages.info(request, '{} is banned.'.format(lead_account))
-                return None
-        else:
-            form = AdminLeadAccountBanForm()
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban_facebook_screenshot_account',
-            'title': 'Choose reason to ban Facebook account',
-            'button': 'Ban',
-            'objects': queryset,
-            'form': form,
-        })
+        return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT, action_name='ban_facebook_screenshot_account')
 
     def unban_facebook_screenshot_account(self, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT):
-                if lead_account.unban(request.user):
-                    messages.info(request, '{} is unbanned.'.format(lead_account))
+        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT)
 
     def ban_amazon_account(self, request, queryset):
-        if 'do_action' in request.POST:
-            form = AdminLeadAccountBanForm(request.POST)
-            if form.is_valid():
-                reason = form.cleaned_data['reason']
-                for lead in queryset:
-                    for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_AMAZON):
-                        lead_account.ban(request.user, reason)
-                        messages.info(request, '{} is banned.'.format(lead_account))
-                return None
-        else:
-            form = AdminLeadAccountBanForm()
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'ban_amazon_account',
-            'title': 'Choose reason to ban Amazon account',
-            'button': 'Ban',
-            'objects': queryset,
-            'form': form,
-        })
+        return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_AMAZON, action_name='ban_amazon_account')
 
     def unban_amazon_account(self, request, queryset):
-        for lead in queryset:
-            for lead_account in lead.lead_accounts.filter(account_type=LeadAccount.ACCOUNT_TYPE_AMAZON):
-                if lead_account.unban(request.user):
-                    messages.info(request, '{} is unbanned.'.format(lead_account))
+        return unban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)
 
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:

@@ -129,6 +129,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
     old_status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     ban_reason = models.CharField(max_length=50, choices=BAN_REASON_CHOICES, null=True, blank=True, help_text='Populated from ban form')
+    ban_note = models.TextField(null=True, blank=True, help_text='Populated from ban form')
     account_type = models.CharField(max_length=50, choices=ACCOUNT_TYPE_CHOICES)
     friends = models.BigIntegerField(default=0)
     account_url = models.CharField(max_length=255, blank=True, null=True)
@@ -370,11 +371,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
         return True
 
-    def ban(self, edited_by: User, reason: typing.Optional[str] = None) -> bool:
+    def ban(self, edited_by: User, reason: typing.Optional[str] = None, note: typing.Optional[str] = None) -> bool:
         'Mark lead account as banned, send cutomer.io event.'
         now = timezone.localtime(timezone.now())
         self.ban_reason = reason
         self.banned_date = now
+        self.ban_note = note
         # if self.in_progress_date and self.in_progress_date > now - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
         #     self.charge_back = True
 
@@ -401,6 +403,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def unban(self, edited_by: User) -> bool:
         'Restores lead account previous status before banned.'
         self.ban_reason = None
+        self.ban_note = None
         self.save()
         result = self.set_status(self.old_status or LeadAccount.STATUS_QUALIFIED, edited_by)
         if result:

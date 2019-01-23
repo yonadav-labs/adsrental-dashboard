@@ -286,7 +286,24 @@ class LandingForm(forms.Form):
 
 
 class AdminLeadAccountBanForm(forms.Form):
-    reason = forms.ChoiceField(choices=LeadAccount.BAN_REASON_CHOICES)
+    reason = forms.ChoiceField(label='Reason', choices=LeadAccount.BAN_REASON_CHOICES)
+    note = forms.CharField(label='Note', required=False, widget=forms.Textarea())
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
+        super(AdminLeadAccountBanForm, self).__init__(*args, **kwargs)
+        if not request.user.is_superuser:
+            self.fields['reason'].choices = (
+                (LeadAccount.BAN_REASON_QUIT, 'Quit'),
+            )
+
+    def clean_note(self) -> str:
+        reason = self.cleaned_data['reason']
+        note = self.cleaned_data['note']
+        if reason != LeadAccount.BAN_REASON_QUIT and not note:
+            raise forms.ValidationError('Please add note')
+
+        return note
 
 
 class AdminLeadDeleteForm(forms.Form):
