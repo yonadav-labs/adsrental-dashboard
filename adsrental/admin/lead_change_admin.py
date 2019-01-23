@@ -1,6 +1,5 @@
 import html
 
-from django.contrib import admin
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.db.models import Value
@@ -9,6 +8,7 @@ from django.db.models.functions import Concat
 from adsrental.models.lead_change import LeadChange
 
 from adsrental.admin.list_filters import AbstractUIDListFilter, AbstractIntIDListFilter, EditedByListFilter
+from adsrental.admin.base import ReadOnlyModelAdmin
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -21,7 +21,7 @@ class LeadAccountIDListFilter(AbstractIntIDListFilter):
     title = 'LeadAccount ID'
 
 
-class LeadChangeAdmin(admin.ModelAdmin):
+class LeadChangeAdmin(ReadOnlyModelAdmin):
     model = LeadChange
     list_display = (
         'id',
