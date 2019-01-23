@@ -48,13 +48,6 @@ class CustomIndexDashboard(Dashboard):
                         # lead__company__exact=Lead.COMPANY_FBM,
                     )),
                 )],
-                [_('Master Report for Google Accounts'), '{}?{}'.format(
-                    reverse('admin:adsrental_reportproxyleadaccount_changelist'),
-                    urlencode(dict(
-                        account_type__exact=LeadAccount.ACCOUNT_TYPE_GOOGLE,
-                        status=LeadAccount.STATUS_ACTIVE,
-                    )),
-                )],
                 [_('Master Report for Amazon Accounts'), '{}?{}'.format(
                     reverse('admin:adsrental_reportproxyleadaccount_changelist'),
                     urlencode(dict(
