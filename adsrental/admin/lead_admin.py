@@ -363,7 +363,7 @@ class LeadAdmin(admin.ModelAdmin):
             ))
 
         result.append('<a href="{url}">Fix address</a>'.format(
-            url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid})
+            url=reverse('dashboard_change_address', kwargs={'lead_id': obj.leadid or 'unknown'})
         ))
 
         result.append('<a target="_blank" href="{url}?lead__leadid={q}">History</a>'.format(
