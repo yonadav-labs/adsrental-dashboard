@@ -192,7 +192,7 @@ class RaspberryPi(models.Model):
             if lead.status == lead.STATUS_QUALIFIED:
                 lead.set_status(lead.STATUS_IN_PROGRESS, edited_by=ping_user)
             for lead_account in lead.lead_accounts.filter(status='Qualified'):
-                if lead_account.account_type in lead_account.ACCOUNT_TYPES_NEED_APPROVAL:
+                if lead_account.is_approval_needed():
                     lead_account.set_status(lead_account.STATUS_NEEDS_APPROVAL, edited_by=ping_user)
                     lead_account.save()
                     lead.set_status(lead.STATUS_NEEDS_APPROVAL, edited_by=ping_user)

@@ -159,6 +159,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
+    def is_approval_needed(self):
+        if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            return True
+
+        if self.primary and self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+            return True
+
+        return False
+
     def get_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and self.lead.raspberry_pi.online() and not self.bundler_paid:
