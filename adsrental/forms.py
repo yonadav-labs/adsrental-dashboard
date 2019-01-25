@@ -100,8 +100,9 @@ class SetPasswordForm(forms.Form):
 
     def update_lead_account(self, lead_account: LeadAccount) -> None:
         lead_account.password = self.cleaned_data['new_password']
-        lead_account.wrong_password_date = None
-        lead_account.wrong_password_change_counter = lead_account.wrong_password_change_counter + 1
+        if lead_account.wrong_password_date:
+            lead_account.wrong_password_date = None
+            lead_account.wrong_password_change_counter = lead_account.wrong_password_change_counter + 1
         lead_account.save()
 
 
