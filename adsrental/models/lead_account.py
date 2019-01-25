@@ -168,6 +168,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         return False
 
+    def user_can_change_password(self) -> bool:
+        return self.wrong_password_change_counter < LeadAccount.MAX_WRONG_PASSWORD_CHANGE_COUNTER
+
     def get_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and self.lead.raspberry_pi.online() and not self.bundler_paid:

@@ -108,15 +108,17 @@
                             <p>
                                 Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
                             </p> 
-                            <p>
-                                <form class="form-inline" action="{% url 'user_fix_password' lead_account_id=lead_account.id %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="input-group mb-2 mr-sm-2">
-                                        <input type="text" name="new_password" class="form-control" placeholder="New password">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary mb-2">Fix password</button>
-                                </form>
-                            </p>
+                            {% if entry.user_can_change_password %}
+                                <p>
+                                    <form class="form-inline" action="{% url 'user_fix_password' lead_account_id=lead_account.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="input-group mb-2 mr-sm-2">
+                                            <input type="text" name="new_password" class="form-control" placeholder="New password">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-2">Fix password</button>
+                                    </form>
+                                </p>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% else %}
