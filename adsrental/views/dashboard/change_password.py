@@ -7,7 +7,6 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from adsrental.models.lead_change import LeadChange
 from adsrental.models.lead_account import LeadAccount
 from adsrental.forms import SetPasswordForm
 
@@ -38,10 +37,7 @@ class ChangePasswordView(View):
 
         form.lead_account = lead_account
         if form.is_valid():
-            old_value = lead_account.password
-            form.update_lead_account(lead_account)
-            value = lead_account.password
-            LeadChange(lead=lead_account.lead, lead_account=lead_account, field=LeadChange.FIELD_PASSWORD, value=value, old_value=old_value, edited_by=request.user).save()
+            lead_account.set_correct_password(new_password=form.cleaned_data.get('new_password'), edited_by=request.user)
             return HttpResponseRedirect('{}?{}'.format(
                 reverse('dashboard'),
                 urlencode(dict(

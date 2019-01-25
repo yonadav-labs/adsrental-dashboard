@@ -16,6 +16,7 @@ class LeadChange(models.Model):
     FIELD_SECURITY_CHECKPOINT = 'security_checkpoint'
     FIELD_STATUS = 'status'
     FIELD_WRONG_PASSWORD = 'wrong_password'
+    FIELD_WRONG_PASSWORD_FIX = 'wrong_password_fix'
 
     FIELD_CHOICES = (
         (FIELD_ADDRESS, 'Address', ),
@@ -28,6 +29,7 @@ class LeadChange(models.Model):
         (FIELD_SECURITY_CHECKPOINT, 'Security checkpoint', ),
         (FIELD_STATUS, 'Status', ),
         (FIELD_WRONG_PASSWORD, 'Wrong password', ),
+        (FIELD_WRONG_PASSWORD_FIX, 'Wrong password fixed', ),
     )
 
     lead = models.ForeignKey('adsrental.Lead', on_delete=models.CASCADE)

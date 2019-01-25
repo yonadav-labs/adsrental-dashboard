@@ -12,5 +12,5 @@ urlpatterns = [  # pylint: disable=C0103
     path('logout/', UserLogoutView.as_view(), name='user_logout'),
     path('stats/', UserStatsView.as_view(), name='user_stats'),
     path('stats/timestamps/', UserTimestampsView.as_view(), name='user_timestamps'),
-    path('fix_password/', UserFixPasswordView.as_view(), name='user_fix_password'),
+    path('fix_password/<int:lead_account_id>/', UserFixPasswordView.as_view(), name='user_fix_password'),
 ]

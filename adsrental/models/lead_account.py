@@ -333,8 +333,18 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         'Change password, marks as correct, create LeadChange instance.'
         old_value = self.password
         self.password = new_password
-        self.wrong_password_date = None
-        self.insert_note(f'Wrong password fixed by {edited_by.email}')
+        user_email = edited_by.email if edited_by else 'user'
+        if self.wrong_password_date:
+            self.wrong_password_date = None
+            if edited_by and not edited_by.is_superuser:
+                self.wrong_password_change_counter = self.wrong_password_change_counter + 1
+
+            self.insert_note(f'Wrong password fixed by {user_email}')
+            self.save()
+            LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_WRONG_PASSWORD_FIX, value=new_password, old_value=old_value, edited_by=edited_by).save()
+            return
+
+        self.insert_note(f'Password changed by {user_email}')
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_PASSWORD, value=new_password, old_value=old_value, edited_by=edited_by).save()
 
