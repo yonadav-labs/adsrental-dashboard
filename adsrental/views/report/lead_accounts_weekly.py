@@ -1,11 +1,12 @@
 import datetime
 from dateutil import parser
+import typing
 
 from django.views import View
 from django.utils import timezone
 from django.shortcuts import render
 from django.conf import settings
-from django.db.models import Count, Q
+from django.db.models import Count, Q, QuerySet
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -21,6 +22,22 @@ class LeadAccountsWeeklyView(View):
     template_name = 'report/lead_accounts_weekly.html'
     email_template_name = 'email/report/lead_accounts_weekly.html'
     email_title_template_name = 'email/report/lead_accounts_weekly_title.html'
+
+    def get_week_stats(self, lead_accounts: QuerySet, start_dt: datetime.datetime, end_dt: datetime.datetime) -> typing.Dict[str, int]:
+        return dict(
+            total_in_progress=lead_accounts.filter(in_progress_date__lte=end_dt, status=LeadAccount.STATUS_IN_PROGRESS, in_progress_date__lt=end_dt, primary=True).count(),
+            total_new_online_lead_accounts_count=lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).count(),
+            primary_new_online_lead_accounts_count=lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=True).count(),
+            secondary_new_online_lead_accounts_count=lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count(),
+            qualified_lead_accounts_count=lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).count(),
+            primary_qualified_lead_accounts_count=lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=True).count(),
+            secondary_qualified_lead_accounts_count=lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=False).count(),
+            disqualified_lead_accounts_count=lead_accounts.filter(disqualified_date__gte=start_dt, disqualified_date__lt=end_dt).count(),
+            wrong_pw_lead_accounts_count=lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).count(),
+            sec_checkpoint_lead_accounts_count=lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).count(),
+            chargeback_lead_accounts_count=lead_accounts.filter(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).count(),
+            shipped_lead_accounts_count=lead_accounts.filter(lead__ship_date__gte=start_dt, lead__ship_date__lt=end_dt).count(),
+        )
 
     def get(self, request):
         now = timezone.localtime(timezone.now())
@@ -49,20 +66,10 @@ class LeadAccountsWeeklyView(View):
 
         delivered_start_date = (start_dt - datetime.timedelta(days=14)).date()
         delivered_end_date = (start_dt - datetime.timedelta(days=7)).date()
+        this_week_stats = self.get_week_stats(lead_accounts, start_dt, end_dt)
+        prev_week_stats = self.get_week_stats(lead_accounts, start_dt - datetime.timedelta(days=7), end_dt - datetime.timedelta(days=7))
 
-        total_in_progress = lead_accounts.filter(in_progress_date__lte=end_dt, status=LeadAccount.STATUS_IN_PROGRESS, in_progress_date__lt=end_dt, primary=True).count()
-        new_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=True).count()
-        secondary_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt, primary=False).count()
-        total_online_lead_accounts_count = lead_accounts.filter(in_progress_date__gte=start_dt, in_progress_date__lt=end_dt).count()
-        qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt).count()
-        primary_qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=True).count()
-        secondary_qualified_lead_accounts_count = lead_accounts.filter(qualified_date__gte=start_dt, qualified_date__lt=end_dt, primary=False).count()
-        disqualified_lead_accounts_count = lead_accounts.filter(disqualified_date__gte=start_dt, disqualified_date__lt=end_dt).count()
-        wrong_pw_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, wrong_password_date__lt=end_dt).count()
-        sec_checkpoint_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, security_checkpoint_date__lt=end_dt).count()
         offline_lead_accounts_count = lead_accounts.filter(status=LeadAccount.STATUS_IN_PROGRESS, lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl)).count()
-        chargeback_lead_accounts_count = lead_accounts.filter(lead__bundler__enable_chargeback=True, charge_back=True, banned_date__gte=start_dt, banned_date__lt=end_dt).count()
-        shipped_lead_accounts_count = lead_accounts.filter(lead__ship_date__gte=start_dt, lead__ship_date__lt=end_dt).count()
         awaiting_shipment_lead_accounts_count = lead_accounts.filter(lead__shipstation_order_status=Lead.SHIPSTATION_ORDER_STATUS_AWAITING_SHIPMENT).count()
         delivered = lead_accounts.filter(
             lead__delivery_date__gte=delivered_start_date,
@@ -128,19 +135,9 @@ class LeadAccountsWeeklyView(View):
             start_date=start_dt,
             end_date=end_dt - datetime.timedelta(days=1),
             account_type=account_type,
-            total_in_progress=total_in_progress,
-            new_online_lead_accounts_count=new_online_lead_accounts_count,
-            secondary_online_lead_accounts_count=secondary_online_lead_accounts_count,
-            total_online_lead_accounts_count=total_online_lead_accounts_count,
-            qualified_lead_accounts_count=qualified_lead_accounts_count,
-            primary_qualified_lead_accounts_count=primary_qualified_lead_accounts_count,
-            secondary_qualified_lead_accounts_count=secondary_qualified_lead_accounts_count,
-            disqualified_lead_accounts_count=disqualified_lead_accounts_count,
-            wrong_pw_lead_accounts_count=wrong_pw_lead_accounts_count,
-            sec_checkpoint_lead_accounts_count=sec_checkpoint_lead_accounts_count,
+            this_week_stats=this_week_stats,
+            prev_week_stats=prev_week_stats,
             offline_lead_accounts_count=offline_lead_accounts_count,
-            chargeback_lead_accounts_count=chargeback_lead_accounts_count,
-            shipped_lead_accounts_count=shipped_lead_accounts_count,
             awaiting_shipment_lead_accounts_count=awaiting_shipment_lead_accounts_count,
             lead_accounts_by_bundler_list=lead_accounts_by_bundler_list,
             delivered=delivered,

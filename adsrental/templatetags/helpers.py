@@ -54,3 +54,12 @@ def humanize_timedelta_hours(timedeltaobj: datetime.timedelta) -> str:
         secs = secs - hrs*3600
 
     return timetot
+
+
+@register.simple_tag
+def percent_change(value: int, new_value: int):
+    if not value:
+        return '0%'
+    percent = new_value * 100.0 / value - 100.0
+    sign = '+' if percent > 0 else ''
+    return f'{sign}{percent:0.2f}%'

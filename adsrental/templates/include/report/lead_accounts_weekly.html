@@ -1,50 +1,108 @@
+{% load helpers %}
 
 <h2>Stats</h2>
-<p>
-    Total In-Progress: <strong>{{ total_in_progress }}</strong>
-</p>
-<p>
-    New online: <strong>{{ total_online_lead_accounts_count }}</strong>
-    (
-        <strong>{{ new_online_lead_accounts_count }}</strong> primary,
-        <strong>{{ secondary_online_lead_accounts_count }}</strong> secondary
-    )
-</p>
-<p>
-    Qualified: <strong>{{ qualified_lead_accounts_count }}</strong>
-    (
-        <strong>{{ primary_qualified_lead_accounts_count }}</strong> primary,
-        <strong>{{ secondary_qualified_lead_accounts_count }}</strong> secondary
-    )
-    
-</p>
-<p>
-    Disqualified: <strong>{{ disqualified_lead_accounts_count }}</strong>
-</p>
-<p>
-    Wrong PW: <strong>{{ wrong_pw_lead_accounts_count }}</strong>
-</p>
-<p>
-    Security checkpoint: <strong>{{ sec_checkpoint_lead_accounts_count }}</strong>
-</p>
-<p>
-    Offline: <strong>{{ offline_lead_accounts_count }}</strong>
-</p>
-<p>
-    Chargeback: <strong>{{ chargeback_lead_accounts_count }}</strong>
-</p>
-<p>
-    Shipped: <strong>{{ shipped_lead_accounts_count }}</strong>
-</p>
-<p>
-    Awaiting shipment: <strong>{{ awaiting_shipment_lead_accounts_count }}</strong>
-</p>
 <p>
     Delivered {{delivered_start_date|date:"d M"}} - {{ delivered_end_date|date:"d M"}}: <strong>{{ delivered }}</strong>
 </p>
 <p>
     Delivered {{delivered_start_date|date:"d M"}} - {{ delivered_end_date|date:"d M"}} online: <strong>{{ delivered_online }}</strong>
 </p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Stat</th>
+            <th>This week</th>
+            <th>Previous week</th>
+            <th>Delta</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>Total In-Progress</th>
+            <td>{{ this_week_stats.total_in_progress }}</td>
+            <td>{{ prev_week_stats.total_in_progress }}</td>
+            <td>{% percent_change prev_week_stats.total_in_progress this_week_stats.total_in_progress %}</td>
+        </tr>
+        <tr>
+            <th>New online</th>
+            <td>{{ this_week_stats.total_new_online_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.total_new_online_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.total_new_online_lead_accounts_count this_week_stats.total_new_online_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>New online primary</th>
+            <td>{{ this_week_stats.primary_new_online_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.primary_new_online_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.primary_new_online_lead_accounts_count this_week_stats.primary_new_online_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>New online secondary</th>
+            <td>{{ this_week_stats.secondary_new_online_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.secondary_new_online_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.secondary_new_online_lead_accounts_count this_week_stats.secondary_new_online_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Qualified</th>
+            <td>{{ this_week_stats.qualified_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.qualified_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.qualified_lead_accounts_count this_week_stats.qualified_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Qualified primary</th>
+            <td>{{ this_week_stats.primary_qualified_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.primary_qualified_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.primary_qualified_lead_accounts_count this_week_stats.primary_qualified_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Qualified secondary</th>
+            <td>{{ this_week_stats.secondary_qualified_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.secondary_qualified_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.secondary_qualified_lead_accounts_count this_week_stats.secondary_qualified_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Disqualified</th>
+            <td>{{ this_week_stats.disqualified_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.disqualified_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.disqualified_lead_accounts_count this_week_stats.disqualified_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Wrong Password</th>
+            <td>{{ this_week_stats.wrong_pw_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.wrong_pw_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.wrong_pw_lead_accounts_count this_week_stats.wrong_pw_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Security checkpoint</th>
+            <td>{{ this_week_stats.sec_checkpoint_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.sec_checkpoint_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.sec_checkpoint_lead_accounts_count this_week_stats.sec_checkpoint_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Chargeback</th>
+            <td>{{ this_week_stats.chargeback_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.chargeback_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.chargeback_lead_accounts_count this_week_stats.chargeback_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Shipped</th>
+            <td>{{ this_week_stats.shipped_lead_accounts_count }}</td>
+            <td>{{ prev_week_stats.shipped_lead_accounts_count }}</td>
+            <td>{% percent_change prev_week_stats.shipped_lead_accounts_count this_week_stats.shipped_lead_accounts_count %}</td>
+        </tr>
+        <tr>
+            <th>Offline</th>
+            <td>{{ offline_lead_accounts_count }}</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <th>Awaiting shipment</th>
+            <td>{{ awaiting_shipment_lead_accounts_count }}</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </tbody>
+</table>
 <h2>Stats by bundler</h2>
 
 <table id="resultsTable" class="table table-striped">
