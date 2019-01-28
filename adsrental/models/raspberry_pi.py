@@ -216,10 +216,7 @@ class RaspberryPi(models.Model):
     def online(self) -> bool:
         last_seen = self.get_last_seen()
         if last_seen is None:
-            if self.first_tested is None:
-                return False
-
-            return (timezone.now() - self.first_tested).total_seconds() < self.online_minutes_ttl * 60
+            return False
 
         return (timezone.now() - last_seen).total_seconds() < self.online_minutes_ttl * 60
 
