@@ -82,6 +82,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
         'touch',
         'aggregate',
     )
+    change_list_template = 'admin/change_list_total.html'
     # list_editable = ('amount_paid', )
 
     def get_queryset(self, request):
