@@ -5,6 +5,10 @@
 {{ block.super }}
 <script src="{% static 'scripts/jquery.min.js' %}"></script>
 <script>
+    function roundToTwo(num) {    
+        return +(Math.round(num + "e+2")  + "e-2");
+    }
+
     var getRowResults = function(row){
         var results = [];
         var prefix = '';
@@ -52,7 +56,7 @@
             var totalColumn = $('<td></td>');
             var sumResult = sumResults[i];
             if (sumResult) {
-                totalColumn.text(sumResult);
+                totalColumn.text(roundToTwo(sumResult));
             }
             if (i === 0){
                 totalColumn.html('<b>Total</b>');
