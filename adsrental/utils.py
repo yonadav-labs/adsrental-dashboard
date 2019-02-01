@@ -64,7 +64,7 @@ class CustomerIOClient():
 
         Returns customerio.CustomerIO instance.
         '''
-        clean_phone = '+1' + (''.join([i for i in lead.phone if i.isdigit()]))
+        clean_phone = '+1' + (''.join([i for i in lead.phone if i.isdigit()])) if lead.phone else ''
         if self.client:
             self.client.identify(
                 id=lead.leadid,
