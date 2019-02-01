@@ -310,8 +310,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 self.save()
                 return (response_json, data)
             if response.status_code == 409:
-                self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
-                self.save()
+                pass
+                # self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
+                # self.save()
             return (response_json, data)
 
         request_data = {
