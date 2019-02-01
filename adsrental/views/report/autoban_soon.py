@@ -8,13 +8,14 @@ from django.utils.decorators import method_decorator
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead import Lead
+from adsrental.models.bundler import Bundler
 
 
 class AutoBanSoonView(View):
     template_name = 'report/autoban_soon.html'
 
     @method_decorator(login_required)
-    def get(self, request, account_type):
+    def get(self, request, account_type, bundler_id=0):
         if not request.user.is_superuser:
             raise Http404
 
@@ -25,6 +26,9 @@ class AutoBanSoonView(View):
 
         if account_type != 'all':
             lead_accounts = lead_accounts.filter(account_type=account_type)
+
+        if bundler_id:
+            lead_accounts = lead_accounts.filter(lead__bundler_id=bundler_id)
 
         now = timezone.localtime(timezone.now())
         wrong_password_lead_accounts = lead_accounts.filter(
@@ -55,9 +59,13 @@ class AutoBanSoonView(View):
         for lead_account in not_used_lead_accounts:
             lead_account.ban_timedelta = datetime.datetime.combine(lead_account.lead.delivery_date, datetime.datetime.min.time()).replace(tzinfo=timezone.get_default_timezone()) + datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NOT_USED + 1) - now
 
+        bundlers = Bundler.objects.filter(is_active=True)
+
         context = dict(
             select_account_types=['all', LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],
             account_type=account_type,
+            bundlers=bundlers,
+            bundler_id=bundler_id,
             wrong_password_lead_accounts=wrong_password_lead_accounts,
             sec_checkpoint_lead_accounts=sec_checkpoint_lead_accounts,
             not_used_lead_accounts=not_used_lead_accounts,

@@ -11,8 +11,15 @@
         <h1>{{ account_type|capfirst }} Lead accounts that will be auto banned soon</h1>
         
         <div class="btn-group" role="group">
+            Account type:
             {% for select_account_type in select_account_types %}
-                <a href="{% url 'report:auto_ban' account_type=select_account_type %}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type|capfirst }}</a>
+                <a href="{% url 'report:auto_ban' account_type=select_account_type bundler_id=bundler_id %}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type|capfirst }}</a>
+            {% endfor %}
+        </div>
+        <div>
+            Bundlers:
+            {% for bundler in bundlers %}
+                <a href="{% url 'report:auto_ban' account_type=account_type bundler_id=bundler.id %}" class="btn {% if bundler.id == bundler_id %}btn-primary{% else %}btn-default{% endif %}">{{ bundler.name }}</a>
             {% endfor %}
         </div>
 
