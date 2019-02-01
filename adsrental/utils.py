@@ -105,10 +105,13 @@ class CustomerIOClient():
             kwargs=json.dumps(kwargs),
         ).save()
         if self.client and send:
+            retries = 0
             try:
-                self.client.track(customer_id=lead.leadid, name=event, **kwargs)
+                return self.client.track(customer_id=lead.leadid, name=event, **kwargs)
             except customerio.CustomerIOException:
-                pass
+                retries += 1
+                if retries >= 3:
+                    raise
 
     def is_enabled(self) -> bool:
         'Check if client is initialized.'
