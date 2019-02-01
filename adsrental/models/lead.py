@@ -288,6 +288,7 @@ class Lead(models.Model, FulltextSearchMixin):
         self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
         self.save()
         LeadChange(lead=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
+        CustomerIOClient().send_lead(self)
         return True
 
     def is_ready_for_testing(self) -> bool:
