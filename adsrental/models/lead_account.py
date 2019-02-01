@@ -306,13 +306,17 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             except ValueError:
                 return ({'error': True, 'url': url, 'data': [data], 'text': response.text, 'status': response.status_code}, data)
             if response.status_code == 200:
-                self.adsdb_account_id = response_json.get('account_data')[0]['id']
-                self.save()
-                return (response_json, data)
+                adsdb_account_id = response_json.get('account_data')[0]['id']
+                conflicting = LeadAccount.objects.filter(adsdb_account_id=adsdb_account_id).exclude(id=self.id)
+                if not conflicting:
+                    self.adsdb_account_id = adsdb_account_id
+                    self.save()
             if response.status_code == 409:
-                pass
-                # self.adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
-                # self.save()
+                adsdb_account_id = response_json.get('account_data')[0]['conflict_id']
+                conflicting = LeadAccount.objects.filter(adsdb_account_id=adsdb_account_id).exclude(id=self.id)
+                if not conflicting:
+                    self.adsdb_account_id = adsdb_account_id
+                    self.save()
             return (response_json, data)
 
         request_data = {
