@@ -22,12 +22,12 @@ class BundlerLeaderboardView(View):
             bundler = request.user.bundler
 
         if request.user.is_superuser:
-            bundler = Bundler.objects.filter(is_active=True).filter(id=bundler_id).first()
+            bundler = Bundler.objects.filter(id=bundler_id).first()
 
         if not bundler:
             raise Http404
 
-        top_bundlers_ids_list = BundlerLeadStat.objects.filter(bundler__is_active=True).exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')
+        top_bundlers_ids_list = BundlerLeadStat.objects.all().exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')
         bundler_ids = [bundler.id, ]
         for bundler_id in top_bundlers_ids_list:
             bundler_ids.append(bundler_id)

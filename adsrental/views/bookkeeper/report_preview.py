@@ -69,7 +69,7 @@ class BookkepperReportPreviewView(View):
                     entries.append(lead_account)
 
         children_stats = []
-        for child_bundler in Bundler.objects.filter(is_active=True).filter(Q(parent_bundler=bundler) | Q(second_parent_bundler=bundler)):
+        for child_bundler in Bundler.objects.filter(Q(parent_bundler=bundler) | Q(second_parent_bundler=bundler)):
             second_parent = False
             if child_bundler.second_parent_bundler == bundler:
                 second_parent = True
@@ -97,7 +97,7 @@ class BookkepperReportPreviewView(View):
         if not request.user.is_bookkeeper():
             raise Http404
 
-        bundlers = Bundler.objects.filter(is_active=True)
+        bundlers = Bundler.objects.all()
 
         today = timezone.localtime(timezone.now()).date()
         yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()

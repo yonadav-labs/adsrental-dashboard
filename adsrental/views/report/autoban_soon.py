@@ -59,7 +59,7 @@ class AutoBanSoonView(View):
         for lead_account in not_used_lead_accounts:
             lead_account.ban_timedelta = datetime.datetime.combine(lead_account.lead.delivery_date, datetime.datetime.min.time()).replace(tzinfo=timezone.get_default_timezone()) + datetime.timedelta(days=LeadAccount.AUTO_BAN_DAYS_NOT_USED + 1) - now
 
-        bundlers = Bundler.objects.filter(is_active=True)
+        bundlers = Bundler.objects.all()
 
         context = dict(
             select_account_types=['all', LeadAccount.ACCOUNT_TYPE_FACEBOOK, LeadAccount.ACCOUNT_TYPE_GOOGLE, LeadAccount.ACCOUNT_TYPE_AMAZON],

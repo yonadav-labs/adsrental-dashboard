@@ -11,7 +11,7 @@ from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 class BundlerPaymentsHTMLView(View):
     @method_decorator(login_required)
     def get(self, request, report_id, bundler_id):
-        bundler = Bundler.objects.filter(is_active=True).filter(id=int(bundler_id)).first()
+        bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         if not bundler:
             raise Http404
 

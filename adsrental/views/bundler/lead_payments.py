@@ -71,9 +71,9 @@ class BundlerLeadPaymentsView(View):
 
         if request.user.is_superuser:
             if bundler_id == 'all':
-                bundlers = Bundler.objects.filter(is_active=True)
+                bundlers = Bundler.objects.all()
             else:
-                bundlers = Bundler.objects.filter(is_active=True).filter(id=bundler_id)
+                bundlers = Bundler.objects.filter(id=bundler_id)
 
         if not bundlers:
             raise Http404

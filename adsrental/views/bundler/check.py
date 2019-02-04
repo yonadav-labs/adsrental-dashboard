@@ -26,7 +26,7 @@ class BundlerCheckView(View):
         else:
             date = select_dates[-1]
 
-        bundler = Bundler.objects.filter(is_active=True).filter(id=int(bundler_id)).first()
+        bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         if not bundler:
             raise Http404
 
