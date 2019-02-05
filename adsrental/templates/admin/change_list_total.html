@@ -20,7 +20,7 @@
                 text = text.slice(1);
                 prefix = '$';
             }
-            if (parseFloat(text, 10).toString() === text && cell.is('td')){
+            if (parseFloat(text, 10) && cell.is('td')){
                 results.push(parseFloat(text, 10))
             } else {
                 results.push(0)
