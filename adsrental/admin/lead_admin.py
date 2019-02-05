@@ -40,6 +40,12 @@ class AddressListFilter(AbstractFulltextFilter):
     field_names = ['city', 'country', 'state', 'postal_code', 'street']
 
 
+class UsernameListFilter(AbstractFulltextFilter):
+    title = 'Username'
+    parameter_name = 'username'
+    field_names = ['lead_account__username']
+
+
 class LeadAccountInline(admin.StackedInline):
     model = LeadAccount
     max_num = 3
@@ -92,6 +98,7 @@ class LeadAdmin(admin.ModelAdmin):
     )
     list_filter = (
         LeadidListFilter,
+        UsernameListFilter,
         AddressListFilter,
         StatusListFilter,
         LeadAccountStatusListFilter,

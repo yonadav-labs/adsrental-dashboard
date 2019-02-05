@@ -1,12 +1,12 @@
-version: '3.6'
+version: "3.6"
 
 services:
   db:
     image: mysql:5.7.22
-    command: 'mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=300'
+    command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=300"
     environment:
       MYSQL_DATABASE: adsrental
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - ./dbdata1:/var/lib/mysql
     ports:
@@ -17,9 +17,9 @@ services:
     privileged: true
     environment:
       ENV: local
-      WERKZEUG_DEBUG_PIN: 'off'
-      HTTPS: 'on'
-      wsgi.url_scheme: 'https'
+      WERKZEUG_DEBUG_PIN: "off"
+      HTTPS: "on"
+      wsgi.url_scheme: "https"
       UWSGI_INI: /app/config/nginx/uwsgi_debug.ini
     volumes:
       - ./cert/:/app/cert/
@@ -32,7 +32,7 @@ services:
       - ./app_log/:/app/app_log/
       - ./media/:/app/media/
     ports:
-      - "8080:80"
+      # - "8080:80"
       - "7443:443"
     depends_on:
       - db
