@@ -8,104 +8,106 @@
 
 {% block content %}
     <div class="container">
-        <h1>{{ account_type|capfirst }} Lead accounts that will be auto banned soon</h1>
+        <h1>Lead accounts that will be auto banned soon</h1>
         
-        <div class="btn-group" role="group">
-            Account type:
-            {% for select_account_type in select_account_types %}
-                <a href="{% url 'report:auto_ban' account_type=select_account_type bundler_id=bundler_id %}" class="btn {% if select_account_type == account_type %}btn-primary{% else %}btn-default{% endif %}">{{ select_account_type|capfirst }}</a>
-            {% endfor %}
-        </div>
-        <div>
-            Bundlers:
-            {% for bundler in bundlers %}
-                <a href="{% url 'report:auto_ban' account_type=account_type bundler_id=bundler.id %}" class="btn {% if bundler.id == bundler_id %}btn-primary{% else %}btn-default{% endif %}">{{ bundler.name }}</a>
-            {% endfor %}
-        </div>
+        <form role="form" action="" method="GET">
+            {{ form|bootstrap }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
 
-        <h2>Auto ban for offline</h2>
-        <table class="table table-striped">
-            <thead>
-                <th>Lead</th>
-                <th>Account</th>
-                <th>Bundler</th>
-                <th>Type</th>
-                <th>Ban in</th>
-            </thead>
-            <tbody>
-                {% for lead_account in offline_lead_accounts %}
-                    <tr>
-                        <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
-                        <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
-                        <td>{{ lead_account.lead.bundler.name }}</td>
-                        <td>{{ lead_account.get_account_type_display }}</td>
-                        <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <h2>Auto ban for wrong password</h2>
-        <table class="table table-striped">
-            <thead>
-                <th>Lead</th>
-                <th>Account</th>
-                <th>Bundler</th>
-                <th>Type</th>
-                <th>Ban in</th>
-            </thead>
-            <tbody>
-                {% for lead_account in wrong_password_lead_accounts %}
-                    <tr>
-                        <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
-                        <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
-                        <td>{{ lead_account.lead.bundler.name }}</td>
-                        <td>{{ lead_account.get_account_type_display }}</td>
-                        <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <h2>Auto ban for security checkpoint</h2>
-        <table class="table table-striped">
-            <thead>
-                <th>Lead</th>
-                <th>Account</th>
-                <th>Bundler</th>
-                <th>Type</th>
-                <th>Ban in</th>
-            </thead>
-            <tbody>
-                {% for lead_account in sec_checkpoint_lead_accounts %}
-                    <tr>
-                        <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
-                        <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
-                        <td>{{ lead_account.lead.bundler.name }}</td>
-                        <td>{{ lead_account.get_account_type_display }}</td>
-                        <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <h2>Auto ban for not used</h2>
-        <table class="table table-striped">
-            <thead>
-                <th>Lead</th>
-                <th>Account</th>
-                <th>Bundler</th>
-                <th>Type</th>
-                <th>Ban in</th>
-            </thead>
-            <tbody>
-                {% for lead_account in not_used_lead_accounts %}
-                    <tr>
-                        <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
-                        <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
-                        <td>{{ lead_account.lead.bundler.name }}</td>
-                        <td>{{ lead_account.get_account_type_display }}</td>
-                        <td>{{ lead_account.ban_timedelta|humanize_timedelta_hours }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% if offline_lead_accounts %}
+            <h2>Auto ban for offline</h2>
+            <table class="table table-striped">
+                <thead>
+                    <th>Lead</th>
+                    <th>Account</th>
+                    <th>Bundler</th>
+                    <th>Type</th>
+                    <th>Ban in</th>
+                </thead>
+                <tbody>
+                    {% for lead_account in offline_lead_accounts %}
+                        <tr>
+                            <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
+                            <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
+                            <td>{{ lead_account.lead.bundler.name }}</td>
+                            <td>{{ lead_account.get_account_type_display }}</td>
+                            <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        {% if wrong_password_lead_accounts %}
+            <h2>Auto ban for wrong password</h2>
+            <table class="table table-striped">
+                <thead>
+                    <th>Lead</th>
+                    <th>Account</th>
+                    <th>Bundler</th>
+                    <th>Type</th>
+                    <th>Ban in</th>
+                </thead>
+                <tbody>
+                    {% for lead_account in wrong_password_lead_accounts %}
+                        <tr>
+                            <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
+                            <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
+                            <td>{{ lead_account.lead.bundler.name }}</td>
+                            <td>{{ lead_account.get_account_type_display }}</td>
+                            <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        {% if sec_checkpoint_lead_accounts %}
+            <h2>Auto ban for security checkpoint</h2>
+            <table class="table table-striped">
+                <thead>
+                    <th>Lead</th>
+                    <th>Account</th>
+                    <th>Bundler</th>
+                    <th>Type</th>
+                    <th>Ban in</th>
+                </thead>
+                <tbody>
+                    {% for lead_account in sec_checkpoint_lead_accounts %}
+                        <tr>
+                            <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
+                            <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
+                            <td>{{ lead_account.lead.bundler.name }}</td>
+                            <td>{{ lead_account.get_account_type_display }}</td>
+                            <td>{{ lead_account.ban_timedelta|humanize_timedelta }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        {% if not_used_lead_accounts %}
+            <h2>Auto ban for not used</h2>
+            <table class="table table-striped">
+                <thead>
+                    <th>Lead</th>
+                    <th>Account</th>
+                    <th>Bundler</th>
+                    <th>Type</th>
+                    <th>Ban in</th>
+                </thead>
+                <tbody>
+                    {% for lead_account in not_used_lead_accounts %}
+                        <tr>
+                            <td><a href="{% url 'admin:adsrental_lead_changelist'%}?leadid={{lead_account.lead.leadid}}">{{ lead_account.lead.name }}</a></td>
+                            <td><a href="{% url 'admin:adsrental_leadaccount_changelist'%}?id={{lead_account.id}}">{{ lead_account.username }}</a></td>
+                            <td>{{ lead_account.lead.bundler.name }}</td>
+                            <td>{{ lead_account.get_account_type_display }}</td>
+                            <td>{{ lead_account.ban_timedelta|humanize_timedelta_hours }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 {% endblock %}

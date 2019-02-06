@@ -7,6 +7,7 @@ from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.bundler import Bundler
 
 
 class DashboardForm(forms.Form):
@@ -379,3 +380,18 @@ class DisqualifyLeadAccountForm(forms.Form):
         value = self.cleaned_data['action']
         if value != self.ACTION_SUBMIT:
             raise forms.ValidationError("Submit cancelled")
+
+
+class AutoBanSoonForm(forms.Form):
+    ACCOUNT_TYPE_CHOICES = [
+        ('', 'All', ),
+    ] + LeadAccount.ACCOUNT_TYPE_CHOICES
+
+    BAN_REASON_CHOICES = [
+        ('', 'All'),
+    ] + [(key, value) for key, value in LeadAccount.BAN_REASON_CHOICES if key in LeadAccount.AUTO_BAN_REASONS]
+
+    bundler = forms.ModelChoiceField(label='Bundler', queryset=Bundler.objects.all(), required=False)
+    account_type = forms.ChoiceField(label='Account type', choices=ACCOUNT_TYPE_CHOICES, required=False)
+    ban_reason = forms.ChoiceField(label='Ban reason', choices=BAN_REASON_CHOICES, required=False)
+    days = forms.IntegerField(label='Days before ban', required=True)

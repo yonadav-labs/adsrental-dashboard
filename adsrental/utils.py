@@ -669,29 +669,29 @@ def get_month_boundaries_for_dt(d: datetime.datetime) -> typing.Tuple[datetime.d
 
 def humanize_timedelta(timedeltaobj: datetime.timedelta, short: bool = False) -> str:
     secs = timedeltaobj.total_seconds()
-    timetot = ""
+    timetot = []
     if secs < 60:
         return 'Now'
 
     if secs > 86400:  # 60sec * 60min * 24hrs
         days = int(secs // 86400)
         title = 'days' if days > 1 else 'day'
-        timetot += f'{days} {title}'
+        timetot.append(f'{days} {title}')
         secs = secs - days * 86400
         if short:
-            return timetot
+            return ' '.join(timetot)
 
     if secs > 3600:
         hours = int(secs // 3600)
         title = 'hours' if hours > 1 else 'hour'
-        timetot += f'{hours} {title}'
+        timetot.append(f'{hours} {title}')
         secs = secs - hours * 3600
         if short:
-            return timetot
+            return ' '.join(timetot)
 
     if secs > 60:
         minutes = int(secs // 60)
         title = 'minutes' if minutes > 1 else 'minute'
-        timetot += f'{minutes} {title}'
+        timetot.append(f'{minutes} {title}')
 
-    return timetot
+    return ' '.join(timetot)
