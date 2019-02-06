@@ -84,21 +84,22 @@ class EC2ConnectView(View):
                 ec2_instance.save()
 
         if not ec2_instance:
-            ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_RUNNING).first()
-            if not ec2_instance:
-                ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
+            ec2_instance = EC2Instance.launch_for_lead(lead)
+            # ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_RUNNING).first()
+            # if not ec2_instance:
+            #     ec2_instance = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True).first()
 
-            stopped_essential_ec2 = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_STOPPED).first()
-            if stopped_essential_ec2:
-                stopped_essential_ec2.start()
-            else:
-                EC2Instance.launch_essential()
+            # stopped_essential_ec2 = EC2Instance.objects.filter(is_essential=True, rpid__isnull=True, status=EC2Instance.STATUS_STOPPED).first()
+            # if stopped_essential_ec2:
+            #     stopped_essential_ec2.start()
+            # else:
+            #     # EC2Instance.launch_essential()
 
-            if not ec2_instance:
-                ec2_instance = EC2Instance.launch_essential()
-                messages.info(request, 'New Essential EC2 instance has been launched.')
-                # return redirect('rpi_proxy_tunnel_info', rpid=rpid)
-            ec2_instance.assign_essential(rpid, lead)
+            # if not ec2_instance:
+            #     ec2_instance = EC2Instance.launch_essential()
+            #     messages.info(request, 'New Essential EC2 instance has been launched.')
+            #     return redirect('rpi_proxy_tunnel_info', rpid=rpid)
+            # ec2_instance.assign_essential(rpid, lead)
 
         if ec2_instance.is_essential:
             messages.success(request, 'Using essential EC2.')

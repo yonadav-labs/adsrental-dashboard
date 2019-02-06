@@ -13,7 +13,7 @@ class CheckEC2View(View):
     '''
     Check :model:`adsrental.EC2Instance` if they have action RDP session, stops them otherwise.
     '''
-    MAX_ESSENTIAL_RUNNING = 2
+    MAX_ESSENTIAL_RUNNING = 0
 
     def get(self, request):
         online_ec2s = []
