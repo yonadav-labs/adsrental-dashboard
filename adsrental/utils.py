@@ -39,6 +39,7 @@ class CustomerIOClient():
     EVENT_AVAILABLE_BANNED = 'available_banned'
     EVENT_BANNED_HAS_ACCOUNTS = 'banned_has_accounts'
     EVENT_SECURITY_CHECKPOINT = 'security_checkpoint'
+    EVENT_NOT_QUALIFIED = 'not_qualified'
 
     def __init__(self) -> None:
         self.client = None
