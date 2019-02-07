@@ -21,8 +21,22 @@ sudo chmod a+x /usr/local/bin/docker-compose
 ### Local development mode
 
 ```bash
-./scripts/install-venv.sh
-docker-compose up --build
+./scripts/install-venv.sh -d
+docker-compose up --build web
+
+# get latest DB backup
+scp adsrental:/mnt/volume-nyc3-01/mysqldumps/dump_2019_02_06.sql.gz .
+
+# install in to your running local DB
+zcat ./dump_2019_02_06.sql.gz | mysql -u root -h 0.0.0.0 -P 23306 adsrental
+
+# migrate just in case
+docker-compose run web python manage.py migrate
+
+# fix permissions for dbdata
+sudo chmod a+rwx -R dbdata1
+
+# open https://localhost:7443/admin/ in your browser
 ```
 
 ### Local production-like mode (remote DB)

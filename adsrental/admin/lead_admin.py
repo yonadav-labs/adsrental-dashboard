@@ -109,6 +109,7 @@ class LeadAdmin(admin.ModelAdmin):
         'shipstation_order_status',
         'company',
         'lead_account__bundler_paid',
+        'raspberry_pi__is_proxy_tunnel',
         ShipDateListFilter,
         DeliveryDateListFilter,
         ('bundler__is_active', titled_filter('Bundler active')),
