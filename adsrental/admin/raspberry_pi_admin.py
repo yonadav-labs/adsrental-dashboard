@@ -9,6 +9,7 @@ from django.db.models import Value
 from django.db.models.functions import Concat
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter
 
 
@@ -158,6 +159,13 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.new_config_required = True
             raspberry_pi.unassign_tunnel_ports()
             raspberry_pi.save()
+
+            lead = raspberry_pi.get_lead()
+            ec2_instance = raspberry_pi.get_ec2_instance()
+            if ec2_instance:
+                ec2_instance.start()
+            else:
+                EC2Instance.launch_for_lead(lead)
 
             messages.success(request, 'Device {rpid} converted to EC2'.format(
                 rpid=raspberry_pi.rpid,
