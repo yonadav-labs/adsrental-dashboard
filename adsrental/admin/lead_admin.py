@@ -369,6 +369,9 @@ class LeadAdmin(admin.ModelAdmin):
             result.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
             ))
+            result.append('<a target="_blank" href="{url}">Stats</a>'.format(
+                url=reverse('admin_user_stats', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
+            ))
 
         result.append('<a href="{url}">Fix address</a>'.format(
             url=reverse('dashboard_change_address', kwargs=dict(lead_id=obj.leadid))
