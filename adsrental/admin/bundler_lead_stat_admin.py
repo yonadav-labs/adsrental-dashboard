@@ -10,7 +10,7 @@ from adsrental.models.bundler_lead_stat import BundlerLeadStat
 class BundlerLeadStatsAdmin(admin.ModelAdmin):
     model = BundlerLeadStat
     list_display = (
-        'id',
+        # 'id',
         'bundler_field',
         'in_progress_total_field',
         'in_progress_offline_field',
@@ -18,7 +18,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
         'in_progress_security_checkpoint_field',
         'in_progress_total_issue_percent',
         'autobans_last_30_days_field',
-        'other_bans_last_30_days_field',
+        # 'other_bans_last_30_days_field',
         # 'qualified_today_field',
         # 'qualified_yesterday_field',
         # 'qualified_last_30_days_field',
@@ -156,7 +156,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     in_progress_security_checkpoint_field.short_description = 'Sec Checkpoint In-Progress'
     in_progress_security_checkpoint_field.admin_order_field = 'in_progress_security_checkpoint'
 
-    in_progress_total_field.short_description = 'Total issue In-Progress'
+    in_progress_total_field.short_description = 'Total In-Progress'
     in_progress_total_field.admin_order_field = 'in_progress_total'
 
     autobans_last_30_days_field.short_description = 'Auto bans (last 30 days)'
