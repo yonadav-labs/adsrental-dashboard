@@ -17,6 +17,7 @@ from xhtml2pdf import pisa
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
+from adsrental.models.bundler_payment import BundlerPayment
 
 
 class BundlerPaymentsView(View):
@@ -46,6 +47,8 @@ class BundlerPaymentsView(View):
             if second_parent:
                 parent_payment = lead_account.get_second_parent_bundler_payment(bundler)
             lead_account.parent_payment = parent_payment
+            lead_account.parent_bundler_payment = lead_account.get_second_parent_bundler_payment(bundler)
+            lead_account.second_parent_bundler_payment = lead_account.get_second_parent_bundler_payment(bundler)
             if child:
                 lead_account.payment = parent_payment
             else:
@@ -215,6 +218,37 @@ class BundlerPaymentsView(View):
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
             )
             report.save()
+            for data in bundlers_data:
+                bundler = data['bundler']
+                for entries_name in ['facebook_entries', 'google_entries', 'amazon_entries']:
+                    for lead_account in data[entries_name]:
+                        if lead_account.payment:
+                            BundlerPayment(
+                                lead_account=lead_account,
+                                bundler=bundler,
+                                payment=lead_account.payment,
+                                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
+                                paid=True,
+                                report=report,
+                            ).save()
+                        if lead_account.parent_bundler_payment:
+                            BundlerPayment(
+                                lead_account=lead_account,
+                                bundler=bundler.parent_bundler,
+                                payment=lead_account.parent_bundler_payment,
+                                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
+                                paid=True,
+                                report=report,
+                            ).save()
+                        if lead_account.second_parent_bundler_payment:
+                            BundlerPayment(
+                                lead_account=lead_account,
+                                bundler=bundler.second_parent_bundler,
+                                payment=lead_account.second_parent_bundler_payment,
+                                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+                                paid=True,
+                                report=report,
+                            ).save()
 
             if request.GET.get('mark', '') == 'true':
                 report.mark()

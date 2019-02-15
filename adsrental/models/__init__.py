@@ -11,3 +11,4 @@ from adsrental.models.raspberry_pi_session import RaspberryPiSession  # noqa: F4
 from adsrental.models.lead_account import LeadAccount  # noqa: F401
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport  # noqa: F401
 from adsrental.models.bundler_lead_stat import BundlerLeadStat  # noqa: F401
+from adsrental.models.bundler_payment import BundlerPayment  # noqa: F401

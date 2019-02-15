@@ -27,6 +27,9 @@ class BundlerPaymentsReport(models.Model):
     data = models.TextField(default='')
     cancelled = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f'Bundler payments report for {self.date}'
+
     def get_usernames(self) -> typing.List[str]:
         regexp = r'<td>([^<]+@[^<]+)</td>'
         emails = re.findall(regexp, self.html)
