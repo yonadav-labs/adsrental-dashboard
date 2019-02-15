@@ -19,6 +19,7 @@ class SyncFromShipStationView(View):
     * days_ago - Get orders that were created X days ago. If not provided, gets orders 1 day ago.
     * force - if 'true' removes tracking codes that are not present in SS.
     '''
+
     def get(self, request):
         order_numbers = []
         orders_new = []
@@ -43,6 +44,10 @@ class SyncFromShipStationView(View):
                 params=request_params,
                 auth=requests.auth.HTTPBasicAuth(settings.SHIPSTATION_API_KEY, settings.SHIPSTATION_API_SECRET),
             ).json()
+
+            if 'shipments' not in response:
+                break
+
             last_page = len(response['shipments']) < 100
 
             for row in response['shipments']:
