@@ -384,6 +384,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def generate_payments(self):
         bundler = self.get_bundler()
+        payment_datetime = self.in_progress_date or timezone.now()
         result = []
         payment = self.get_bundler_payment(bundler)
         if payment:
@@ -394,6 +395,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 defaults=dict(payment=payment)
             )
             entry.payment = payment
+            entry.datetime = payment_datetime
             entry.save()
             result.append(entry)
         parent_payment = self.get_parent_bundler_payment(bundler)
@@ -406,6 +408,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 defaults=dict(payment=parent_payment)
             )
             entry.payment = parent_payment
+            entry.datetime = payment_datetime
             entry.save()
             result.append(entry)
         second_parent_payment = self.get_second_parent_bundler_payment(bundler)
@@ -418,6 +421,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 defaults=dict(payment=second_parent_payment)
             )
             entry.payment = second_parent_payment
+            entry.datetime = payment_datetime
             entry.save()
             result.append(entry)
 
@@ -437,6 +441,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         if value == self.STATUS_IN_PROGRESS:
             self.generate_payments()
+            self.insert_note(f'Bundler payments generated')
 
         if self.status != Lead.STATUS_BANNED:
             self.old_status = self.status
