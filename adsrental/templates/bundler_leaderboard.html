@@ -14,7 +14,7 @@
 <div class="container">
     <h3>Leads by qualified date for UTM source {{ bundler.utm_source }}</h3>
 
-    <h4>Rank cross all bundlers: {% if rank %}{{rank|ordinal}}{% else %}n/a{% endif%}</h4>
+    <h4>Rank across all bundlers: {% if rank %}{{rank|ordinal}}{% else %}n/a{% endif%}</h4>
     <h4>Total accounts in progress: {{bundler_lead_stat.in_progress_total}}</h4>
     <h4>Total accounts qualified today: {{lead_accounts_today_total}}</h4>
 
