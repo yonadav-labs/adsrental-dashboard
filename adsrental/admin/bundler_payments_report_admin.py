@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
+from adsrental.models.bundler_payment import BundlerPayment
 
 
 class BundlerPaymentsReportAdmin(admin.ModelAdmin):
@@ -19,8 +20,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_paid',
         'send_by_email',
-        'mark',
-        'unmark',
+        'discard_report',
     )
 
     def get_actions(self, request):
@@ -38,20 +38,13 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     def mark_as_paid(self, request, queryset):
         queryset.update(paid=True)
 
-    def mark(self, request, queryset):
+    def discard_report(self, request, queryset):
         for report in queryset:
-            result = report.mark()
-            messages.success(request, 'Report {} was marked successfully: {}'.format(report.id, result))
-
-    def unmark(self, request, queryset):
-        for report in queryset:
-            result = report.unmark()
-            messages.success(request, 'Report {} was unmarked successfully: {}'.format(report.id, result))
+            BundlerPayment.objects.filter(report=report).update(report=None, paid=False)
+            messages.success(request, f'Report for {report.date} has been disacarded')
 
     def send_by_email(self, request, queryset):
         for report in queryset:
             report.send_by_email()
 
-    mark.short_description = 'DEBUG: Mark all affected lead accounts'
-
-    unmark.short_description = 'DEBUG: Unmark all affected lead accounts'
+    discard_report.short_description = 'DEBUG: Discard this report'

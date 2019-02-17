@@ -1,4 +1,5 @@
 import datetime
+import typing
 
 from django import template
 
@@ -17,6 +18,11 @@ def relative_url(urlencode: str, field_name: str, value: str) -> str:
     encoded_querystring = '&'.join(filtered_querystring)
     url = '{}&{}'.format(url, encoded_querystring)
     return url
+
+
+@register.filter
+def get_key(value: typing.Dict, key: str) -> typing.Any:
+    return value.get(key)
 
 
 @register.filter

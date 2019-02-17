@@ -111,8 +111,9 @@ class AdminBundlerBonusesView(View):
                     continue
                 bundler_payment, _ = BundlerPayment.objects.get_or_create(
                     bundler_id=bundler_stat['bundler_id'],
-                    datetime=end_date,
+                    datetime=end_date - datetime.timedelta(days=1),
                     payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+                    defaults=dict(payment=bundler_stat['bonus']),
                 )
                 bundler_payment.payment = bundler_stat['bonus']
                 bundler_payment.save()

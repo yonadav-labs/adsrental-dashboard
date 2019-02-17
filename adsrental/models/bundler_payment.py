@@ -15,6 +15,12 @@ class BundlerPayment(models.Model):
         (PAYMENT_TYPE_BONUS, 'Bonus'),
         (PAYMENT_TYPE_ACCOUNT_CHARGEBACK, 'Chargeback'),
     )
+
+    PAYMENT_TYPES_PARENT = (
+        PAYMENT_TYPE_ACCOUNT_PARENT,
+        PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+    )
+
     lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.SET_NULL, null=True)
     bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True)
     payment = models.DecimalField(max_digits=8, decimal_places=2)

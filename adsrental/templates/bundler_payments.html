@@ -10,97 +10,219 @@
 
 <div class="container">
     {% block actions_buttons %}
-        <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
         {% if allow_change %}
             <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
         {% endif %}
     {% endblock actions_buttons %}
 
-    {% if allow_change %}
+    {% if show_summary %}
         <h3>Summary</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th></th>
+                    <th>Stat</th>
                     <th>Amount</th>
                 </tr>
             </thead>
             <tbody>
-                {% for data in bundlers_data %}
-                    {% if data.total %}
-                        <tr>
-                            <td>Bundler {{ data.bundler }}</td>
-                            <td>${{ data.total }}</td>
-                        </tr>
-                    {% endif %}
+                {% for data in payments_total_by_bundler %}
+                    <tr>
+                        <td>Bundler {{ data.bundler__name }}</td>
+                        <td>${{ data.payment__sum }}</td>
+                    </tr>
                 {% endfor %}
-                <tr>
-                    <td>Total Google pay </td>
-                    <td>${{ total_google }}</td>
-                </tr>
-                <tr>
-                    <td>Total Facebook pay </td>
-                    <td>${{ total_facebook }}</td>
-                </tr>
-                <tr>
-                    <td>Total Amazon pay </td>
-                    <td>${{ total_amazon }}</td>
-                </tr>
-                <tr>
-                    <td>Total Chargebacks </td>
-                    <td>${{ total_chargeback }}</td>
-                </tr>
-                <tr>
-                    <td>Total pay for all accounts </td>
-                    <td>${{ total }}</td>
-                </tr>
+                {% if payments_total.payment_facebook__sum %}
+                    <tr>
+                        <td>Total pay for Facebook accounts</td>
+                        <td>${{ payments_total.payment_facebook__sum }}</td>
+                    </tr>
+                {% endif %}
+                {% if payments_total.payment_google__sum %}
+                    <tr>
+                        <td>Total pay for Google accounts</td>
+                        <td>${{ payments_total.payment_google__sum }}</td>
+                    </tr>
+                {% endif %}
+                {% if payments_total.payment_amazon__sum %}
+                    <tr>
+                        <td>Total pay for Amazon accounts</td>
+                        <td>${{ payments_total.payment_amazon__sum }}</td>
+                    </tr>
+                {% endif %}
+                {% if payments_total.payment_bonus__sum %}
+                    <tr>
+                        <td>Total pay for bonuses</td>
+                        <td>${{ payments_total.payment_bonus__sum }}</td>
+                    </tr>
+                {% endif %}
+                {% if payments_total.payment__sum %}
+                    <tr>
+                        <td>Total pay</td>
+                        <td>${{ payments_total.payment__sum }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="2">No entries</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     {% endif %}
 
-    {% for data in bundlers_data %}
-        {% if show_bundler_name %}
-            <h3>
-                Bundler {{ data.bundler }} (UTM source {{ data.bundler.utm_source }}) paid report {{ end_date }}
-                {% if not data.bundler.is_active %}(disabled){% endif %}
-            </h3>
-        {% else %}
-            <h3>UTM source {{ data.bundler.utm_source }} paid report {{ end_date }}</h3>
+    {% for record in payments_total_by_bundler %}
+        <h3>
+            {% if show_bundler_name %}
+                Bundler {{ record.bundler_name }} (UTM source {{ record.bundler__utm_source }}) paid report {{ end_date }}
+            {% else %}
+                UTM source {{ record.bundler__utm_source }} paid report {{ end_date }}
+            {% endif %}
+        </h3>
+        {% if payments_by_bundler_id|get_key:record.bundler_id %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Lead</th>
+                        <th>Account</th>
+                        <th>Account type</th>
+                        <th>In progress since</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments_by_bundler_id|get_key:record.bundler_id %}
+                        <tr>
+                            <td>
+                                {% if show_bundler_name and not pdf %}
+                                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?leadid={{ payment.lead_account.lead.leadid|urlencode }}">{{ payment.lead_account.lead.name }}</a>
+                                {% else %}
+                                    {{ payment.lead_account.lead.name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.username }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.account_type }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.in_progress_date.date }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.status }}
+                            </td>
+                            <td>
+                                ${{payment.payment}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    {% if record.own_payment_facebook__sum %}
+                        <tr>
+                            <th colspan="5">Total Facebook</th>
+                            <th>${{record.own_payment_facebook__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    {% if record.own_payment_google__sum %}
+                        <tr>
+                            <th colspan="5">Total Google</th>
+                            <th>${{record.own_payment_google__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    {% if record.own_payment_amazon__sum %}
+                        <tr>
+                            <th colspan="5">Total Amazon</th>
+                            <th>${{record.own_payment_amazon__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th colspan="5">Total</th>
+                        <th>${{record.own_payment__sum}}</th>
+                    </tr>
+                </tfoot>
+            </table>
         {% endif %}
 
-        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Facebook accounts' entries=data.facebook_entries chargeback_total=data.facebook_chargeback_total total=data.facebook_total final_total=data.facebook_final_total %}
-        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Google accounts' entries=data.google_entries chargeback_total=data.google_chargeback_total total=data.google_total final_total=data.google_final_total %}
-        {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name title='Amazon accounts' entries=data.amazon_entries chargeback_total=data.amazon_chargeback_total total=data.amazon_total final_total=data.amazon_final_total %}
-        {% for child_stats in data.facebook_children_stats %}
-            {% if child_stats.entries %}  
-                <h4>
-                    Child bundler Facebook accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
-                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
-                </h4>
-                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
-            {% endif %}
-        {% endfor %}
-        {% for child_stats in data.google_children_stats %}
-            {% if child_stats.entries %}
-                <h4>
-                    Child bundler Google accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
-                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
-                </h4>
-                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
-            {% endif %}
-        {% endfor %}
-        {% for child_stats in data.amazon_children_stats %}
-            {% if child_stats.entries %}
-                <h4>
-                    Child bundler Amazon accounts {{ child_stats.bundler }} (UTM source {{ child_stats.bundler.utm_source }}) paid report {{ end_date }}
-                    {% if not child_stats.bundler.is_active %}(disabled){% endif %}
-                </h4>
-                {% include 'include/bundler_payments_table.html' with show_bundler_name=show_bundler_name entries=child_stats.entries chargeback_total=child_stats.chargeback_total total=child_stats.total final_total=child_stats.final_total %}
-            {% endif %}
-        {% endfor %}
+        {% if children_payments_by_bundler_id|get_key:record.bundler_id %}
+            <h4>Payments from children bundlers</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Bundler</th>
+                        <th>Lead</th>
+                        <th>Account</th>
+                        <th>Account type</th>
+                        <th>In progress since</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in children_payments_by_bundler_id|get_key:record.bundler_id %}
+                        <tr>
+                            <td>
+                                {% if show_bundler_name %}
+                                    {{ payment.lead_account.lead.bundler.name }}
+                                {% else %}
+                                    {{ payment.lead_account.lead.bundler.utm_source }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if show_bundler_name and not pdf %}
+                                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?leadid={{ payment.lead_account.lead.leadid|urlencode }}">{{ payment.lead_account.lead.name }}</a>
+                                {% else %}
+                                    {{ payment.lead_account.lead.name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.username }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.account_type }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.in_progress_date.date }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.status }}
+                            </td>
+                            <td>
+                                ${{payment.payment}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    {% if record.children_payment_facebook__sum %}
+                        <tr>
+                            <th colspan="6">Total Facebook</th>
+                            <th>${{record.children_payment_facebook__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    {% if record.children_payment_google__sum %}
+                        <tr>
+                            <th colspan="6">Total Google</th>
+                            <th>${{record.children_payment_google__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    {% if record.children_payment_amazon__sum %}
+                        <tr>
+                            <th colspan="6">Total Amazon</th>
+                            <th>${{record.children_payment_amazon__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th colspan="6">Total</th>
+                        <th>${{record.children_payment__sum}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        {% endif %}
 
-        <h5>Bonus: ${{ data.bonus|floatformat:2 }}</h5>
-        <h4>Total: ${{ data.total|floatformat:2 }}</h4>
+        {% if record.payment_bonus__sum %}
+            <h5>Bonus: ${{ record.payment_bonus__sum}}</h5> 
+        {% endif %}
+        <h4>Total: ${{ record.payment__sum}}</h4> 
     {% endfor %}
-    <h3>Total for all bundlers: ${{ total|floatformat:2 }}</h3>
 {% endblock %}

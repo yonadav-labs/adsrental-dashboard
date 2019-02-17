@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import re
-import json
-import decimal
 import typing
 
 from django.db import models
@@ -57,78 +55,6 @@ class BundlerPaymentsReport(models.Model):
 
         # result.append('<h3>' + html_parts[-1])
         return ''.join(result)
-
-    def mark(self) -> typing.Dict[str, int]:
-        result = {
-            'facebook_entries_ids': 0,
-            'chargeback_facebook_entries_ids': 0,
-            'google_entries_ids': 0,
-            'chargeback_google_entries_ids': 0,
-            'amazon_entries_ids': 0,
-            'chargeback_amazon_entries_ids': 0,
-        }
-        for data in json.loads(self.data):
-            facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
-            google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
-            amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) < 0]
-
-            result['facebook_entries_ids'] += len(facebook_entries_ids)
-            result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
-            result['google_entries_ids'] += len(google_entries_ids)
-            result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
-            result['amazon_entries_ids'] += len(amazon_entries_ids)
-            result['chargeback_amazon_entries_ids'] += len(chargeback_amazon_entries_ids)
-
-            LeadAccount.objects.filter(id__in=facebook_entries_ids + google_entries_ids + amazon_entries_ids).update(
-                bundler_paid_date=self.date,
-                bundler_paid=True,
-            )
-            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids + chargeback_google_entries_ids + chargeback_amazon_entries_ids).update(
-                charge_back_billed=True,
-            )
-
-        self.cancelled = False
-        self.save()
-
-        return result
-
-    def unmark(self) -> typing.Dict[str, int]:
-        result = {
-            'facebook_entries_ids': 0,
-            'chargeback_facebook_entries_ids': 0,
-            'google_entries_ids': 0,
-            'chargeback_google_entries_ids': 0,
-            'amazon_entries_ids': 0,
-            'chargeback_amazon_entries_ids': 0,
-        }
-        for data in json.loads(self.data):
-            facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_facebook_entries_ids = [i['id'] for i in data['facebook_entries'] if decimal.Decimal(i['payment']) < 0]
-            google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_google_entries_ids = [i['id'] for i in data['google_entries'] if decimal.Decimal(i['payment']) < 0]
-            amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) >= 0]
-            chargeback_amazon_entries_ids = [i['id'] for i in data['amazon_entries'] if decimal.Decimal(i['payment']) < 0]
-
-            result['facebook_entries_ids'] += len(facebook_entries_ids)
-            result['chargeback_facebook_entries_ids'] += len(chargeback_facebook_entries_ids)
-            result['google_entries_ids'] += len(google_entries_ids)
-            result['chargeback_google_entries_ids'] += len(chargeback_google_entries_ids)
-            result['amazon_entries_ids'] += len(amazon_entries_ids)
-            result['chargeback_amazon_entries_ids'] += len(chargeback_amazon_entries_ids)
-
-            LeadAccount.objects.filter(id__in=facebook_entries_ids + google_entries_ids + amazon_entries_ids).update(
-                bundler_paid_date=None,
-                bundler_paid=False,
-            )
-            LeadAccount.objects.filter(id__in=chargeback_facebook_entries_ids + chargeback_google_entries_ids + chargeback_amazon_entries_ids).update(
-                charge_back_billed=False,
-            )
-        self.cancelled = True
-        self.save()
-        return result
 
     def send_by_email(self) -> None:
         email = EmailMessage(
