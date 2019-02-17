@@ -24,8 +24,7 @@ class BundlerCheckDaysView(View):
         else:
             date = now
 
-        current_month_start, _ = get_month_boundaries_for_dt(date)
-        start_date, end_date = get_month_boundaries_for_dt(current_month_start - datetime.timedelta(days=1))
+        start_date, end_date = get_month_boundaries_for_dt(date)
 
         bundler = Bundler.objects.filter(id=int(bundler_id)).first()
         lead = Lead.objects.get(leadid=lead_id)
@@ -38,7 +37,7 @@ class BundlerCheckDaysView(View):
         lead_histories = LeadHistory.objects.filter(
             lead__bundler=bundler,
             date__gte=start_date,
-            date__lte=end_date,
+            date__lt=end_date.date(),
             lead=lead,
         ).select_related('lead', 'lead__raspberry_pi')
         total = decimal.Decimal('0.00')

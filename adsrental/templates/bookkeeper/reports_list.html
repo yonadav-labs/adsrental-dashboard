@@ -22,7 +22,7 @@
         <tbody>
         {% for report in reports %}
             <tr>
-                <td>{{ report.date }}</td>
+                <td>{{ report.date|date }}</td>
                 <td>
                     {% if report.paid %}
                         <span class="glyphicon glyphicon-ok" style="color: lightgreen;"></span>

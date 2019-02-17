@@ -16,11 +16,11 @@
             {% for lead_history in lead_histories %}
                 {% if lead_history.is_active %}
                     <div class="alert alert-success">
-                        <strong>{{ lead_history.date }}</strong> - Online (${{ lead_history.amount }})
+                        <strong>{{ lead_history.date|date }}</strong> - Online (${{ lead_history.amount }})
                     </div>
                 {% else %}
                     <div class="alert alert-warning">
-                        <strong>{{ lead_history.date }}</strong> - {% if not lead_history.is_online %}Offline{% endif %} {% if lead_history.is_wrong_password %}Wrong PW{% endif %}
+                        <strong>{{ lead_history.date|date }}</strong> - {% if not lead_history.is_online %}Offline{% endif %} {% if lead_history.is_wrong_password %}Wrong PW{% endif %}
                     </div>
                 {% endif %}
             {% endfor %}

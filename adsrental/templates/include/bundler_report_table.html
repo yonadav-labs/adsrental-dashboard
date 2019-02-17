@@ -26,7 +26,7 @@
                 {% endif %}
             </td>
             <td>{{ entry.lead_account.username }}</td>
-            <td>{{ entry.lead_account.lead.raspberry_pi.first_seen.date }}</td>
+            <td>{{ entry.lead_account.lead.raspberry_pi.first_seen.date|date }}</td>
             <td>{{ entry.lead_account.status }}</td>
             <td>
                 {% if entry.bundler_paid %}

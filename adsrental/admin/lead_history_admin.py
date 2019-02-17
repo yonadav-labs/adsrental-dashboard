@@ -7,7 +7,12 @@ from django.db.models.functions import Concat
 
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_account import LeadAccount
-from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter
+from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter, AbstractUIDListFilter
+
+
+class LeadLeadidListFilter(AbstractUIDListFilter):
+    parameter_name = 'lead__leadid'
+    title = 'Lead ID'
 
 
 class LeadHistoryAdmin(admin.ModelAdmin):
@@ -33,13 +38,15 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     raw_id_fields = ('lead', )
     list_select_related = ('lead', 'lead__raspberry_pi')
     search_fields = ('lead__email', )
-    list_filter = ('date', )
+    list_filter = (
+        LeadLeadidListFilter,
+        DateMonthListFilter,
+        LeadStatusListFilter,
+    )
     actions = (
         'mark_as_online',
         'mark_as_offline',
     )
-
-    list_filter = (DateMonthListFilter, LeadStatusListFilter, )
 
     def __init__(self, *args, **kwargs):
         self._request = None

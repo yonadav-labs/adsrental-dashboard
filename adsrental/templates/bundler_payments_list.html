@@ -11,7 +11,7 @@
     <h3>Reports for UTM source {{bundler.utm_source }}</h3>
     <ul>
         {% for report in reports %}
-            <li><a href="{% url 'bundler_report_payments' report_id=report.id bundler_id=bundler.id %}">{{report.date }}</a></li>
+            <li><a href="{% url 'bundler_report_payments' report_id=report.id bundler_id=bundler.id %}">{{report.date|date }}</a></li>
         {% endfor %}
     </ul>
     </script>
