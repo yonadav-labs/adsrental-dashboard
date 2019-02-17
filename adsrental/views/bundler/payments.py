@@ -22,14 +22,15 @@ class BundlerPaymentsView(View):
     @method_decorator(login_required)
     def get(self, request, bundler_id):
         bundlers = []
-        if request.user.bundler:
-            bundlers = [request.user.bundler]
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.is_bookkeeper():
             if bundler_id == 'all':
                 bundlers = Bundler.objects.all()
             else:
                 bundlers = Bundler.objects.filter(id=bundler_id)
+
+        if request.user.bundler:
+            bundlers = [request.user.bundler]
 
         if not bundlers:
             raise Http404
