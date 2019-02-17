@@ -74,7 +74,7 @@ class GenerateBundlerBonusesView(CronView):
             if not bundler_stat['bonus']:
                 continue
 
-            payment_datetime = end_date - datetime.timedelta(days=1)
+            payment_datetime = start_date
             bundler_payment, _ = BundlerPayment.objects.get_or_create(
                 bundler_id=bundler_stat['bundler_id'],
                 datetime__date=payment_datetime.date(),
