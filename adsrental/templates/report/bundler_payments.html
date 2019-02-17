@@ -99,14 +99,18 @@
                             </td>
                             <td>
                                 {% if entry.paid_sum %}
-                                    ${{entry.paid_sum}}
+                                    <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ entry.bundler_id }}&amp;paid__exact=1">
+                                        ${{entry.paid_sum}}
+                                    </a>
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td>
                                 {% if entry.not_paid_sum %}
-                                    ${{entry.not_paid_sum}}
+                                    <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ entry.bundler_id }}&amp;paid__exact=0">
+                                        ${{entry.not_paid_sum}}
+                                    </a>
                                 {% else %}
                                     -
                                 {% endif %}
