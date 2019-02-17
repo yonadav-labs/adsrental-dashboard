@@ -17,7 +17,6 @@ from xhtml2pdf import pisa
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
-from adsrental.models.bundler_payment import BundlerPayment
 
 
 class BundlerPaymentsView(View):
