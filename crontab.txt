@@ -20,4 +20,4 @@
 0 4 * * MON /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/report/lead_accounts_weekly/?cron=true\&account_type=Facebook\&email=seanharrison@adsinc.io
 0 4 * * MON /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/report/lead_accounts_weekly/?cron=true\&account_type=Google\&email=bkirk@tnfmarketing.com
 */4 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/event_not_qualified/ >> /root/logs/cron_event_not_qualified.log
-0 4 * * MON /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/generate_bundler_bonuses/?execute=true >> /root/logs/cron_generate_bundler_bonuses.log
+0 4 * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/generate_bundler_bonuses/?execute=true >> /root/logs/cron_generate_bundler_bonuses.log
