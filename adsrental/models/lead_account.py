@@ -439,15 +439,17 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if value == self.STATUS_QUALIFIED and old_value == self.STATUS_IN_PROGRESS:
             return False
 
-        if value == self.STATUS_IN_PROGRESS:
-            self.generate_payments()
-            self.insert_note(f'Bundler payments generated')
-
         if self.status != Lead.STATUS_BANNED:
             self.old_status = self.status
 
         self.status = value
+
         self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
+
+        if value == self.STATUS_IN_PROGRESS:
+            self.generate_payments()
+            self.insert_note(f'Bundler payments generated')
+
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
         return True
