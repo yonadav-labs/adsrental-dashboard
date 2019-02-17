@@ -37,11 +37,11 @@ class BundlerPayment(models.Model):
     ]
 
     lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.SET_NULL, null=True)
-    bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True)
+    bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True, db_index=True)
     payment = models.DecimalField(max_digits=8, decimal_places=2)
-    payment_type = models.CharField(max_length=50, choices=PAYMENT_TYPE_CHOICES, default=PAYMENT_TYPE_ACCOUNT_MAIN)
-    report = models.ForeignKey('adsrental.BundlerPaymentsReport', on_delete=models.SET_NULL, null=True, blank=True)
+    payment_type = models.CharField(max_length=50, choices=PAYMENT_TYPE_CHOICES, default=PAYMENT_TYPE_ACCOUNT_MAIN, db_index=True)
+    report = models.ForeignKey('adsrental.BundlerPaymentsReport', on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
     datetime = models.DateTimeField(default=timezone.now)
-    paid = models.BooleanField(default=False)
+    paid = models.BooleanField(default=False, db_index=True)
     ready = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)

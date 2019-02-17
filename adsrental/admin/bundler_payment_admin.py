@@ -8,6 +8,9 @@ from adsrental.models.bundler_payment import BundlerPayment
 
 
 class BundlerPaymentAdmin(admin.ModelAdmin):
+    list_per_page = 1000
+    change_list_template = 'admin/change_list_total.html'
+
     model = BundlerPayment
     list_display = (
         'id',
@@ -22,6 +25,7 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'payment_type',
+        'paid',
         'bundler',
     )
 
