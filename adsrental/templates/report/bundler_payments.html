@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Bundler payments report{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Bundler {{ bundler.name}} payments report</h1>
+        
+        <form role="form" action="" method="GET">
+            {{ form|bootstrap }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        {% if bundler_payments_by_type %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Payment type</th>
+                        <th>Paid sum</th>
+                        <th>To pay sum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in bundler_payments_by_type %}
+                        <tr>
+                            <td>{{payment_types_map|get_key:entry.payment_type}}</td>
+                            <td>
+                                {% if entry.paid_sum %}
+                                    ${{entry.paid_sum}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.not_paid_sum %}
+                                    ${{entry.not_paid_sum}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th>
+                            {% if bundler_payments_total.paid_sum %}
+                                ${{bundler_payments_total.paid_sum}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if bundler_payments_total.not_paid_sum %}
+                                ${{bundler_payments_total.not_paid_sum}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        {% else %}
+            <h2>No data</h2>
+        {% endif %}
+
+        {% if bundler_payments_by_bundler %}
+            <h1>All bundlers</h1>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Bundler</th>
+                        <th>Paid sum</th>
+                        <th>To pay sum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in bundler_payments_by_bundler %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'report:bundler_payments' %}?bundler={{entry.bundler_id}}">
+                                    {{ entry.bundler__name }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if entry.paid_sum %}
+                                    ${{entry.paid_sum}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.not_paid_sum %}
+                                    ${{entry.not_paid_sum}}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

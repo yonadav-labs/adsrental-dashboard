@@ -16,6 +16,7 @@ class CustomIndexDashboard(Dashboard):
     """
     Custom index dashboard for app.
     """
+
     def init_with_context(self, context: typing.Dict) -> None:
         # append a link list module for "quick links"
         request = context['request']
@@ -147,6 +148,9 @@ class CustomIndexDashboard(Dashboard):
                 )],
                 [_('Auto Ban Soon report'), '{}'.format(
                     reverse('report:auto_ban'),
+                )],
+                [_('Bundler payments total report'), '{}'.format(
+                    reverse('report:bundler_payments'),
                 )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),

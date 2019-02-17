@@ -395,3 +395,7 @@ class AutoBanSoonForm(forms.Form):
     account_type = forms.ChoiceField(label='Account type', choices=ACCOUNT_TYPE_CHOICES, required=False)
     ban_reason = forms.ChoiceField(label='Ban reason', choices=BAN_REASON_CHOICES, required=False)
     days = forms.IntegerField(label='Days before ban', required=True)
+
+
+class BundlerPaymentsForm(forms.Form):
+    bundler = forms.ModelChoiceField(label='Bundler', queryset=Bundler.objects.all(), required=False)
