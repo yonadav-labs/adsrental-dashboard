@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import get_week_boundaries_for_dt
 
 BONUSES = [
@@ -73,7 +74,6 @@ class AdminBundlerBonusesView(View):
 
         final_bundler_stats = {}
 
-
         for bundler_stat in bundler_stats:
             bundler_id = bundler_stat['lead__bundler_id']
             bundler_name = bundler_stat['lead__bundler__name']
@@ -104,6 +104,18 @@ class AdminBundlerBonusesView(View):
 
         for bundler_stat in final_bundler_stats:
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
+
+        if request.GET.get('save'):
+            for bundler_stat in final_bundler_stats:
+                if not bundler_stat['bonus']:
+                    continue
+                bundler_payment, _ = BundlerPayment.objects.get_or_create(
+                    bundler_id=bundler_stat['bundler_id'],
+                    datetime=end_date,
+                    payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+                )
+                bundler_payment.payment = bundler_stat['bonus']
+                bundler_payment.save()
 
         return render(request, 'admin/bundler_bonuses.html', dict(
             bundler_stats=bundler_stats,

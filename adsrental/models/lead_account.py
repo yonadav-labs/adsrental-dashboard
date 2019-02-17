@@ -15,6 +15,7 @@ from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
+from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import CustomerIOClient
 
 if typing.TYPE_CHECKING:
@@ -160,6 +161,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     objects = BulkUpdateManager()
 
+    def get_bundler(self) -> Bundler:
+        return self.lead.bundler
+
     def is_approval_needed(self):
         if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
             return True
@@ -174,7 +178,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
-        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and self.lead.raspberry_pi.online() and not self.bundler_paid:
+        if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_payment
                 result -= self.get_parent_bundler_payment(bundler)
@@ -206,7 +210,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
-        if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
+        if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_parent_payment
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
@@ -220,7 +224,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def get_second_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
-        if bundler.second_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi.online() and not self.bundler_paid:
+        if bundler.second_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
             if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_second_parent_payment
             if self.account_type == self.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
@@ -378,6 +382,47 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_SECURITY_CHECKPOINT, value='False', old_value=old_value, edited_by=edited_by).save()
 
+    def generate_payments(self):
+        bundler = self.get_bundler()
+        result = []
+        payment = self.get_bundler_payment(bundler)
+        if payment:
+            entry, _ = BundlerPayment.objects.get_or_create(
+                bundler=bundler,
+                lead_account=self,
+                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
+                defaults=dict(payment=payment)
+            )
+            entry.payment = payment
+            entry.save()
+            result.append(entry)
+        parent_payment = self.get_parent_bundler_payment(bundler)
+        if parent_payment:
+            parent_bundler = bundler.parent_bundler  # pylint: disable=no-member
+            entry, _ = BundlerPayment.objects.get_or_create(
+                bundler=parent_bundler,
+                lead_account=self,
+                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
+                defaults=dict(payment=parent_payment)
+            )
+            entry.payment = parent_payment
+            entry.save()
+            result.append(entry)
+        second_parent_payment = self.get_second_parent_bundler_payment(bundler)
+        if second_parent_payment:
+            second_parent_bundler = bundler.second_parent_bundler  # pylint: disable=no-member
+            entry, _ = BundlerPayment.objects.get_or_create(
+                bundler=second_parent_bundler,
+                lead_account=self,
+                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+                defaults=dict(payment=second_parent_payment)
+            )
+            entry.payment = second_parent_payment
+            entry.save()
+            result.append(entry)
+
+        return result
+
     def set_status(self, value: str, edited_by: User) -> bool:
         'Change status, create LeadChange instance.'
         if value not in dict(self.STATUS_CHOICES).keys():
@@ -389,6 +434,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         if value == self.STATUS_QUALIFIED and old_value == self.STATUS_IN_PROGRESS:
             return False
+
+        if value == self.STATUS_IN_PROGRESS:
+            self.generate_payments()
 
         if self.status != Lead.STATUS_BANNED:
             self.old_status = self.status

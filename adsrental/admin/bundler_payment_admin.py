@@ -16,7 +16,7 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
         'payment',
         'payment_type',
         'report',
-        'created',
+        'datetime',
     )
     list_filter = (
         'payment_type',
@@ -36,6 +36,8 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
         ))
 
     def bundler_field(self, obj):
+        if not obj.bundler:
+            return None
         return mark_safe('<a href="{url}?q={search}">{value}</a>'.format(
             url=reverse('admin:adsrental_bundler_changelist'),
             search=html.escape(obj.bundler.name),
