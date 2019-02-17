@@ -38,7 +38,7 @@ class BundlerPaymentsView(View):
         today = now.replace(hour=0, minute=0, second=0)
         yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
 
-        bundler_payments = BundlerPayment.objects.filter(paid=False, bundler__in=bundlers, datetime__lte=today).select_related(
+        bundler_payments = BundlerPayment.objects.filter(ready=True, paid=False, bundler__in=bundlers, datetime__lte=today).select_related(
             'bundler',
             'lead_account',
             'lead_account__lead',

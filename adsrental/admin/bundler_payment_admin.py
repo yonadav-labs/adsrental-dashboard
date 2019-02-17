@@ -17,6 +17,7 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
         'payment_type',
         'report',
         'paid',
+        'ready',
         'datetime',
     )
     list_filter = (

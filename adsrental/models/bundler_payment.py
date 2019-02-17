@@ -43,4 +43,5 @@ class BundlerPayment(models.Model):
     report = models.ForeignKey('adsrental.BundlerPaymentsReport', on_delete=models.SET_NULL, null=True, blank=True)
     datetime = models.DateTimeField(default=timezone.now)
     paid = models.BooleanField(default=False)
+    ready = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)

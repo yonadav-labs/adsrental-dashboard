@@ -20,7 +20,8 @@ class GenerateBundlerBonusesView(CronView):
         return decimal.Decimal('0.00')
 
     def get(self, request):
-        date = timezone.now() - datetime.timedelta(days=3)
+        now = timezone.now()
+        date = now - datetime.timedelta(days=1)
 
         start_date, end_date = get_week_boundaries_for_dt(date)
 
@@ -83,8 +84,9 @@ class GenerateBundlerBonusesView(CronView):
             )
             bundler_payment.payment = bundler_stat['bonus']
             bundler_payment.datetime = payment_datetime
+            bundler_payment.ready = end_date > now
             if self.is_execute():
                 bundler_payment.save()
             bundler_payments.append(bundler_payment)
 
-        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment)] for i in bundler_payments]})
+        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), i.ready] for i in bundler_payments]})
