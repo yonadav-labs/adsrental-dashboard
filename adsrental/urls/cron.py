@@ -12,6 +12,7 @@ from adsrental.views.cron.check_ec2 import CheckEC2View
 from adsrental.views.cron.sync_adsdb import SyncAdsDBView
 from adsrental.views.cron.fix_primary import FixPrimaryView
 from adsrental.views.cron.event_not_qualified import EventNotQualifiedView
+from adsrental.views.cron.generate_bundler_bonuses import GenerateBundlerBonusesView
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -27,4 +28,5 @@ urlpatterns = [  # pylint: disable=C0103
     path('sync_adsdb/', SyncAdsDBView.as_view(), name='cron_sync_adsdb'),
     path('fix_primary/', FixPrimaryView.as_view(), name='cron_fix_primary'),
     path('event_not_qualified/', EventNotQualifiedView.as_view(), name='cron_event_not_qualified'),
+    path('generate_bundler_bonuses/', GenerateBundlerBonusesView.as_view(), name='generate_bundler_bonuses'),
 ]

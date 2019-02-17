@@ -1,3 +1,5 @@
+import decimal
+
 from django.db import models
 from django.utils import timezone
 
@@ -20,6 +22,19 @@ class BundlerPayment(models.Model):
         PAYMENT_TYPE_ACCOUNT_PARENT,
         PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
     )
+
+    BONUSES = [
+        [100, decimal.Decimal(3000)],
+        [90, decimal.Decimal(2500)],
+        [80, decimal.Decimal(2000)],
+        [70, decimal.Decimal(1500)],
+        [60, decimal.Decimal(1000)],
+        [50, decimal.Decimal(500)],
+        [40, decimal.Decimal(400)],
+        [30, decimal.Decimal(300)],
+        [20, decimal.Decimal(200)],
+        [10, decimal.Decimal(100)],
+    ]
 
     lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.SET_NULL, null=True)
     bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True)

@@ -1,20 +1,16 @@
 import decimal
 import datetime
-from dateutil import parser
 
-from django.views import View
-from django.utils import timezone
-from django.shortcuts import Http404, render
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.db.models import Count
+from django.utils import timezone
 
+from adsrental.views.cron.base import CronView
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import get_week_boundaries_for_dt
 
 
-class AdminBundlerBonusesView(View):
+class GenerateBundlerBonusesView(CronView):
     @staticmethod
     def get_bonus(lead_accounts_count):
         for count, bonus in BundlerPayment.BONUSES:
@@ -23,27 +19,10 @@ class AdminBundlerBonusesView(View):
 
         return decimal.Decimal('0.00')
 
-    @method_decorator(login_required)
     def get(self, request):
-        if not request.user.is_superuser:
-            raise Http404
-
-        now = timezone.localtime(timezone.now())
-        date_str = request.GET.get('date')
-        if date_str:
-            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
-        else:
-            date = now
+        date = timezone.now() - datetime.timedelta(days=3)
 
         start_date, end_date = get_week_boundaries_for_dt(date)
-
-        dates_list = []
-        for i in range(-1, 2):
-            if start_date + datetime.timedelta(days=7 * i) < now:
-                dates_list.append(dict(
-                    start_date=start_date + datetime.timedelta(days=7 * i),
-                    end_date=end_date + datetime.timedelta(days=7 * i) - datetime.timedelta(days=1),
-                ))
 
         bundler_stats = LeadAccount.objects.filter(
             account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
@@ -57,7 +36,6 @@ class AdminBundlerBonusesView(View):
             'lead__bundler__bonus_receiver_bundler__name',
             'lead__bundler__name',
         ).annotate(lead_accounts_count=Count('id')).order_by('-lead_accounts_count')
-        # bundler_stats.sort(key=lambda x:x['lead_accounts_count'], reverse=True)
 
         final_bundler_stats = {}
 
@@ -87,28 +65,26 @@ class AdminBundlerBonusesView(View):
                 final_bundler_stats[bundler_id]['own_lead_accounts_count'] += bundler_stat['lead_accounts_count']
 
         final_bundler_stats = list(final_bundler_stats.values())
-        final_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
 
         for bundler_stat in final_bundler_stats:
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
 
-        if request.GET.get('save'):
-            for bundler_stat in final_bundler_stats:
-                if not bundler_stat['bonus']:
-                    continue
-                bundler_payment, _ = BundlerPayment.objects.get_or_create(
-                    bundler_id=bundler_stat['bundler_id'],
-                    datetime=end_date - datetime.timedelta(days=1),
-                    payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
-                    defaults=dict(payment=bundler_stat['bonus']),
-                )
-                bundler_payment.payment = bundler_stat['bonus']
-                bundler_payment.save()
+        bundler_payments = []
+        for bundler_stat in final_bundler_stats:
+            if not bundler_stat['bonus']:
+                continue
 
-        return render(request, 'admin/bundler_bonuses.html', dict(
-            bundler_stats=bundler_stats,
-            final_bundler_stats=final_bundler_stats,
-            start_date=start_date,
-            end_date=end_date - datetime.timedelta(days=1),
-            dates_list=dates_list,
-        ))
+            payment_datetime = end_date - datetime.timedelta(days=1)
+            bundler_payment, _ = BundlerPayment.objects.get_or_create(
+                bundler_id=bundler_stat['bundler_id'],
+                datetime__date=payment_datetime.date(),
+                payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+                defaults=dict(payment=bundler_stat['bonus']),
+            )
+            bundler_payment.payment = bundler_stat['bonus']
+            bundler_payment.datetime = payment_datetime
+            if self.is_execute():
+                bundler_payment.save()
+            bundler_payments.append(bundler_payment)
+
+        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment)] for i in bundler_payments]})
