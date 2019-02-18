@@ -49,8 +49,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.groups.filter(name='Bookkeeper').exists()
 
     def can_access_bundler(self, bundler) -> bool:
-        if self.bundler == bundler:
-            return False
+        if self.bundler and self.bundler == bundler:
+            return True
 
         if self.is_superuser:
             return True
