@@ -60,9 +60,12 @@ class AutoBanView(View):
                 'last_seen': lead_account.lead.raspberry_pi.last_seen.date()
             })
             if execute:
-                lead_account.ban(autoban_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
+                lead_account.ban(edited_by=autoban_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
                 lead_account.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
                 lead_account.save()
+                lead = lead_account.lead
+                lead.ban(edited_by=autoban_user)
+                lead.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),

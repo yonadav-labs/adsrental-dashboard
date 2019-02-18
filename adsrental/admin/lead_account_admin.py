@@ -195,7 +195,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if obj.status == LeadAccount.STATUS_BANNED:
             dt = f'after {humanize_timedelta(obj.banned_date - obj.created, short=True)}' if obj.banned_date else ''
             status = f'{obj.status} ({obj.get_ban_reason_display()}) {dt}'
-            title = obj.note if obj.note  else f'Banned for {obj.get_ban_reason_display()}'
+            title = obj.note if obj.note else f'Banned for {obj.get_ban_reason_display()}'
         return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.id,

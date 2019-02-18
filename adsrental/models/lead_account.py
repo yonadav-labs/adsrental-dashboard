@@ -14,7 +14,7 @@ from django_bulk_update.manager import BulkUpdateManager
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.lead_change import LeadChange
+from adsrental.models.Lead_change import LeadChange
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import CustomerIOClient
 
@@ -456,6 +456,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
     def ban(self, edited_by: User, reason: typing.Optional[str] = None, note: typing.Optional[str] = None) -> bool:
         'Mark lead account as banned, send cutomer.io event.'
+        if self.status == LeadAccount.STATUS_BANNED:
+            return False
         now = timezone.localtime(timezone.now())
         self.ban_reason = reason
         self.banned_date = now
@@ -479,8 +481,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         else:
             CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED, account_type=self.account_type)
 
-        if not active_accounts:
-            self.lead.ban(edited_by)
+        # if not active_accounts:
+        #     self.lead.ban(edited_by)
         return result
 
     def unban(self, edited_by: User) -> bool:
