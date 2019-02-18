@@ -37,7 +37,10 @@ class BundlerPaymentsReport(models.Model):
         for entry in data:
             for key in keys:
                 for lead_account_entry in entry[key]:
-                    result.append(LeadAccount.objects.get(id=lead_account_entry['id']))
+                    try:
+                        result.append(LeadAccount.objects.get(id=lead_account_entry['id']))
+                    except LeadAccount.DoesNotExist:
+                        pass
 
         return result
 
