@@ -71,22 +71,27 @@ class GenerateBundlerBonusesView(CronView):
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
 
         bundler_payments = []
+        payment_datetime = start_date
         for bundler_stat in final_bundler_stats:
             if not bundler_stat['bonus']:
                 continue
 
-            payment_datetime = start_date
-            bundler_payment, _ = BundlerPayment.objects.get_or_create(
-                bundler_id=bundler_stat['bundler_id'],
-                datetime__date=payment_datetime.date(),
-                payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
-                defaults=dict(payment=bundler_stat['bonus']),
-            )
+            try:
+                bundler_payment = BundlerPayment.objects.get(
+                    bundler_id=bundler_stat['bundler_id'],
+                    datetime__date=payment_datetime.date(),
+                    payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+                )
+            except BundlerPayment.DoesNotExist:
+                bundler_payment = BundlerPayment(
+                    bundler_id=bundler_stat['bundler_id'],
+                    datetime=payment_datetime.date(),
+                    payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+                )
             bundler_payment.payment = bundler_stat['bonus']
-            bundler_payment.datetime = payment_datetime
             bundler_payment.ready = end_date < now
             if self.is_execute():
                 bundler_payment.save()
             bundler_payments.append(bundler_payment)
 
-        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), i.ready] for i in bundler_payments]})
+        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), i.ready, bundler_payment.datetime] for i in bundler_payments]})
