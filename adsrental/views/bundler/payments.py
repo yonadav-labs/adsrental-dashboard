@@ -26,14 +26,12 @@ class BundlerPaymentsView(View):
         if bundler_id is not None:
             bundlers = bundlers.filter(id=bundler_id)
 
-        if request.user.bundler:
-            bundlers = bundlers.filter(id=request.user.bundler.id)
-
+        available_bundlers = []
         for bundler in bundlers:
-            if not request.user.can_access_bundler(bundler):
-                raise Http404
+            if request.user.can_access_bundler(bundler):
+                available_bundlers.append(bundler)
 
-        if not bundlers:
+        if not available_bundlers:
             raise Http404
 
         now = timezone.localtime(timezone.now())
@@ -45,7 +43,7 @@ class BundlerPaymentsView(View):
             report = get_object_or_404(BundlerPaymentsReport, id=report_id)
             report_date = report.date
 
-        bundler_payments = BundlerPayment.objects.filter(ready=True, report_id=report_id, bundler__in=bundlers, datetime__lte=today).select_related(
+        bundler_payments = BundlerPayment.objects.filter(ready=True, report_id=report_id, bundler__in=available_bundlers, datetime__lte=today).select_related(
             'bundler',
             'lead_account',
             'lead_account__lead',
