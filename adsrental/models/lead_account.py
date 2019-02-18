@@ -13,6 +13,7 @@ from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead import Lead
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import CustomerIOClient
