@@ -124,6 +124,32 @@
                             </td>
                         </tr>
                     {% endfor %}
+                    {% for payment in chargebacks_by_bundler_id|get_key:record.bundler_id %}
+                        <tr>
+                            <td>
+                                {% if show_bundler_name and not pdf %}
+                                    <a target="_blank" href="{% url 'admin:adsrental_lead_changelist' %}?leadid={{ payment.lead_account.lead.leadid|urlencode }}">{{ payment.lead_account.lead.name }}</a>
+                                {% else %}
+                                    {{ payment.lead_account.lead.name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.username }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.account_type }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.in_progress_date|date }}
+                            </td>
+                            <td>
+                                {{ payment.lead_account.status }}
+                            </td>
+                            <td>
+                                ${{payment.payment}}
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
                 <tfoot>
                     {% if record.own_payment_facebook__sum %}
@@ -142,6 +168,12 @@
                         <tr>
                             <th colspan="5">Total Amazon</th>
                             <th>${{record.own_payment_amazon__sum}}</th>
+                        </tr>
+                    {% endif %}
+                    {% if record.chargeback__sum %}
+                        <tr>
+                            <th colspan="5">Total chargebacks</th>
+                            <th>${{record.chargeback__sum}}</th>
                         </tr>
                     {% endif %}
                     <tr>
