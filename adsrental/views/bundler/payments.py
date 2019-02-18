@@ -91,11 +91,13 @@ class BundlerPaymentsView(View):
         )
         bundler_payments_by_bundler_id = {}
         children_bundler_payments_by_bundler_id = {}
+        bonus_bundler_payments_by_bundler_id = {}
         for record in bundler_payments_total_by_bundler:
             record_bundler_id = record['bundler_id']
             bundler_payments_for_id = bundler_payments.filter(bundler_id=record_bundler_id)
             bundler_payments_by_bundler_id[record_bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN).order_by('lead_account__account_type')
             children_bundler_payments_by_bundler_id[record_bundler_id] = bundler_payments_for_id.filter(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT).order_by('lead_account__account_type', 'lead_account__lead__bundler')
+            bonus_bundler_payments_by_bundler_id[record_bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_BONUS).order_by('datetime')
 
         bundler_chargebacks_by_bundler_id = {}
         for record in bundler_payments_total_by_bundler:
@@ -118,6 +120,7 @@ class BundlerPaymentsView(View):
             payments_total_by_bundler=bundler_payments_total_by_bundler,
             payments_total=bundler_payments_total,
             payments_by_bundler_id=bundler_payments_by_bundler_id,
+            bonus_payments_by_bundler_id=bonus_bundler_payments_by_bundler_id,
             chargebacks_by_bundler_id=bundler_chargebacks_by_bundler_id,
             children_payments_by_bundler_id=children_bundler_payments_by_bundler_id,
             show_bundler_name=request.user.is_superuser or request.user.is_bookkeeper(),

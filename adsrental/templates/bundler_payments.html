@@ -260,9 +260,36 @@
             </table>
         {% endif %}
 
-        {% if record.payment_bonus__sum %}
-            <h5>Bonus: ${{ record.payment_bonus__sum}}</h5> 
+        {% if bonus_payments_by_bundler_id|get_key:record.bundler_id %}
+            <h4>Bonus payments</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in bonus_payments_by_bundler_id|get_key:record.bundler_id %}
+                        <tr>
+                            <td>
+                                {{ payment.datetime|date }}
+                            </td>
+                            <td>
+                                ${{payment.payment}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th>${{record.payment_bonus__sum}}</th>
+                    </tr>
+                </tfoot>
+            </table>
         {% endif %}
+
         <h4>Total: ${{ record.payment__sum}}</h4> 
     {% endfor %}
 {% endblock %}
