@@ -12,9 +12,8 @@ from django.utils import dateformat
 from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.mixins import FulltextSearchMixin
-from adsrental.models.lead import Lead
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.Lead_change import LeadChange
+from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import CustomerIOClient
 
