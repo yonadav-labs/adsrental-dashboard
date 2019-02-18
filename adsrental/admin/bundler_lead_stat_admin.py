@@ -8,6 +8,11 @@ from adsrental.models.bundler_lead_stat import BundlerLeadStat
 
 
 class BundlerLeadStatsAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+
     model = BundlerLeadStat
     list_display = (
         # 'id',
@@ -177,5 +182,14 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     qualified_total_field.short_description = 'Qualified total'
     qualified_total_field.admin_order_field = 'qualified_total'
 
-    delivered_not_connected_last_14_days_field.short_description = 'Delivered not connected (last 14 days)'
+    delivered_not_connected_last_14_days_field.short_description = 'Delivered not connected'
     delivered_not_connected_last_14_days_field.admin_order_field = 'delivered_not_connected_last_14_days'
+
+    delivered_connected_last_14_days.short_description = 'Delivered connected'
+    delivered_connected_last_14_days.admin_order_field = 'delivered_connected_last_14_days'
+
+    delivered_connected_last_14_days_percent.short_description = 'Delivered connected percent'
+    delivered_connected_last_14_days_percent.admin_order_field = 'delivered_connected_last_14_days_percent'
+
+    in_progress_total_issue_percent.short_description = 'In-Progress issues percent'
+    in_progress_total_issue_percent.admin_order_field = 'in_progress_total_issue_percent'
