@@ -84,7 +84,7 @@ class GenerateBundlerBonusesView(CronView):
             )
             bundler_payment.payment = bundler_stat['bonus']
             bundler_payment.datetime = payment_datetime
-            bundler_payment.ready = end_date > now
+            bundler_payment.ready = end_date < now
             if self.is_execute():
                 bundler_payment.save()
             bundler_payments.append(bundler_payment)
