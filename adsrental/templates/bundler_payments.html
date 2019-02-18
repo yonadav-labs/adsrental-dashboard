@@ -72,7 +72,7 @@
     {% for record in payments_total_by_bundler %}
         <h3>
             {% if show_bundler_name %}
-                Bundler {{ record.bundler_name }} (UTM source {{ record.bundler__utm_source }}) paid report {{ end_date }}
+                Bundler {{ record.bundler__name }} (UTM source {{ record.bundler__utm_source }}) paid report {{ end_date }}
             {% else %}
                 UTM source {{ record.bundler__utm_source }} paid report {{ end_date }}
             {% endif %}
@@ -163,7 +163,7 @@
                         <tr>
                             <td>
                                 {% if show_bundler_name %}
-                                    {{ payment.lead_account.lead.bundler.name }}
+                                    {{ payment.lead_account.lead.bundler.name }} ({{ payment.lead_account.lead.bundler.utm_source }})
                                 {% else %}
                                     {{ payment.lead_account.lead.bundler.utm_source }}
                                 {% endif %}
