@@ -1,5 +1,6 @@
 import datetime
 import io
+import decimal
 
 from django.db.models import Q, Sum
 from django.shortcuts import render, Http404, redirect, get_object_or_404
@@ -43,11 +44,30 @@ class BundlerPaymentsView(View):
             report = get_object_or_404(BundlerPaymentsReport, id=report_id)
             report_date = report.date
 
-        bundler_payments = BundlerPayment.objects.filter(ready=True, report_id=report_id, bundler__in=available_bundlers, datetime__lte=today).select_related(
+        bundler_payments = BundlerPayment.objects.filter(
+            ready=True,
+            report_id=report_id,
+            bundler__in=available_bundlers,
+            datetime__lte=today,
+        ).exclude(
+            payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
+        ).select_related(
             'bundler',
             'lead_account',
             'lead_account__lead',
             'lead_account__lead__bundler',
+        ).order_by('-payment')
+
+        bundler_chargebacks = BundlerPayment.objects.filter(
+            ready=True,
+            report_id=report_id,
+            bundler__in=available_bundlers,
+            datetime__lte=today,
+            payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
+        ).select_related(
+            'bundler',
+            'lead_account',
+            'lead_account__lead',
         ).order_by('-payment')
         bundler_payments_total_by_bundler = bundler_payments.values('bundler_id', 'bundler__name', 'bundler__utm_source').annotate(
             payment__sum=Sum('payment'),
@@ -72,10 +92,22 @@ class BundlerPaymentsView(View):
         bundler_payments_by_bundler_id = {}
         children_bundler_payments_by_bundler_id = {}
         for record in bundler_payments_total_by_bundler:
-            report_bundler_id = record['bundler_id']
-            bundler_payments_for_id = bundler_payments.filter(bundler_id=report_bundler_id)
-            bundler_payments_by_bundler_id[report_bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN).order_by('lead_account__account_type')
-            children_bundler_payments_by_bundler_id[report_bundler_id] = bundler_payments_for_id.filter(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT).order_by('lead_account__account_type', 'lead_account__lead__bundler')
+            record_bundler_id = record['bundler_id']
+            bundler_payments_for_id = bundler_payments.filter(bundler_id=record_bundler_id)
+            bundler_payments_by_bundler_id[record_bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN).order_by('lead_account__account_type')
+            children_bundler_payments_by_bundler_id[record_bundler_id] = bundler_payments_for_id.filter(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT).order_by('lead_account__account_type', 'lead_account__lead__bundler')
+
+        bundler_chargebacks_by_bundler_id = {}
+        for record in bundler_payments_total_by_bundler:
+            record_bundler_id = record['bundler_id']
+            chargebacks = bundler_chargebacks.filter(bundler_id=record_bundler_id)
+            bundler_chargebacks_by_bundler_id[record_bundler_id] = []
+            for chargeback in chargebacks:
+                if record['payment__sum'] + chargeback.payment >= 0:
+                    chargebacks.append(chargeback)
+                    record['payment__sum'] = record['payment__sum'] + chargeback.payment
+                    bundler_payments_total['payment__sum'] = bundler_payments_total['payment__sum'] + chargeback.payment
+                    bundler_payments_total['chargeback__sum'] = bundler_payments_total.get('chargeback__sum', decimal.Decimal('0.00')) - chargeback.payment
 
         context = dict(
             bundler_id=bundler_id,
@@ -86,6 +118,7 @@ class BundlerPaymentsView(View):
             payments_total_by_bundler=bundler_payments_total_by_bundler,
             payments_total=bundler_payments_total,
             payments_by_bundler_id=bundler_payments_by_bundler_id,
+            chargebacks_by_bundler_id=bundler_chargebacks_by_bundler_id,
             children_payments_by_bundler_id=children_bundler_payments_by_bundler_id,
             show_bundler_name=request.user.is_superuser or request.user.is_bookkeeper(),
             allow_change=request.user.is_superuser or request.user.is_bookkeeper(),
@@ -109,6 +142,11 @@ class BundlerPaymentsView(View):
             )
             report.save()
             bundler_payments.update(report=report, paid=True)
+            for chargebacks in bundler_chargebacks_by_bundler_id.values():
+                for chargeback in chargebacks:
+                    chargeback.report = report
+                    chargeback.paid = True
+                    chargeback.save()
 
             messages.success(request, 'New report was successfully generated')
             if request.user.is_bookkeeper():

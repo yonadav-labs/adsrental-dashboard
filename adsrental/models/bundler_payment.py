@@ -32,9 +32,15 @@ class BundlerPayment(models.Model):
         [50, decimal.Decimal(500)],
         [40, decimal.Decimal(400)],
         [30, decimal.Decimal(300)],
+        [25, decimal.Decimal(250)],
         [20, decimal.Decimal(200)],
+        [15, decimal.Decimal(150)],
         [10, decimal.Decimal(100)],
+        [5, decimal.Decimal(50)],
     ]
+
+    def __str__(self):
+        return f'Bundler {self.bundler} {self.payment_type} payment for ${self.payment}'
 
     lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.SET_NULL, null=True)
     bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True, db_index=True)

@@ -57,6 +57,12 @@
                         <td>${{ payments_total.payment_bonus__sum }}</td>
                     </tr>
                 {% endif %}
+                {% if payments_total.chargeback__sum %}
+                    <tr>
+                        <td>Total chargeback</td>
+                        <td>${{ payments_total.chargeback__sum }}</td>
+                    </tr>
+                {% endif %}
                 {% if payments_total.payment__sum %}
                     <tr>
                         <td>Total pay</td>

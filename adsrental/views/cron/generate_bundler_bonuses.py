@@ -1,5 +1,6 @@
 import decimal
 import datetime
+from dateutil import parser
 
 from django.db.models import Count
 from django.utils import timezone
@@ -7,7 +8,6 @@ from django.utils import timezone
 from adsrental.views.cron.base import CronView
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler_payment import BundlerPayment
-from adsrental.utils import get_week_boundaries_for_dt
 
 
 class GenerateBundlerBonusesView(CronView):
@@ -20,10 +20,15 @@ class GenerateBundlerBonusesView(CronView):
         return decimal.Decimal('0.00')
 
     def get(self, request):
-        now = timezone.now()
-        date = now - datetime.timedelta(days=1)
+        now = timezone.localtime(timezone.now())
+        date_str = request.GET.get('date')
+        if date_str:
+            date = parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
+        else:
+            date = now - datetime.timedelta(days=1)
 
-        start_date, end_date = get_week_boundaries_for_dt(date)
+        start_date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = start_date + datetime.timedelta(days=1)
 
         bundler_stats = LeadAccount.objects.filter(
             account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
@@ -66,6 +71,7 @@ class GenerateBundlerBonusesView(CronView):
                 final_bundler_stats[bundler_id]['own_lead_accounts_count'] += bundler_stat['lead_accounts_count']
 
         final_bundler_stats = list(final_bundler_stats.values())
+        final_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
 
         for bundler_stat in final_bundler_stats:
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
@@ -89,9 +95,9 @@ class GenerateBundlerBonusesView(CronView):
                     payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
                 )
             bundler_payment.payment = bundler_stat['bonus']
-            bundler_payment.ready = end_date < now
+            bundler_payment.ready = True
             if self.is_execute():
                 bundler_payment.save()
             bundler_payments.append(bundler_payment)
 
-        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), i.ready, bundler_payment.datetime] for i in bundler_payments]})
+        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), bundler_payment.datetime] for i in bundler_payments]})

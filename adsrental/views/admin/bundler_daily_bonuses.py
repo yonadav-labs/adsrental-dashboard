@@ -10,28 +10,13 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count
 
 from adsrental.models.lead_account import LeadAccount
-
-BONUSES = [
-    [100, decimal.Decimal(3000)],
-    [90, decimal.Decimal(2500)],
-    [80, decimal.Decimal(2000)],
-    [70, decimal.Decimal(1500)],
-    [60, decimal.Decimal(1000)],
-    [50, decimal.Decimal(500)],
-    [40, decimal.Decimal(400)],
-    [30, decimal.Decimal(300)],
-    [25, decimal.Decimal(250)],
-    [20, decimal.Decimal(200)],
-    [15, decimal.Decimal(150)],
-    [10, decimal.Decimal(100)],
-    [5, decimal.Decimal(50)],
-]
+from adsrental.models.bundler_payment import BundlerPayment
 
 
 class AdminBundlerDailyBonusesView(View):
     @staticmethod
     def get_bonus(lead_accounts_count):
-        for count, bonus in BONUSES:
+        for count, bonus in BundlerPayment.BONUSES:
             if lead_accounts_count >= count:
                 return bonus
 
@@ -75,7 +60,6 @@ class AdminBundlerDailyBonusesView(View):
         # bundler_stats.sort(key=lambda x:x['lead_accounts_count'], reverse=True)
 
         final_bundler_stats = {}
-
 
         for bundler_stat in bundler_stats:
             bundler_id = bundler_stat['lead__bundler_id']

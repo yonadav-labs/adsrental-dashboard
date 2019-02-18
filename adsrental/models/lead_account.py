@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import decimal
 import typing
+import datetime
 
 import requests
 from django.utils import timezone
@@ -196,17 +197,23 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 result -= self.get_parent_bundler_payment(bundler)
                 result -= self.get_second_parent_bundler_payment(bundler)
 
-        if bundler.enable_chargeback and self.charge_back and self.bundler_paid and not self.charge_back_billed:
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
-                result -= bundler.facebook_chargeback
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
-                result -= bundler.facebook_chargeback
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                result -= bundler.google_chargeback
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
-                result -= bundler.amazon_chargeback
-
         return result
+
+    def get_bundler_chargeback(self, bundler: Bundler) -> decimal.Decimal:
+        if not bundler.enable_chargeback or not self.in_progress_date or not self.banned_date:
+            return decimal.Decimal('0.00')
+
+        if self.in_progress_date < self.banned_date - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
+            return decimal.Decimal('0.00')
+
+        if self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK and bundler.facebook_chargeback:
+            return - bundler.facebook_chargeback
+        if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE and bundler.google_chargeback:
+            return - bundler.google_chargeback
+        if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON and bundler.amazon_chargeback:
+            return - bundler.amazon_chargeback
+
+        return decimal.Decimal('0.00')
 
     def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
@@ -425,6 +432,19 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             entry.save()
             result.append(entry)
 
+        chargeback = self.get_bundler_chargeback(bundler)
+        if chargeback:
+            entry, _ = BundlerPayment.objects.get_or_create(
+                bundler=bundler,
+                lead_account=self,
+                payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
+                defaults=dict(payment=chargeback)
+            )
+            entry.payment = chargeback
+            entry.datetime = self.banned_date
+            entry.save()
+            result.append(entry)
+
         return result
 
     def set_status(self, value: str, edited_by: User) -> bool:
@@ -446,7 +466,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
 
-        if value == self.STATUS_IN_PROGRESS:
+        if self.status in (self.STATUS_IN_PROGRESS, self.STATUS_BANNED):
             self.generate_payments()
             self.insert_note(f'Bundler payments generated')
 
@@ -462,8 +482,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.ban_reason = reason
         self.banned_date = now
         self.ban_note = note
-        # if self.in_progress_date and self.in_progress_date > now - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
-        #     self.charge_back = True
 
         self.save()
 
