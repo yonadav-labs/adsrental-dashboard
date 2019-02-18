@@ -11,7 +11,9 @@
 <div class="container">
     {% block actions_buttons %}
         {% if allow_change %}
-            <a target="_blank" href="{% url 'bundler_payments' bundler_id='all' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
+            {% if report_id is None %}
+                <a target="_blank" href="{% url 'bundler_payments' bundler_id=bundler_id %}?save=true"><button class="btn btn-primary">Generate a new report</button></a>
+            {% endif %}
         {% endif %}
     {% endblock actions_buttons %}
 

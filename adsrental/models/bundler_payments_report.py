@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import re
+import json
 import typing
 
 from django.db import models
@@ -28,19 +28,18 @@ class BundlerPaymentsReport(models.Model):
     def __str__(self):
         return f'Bundler payments report for {self.date}'
 
-    def get_usernames(self) -> typing.List[str]:
-        regexp = r'<td>([^<]+@[^<]+)</td>'
-        emails = re.findall(regexp, self.html)
-
-        regexp = r'<td>(\d{8,40})</td>'
-        phones = re.findall(regexp, self.html)
-        usernames = phones + emails
-        return usernames
-
     def get_lead_accounts(self) -> models.query.QuerySet:
-        usernames = self.get_usernames()
-        lead_accounts = LeadAccount.objects.filter(username__in=usernames, active=True, bundler_paid=True, bundler_paid_date=self.date)
-        return lead_accounts
+        result = []
+        if not self.data:
+            return result
+        data = json.loads(self.data)
+        keys = ['facebook_entries', 'google_entries', 'amazon_entries']
+        for entry in data:
+            for key in keys:
+                for lead_account_entry in entry[key]:
+                    result.append(LeadAccount.objects.get(id=lead_account_entry['id']))
+
+        return result
 
     def get_html_for_bundler(self, bundler: Bundler) -> str:
         html = self.html

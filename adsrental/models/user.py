@@ -47,3 +47,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_bookkeeper(self) -> bool:
         return self.groups.filter(name='Bookkeeper').exists()
+
+    def can_access_bundler(self, bundler) -> bool:
+        if self.bundler == bundler:
+            return False
+
+        if self.is_superuser:
+            return True
+
+        if self.is_bookkeeper():
+            return True
+
+        return False

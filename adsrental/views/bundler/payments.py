@@ -2,7 +2,7 @@ import datetime
 import io
 
 from django.db.models import Q, Sum
-from django.shortcuts import render, Http404, redirect
+from django.shortcuts import render, Http404, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -20,17 +20,18 @@ from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
 class BundlerPaymentsView(View):
     @method_decorator(login_required)
-    def get(self, request, bundler_id):
-        bundlers = []
+    def get(self, request, bundler_id, report_id):
+        bundlers = Bundler.objects.all()
 
-        if request.user.is_superuser or request.user.is_bookkeeper():
-            if bundler_id == 'all':
-                bundlers = Bundler.objects.all()
-            else:
-                bundlers = Bundler.objects.filter(id=bundler_id)
+        if bundler_id is not None:
+            bundlers = bundlers.filter(id=bundler_id)
 
         if request.user.bundler:
-            bundlers = [request.user.bundler]
+            bundlers = bundlers.filter(id=request.user.bundler.id)
+
+        for bundler in bundlers:
+            if not request.user.can_access_bundler(bundler):
+                raise Http404
 
         if not bundlers:
             raise Http404
@@ -38,8 +39,13 @@ class BundlerPaymentsView(View):
         now = timezone.localtime(timezone.now())
         today = now.replace(hour=0, minute=0, second=0)
         yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
+        report_date = yesterday
 
-        bundler_payments = BundlerPayment.objects.filter(ready=True, paid=False, bundler__in=bundlers, datetime__lte=today).select_related(
+        if report_id is not None:
+            report = get_object_or_404(BundlerPaymentsReport, id=report_id)
+            report_date = report.date
+
+        bundler_payments = BundlerPayment.objects.filter(ready=True, report_id=report_id, bundler__in=bundlers, datetime__lte=today).select_related(
             'bundler',
             'lead_account',
             'lead_account__lead',
@@ -68,14 +74,16 @@ class BundlerPaymentsView(View):
         bundler_payments_by_bundler_id = {}
         children_bundler_payments_by_bundler_id = {}
         for record in bundler_payments_total_by_bundler:
-            bundler_id = record['bundler_id']
-            bundler_payments_for_id = bundler_payments.filter(bundler_id=bundler_id)
-            bundler_payments_by_bundler_id[bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN).order_by('lead_account__account_type')
-            children_bundler_payments_by_bundler_id[bundler_id] = bundler_payments_for_id.filter(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT).order_by('lead_account__account_type', 'lead_account__lead__bundler')
+            report_bundler_id = record['bundler_id']
+            bundler_payments_for_id = bundler_payments.filter(bundler_id=report_bundler_id)
+            bundler_payments_by_bundler_id[report_bundler_id] = bundler_payments_for_id.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN).order_by('lead_account__account_type')
+            children_bundler_payments_by_bundler_id[report_bundler_id] = bundler_payments_for_id.filter(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT).order_by('lead_account__account_type', 'lead_account__lead__bundler')
 
         context = dict(
+            bundler_id=bundler_id,
+            report_id=report_id,
             user=request.user,
-            end_date=yesterday,
+            end_date=report_date,
             payments=bundler_payments,
             payments_total_by_bundler=bundler_payments_total_by_bundler,
             payments_total=bundler_payments_total,

@@ -31,7 +31,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{url}">View</a>'.format(url=reverse('admin_bundler_report_payments', kwargs=dict(report_id=obj.id))))
+        result.append('<a target="_blank" href="{url}">View</a>'.format(url=reverse('bundler_payments', kwargs=dict(report_id=obj.id))))
         result.append('<a target="_blank" href="{url}">Download PDF</a>'.format(url=obj.pdf.url))
         return mark_safe(', '.join(result))
 
@@ -41,6 +41,8 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     def discard_report(self, request, queryset):
         for report in queryset:
             BundlerPayment.objects.filter(report=report).update(report=None, paid=False)
+            report.cancelled = True
+            report.save()
             messages.success(request, f'Report for {report.date} has been disacarded')
 
     def send_by_email(self, request, queryset):

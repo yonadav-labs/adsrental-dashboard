@@ -33,7 +33,7 @@
                 </td>
                 <td>
                     <a class="btn btn-primary" target="_blank" href="{{ report.pdf.url|safe }}">PDF</a>
-                    <a class="btn btn-default" target="_blank"  href="{% url 'bookkeeper_report_html' report_id=report.id %}">HTML</a>
+                    <a class="btn btn-default" target="_blank"  href="{% url 'bookkeeper_report_view' report_id=report.id %}">HTML</a>
                 </td>
                 <td>
                     {% if report.email_sent %}
