@@ -8,7 +8,7 @@ from adsrental.models.bundler_payment import BundlerPayment
 
 
 class BundlerPaymentAdmin(admin.ModelAdmin):
-    list_per_page = 1000
+    list_per_page = 100
     change_list_template = 'admin/change_list_total.html'
 
     model = BundlerPayment
@@ -28,6 +28,8 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
         'paid',
         'bundler',
     )
+    list_select_related = ('lead_account', 'bundler', 'report')
+    raw_id_fields = ('lead_account', )
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
