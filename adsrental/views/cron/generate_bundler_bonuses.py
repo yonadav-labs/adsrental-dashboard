@@ -4,6 +4,7 @@ from dateutil import parser
 
 from django.db.models import Count
 from django.utils import timezone
+from django.conf import settings
 
 from adsrental.views.cron.base import CronView
 from adsrental.models.lead_account import LeadAccount
@@ -105,4 +106,4 @@ class GenerateBundlerBonusesView(CronView):
                 bundler_payment.save()
             bundler_payments.append(bundler_payment)
 
-        return self.render({'bundler_payments': [[i.bundler.name, str(i.payment), bundler_payment.datetime] for i in bundler_payments]})
+        return self.render({'now': now.strftime(settings.SYSTEM_DATETIME_FORMAT), 'bundler_payments': [[i.bundler.name, str(i.payment), bundler_payment.datetime] for i in bundler_payments]})
