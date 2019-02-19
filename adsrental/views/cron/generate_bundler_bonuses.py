@@ -95,6 +95,11 @@ class GenerateBundlerBonusesView(CronView):
                     payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
                 )
             bundler_payment.payment = bundler_stat['bonus']
+
+            extra = f"{bundler_stat['lead_accounts_count']} lead accounts"
+            if bundler_stat['bonus_lead_accounts_count']:
+                extra = f"{extra} ({bundler_stat['own_lead_accounts_count']} own, {bundler_stat['bonus_lead_accounts_count']} from children)"
+            bundler_payment.extra = extra
             bundler_payment.ready = True
             if self.is_execute():
                 bundler_payment.save()

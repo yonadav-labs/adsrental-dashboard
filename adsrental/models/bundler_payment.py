@@ -48,6 +48,7 @@ class BundlerPayment(models.Model):
     payment_type = models.CharField(max_length=50, choices=PAYMENT_TYPE_CHOICES, default=PAYMENT_TYPE_ACCOUNT_MAIN, db_index=True)
     report = models.ForeignKey('adsrental.BundlerPaymentsReport', on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
     datetime = models.DateTimeField(default=timezone.now)
+    extra = models.TextField(null=True, blank=True)
     paid = models.BooleanField(default=False, db_index=True)
     ready = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)

@@ -266,6 +266,7 @@
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Info</th>
                         <th>Payment</th>
                     </tr>
                 </thead>
@@ -276,6 +277,9 @@
                                 {{ payment.datetime|date }}
                             </td>
                             <td>
+                                {{payment.extra}}
+                            </td>
+                            <td>
                                 ${{payment.payment}}
                             </td>
                         </tr>
@@ -283,7 +287,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>Total</th>
+                        <th colspan="2">Total</th>
                         <th>${{record.payment_bonus__sum}}</th>
                     </tr>
                 </tfoot>
