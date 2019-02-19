@@ -48,7 +48,6 @@ class BundlerPaymentsView(View):
             ready=True,
             report_id=report_id,
             bundler__in=available_bundlers,
-            datetime__lte=today,
         ).exclude(
             payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
         ).select_related(
