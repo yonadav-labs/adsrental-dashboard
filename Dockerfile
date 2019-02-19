@@ -19,7 +19,7 @@ ADD ./scripts/ /app/scripts/
 ADD ./adsrental/ /app/adsrental/
 ADD ./restapi/ /app/restapi/
 ADD ./config/nginx/web.conf /etc/nginx/conf.d/nginx.conf
-ADD ./config/nginx/nginx.conf /etc/nginx/nginx.conf
+ADD ./config/nginx/nginx.conf /app/nginx.conf
 
 EXPOSE 80
 EXPOSE 443
