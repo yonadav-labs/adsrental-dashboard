@@ -32,18 +32,30 @@
                             <td>{{payment_types_map|get_key:entry.payment_type}}</td>
                             <td>
                                 {% if entry.paid_sum %}
-                                    <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ bundler.id }}&amp;paid__exact=1&amp;payment_type__exact={{entry.payment_type}}">
-                                        ${{entry.paid_sum}}
-                                    </a>
+                                    {% if bundler %}
+                                        <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ bundler.id }}&amp;paid__exact=1&amp;payment_type__exact={{entry.payment_type}}">
+                                            ${{entry.paid_sum}}
+                                        </a>
+                                    {% else %}
+                                        <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?paid__exact=1&amp;payment_type__exact={{entry.payment_type}}">
+                                            ${{entry.paid_sum}}
+                                        </a>
+                                    {% endif %}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td>
                                 {% if entry.not_paid_sum %}
-                                    <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ bundler.id }}&amp;paid__exact=0&amp;payment_type__exact={{entry.payment_type}}">
-                                        ${{entry.not_paid_sum}}
-                                    </a>
+                                    {% if bundler %}
+                                        <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?bundler__id__exact={{ bundler.id }}&amp;paid__exact=0&amp;payment_type__exact={{entry.payment_type}}">
+                                            ${{entry.not_paid_sum}}
+                                        </a>
+                                    {% else %}
+                                        <a target="_blank" href="{% url 'admin:adsrental_bundlerpayment_changelist' %}?paid__exact=0&amp;payment_type__exact={{entry.payment_type}}">
+                                            ${{entry.not_paid_sum}}
+                                        </a>
+                                    {% endif %}
                                 {% else %}
                                     -
                                 {% endif %}
