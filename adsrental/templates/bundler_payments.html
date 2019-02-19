@@ -92,7 +92,7 @@
                         <th>Lead</th>
                         <th>Account</th>
                         <th>Account type</th>
-                        <th>In progress since</th>
+                        <th>Date</th>
                         <th>Status</th>
                         <th>Payment</th>
                     </tr>
@@ -140,7 +140,7 @@
                                 {{ payment.lead_account.account_type }}
                             </td>
                             <td>
-                                {{ payment.lead_account.in_progress_date|date }}
+                                {{ payment.lead_account.banned_date|date }}
                             </td>
                             <td>
                                 {{ payment.lead_account.status }}

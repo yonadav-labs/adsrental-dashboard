@@ -61,7 +61,6 @@ class BundlerPaymentsView(View):
             ready=True,
             report_id=report_id,
             bundler__in=available_bundlers,
-            datetime__lte=today,
             payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
         ).select_related(
             'bundler',
@@ -104,9 +103,11 @@ class BundlerPaymentsView(View):
             chargebacks = bundler_chargebacks.filter(bundler_id=record_bundler_id)
             bundler_chargebacks_by_bundler_id[record_bundler_id] = []
             for chargeback in chargebacks:
-                if record['payment__sum'] + chargeback.payment >= 0:
-                    chargebacks.append(chargeback)
+                if record['own_payment__sum'] + chargeback.payment >= 0:
+                    bundler_chargebacks_by_bundler_id[record_bundler_id].append(chargeback)
+                    record['own_payment__sum'] = record['own_payment__sum'] + chargeback.payment
                     record['payment__sum'] = record['payment__sum'] + chargeback.payment
+                    record['chargeback__sum'] = record.get('chargeback__sum', decimal.Decimal('0.00')) + chargeback.payment
                     bundler_payments_total['payment__sum'] = bundler_payments_total['payment__sum'] + chargeback.payment
                     bundler_payments_total['chargeback__sum'] = bundler_payments_total.get('chargeback__sum', decimal.Decimal('0.00')) - chargeback.payment
 
