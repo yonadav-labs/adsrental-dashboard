@@ -20,7 +20,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_paid',
         'send_by_email',
-        'discard_report',
+        'cancel_report',
     )
 
     def get_actions(self, request):
@@ -38,7 +38,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
     def mark_as_paid(self, request, queryset):
         queryset.update(paid=True)
 
-    def discard_report(self, request, queryset):
+    def cancel_report(self, request, queryset):
         for report in queryset:
             bundler_payments = BundlerPayment.objects.filter(report=report).select_related('lead_account')
             for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN):
@@ -50,10 +50,10 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
             bundler_payments.update(report=None, paid=False)
             report.cancelled = True
             report.save()
-            messages.success(request, f'Report for {report.date} has been disacarded')
+            messages.success(request, f'Report for {report.date} has been cancelled')
 
     def send_by_email(self, request, queryset):
         for report in queryset:
             report.send_by_email()
 
-    discard_report.short_description = 'DEBUG: Discard this report'
+    cancel_report.short_description = 'DEBUG: Cancel this report'
