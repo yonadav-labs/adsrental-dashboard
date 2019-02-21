@@ -51,7 +51,7 @@ class BundlerPaymentsView(View):
             ready=True,
             report_id=report_id,
             bundler__in=available_bundlers,
-            lead_account__lead__raspberry_pi__last_seen__gte=now_utc - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+            lead_account__lead__raspberry_pi__last_seen__gte=RaspberryPi.get_last_seen_online_dt(now_utc),
             lead_account__wrong_password_date__isnull=True,
             lead_account__security_checkpoint_date__isnull=True,
         )

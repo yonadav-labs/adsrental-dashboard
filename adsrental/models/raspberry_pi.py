@@ -230,6 +230,14 @@ class RaspberryPi(models.Model):
         now = timezone.localtime(timezone.now())
         return cls.objects.all().exclude(last_seen__gte=now - datetime.timedelta(minutes=cls.online_minutes_ttl))
 
+    @classmethod
+    def get_last_seen_online_dt(cls, now=None) -> datetime.datetime:
+        if not now:
+            now = timezone.now()
+        if settings.LOCAL:
+            return now - datetime.timedelta(days=180)
+        return now - datetime.timedelta(minutes=cls.online_minutes_ttl)
+
     def get_first_seen(self) -> typing.Optional[datetime.datetime]:
         if self.first_seen is None:
             return None
