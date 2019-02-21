@@ -58,7 +58,7 @@ class BundlerPaymentsView(View):
         if report:
             bundler_payments = BundlerPayment.objects.filter(
                 ready=True,
-                report_id=report_id,
+                report=report,
                 bundler__in=available_bundlers,
             )
 
@@ -158,12 +158,13 @@ class BundlerPaymentsView(View):
                 pdf=ContentFile(pdf_stream.read(), name='{}.pdf'.format(yesterday)),
             )
             report.save()
-            bundler_payments.update(report=report, paid=True)
             for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN):
                 lead_account = bundler_payment.lead_account
                 lead_account.bundler_paid = True
                 lead_account.bundler_paid_date = now_utc
                 lead_account.save()
+
+            bundler_payments.update(report=report, paid=True)
             for chargebacks in bundler_chargebacks_by_bundler_id.values():
                 for chargeback in chargebacks:
                     chargeback.report = report

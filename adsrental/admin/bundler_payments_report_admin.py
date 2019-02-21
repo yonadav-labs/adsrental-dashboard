@@ -40,6 +40,9 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def cancel_report(self, request, queryset):
         for report in queryset:
+            if report.cancelled:
+                messages.warning(request, f'Report for {report.date} is already cacelled')
+                continue
             bundler_payments = BundlerPayment.objects.filter(report=report).select_related('lead_account')
             for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN):
                 lead_account = bundler_payment.lead_account
