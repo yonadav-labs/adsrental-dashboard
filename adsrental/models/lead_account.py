@@ -200,6 +200,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         return result
 
     def get_bundler_chargeback(self, bundler: Bundler) -> decimal.Decimal:
+        if not self.bundler_paid:
+            return decimal.Decimal('0.00')
+
         if not bundler.enable_chargeback or not self.in_progress_date or not self.banned_date:
             return decimal.Decimal('0.00')
 
@@ -404,6 +407,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             entry.payment = payment
             entry.datetime = payment_datetime
             entry.save()
+            if not self.bundler_paid:
+                self.bundler_paid = True
+                self.bundler_paid_date = payment_datetime
+                self.save()
             result.append(entry)
         parent_payment = self.get_parent_bundler_payment(bundler)
         if parent_payment:
