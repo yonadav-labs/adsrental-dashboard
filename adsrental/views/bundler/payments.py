@@ -171,6 +171,10 @@ class BundlerPaymentsView(View):
                     chargeback.paid = True
                     chargeback.save()
 
+                    lead_account = chargeback.lead_account
+                    lead_account.charge_back_billed = True
+                    lead_account.save()
+
             messages.success(request, 'New report was successfully generated')
             if request.user.is_bookkeeper():
                 return redirect('bookkeeper_reports_list')

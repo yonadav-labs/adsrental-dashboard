@@ -49,6 +49,10 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
                 lead_account.bundler_paid = False
                 lead_account.bundler_paid_date = None
                 lead_account.save()
+            for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK):
+                lead_account = bundler_payment.lead_account
+                lead_account.charge_back_billed = False
+                lead_account.save()
 
             bundler_payments.update(report=None, paid=False)
             report.cancelled = True
