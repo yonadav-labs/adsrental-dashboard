@@ -159,7 +159,7 @@ class BundlerPaymentsView(View):
             )
             report.save()
             bundler_payments.update(report=report, paid=True)
-            for bundler_payment in bundler_payments:
+            for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN):
                 lead_account = bundler_payment.lead_account
                 lead_account.bundler_paid = True
                 lead_account.bundler_paid_date = now_utc

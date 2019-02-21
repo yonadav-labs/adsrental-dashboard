@@ -40,7 +40,14 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def discard_report(self, request, queryset):
         for report in queryset:
-            BundlerPayment.objects.filter(report=report).update(report=None, paid=False)
+            bundler_payments = BundlerPayment.objects.filter(report=report).select_related('lead_account')
+            for bundler_payment in bundler_payments.filter(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN):
+                lead_account = bundler_payment.lead_account
+                lead_account.bundler_paid = False
+                lead_account.bundler_paid_date = None
+                lead_account.save()
+
+            bundler_payments.update(report=None, paid=False)
             report.cancelled = True
             report.save()
             messages.success(request, f'Report for {report.date} has been disacarded')

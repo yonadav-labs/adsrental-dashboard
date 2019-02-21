@@ -39,9 +39,6 @@ class BundlerPayment(models.Model):
         [5, decimal.Decimal(50)],
     ]
 
-    def __str__(self):
-        return f'Bundler {self.bundler} {self.payment_type} payment for ${self.payment}'
-
     lead_account = models.ForeignKey('adsrental.LeadAccount', on_delete=models.SET_NULL, null=True)
     bundler = models.ForeignKey('adsrental.Bundler', on_delete=models.SET_NULL, null=True, db_index=True)
     payment = models.DecimalField(max_digits=8, decimal_places=2)
@@ -52,3 +49,6 @@ class BundlerPayment(models.Model):
     paid = models.BooleanField(default=False, db_index=True)
     ready = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Bundler {self.bundler} {self.payment_type} payment for ${self.payment}'
