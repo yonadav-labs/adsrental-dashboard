@@ -407,10 +407,6 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             entry.payment = payment
             entry.datetime = payment_datetime
             entry.save()
-            if not self.bundler_paid:
-                self.bundler_paid = True
-                self.bundler_paid_date = payment_datetime
-                self.save()
             result.append(entry)
         parent_payment = self.get_parent_bundler_payment(bundler)
         if parent_payment:

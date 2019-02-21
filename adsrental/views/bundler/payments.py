@@ -15,6 +15,7 @@ from xhtml2pdf import pisa
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
+from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 
@@ -35,10 +36,12 @@ class BundlerPaymentsView(View):
         if not available_bundlers:
             raise Http404
 
+        now_utc = timezone.now()
         now = timezone.localtime(timezone.now())
         today = now.replace(hour=0, minute=0, second=0)
         yesterday = (timezone.localtime(timezone.now()) - datetime.timedelta(days=1)).date()
         report_date = yesterday
+        report = None
 
         if report_id is not None:
             report = get_object_or_404(BundlerPaymentsReport, id=report_id)
@@ -48,7 +51,18 @@ class BundlerPaymentsView(View):
             ready=True,
             report_id=report_id,
             bundler__in=available_bundlers,
-        ).exclude(
+            lead_account__lead__raspberry_pi__last_seen__gte=now_utc - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
+            lead_account__wrong_password_date__isnull=True,
+            lead_account__security_checkpoint_date__isnull=True,
+        )
+        if report:
+            bundler_payments = BundlerPayment.objects.filter(
+                ready=True,
+                report_id=report_id,
+                bundler__in=available_bundlers,
+            )
+
+        bundler_payments = bundler_payments.exclude(
             payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
         ).select_related(
             'bundler',
@@ -145,6 +159,11 @@ class BundlerPaymentsView(View):
             )
             report.save()
             bundler_payments.update(report=report, paid=True)
+            for bundler_payment in bundler_payments:
+                lead_account = bundler_payment.lead_account
+                lead_account.bundler_paid = True
+                lead_account.bundler_paid_date = now_utc
+                lead_account.save()
             for chargebacks in bundler_chargebacks_by_bundler_id.values():
                 for chargeback in chargebacks:
                     chargeback.report = report
