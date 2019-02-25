@@ -391,6 +391,7 @@ class LeadAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_leadhistorymonth_changelist'),
             search=obj.email,
         ))
+        result.append(f'''<a target="_blank" href="{reverse('report:lead_cost', kwargs={'leadid': obj.leadid})}">Cost</a>''')
 
         return mark_safe(', '.join(result))
 
