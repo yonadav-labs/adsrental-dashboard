@@ -114,7 +114,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'approve_account',
         'mark_as_qualified',
         'mark_as_disqualified',
-        'mark_as_in_progress_from_disqualified',
+        'mark_as_available_from_disqualified',
         'ban',
         'unban',
         'report_wrong_password',
@@ -315,13 +315,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
             lead_account.disqualify(request.user)
             messages.info(request, '{} is disqualified.'.format(lead_account))
 
-    def mark_as_in_progress_from_disqualified(self, request, queryset):
+    def mark_as_available_from_disqualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.status != LeadAccount.STATUS_DISQUALIFIED:
                 messages.warning(request, f'{lead_account} is {lead_account.status}, skipping')
                 continue
 
-            lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+            lead_account.set_status(LeadAccount.STATUS_AVAILABLE, request.user)
             messages.info(request, f'{lead_account} is moved back to {lead_account.status}')
 
     def ban(self, request, queryset):
