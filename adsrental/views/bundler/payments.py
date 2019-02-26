@@ -54,6 +54,13 @@ class BundlerPaymentsView(View):
             lead_account__lead__raspberry_pi__last_seen__gte=RaspberryPi.get_last_seen_online_dt(now_utc),
             lead_account__wrong_password_date__isnull=True,
             lead_account__security_checkpoint_date__isnull=True,
+        ).exclude(
+            payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
+        ) | BundlerPayment.objects.filter(
+            ready=True,
+            report_id=report_id,
+            bundler__in=available_bundlers,
+            payment_type=BundlerPayment.PAYMENT_TYPE_BONUS,
         )
         if report:
             bundler_payments = BundlerPayment.objects.filter(
