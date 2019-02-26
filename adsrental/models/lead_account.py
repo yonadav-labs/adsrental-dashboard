@@ -209,6 +209,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if self.in_progress_date < self.banned_date - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
             return decimal.Decimal('0.00')
 
+        if self.ban_reason == LeadAccount.BAN_REASON_AUTO_CHECKPOINT:
+            return decimal.Decimal('0.00')
+
         if self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK and bundler.facebook_chargeback:
             return - bundler.facebook_chargeback
         if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE and bundler.google_chargeback:
