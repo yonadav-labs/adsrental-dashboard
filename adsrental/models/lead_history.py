@@ -159,11 +159,16 @@ class LeadHistory(models.Model):
         days_in_month = (self.get_last_day() - self.get_first_day()).days + 1
         note = []
         for lead_account in self.lead.lead_accounts.filter(active=True):
-            created_date = lead_account.created.date()
-            if created_date > self.date:
-                note.append('{type} account was created only on {date} ($0.00)'.format(
+            if not lead_account.in_progress_date:
+                note.append('{type} account is not in-progress yet ($0.00)'.format(
                     type=lead_account.get_account_type_display(),
-                    date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
+                ))
+                continue
+            in_progress_date = lead_account.in_progress_date.date()
+            if in_progress_date > self.date:
+                note.append('{type} account became in progress only on {date} ($0.00)'.format(
+                    type=lead_account.get_account_type_display(),
+                    date=lead_account.in_progress_date.strftime(settings.HUMAN_DATE_FORMAT),
                 ))
                 continue
             if lead_account.is_banned() and (not lead_account.banned_date or lead_account.banned_date.date() <= self.get_last_day()):
@@ -208,9 +213,9 @@ class LeadHistory(models.Model):
                 month_payment = self.AMAZON_MAX_PAYMENT
 
             day_payment = round(month_payment / days_in_month, 4)
-            note.append('{type} account created on {date} (${result})'.format(
+            note.append('{type} account in-progress from {date} (${result})'.format(
                 type=lead_account.get_account_type_display(),
-                date=lead_account.created.strftime(settings.HUMAN_DATE_FORMAT),
+                date=lead_account.in_progress_date.strftime(settings.HUMAN_DATE_FORMAT),
                 result=day_payment,
             ))
             result += day_payment
