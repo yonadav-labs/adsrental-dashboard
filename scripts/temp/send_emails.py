@@ -1,6 +1,5 @@
 from django.core.mail import EmailMessage
 
-from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
 
 lead_accounts = LeadAccount.objects.filter(lead__bundler_id=137, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK, status=LeadAccount.STATUS_AVAILABLE).exclude(note__contains='Account registration reminder email sent').exclude(lead__note__contains='Account registration reminder email sent')
@@ -23,7 +22,7 @@ Email: rageth_chris@yahoo.com
     )
     try:
         email.send()
-    except:
+    except:  # pylint: disable=bare-except
         print('FAIL sending to', lead.email)
         continue
 
