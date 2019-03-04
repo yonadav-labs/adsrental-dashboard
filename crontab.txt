@@ -12,7 +12,7 @@
 */10 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/check_ec2/ >> /root/logs/cron_check_ec2.log
 */2 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/update_ping/ >> /root/logs/cron_update_ping.log
 0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/bundler_lead_stat/ >> /root/logs/cron_bundler_lead_stat.log
-# 0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/sync_adsdb/ >> /root/logs/cron_sync_adsdb.log
+0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/cron/sync_adsdb/ >> /root/logs/cron_sync_adsdb.log
 * * * * * bash /root/dashboard/scripts/webconnect_keepalive.sh >> /root/logs/cron_webconnect_keepalive.log
 0 5 1 * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/app/cron/lead_history/?date=`date --date='-1 month' +\%Y-\%m-\%d`\&aggregate=true >> /root/logs/cron_aggregate.log
 0 6 * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' https://adsrental.com/app/cron/lead_history/?date=`date +\%Y-\%m-\%d`\&aggregate=true >> /root/logs/cron_aggregate_current.log
