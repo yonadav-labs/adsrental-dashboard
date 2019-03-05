@@ -722,6 +722,7 @@ class AdsdbClient():
             result += data.get('data')
             page += 1
             if len(result) >= data.get('count', 0):
+                next_page_exists = False
                 break
 
         return result
