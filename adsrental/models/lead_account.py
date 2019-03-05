@@ -165,7 +165,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def get_bundler(self) -> Bundler:
         return self.lead.bundler
 
-    def get_adsdb_account(self):
+    def get_adsdb_account(self, archive=False):
         if not self.adsdb_account_id:
             return None
 
@@ -176,7 +176,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             json={
                 'limit': 1,
                 'ids': self.adsdb_account_id,
-                'archive': True,
+                'archive': archive,
                 'page': 1,
             },
         ).json()
