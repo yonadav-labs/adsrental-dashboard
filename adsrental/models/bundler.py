@@ -18,6 +18,7 @@ class Bundler(models.Model):
     phone = models.CharField(max_length=255, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     bank_info = models.TextField(null=True, blank=True)
+    slack_tag = models.CharField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(default=True, help_text='If inactive, landing/sugnup page will not be shown for this utm_source.')
     enable_chargeback = models.BooleanField(default=True, help_text='If inactive, no chargeback will be calculated for lead accounts.')
     facebook_payment = models.DecimalField(default=decimal.Decimal(125.00), max_digits=8, decimal_places=2, help_text='Payout for Facebook accounts')
