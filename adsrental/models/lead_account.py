@@ -165,6 +165,25 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def get_bundler(self) -> Bundler:
         return self.lead.bundler
 
+    def get_adsdb_account(self):
+        if not self.adsdb_account_id:
+            return None
+
+        auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
+        data = requests.post(
+            'https://www.adsdb.io/api/v1/accounts/get',
+            auth=auth,
+            json={
+                'limit': 1,
+                'ids': self.adsdb_account_id,
+                'archive': True,
+                'page': 1,
+            },
+        ).json()
+        if not data.get('data'):
+            return None
+        return data['data'][0]
+
     def get_active_timedelta(self):
         if not self.qualified_date or not self.banned_date:
             return None
