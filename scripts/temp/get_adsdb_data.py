@@ -19,13 +19,18 @@ for page in range(1, 1000):
         json={
             'limit': 200,
             # 'ids': ids_filter,
+            # 'sidx': 'accounts.dead_date',
             'page': page,
             'filters': {
                 'rules': [{'field': 'accounts.account_status', 'data': 3}]
             }
         },
     ).json()
-    accounts += data['data']
+    if 'data' in data:
+        accounts += data['data']
+    else:
+        print(data)
+        break
     if not data.get('count') <= len(accounts):
         break
     print('Total', len(accounts))

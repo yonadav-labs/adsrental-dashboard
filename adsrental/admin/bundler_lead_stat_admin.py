@@ -38,6 +38,9 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     actions = (
         'calculate',
     )
+    list_filter = (
+        'bundler__is_active',
+    )
     search_fields = ('id', 'bundler__name')
     change_list_template = 'admin/change_list_total.html'
 
