@@ -4,7 +4,10 @@ import json
 
 import requests
 from django.conf import settings
-from adsrental.models import *
+from adsrental.models.lead_account import LeadAccount
+
+# ids = tuple(map(lambda x: x[0], LeadAccount.objects.filter(adsdb_account_id__isnull=False, status=LeadAccount.STATUS_IN_PROGRESS).values_list('adsdb_account_id')))
+# ids_filter = ','.join(ids)
 
 accounts = []
 auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
@@ -15,12 +18,16 @@ for page in range(1, 1000):
         auth=auth,
         json={
             'limit': 200,
+            # 'ids': ids_filter,
             'page': page,
+            'filters': {
+                'rules': [{'field': 'accounts.account_status', 'data': 3}]
+            }
         },
     ).json()
-    if not data.get('success') or not data.get('data'):
-        break
     accounts += data['data']
+    if not data.get('count') <= len(accounts):
+        break
     print('Total', len(accounts))
 
 user = User.objects.get(email=settings.ADSDBSYNC_USER_EMAIL)
@@ -59,5 +66,8 @@ for account in accounts:
     if la.status != LeadAccount.STATUS_BANNED:
         print('Account will be banned', la.username, la.account_type, la.status)
         la.insert_note('Banned by sync script')
-        la.ban(edited_by=user, reason=LeadAccount.BAN_REASON_QUIT)
+        ban_reason = LeadAccount.BAN_REASON_QUIT
+        if account['ban_message'] in dict(LeadAccount.BAN_REASON_CHOICES).keys():
+            ban_reason = account['ban_message']
+        la.ban(edited_by=user, reason=ban_reason)
         la.save()

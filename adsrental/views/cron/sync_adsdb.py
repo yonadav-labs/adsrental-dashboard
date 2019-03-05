@@ -27,6 +27,9 @@ class SyncAdsDBView(View):
                     json={
                         'limit': 200,
                         'page': page,
+                        'filters': {
+                            'rules': [{'field': 'accounts.account_status', 'data': 3}]
+                        }
                     },
                 ).json()
             except (requests.RequestException, json.JSONDecodeError):
@@ -59,10 +62,10 @@ class SyncAdsDBView(View):
                 continue
 
             messages.append(f'{la.account_type} account {la.username} banned from {la.status}')
-            reason = LeadAccount.BAN_REASON_FACEBOOK_POLICY
-            if la.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
-                reason = LeadAccount.BAN_REASON_GOOGLE_POLICY
-            la.ban(edited_by=user, reason=reason)
+            ban_reason = LeadAccount.BAN_REASON_QUIT
+            if account['ban_message'] in dict(LeadAccount.BAN_REASON_CHOICES).keys():
+                ban_reason = account['ban_message']
+            la.ban(edited_by=user, reason=ban_reason)
 
         return JsonResponse({
             'messages': messages,
