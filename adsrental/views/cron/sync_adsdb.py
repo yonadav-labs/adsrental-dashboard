@@ -27,7 +27,9 @@ class SyncAdsDBView(CronView):
             if adsdb_account['account_status'] != 'Dead':
                 continue
 
-            ban_reason = LeadAccount.BAN_REASON_QUIT
+            ban_reason = LeadAccount.BAN_REASON_FACEBOOK_POLICY
+            if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+                ban_reason = LeadAccount.BAN_REASON_GOOGLE_POLICY
             if adsdb_account['ban_message'] in known_ban_reasons:
                 ban_reason = adsdb_account['ban_message']
 
