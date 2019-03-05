@@ -192,7 +192,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     delivered_connected_last_14_days.admin_order_field = 'delivered_connected_last_14_days'
 
     delivered_connected_last_14_days_percent.short_description = 'Delivered connected percent'
-    delivered_connected_last_14_days_percent.admin_order_field = 'delivered_connected_last_14_days_percent'
+    delivered_connected_last_14_days_percent.admin_order_field = 'delivered_last_14_days'
 
     in_progress_total_issue_percent.short_description = 'In-Progress issues percent'
-    in_progress_total_issue_percent.admin_order_field = 'in_progress_total_issue_percent'
+    in_progress_total_issue_percent.admin_order_field = 'in_progress_total_issue'
