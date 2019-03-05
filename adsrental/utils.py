@@ -695,3 +695,33 @@ def humanize_timedelta(timedeltaobj: datetime.timedelta, short: bool = False) ->
         timetot.append(f'{minutes} {title}')
 
     return ' '.join(timetot)
+
+
+class AdsdbClient():
+    def __init__(self):
+        self.auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
+
+    def get_accounts(self, **kwargs):
+        page = 1
+        next_page_exists = True
+        result = []
+        while next_page_exists:
+            data = requests.post(
+                'https://www.adsdb.io/api/v1/accounts/get',
+                auth=self.auth,
+                json={
+                    'limit': 200,
+                    'page': page,
+                    **kwargs,
+                },
+            ).json()
+            if not data.get('data'):
+                next_page_exists = False
+                break
+
+            result += data.get('data')
+            page += 1
+            if len(result) >= data.get('count', 0):
+                break
+
+        return result
