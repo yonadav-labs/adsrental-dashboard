@@ -399,3 +399,9 @@ class AutoBanSoonForm(forms.Form):
 
 class BundlerPaymentsForm(forms.Form):
     bundler = forms.ModelChoiceField(label='Bundler', queryset=Bundler.objects.all(), required=False)
+
+
+class BanReasonForm(forms.Form):
+    bundler = forms.ModelChoiceField(label='Bundler', queryset=Bundler.objects.all(), required=False)
+    start_date = forms.DateField(label='Start date', widget=forms.SelectDateWidget)
+    end_date = forms.DateField(label='End date', widget=forms.SelectDateWidget)

@@ -668,6 +668,8 @@ def get_month_boundaries_for_dt(d: datetime.datetime) -> typing.Tuple[datetime.d
 
 
 def humanize_timedelta(timedeltaobj: datetime.timedelta, short: bool = False) -> str:
+    if not timedeltaobj:
+        return '-'
     secs = timedeltaobj.total_seconds()
     timetot = []
     if secs < 60:

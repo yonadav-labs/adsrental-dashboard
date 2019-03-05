@@ -152,6 +152,9 @@ class CustomIndexDashboard(Dashboard):
                 [_('Bundler payments total report'), '{}'.format(
                     reverse('report:bundler_payments'),
                 )],
+                [_('Ban reason report'), '{}'.format(
+                    reverse('report:ban_reason'),
+                )],
                 [_('DEBUG: Tunnel down'), '{}?{}'.format(
                     reverse('admin:adsrental_ec2instance_changelist'),
                     urlencode(dict(

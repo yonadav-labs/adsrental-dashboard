@@ -165,6 +165,12 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     def get_bundler(self) -> Bundler:
         return self.lead.bundler
 
+    def get_active_timedelta(self):
+        if not self.qualified_date or not self.banned_date:
+            return None
+
+        return self.banned_date - self.qualified_date
+
     def is_approval_needed(self):
         if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
             return True

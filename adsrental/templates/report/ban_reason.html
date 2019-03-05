@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title %}Adsrental | Ban reason report{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Ban reason report</h1>
+
+        <form role="form" action="" method="POST" class="form-horizontal">
+            {% csrf_token %}
+            {{ form|bootstrap_horizontal }}
+            <div class="form-group">
+              <div class="col-sm-10 col-sm-offset-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+              </div>
+            </div>
+        </form>
+
+        {% if lead_accounts %}
+            <h2>Lead accounts</h2>
+            <table class="table table-striped">
+                <thead>
+                    <th>Lead name</th>
+                    <th>Account</th>
+                    <th>Reason</th>
+                    <th>Active time</th>
+                    <th>Charged back</th>
+                </thead>
+                <tbody>
+                    {% for lead_account in lead_accounts %}
+                        <tr>
+                            <td>{{ lead_account.lead.name }}</td>
+                            <td>{{ lead_account.get_account_type_display }}</td>
+                            <td>{{ lead_account.get_ban_reason_display }}</td>
+                            <td>{{ lead_account.get_active_timedelta|humanize_timedelta }}</td>
+                            <td>{% if lead_account.charge_back_billed %}
+                                <span class="glyphicon glyphicon-ok"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-remove"></span>
+                            {% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+         <h3>No data</h3>
+        {% endif %}
+    </div>
+{% endblock %}

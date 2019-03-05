@@ -6,3 +6,8 @@
     border-bottom: 1px dashed gray;
     cursor: pointer;
 }
+
+select.form-control {
+    display: inline-block;
+    width: auto;
+}

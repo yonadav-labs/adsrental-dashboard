@@ -5,6 +5,7 @@ from adsrental.views.report.lead_accounts_weekly import LeadAccountsWeeklyView
 from adsrental.views.report.autoban_soon import AutoBanSoonView
 from adsrental.views.report.bundler_payments import BundlerPaymentsView
 from adsrental.views.report.lead_cost import LeadCostView
+from adsrental.views.report.ban_reason import BanReasonView
 
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('auto_ban/', AutoBanSoonView.as_view(), name='auto_ban'),
     path('bundler_payments/', BundlerPaymentsView.as_view(), name='bundler_payments'),
     path('lead_cost/<leadid>/', LeadCostView.as_view(), name='lead_cost'),
+    path('ban_reason/', BanReasonView.as_view(), name='ban_reason'),
 ]
