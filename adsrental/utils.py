@@ -697,11 +697,37 @@ def humanize_timedelta(timedeltaobj: datetime.timedelta, short: bool = False) ->
     return ' '.join(timetot)
 
 
+class AdsdbClientError(Exception):
+    pass
+
+
+class AdsdbClientNotFoundError(AdsdbClientError):
+    pass
+
+
 class AdsdbClient():
+    BANNED_FILTERS = {'rules': [{'field': 'accounts.account_status', 'data': 3}]}
+
     def __init__(self):
         self.auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
 
-    def get_accounts(self, **kwargs):
+    @staticmethod
+    def chunks(iterable, chunk_size):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(iterable), chunk_size):
+            yield iterable[i:i + chunk_size]
+
+    def get_accounts_by_ids(self, ids, limit=200, **kwargs):
+        result = []
+        for ids_group in self.chunks(ids, limit):
+            try:
+                result += self.get_accounts(limit=len(ids_group), ids=','.join(ids_group), **kwargs)
+            except AdsdbClientError:
+                raise AdsdbClientNotFoundError({'ids': ids_group})
+
+        return result
+
+    def get_accounts(self, limit=200, **kwargs):
         page = 1
         next_page_exists = True
         result = []
@@ -710,14 +736,13 @@ class AdsdbClient():
                 'https://www.adsdb.io/api/v1/accounts/get',
                 auth=self.auth,
                 json={
-                    'limit': 200,
+                    'limit': limit,
                     'page': page,
                     **kwargs,
                 },
             ).json()
             if not data.get('data'):
-                next_page_exists = False
-                break
+                raise AdsdbClientError(data)
 
             result += data.get('data')
             page += 1

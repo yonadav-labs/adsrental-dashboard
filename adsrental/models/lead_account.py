@@ -25,9 +25,19 @@ if typing.TYPE_CHECKING:
 
 
 class LeadAccountQuerySet(BulkUpdateQuerySet):
-    def get_adsdb_data(self):
+    def get_adsdb_data(self, **kwargs):
         adsdb_ids = tuple(filter(lambda x: x is not None, map(lambda x: x[0], self.values_list('adsdb_account_id'))))
-        adsdb_accounts = AdsdbClient().get_accounts(ids=','.join(adsdb_ids), archive=True)
+        adsdb_accounts = AdsdbClient().get_accounts_by_ids(ids=adsdb_ids, **kwargs)
+        adsdb_accounts_map = {}
+        for adsdb_account in adsdb_accounts:
+            adsdb_accounts_map[str(adsdb_account['id'])] = adsdb_account
+        for lead_account in self:
+            lead_account.adsdb_account = adsdb_accounts_map.get(lead_account.adsdb_account_id, None)
+
+        return self
+
+    def get_adsdb_data_safe(self, **kwargs):
+        adsdb_accounts = AdsdbClient().get_accounts(**kwargs)
         adsdb_accounts_map = {}
         for adsdb_account in adsdb_accounts:
             adsdb_accounts_map[str(adsdb_account['id'])] = adsdb_account

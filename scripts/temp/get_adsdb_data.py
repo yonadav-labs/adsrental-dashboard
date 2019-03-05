@@ -20,9 +20,7 @@ for page in range(1, 1000):
             'limit': 200,
             # 'ids': ids_filter,
             'page': page,
-            'filters': {
-                'rules': [{'field': 'accounts.account_status', 'data': 3}]
-            }
+            'filters': {'rules': [{'field': 'accounts.account_status', 'data': 3}]}
         },
     ).json()
     accounts += data['data']
