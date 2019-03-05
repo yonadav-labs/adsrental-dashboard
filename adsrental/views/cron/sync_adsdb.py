@@ -12,12 +12,12 @@ class SyncAdsDBView(CronView):
         safe = request.GET.get('safe', '') == 'true'
         user = User.objects.get(email=settings.ADSDBSYNC_USER_EMAIL)
         known_ban_reasons = dict(LeadAccount.BAN_REASON_CHOICES).keys()
-        lead_accounts = LeadAccount.objects.filter(adsdb_account_id__isnull=False, status=LeadAccount.STATUS_IN_PROGRESS)
+        lead_accounts = LeadAccount.objects.filter(adsdb_account_id__isnull=False).exclude(status=LeadAccount.STATUS_BANNED)
 
         if safe:
             lead_accounts.get_adsdb_data_safe(filters=AdsdbClient.BANNED_FILTERS, archive=True)
         else:
-            lead_accounts.get_adsdb_data(filters=AdsdbClient.BANNED_FILTERS, archive=True)
+            lead_accounts.get_adsdb_data(archive=True)
 
         for lead_account in lead_accounts:
             if not lead_account.adsdb_account:
