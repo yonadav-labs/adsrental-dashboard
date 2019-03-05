@@ -40,5 +40,5 @@ class SyncAdsDBView(CronView):
 
         return self.render({
             'messages': messages,
-            'total_banned': len(messages) - 1,
+            'total_banned': len(messages),
         })
