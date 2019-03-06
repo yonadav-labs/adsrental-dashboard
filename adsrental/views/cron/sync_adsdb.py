@@ -17,7 +17,7 @@ class SyncAdsDBView(CronView):
         if safe:
             lead_accounts.get_adsdb_data_safe(filters=AdsdbClient.BANNED_FILTERS, archive=True)
         else:
-            lead_accounts.get_adsdb_data(archive=True)
+            lead_accounts.get_adsdb_data(filters=AdsdbClient.BANNED_FILTERS, archive=True)
 
         for lead_account in lead_accounts:
             if not lead_account.adsdb_account:

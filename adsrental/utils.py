@@ -721,9 +721,9 @@ class AdsdbClient():
         result = []
         for ids_group in self.chunks(ids, limit):
             try:
-                result += self.get_accounts(limit=len(ids_group), ids=','.join(ids_group), **kwargs)
-            except AdsdbClientError:
-                raise AdsdbClientNotFoundError({'ids': ids_group})
+                result.extend(self.get_accounts(limit=len(ids_group), ids=','.join(ids_group), **kwargs))
+            except AdsdbClientError as e:
+                raise AdsdbClientNotFoundError({'ids': ids_group, 'error': e})
 
         return result
 
@@ -741,10 +741,10 @@ class AdsdbClient():
                     **kwargs,
                 },
             ).json()
-            if not data.get('data'):
+            if 'data' not in data:
                 raise AdsdbClientError(data)
 
-            result += data.get('data')
+            result.extend(data['data'])
             page += 1
             if len(result) >= data.get('count', 0):
                 next_page_exists = False
