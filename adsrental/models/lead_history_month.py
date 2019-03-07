@@ -91,6 +91,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
 
         if self.amount < self.MOVE_AMOUNT:
             self.move_to_next_month = True
+        else:
+            self.move_to_next_month = False
 
     @classmethod
     def get_or_create(cls, lead: Lead, date: datetime.date) -> LeadHistoryMonth:
