@@ -15,6 +15,7 @@ from adsrental.admin.bundler_payments_report_admin import BundlerPaymentsReportA
 from adsrental.admin.bundler_lead_stat_admin import BundlerLeadStatsAdmin
 from adsrental.admin.vultr_instance import VultrInstanceAdmin
 from adsrental.admin.bundler_payment_admin import BundlerPaymentAdmin
+from adsrental.admin.lead_account_issue_admin import LeadAccountIssueAdmin
 
 
 admin.site.register(CustomUserAdmin.model, CustomUserAdmin)
@@ -36,3 +37,4 @@ admin.site.register(BundlerPaymentAdmin.model, BundlerPaymentAdmin)
 admin.site.register(BundlerPaymentsReportAdmin.model, BundlerPaymentsReportAdmin)
 admin.site.register(BundlerLeadStatsAdmin.model, BundlerLeadStatsAdmin)
 admin.site.register(VultrInstanceAdmin.model, VultrInstanceAdmin)
+admin.site.register(LeadAccountIssueAdmin.model, LeadAccountIssueAdmin)
