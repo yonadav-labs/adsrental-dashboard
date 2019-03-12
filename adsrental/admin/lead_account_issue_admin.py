@@ -35,9 +35,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'lead__account__lead__first_name',
         'lead__account__lead__last_name',
     )
-    actions = (
-        'reopen',
-    )
+
     raw_id_fields = ('lead_account', )
 
     def __init__(self, *args, **kwargs):
@@ -83,16 +81,11 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
             value=bundler,
         ))
 
-    def reopen(self, request, queryset):
-        for issue in queryset:
-            if not issue.status == LeadAccountIssue.STATUS_CLOSED:
-                continue
-            issue.status = LeadAccountIssue.STATUS_OPEN
-            issue.insert_note(f'Reopened by {request.user}')
-            issue.save()
-
     def buttons(self, obj):
         result = []
-        if obj.status == LeadAccountIssue.STATUS_OPEN:
+        if obj.status == LeadAccountIssue.STATUS_REPORTED:
             result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('admin_helpers:fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+        if obj.status == LeadAccountIssue.STATUS_SUBMITTED:
+            result.append('<a target="_blank" href="{url}"><button type="button">Approve</button></a>'.format(url=reverse('admin_helpers:fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+            result.append('<a target="_blank" href="{url}"><button type="button">Reject</button></a>'.format(url=reverse('admin_helpers:fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         return mark_safe(', '.join(result))

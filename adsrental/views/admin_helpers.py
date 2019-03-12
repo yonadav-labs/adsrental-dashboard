@@ -58,7 +58,7 @@ class FixLeadAccountIssueView(View):
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
         next_url = request.GET.get('next')
 
-        lead_account_issue.status = LeadAccountIssue.STATUS_CLOSED
+        lead_account_issue.status = LeadAccountIssue.STATUS_SUBMITTED
         lead_account_issue.insert_note(f'Closed by {request.user}')
         lead_account_issue.save()
 
