@@ -40,3 +40,6 @@ class LeadChange(models.Model):
     data = models.TextField(null=True, blank=True)
     edited_by = models.ForeignKey('adsrental.User', null=True, blank=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.lead_account or self.lead.name()} field {self.field} changed'
