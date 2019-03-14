@@ -16,7 +16,8 @@ class Migration(migrations.Migration):
             name='LeadAccountIssue',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('issue_type', models.CharField(choices=[('Ban Account Request', 'Ban Account Request'), ('Connection Issue', 'Connection Issue'), ('Wrong Password', 'Wrong Password'), ('Security Checkpoint', 'Security Checkpoint'), ('Phone Number Change', 'Phone Number Change'), ('Address Change', 'Address Change'), ('Reshipment Needed', 'Reshipment Needed'), ('Missing Payment', 'Missing Payment'), ('Returned Check', 'Returned Check'), ('Charge to Account', 'Charge to Account'), ('Bill Left on Account', 'Bill Left on Account')], max_length=50)),
+                ('issue_type', models.CharField(choices=[('Ban Account Request', 'Ban Account Request'), ('Connection Issue', 'Connection Issue'), ('Wrong Password', 'Wrong Password'), ('Security Checkpoint', 'Security Checkpoint'), ('Phone Number Change', 'Phone Number Change'), (
+                    'Address Change', 'Address Change'), ('Reshipment Needed', 'Reshipment Needed'), ('Missing Payment', 'Missing Payment'), ('Returned Check', 'Returned Check'), ('Charge to Account', 'Charge to Account'), ('Bill Left on Account', 'Bill Left on Account')], max_length=50)),
                 ('status', models.CharField(choices=[('Open', 'Open'), ('Closed', 'Closed')], default='Open', max_length=50)),
                 ('note', models.TextField(default='')),
                 ('new_value', models.TextField(default='')),
