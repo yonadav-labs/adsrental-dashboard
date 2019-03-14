@@ -49,7 +49,7 @@ class BundlerLeadStat(models.Model):
         last_14_days_start = now - datetime.timedelta(days=14)
         delivered_last_14_days_lead_accounts = lead_accounts.filter(
             lead__delivery_date__lte=now - datetime.timedelta(days=2),
-            lead__delivery_date__gte=last_14_days_start.date(),
+            lead__delivery_date__gte=last_14_days_start,
         ).exclude(
             status=LeadAccount.STATUS_AVAILABLE,
         )
