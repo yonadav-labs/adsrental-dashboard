@@ -10,18 +10,45 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django.utils import dateformat
-from django_bulk_update.manager import BulkUpdateManager
+from django_bulk_update.query import BulkUpdateQuerySet
 
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead import Lead
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler_payment import BundlerPayment
-from adsrental.utils import CustomerIOClient
+from adsrental.utils import CustomerIOClient, AdsdbClient
 
 if typing.TYPE_CHECKING:
     from adsrental.models.user import User
     from adsrental.models.bundler import Bundler
+
+
+class LeadAccountQuerySet(BulkUpdateQuerySet):
+    def get_adsdb_data(self, **kwargs):
+        adsdb_ids = tuple(filter(lambda x: x is not None, map(lambda x: x[0], self.values_list('adsdb_account_id'))))
+        adsdb_accounts = AdsdbClient().get_accounts_by_ids(ids=adsdb_ids, **kwargs)
+        adsdb_accounts_map = {}
+        for adsdb_account in adsdb_accounts:
+            adsdb_accounts_map[str(adsdb_account['id'])] = adsdb_account
+        for lead_account in self:
+            lead_account.adsdb_account = adsdb_accounts_map.get(lead_account.adsdb_account_id, None)
+
+        return self
+
+    def get_adsdb_data_safe(self, **kwargs):
+        adsdb_accounts = AdsdbClient().get_accounts(**kwargs)
+        adsdb_accounts_map = {}
+        for adsdb_account in adsdb_accounts:
+            adsdb_accounts_map[str(adsdb_account['id'])] = adsdb_account
+        for lead_account in self:
+            lead_account.adsdb_account = adsdb_accounts_map.get(lead_account.adsdb_account_id, None)
+
+        return self
+
+
+class LeadAccountManager(models.Manager.from_queryset(LeadAccountQuerySet)):
+    pass
 
 
 class LeadAccount(models.Model, FulltextSearchMixin):
@@ -89,6 +116,9 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     BAN_REASON_FACEBOOK_LOCKOUT = 'Facebook - Lockout'
     BAN_REASON_ADSDB = 'ADSDB'
     BAN_REASON_QUIT = 'Quit'
+    BAN_REASON_BAD_AD_ACCOUNT = 'Bad ad account'
+    BAN_REASON_DUPLICATE = 'Duplicate'
+    BAN_REASON_OTHER = 'Other'
 
     POLICY_BAN_REASONS = (
         BAN_REASON_GOOGLE_POLICY,
@@ -113,15 +143,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         (BAN_REASON_FACEBOOK_SUSPICIOUS, 'Facebook - Suspicious', ),
         (BAN_REASON_FACEBOOK_LOCKOUT, 'Facebook - Lockout', ),
         (BAN_REASON_FACEBOOK_UNRESPONSIVE_USER, 'Facebook - Unresponsive User', ),
-        ('Duplicate', 'Duplicate', ),
-        ('Bad ad account', 'Bad ad account', ),
+        (BAN_REASON_DUPLICATE, 'Duplicate', ),
+        (BAN_REASON_BAD_AD_ACCOUNT, 'Bad ad account', ),
         (BAN_REASON_AUTO_OFFLINE, 'Auto: offline for 2 weeks', ),
         (BAN_REASON_AUTO_WRONG_PASSWORD, 'Auto: wrong password for 2 weeks', ),
         (BAN_REASON_AUTO_CHECKPOINT, 'Auto: reported security checkpoint for 2 weeks', ),
         (BAN_REASON_AUTO_NOT_USED, 'Auto: not used for 2 weeks after delivery', ),
         (BAN_REASON_ADSDB, 'Banned by Adsdb sync'),
         (BAN_REASON_QUIT, 'Quit'),
-        ('Other', 'Other', ),
+        (BAN_REASON_OTHER, 'Other', ),
     )
 
     username = models.CharField(max_length=255)
@@ -160,29 +190,20 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
 
-    objects = BulkUpdateManager()
+    objects = LeadAccountManager()
 
     def get_bundler(self) -> Bundler:
         return self.lead.bundler
 
-    def get_adsdb_account(self):
+    def get_adsdb_account(self, archive=False):
         if not self.adsdb_account_id:
             return None
 
-        auth = requests.auth.HTTPBasicAuth(settings.ADSDB_USERNAME, settings.ADSDB_PASSWORD)
-        data = requests.post(
-            'https://www.adsdb.io/api/v1/accounts/get',
-            auth=auth,
-            json={
-                'limit': 1,
-                'ids': self.adsdb_account_id,
-                'archive': True,
-                'page': 1,
-            },
-        ).json()
-        if not data.get('data'):
+        adsdb_accounts = AdsdbClient().get_accounts(ids=self.adsdb_account_id, archive=archive)
+        if not adsdb_accounts:
             return None
-        return data['data'][0]
+
+        return adsdb_accounts[0]
 
     def get_active_timedelta(self):
         if not self.qualified_date or not self.banned_date:
@@ -234,8 +255,20 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if self.in_progress_date < self.banned_date - datetime.timedelta(days=self.CHARGE_BACK_DAYS_OLD):
             return decimal.Decimal('0.00')
 
-        if self.ban_reason == LeadAccount.BAN_REASON_AUTO_CHECKPOINT:
+        if self.ban_reason not in (
+                LeadAccount.BAN_REASON_QUIT,
+                LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
+                LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
+                LeadAccount.BAN_REASON_AUTO_OFFLINE,
+                LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+                LeadAccount.BAN_REASON_BAD_AD_ACCOUNT,
+                LeadAccount.BAN_REASON_DUPLICATE,
+        ):
             return decimal.Decimal('0.00')
+
+        if not self.charge_back:
+            self.charge_back = True
+            self.save()
 
         if self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK and bundler.facebook_chargeback:
             return - bundler.facebook_chargeback

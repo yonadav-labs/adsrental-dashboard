@@ -28,7 +28,7 @@ class CronView(View):
         return super(CronView, self).dispatch(request, *args, **kwargs)
 
     def is_execute(self):
-        return True if self._request.GET.get('execute') else False
+        return True if self._request.GET.get('execute', '') == 'true' else False
 
     def get_datetime(self):
         date_str = self._request.GET.get('date')

@@ -23,6 +23,7 @@ class LeadHistoryView(View):
     * date - 'YYYY-MM-DD', if provided calculates :model:`adsrental.LeadHistory` from logs. Does not check worng password and potentially incaccurate.
     * aggregate - if 'true' calculates :model:`adsrental.LeadHistoryMonth`. You can also provide *date*
     '''
+
     def get(self, request):
         now = request.GET.get('now')
         force = request.GET.get('force')
@@ -56,7 +57,6 @@ class LeadHistoryView(View):
                 if item.amount or item.id:
                     item.save()
                 counter += 1
-                print(lead.name(), counter, leads.count())
             return JsonResponse({
                 'result': True,
                 'count': leads.count(),

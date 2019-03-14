@@ -21,9 +21,7 @@ for page in range(1, 1000):
             # 'ids': ids_filter,
             # 'sidx': 'accounts.dead_date',
             'page': page,
-            'filters': {
-                'rules': [{'field': 'accounts.account_status', 'data': 3}]
-            }
+            'filters': {'rules': [{'field': 'accounts.account_status', 'data': 3}]}
         },
     ).json()
     if 'data' in data:

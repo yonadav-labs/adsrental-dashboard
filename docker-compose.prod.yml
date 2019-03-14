@@ -1,13 +1,13 @@
-version: '3'
+version: "3"
 
 services:
   db:
+    image: mysql:5.7.20
     restart: on-failure
-    image: mysql
-    command: 'mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=10000'
+    command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=10000"
     environment:
       MYSQL_DATABASE: adsrental
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - ./dbdata1:/var/lib/mysql
     ports:
@@ -19,8 +19,8 @@ services:
     privileged: true
     environment:
       ENV: prod
-      HTTPS: 'on'
-      wsgi.url_scheme: 'https'
+      HTTPS: "on"
+      wsgi.url_scheme: "https"
     volumes:
       - ./cert/:/app/cert/
       - ./config/:/app/config/
