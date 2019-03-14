@@ -56,6 +56,7 @@ class BundlerLeadStat(models.Model):
         obj.delivered_last_14_days = delivered_last_14_days_lead_accounts.count()
         obj.delivered_not_connected_last_14_days = delivered_last_14_days_lead_accounts.filter(
             in_progress_date__isnull=True,
+            status=LeadAccount.STATUS_QUALIFIED,
         ).count()
         for lead_account in lead_accounts:
             lead = lead_account.lead
