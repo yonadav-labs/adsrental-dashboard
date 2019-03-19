@@ -27,6 +27,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'bundler_field',
         'issue_type',
         'status_field',
+        'old_value',
         'new_value',
         'created',
         'buttons',
@@ -60,6 +61,9 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
             name=html.escape(obj.get_status_display()),
             note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
         ))
+
+    def old_value(self, obj):
+        return obj.get_old_value() or '-'
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
@@ -102,3 +106,5 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         if obj.can_be_resolved():
             result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         return mark_safe(', '.join(result))
+
+    status_field.short_description = 'Status'
