@@ -30,6 +30,15 @@ class FixLeadAccountIssueView(View):
     def post(self, request, lead_account_issue_id):
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
 
+        if lead_account_issue.is_form_needed():
+            form = FixIssueForm(request.POST)
+            if not form.is_valid():
+                return render(request, 'bundler/fix_lead_account_issue.html', dict(
+                    lead_account_issue=lead_account_issue,
+                    form=form,
+                    can_be_fixed=lead_account_issue.can_be_fixed(),
+                ))
+
         if lead_account_issue.can_be_fixed():
             lead_account_issue.submit(request.POST.get('new_value', ''), request.user)
             lead_account_issue.save()

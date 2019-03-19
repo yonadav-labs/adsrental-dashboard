@@ -30,3 +30,11 @@ class BundlerIssuesForm(forms.Form):
 class FixIssueForm(forms.Form):
     old_value = forms.CharField(label='Old value', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     new_value = forms.CharField(label='New value', required=True)
+
+    def clean_new_value(self):
+        new_value = self.cleaned_data['new_value']
+        old_value = self.cleaned_data['old_value']
+        if new_value == old_value:
+            raise forms.ValidationError("Value cannot be the same as the old one")
+
+        return new_value
