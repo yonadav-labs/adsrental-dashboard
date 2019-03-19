@@ -26,7 +26,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'lead_field',
         'bundler_field',
         'issue_type',
-        'status',
+        'status_field',
         'new_value',
         'created',
         'buttons',
@@ -54,6 +54,12 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         self._request = request
         list_display = super(LeadAccountIssueAdmin, self).get_list_display(request)
         return list_display
+
+    def status_field(self, obj):
+        return mark_safe('{name}{note}'.format(
+            name=html.escape(obj.get_status_display()),
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+        ))
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
