@@ -111,6 +111,20 @@ class LeadAccountIssue(models.Model):
         if self.issue_type == self.ISSUE_TYPE_MISSING_PAYMENT:
             self.status = self.STATUS_PAID
             return
+        if self.issue_type == self.ISSUE_TYPE_WRONG_PASSWORD:
+            self.lead_account.set_correct_password(new_password=self.new_value, edited_by=edited_by)  # pylint: disable=no-member
+            self.status = self.STATUS_VERIFIED
+            return
+        if self.issue_type == self.ISSUE_TYPE_SECURITY_CHECKPOINT:
+            self.lead_account.resolve_security_checkpoint(edited_by=edited_by)  # pylint: disable=no-member
+            self.status = self.STATUS_VERIFIED
+            return
+        if self.issue_type == self.ISSUE_TYPE_PHONE_NUMBER_CHANGE:
+            lead = self.lead_account.lead  # pylint: disable=no-member
+            lead.set_phone(self.new_value)
+            lead.save()
+            self.status = self.STATUS_VERIFIED
+            return
 
         self.status = self.STATUS_VERIFIED
         self.insert_note(f'Resolved by {edited_by}')
@@ -129,3 +143,10 @@ class LeadAccountIssue(models.Model):
         self.status = self.STATUS_SUBMITTED
         self.new_value = value
         self.insert_note(f'Fix submitted by {edited_by} with value {value}')
+
+    def is_form_needed(self):
+        return self.issue_type in [
+            self.ISSUE_TYPE_ADDRESS_CHANGE,
+            self.ISSUE_TYPE_PHONE_NUMBER_CHANGE,
+            self.ISSUE_TYPE_WRONG_PASSWORD,
+        ]

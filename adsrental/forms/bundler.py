@@ -25,3 +25,8 @@ class BundlerIssuesForm(forms.Form):
             queryset = queryset.filter(status=self.cleaned_data['status'])
 
         return queryset
+
+
+class FixIssueForm(forms.Form):
+    old_value = forms.CharField(label='Old value', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    new_value = forms.CharField(label='New value', required=True)

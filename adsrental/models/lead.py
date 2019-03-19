@@ -250,6 +250,10 @@ class Lead(models.Model, FulltextSearchMixin):
             self.country or '',
         ])
 
+    def set_phone(self, value: str) -> None:
+        digits = ''.join([i for i in value if i.isdigit()])
+        self.phone = digits
+
     def get_phone_formatted(self) -> typing.Optional[str]:
         'Get phone to show to end user.'
         if not self.phone:

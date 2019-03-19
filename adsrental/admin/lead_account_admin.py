@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from adsrental.models.lead import Lead
 from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
+from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
 from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFilter, \
     WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, \
@@ -356,6 +357,12 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 messages.info(request, f'Lead Account {lead_account} was already marked as wrong, skipping.')
                 continue
             lead_account.mark_wrong_password(edited_by=request.user)
+            issue = LeadAccountIssue(
+                lead_account=lead_account,
+                issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
+            )
+            issue.insert_note(f'Reported by {request.user}')
+            issue.save()
             messages.info(request, f'{lead_account} password is marked as wrong.')
 
     def report_correct_password(self, request, queryset):
@@ -396,6 +403,12 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 continue
 
             lead_account.mark_security_checkpoint(edited_by=request.user)
+            issue = LeadAccountIssue(
+                lead_account=lead_account,
+                issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
+            )
+            issue.insert_note(f'Reported by {request.user}')
+            issue.save()
             messages.info(request, '{} security checkpoint reported.'.format(lead_account))
 
     def report_security_checkpoint_resolved(self, request, queryset):

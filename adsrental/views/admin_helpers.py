@@ -66,7 +66,10 @@ class ResolveLeadAccountIssueView(View):
 
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
         if lead_account_issue.can_be_resolved():
-            lead_account_issue.resolve(request.user)
+            if request.POST['action'] == 'resolve':
+                lead_account_issue.resolve(request.user)
+            if request.POST['action'] == 'reject':
+                lead_account_issue.reject(request.user)
             lead_account_issue.save()
 
         next_url = request.GET.get('next')

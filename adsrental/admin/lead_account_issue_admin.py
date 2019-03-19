@@ -21,6 +21,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'bundler_field',
         'issue_type',
         'status',
+        'new_value',
         'created',
         'buttons',
     )
