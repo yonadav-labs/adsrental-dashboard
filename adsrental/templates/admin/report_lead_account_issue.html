@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Report issue for {{ lead_account_issue.lead_account }}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button>Report</button>
+    </form>
+    <p>
+        <a href="{% url 'admin:adsrental_leadaccountissue_changelist'%}">
+            Back to issues admin
+        </a>
+    </p>
+{% endblock %}

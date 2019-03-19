@@ -8,7 +8,9 @@ from adsrental.admin.lead_admin import LeadAdmin
 from adsrental.admin.lead_account_admin import LeadAccountAdmin
 from adsrental.admin.lead_history_admin import LeadHistoryAdmin
 from adsrental.admin.lead_account_issue_admin import LeadAccountIssueAdmin
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.forms.admin import ReportIssueForm
 
 
 class AdminActionView(View):
@@ -77,3 +79,44 @@ class ResolveLeadAccountIssueView(View):
             return HttpResponseRedirect(next_url)
 
         return redirect('admin_helpers:resolve_lead_account_issue', lead_account_issue_id=lead_account_issue_id)
+
+
+class ReportLeadAccountIssueView(View):
+    @method_decorator(login_required)
+    def get(self, request, lead_account_id):
+        if not request.user.is_superuser:
+            raise Http404
+
+        lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
+        form = ReportIssueForm()
+
+        return render(request, 'admin/report_lead_account_issue.html', dict(
+            lead_account=lead_account,
+            form=form,
+        ))
+
+    @method_decorator(login_required)
+    def post(self, request, lead_account_id):
+        if not request.user.is_superuser:
+            raise Http404
+
+        lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
+        form = ReportIssueForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'admin/report_lead_account_issue.html', dict(
+                lead_account=lead_account,
+                form=form,
+            ))
+
+        issue = LeadAccountIssue(
+            lead_account=lead_account,
+            issue_type=form.cleaned_data['issue_type'],
+        )
+        issue.insert_note(f'Reported by {request.user}')
+        issue.save()
+
+        next_url = request.GET.get('next')
+        if next_url:
+            return HttpResponseRedirect(next_url)
+
+        return redirect('admin:adsrental_leadaccountissue_changelist')

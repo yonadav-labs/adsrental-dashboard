@@ -280,6 +280,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_leadaccountissue_changelist'),
             id=obj.id,
         ))
+        result.append('<a target="_blank" href="{url}">Report new issue</a>'.format(
+            url=reverse('admin_helpers:report_lead_account_issue', kwargs=dict(lead_account_id=obj.id)),
+        ))
         return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):
