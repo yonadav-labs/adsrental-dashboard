@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.forms.bundler import BundlerIssuesForm
 
 
 class IssuesDashboardView(View):
@@ -22,11 +23,19 @@ class IssuesDashboardView(View):
 
         issues = LeadAccountIssue.objects.filter(
             lead_account__lead__bundler__in=bundlers,
-            status__in=[LeadAccountIssue.STATUS_REPORTED, LeadAccountIssue.STATUS_REJECTED, LeadAccountIssue.STATUS_SUBMITTED]
+            status__in=[
+                LeadAccountIssue.STATUS_REPORTED,
+                LeadAccountIssue.STATUS_REJECTED,
+                LeadAccountIssue.STATUS_SUBMITTED,
+            ]
         ).select_related('lead_account', 'lead_account__lead', 'lead_account__lead__bundler')
 
+        form = BundlerIssuesForm(request.GET)
+        if form.is_valid():
+            issues = form.filter(issues)
+
         return render(request, 'bundler/issues_dashboard.html', dict(
-            user=request.user,
-            bundler=bundlers,
-            entries=issues
+            form=form,
+            bundlers=bundlers,
+            issues=issues
         ))

@@ -79,7 +79,7 @@ class LeadAccountIssue(models.Model):
         return False
 
     def can_be_resolved(self):
-        if not self.status == self.STATUS_SUBMITTED:
+        if self.status == self.STATUS_SUBMITTED:
             return True
 
         return False
@@ -87,6 +87,19 @@ class LeadAccountIssue(models.Model):
     def get_time_elapsed(self):
         now = timezone.localtime(timezone.now())
         return now - self.created
+
+    def get_old_value(self):
+        if self.issue_type == self.ISSUE_TYPE_WRONG_PASSWORD:
+            return self.lead_account.password  # pylint: disable=no-member
+        if self.issue_type == self.ISSUE_TYPE_ADDRESS_CHANGE:
+            return self.lead_account.lead.get_address()  # pylint: disable=no-member
+        if self.issue_type == self.ISSUE_TYPE_PHONE_NUMBER_CHANGE:
+            return self.lead_account.lead.get_phone_formatted()  # pylint: disable=no-member
+
+        return None
+
+    def get_note_lines(self):
+        return self.note.split('\n')
 
     def resolve(self, edited_by):
         if not self.can_be_resolved():

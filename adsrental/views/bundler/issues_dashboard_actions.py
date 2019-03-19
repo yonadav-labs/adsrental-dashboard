@@ -28,4 +28,19 @@ class FixLeadAccountIssueView(View):
         if next_url:
             return HttpResponseRedirect(next_url)
 
-        return redirect('bundler_fix_lead_account_issue')
+        return redirect('bundler_fix_lead_account_issue', lead_account_issue_id=lead_account_issue_id)
+
+
+class RejectLeadAccountIssueView(View):
+    @method_decorator(login_required)
+    def get(self, request, lead_account_issue_id):
+        lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
+        if lead_account_issue.can_be_resolved():
+            lead_account_issue.reject(request.user)
+            lead_account_issue.save()
+
+        next_url = request.GET.get('next')
+        if next_url:
+            return HttpResponseRedirect(next_url)
+
+        return redirect('bundler_fix_lead_account_issue', lead_account_issue_id=lead_account_issue_id)

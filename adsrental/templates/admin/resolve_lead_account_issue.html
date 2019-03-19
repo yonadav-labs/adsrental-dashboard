@@ -2,19 +2,26 @@
 
 {% block content %}
     <h1>Resolve {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
-    <p>New value: {{ lead_account_issue.new_value }}</p>
-    <h3>Notes</h3>
-    {% for note in notes %}
+    <h2>New value</h2>
+    <p>{{ lead_account_issue.new_value }}</p>
+    <h2>Notes</h2>
+    {% for note in lead_account_issue.get_note_lines %}
         <p>{{ note }}</p>
     {% endfor %}
 
-    {% if can_be_resolved %}
+    <h2>Actions</h2>
+    {% if lead_account_issue.can_be_resolved %}
         <form action="" method="post">
             {% csrf_token %}
             <button name="action" value="resolve">Resolve</button>
             <button name="action" value="reject">Reject</button>
         </form>
     {% else %}
-        <p>Issue cannot be resolved.</p>
+        <p>Issue is already {{ lead_account_issue.get_status_display }} and cannot be resolved.</p>
+        <p>
+            <a href="{% url 'admin:adsrental_leadaccountissue_changelist'%}">
+                Back to issues admin
+            </a>
+        </p>
     {% endif %}
 {% endblock %}

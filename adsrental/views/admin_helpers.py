@@ -21,7 +21,6 @@ class AdminActionView(View):
 
     @method_decorator(login_required)
     def get(self, request, model_name, action_name, object_id):
-        next_url = request.GET.get('next')
         admin_model_cls = self.admin_models[model_name]
         queryset = admin_model_cls.model.objects.filter(pk=object_id)
 
@@ -29,7 +28,11 @@ class AdminActionView(View):
         if result:
             return result
 
-        return HttpResponseRedirect(next_url)
+        next_url = request.GET.get('next')
+        if next_url:
+            return HttpResponseRedirect(next_url)
+
+        return redirect('admin:index')
 
     @method_decorator(login_required)
     def post(self, request, model_name, action_name, object_id):
@@ -51,12 +54,9 @@ class ResolveLeadAccountIssueView(View):
             raise Http404
 
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
-        if not lead_account_issue.can_be_resolved():
-            return redirect('admin_helpers:resolve_lead_account_issue')
 
         return render(request, 'admin/resolve_lead_account_issue.html', dict(
             lead_account_issue=lead_account_issue,
-            notes=lead_account_issue.note.split('\n'),
         ))
 
     @method_decorator(login_required)
@@ -65,10 +65,12 @@ class ResolveLeadAccountIssueView(View):
             raise Http404
 
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
-        if not lead_account_issue.can_be_resolved():
-            return redirect('admin_helpers:resolve_lead_account_issue')
+        if lead_account_issue.can_be_resolved():
+            lead_account_issue.resolve(request.user)
+            lead_account_issue.save()
 
-        lead_account_issue.resolve(request.user)
-        lead_account_issue.save()
+        next_url = request.GET.get('next')
+        if next_url:
+            return HttpResponseRedirect(next_url)
 
-        return redirect('admin_helpers:resolve_lead_account_issue')
+        return redirect('admin_helpers:resolve_lead_account_issue', lead_account_issue_id=lead_account_issue_id)

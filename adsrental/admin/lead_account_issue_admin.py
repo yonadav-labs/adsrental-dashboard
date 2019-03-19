@@ -83,8 +83,8 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
 
     def buttons(self, obj):
         result = []
-        if obj.status == LeadAccountIssue.STATUS_REPORTED:
-            result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('admin_helpers:fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
-        if obj.status == LeadAccountIssue.STATUS_SUBMITTED:
+        if obj.can_be_fixed():
+            result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+        if obj.can_be_resolved():
             result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         return mark_safe(', '.join(result))
