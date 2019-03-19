@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Fix lead account issue{% endblock %}
+
+{% block content %}
+    <h1>Lead account issues</h1>
+    
+    {% if issues %}
+        <table id="results" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Time elapsed</th>
+                    <th>Account type</th>
+                    <th>Lead name</th>
+                    <th>Bundler</th>
+                    <th>Issue</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Old value</th>
+                    <th>New value</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in issues %}
+                    <tr>
+                        <td>{{ issue.get_time_elapsed|humanize_timedelta }}</td>
+                        <td>{{ issue.lead_account.account_type }}</td>
+                        <td>{{ issue.lead_account.lead.name }}</td>
+                        <td>{{ issue.lead_account.lead.bundler.name }}</td>
+                        <td>{{ issue.get_issue_type_display }}</td>
+                        <td>{{ issue.get_status_display }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                            {% if issue.can_be_fixed %}
+                                <a class="btn btn-primary btn-xs" href="{% url 'bundler_fix_lead_account_issue' lead_account_issue_id=issue.id %}?next={{ request.get_full_path|urlencode }}">Fix</a>
+                            {% endif %}
+                            {% if issue.can_be_resolved %}
+                                <a class="btn btn-secondary btn-xs">Reject</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        No issues found
+    {% endif %}
+{% endblock %}

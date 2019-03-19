@@ -5,6 +5,8 @@ from adsrental.views.bundler.payments import BundlerPaymentsView
 from adsrental.views.bundler.payments_list import BundlerPaymentsListView
 from adsrental.views.bundler.check import BundlerCheckView
 from adsrental.views.bundler.check_days import BundlerCheckDaysView
+from adsrental.views.bundler.issues_dashboard import IssuesDashboardView
+from adsrental.views.bundler.issues_dashboard_actions import FixLeadAccountIssueView
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -16,4 +18,6 @@ urlpatterns = [  # pylint: disable=C0103
     path('report/payments/<int:bundler_id>/list/', BundlerPaymentsListView.as_view(), name='bundler_report_payments_list'),
     path('report/check/<int:bundler_id>/', BundlerCheckView.as_view(), name='bundler_report_check'),
     path('report/check/<int:bundler_id>/days/<lead_id>/', BundlerCheckDaysView.as_view(), name='bundler_report_check_days'),
+    path('issues/dashboard/', IssuesDashboardView.as_view(), name='bundler_issues_dashboard'),
+    path('issues/fix/<int:lead_account_issue_id>/', FixLeadAccountIssueView.as_view(), name='bundler_fix_lead_account_issue'),
 ]

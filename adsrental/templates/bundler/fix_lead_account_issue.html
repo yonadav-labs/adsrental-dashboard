@@ -1,9 +1,15 @@
-{% extends "admin/base_site.html" %}
+{% extends "base.html" %}
+
+{% block title %}Fix lead account issue{% endblock %}
 
 {% block content %}
     <h1>Fix {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
+    {% if can_be_fixed %}
     <form action="" method="post">
         {% csrf_token %}
         <button>Fix</button>
     </form>
+    {% else %}
+        <p>Fix was already submitted, please wait for approval.</p>
+    {% endif %}
 {% endblock %}

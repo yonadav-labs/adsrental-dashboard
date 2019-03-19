@@ -1,8 +1,8 @@
 from django.views import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from adsrental.admin.lead_admin import LeadAdmin
 from adsrental.admin.lead_account_admin import LeadAccountAdmin
@@ -44,22 +44,31 @@ class AdminActionView(View):
         return HttpResponseRedirect(next_url)
 
 
-class FixLeadAccountIssueView(View):
+class ResolveLeadAccountIssueView(View):
     @method_decorator(login_required)
     def get(self, request, lead_account_issue_id):
-        lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
+        if not request.user.is_superuser:
+            raise Http404
 
-        return render(request, 'admin/fix_lead_account_issue.html', dict(
+        lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
+        if not lead_account_issue.can_be_resolved():
+            return redirect('admin_helpers:resolve_lead_account_issue')
+
+        return render(request, 'admin/resolve_lead_account_issue.html', dict(
             lead_account_issue=lead_account_issue,
+            notes=lead_account_issue.note.split('\n'),
         ))
 
     @method_decorator(login_required)
     def post(self, request, lead_account_issue_id):
-        lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
-        next_url = request.GET.get('next')
+        if not request.user.is_superuser:
+            raise Http404
 
-        lead_account_issue.status = LeadAccountIssue.STATUS_SUBMITTED
-        lead_account_issue.insert_note(f'Closed by {request.user}')
+        lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
+        if not lead_account_issue.can_be_resolved():
+            return redirect('admin_helpers:resolve_lead_account_issue')
+
+        lead_account_issue.resolve(request.user)
         lead_account_issue.save()
 
-        return HttpResponseRedirect(next_url)
+        return redirect('admin_helpers:resolve_lead_account_issue')

@@ -71,3 +71,48 @@ class LeadAccountIssue(models.Model):
             self.note = line
         else:
             self.note = f'{self.note}\n{line}'
+
+    def can_be_fixed(self):
+        if self.status in [self.STATUS_REPORTED, self.STATUS_REJECTED]:
+            return True
+
+        return False
+
+    def can_be_resolved(self):
+        if not self.status == self.STATUS_SUBMITTED:
+            return True
+
+        return False
+
+    def get_time_elapsed(self):
+        now = timezone.localtime(timezone.now())
+        return now - self.created
+
+    def resolve(self, edited_by):
+        if not self.can_be_resolved():
+            return
+
+        if self.issue_type == self.ISSUE_TYPE_RESHIPMENT_NEEDED:
+            self.status = self.STATUS_RESHIPPED
+            return
+        if self.issue_type == self.ISSUE_TYPE_MISSING_PAYMENT:
+            self.status = self.STATUS_PAID
+            return
+
+        self.status = self.STATUS_VERIFIED
+        self.insert_note(f'Resolved by {edited_by}')
+
+    def reject(self, edited_by):
+        if not self.can_be_resolved():
+            return
+
+        self.status = self.STATUS_REJECTED
+        self.insert_note(f'Rejected by {edited_by}')
+
+    def submit(self, value, edited_by):
+        if not self.can_be_fixed():
+            return
+
+        self.status = self.STATUS_SUBMITTED
+        self.new_value = value
+        self.insert_note(f'Fix submitted by {edited_by} with value {value}')
