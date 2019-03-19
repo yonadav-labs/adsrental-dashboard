@@ -71,8 +71,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'touch_button',
         'wrong_password_date_field',
         'security_checkpoint_date_field',
-        'primary',
-        'billed',
+        # 'primary',
+        # 'billed',
+        'links',
         'created',
     )
     list_select_related = ('lead', 'lead__ec2instance')
@@ -272,6 +273,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
             ))
 
         return None
+
+    def links(self, obj):
+        result = []
+        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Issues</a>'.format(
+            url=reverse('admin:adsrental_leadaccountissue_changelist'),
+            id=obj.id,
+        ))
+        return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):
         for lead_account in queryset.filter(status=LeadAccount.STATUS_NEEDS_APPROVAL):
