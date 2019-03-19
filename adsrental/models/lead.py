@@ -250,6 +250,15 @@ class Lead(models.Model, FulltextSearchMixin):
             self.country or '',
         ])
 
+    def set_address(self, value: str) -> None:
+        'Set address as a string.'
+        fields = ['street', 'apartment', 'city', 'state', 'postal_code']
+        for index, part in enumerate(value.split(', ')):
+            if index >= len(fields):
+                return
+
+            setattr(self, fields[index], part)
+
     def set_phone(self, value: str) -> None:
         digits = ''.join([i for i in value if i.isdigit()])
         self.phone = digits

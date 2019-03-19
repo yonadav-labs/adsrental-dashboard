@@ -125,6 +125,12 @@ class LeadAccountIssue(models.Model):
             lead.save()
             self.status = self.STATUS_VERIFIED
             return
+        if self.issue_type == self.ISSUE_TYPE_ADDRESS_CHANGE:
+            lead = self.lead_account.lead  # pylint: disable=no-member
+            lead.set_address(self.new_value)
+            lead.save()
+            self.status = self.STATUS_VERIFIED
+            return
 
         self.status = self.STATUS_VERIFIED
         self.insert_note(f'Resolved by {edited_by}')
