@@ -547,24 +547,24 @@ class LeadAdmin(admin.ModelAdmin):
     def ban_lead(self, request, queryset):
         for lead in queryset:
             if lead.is_banned():
-                messages.warning(request, f'{lead.name} is already banned. Skipping.')
+                messages.warning(request, f'{lead.name()} is already banned. Skipping.')
                 continue
 
             active_accounts = LeadAccount.get_active_lead_accounts(lead)
             if active_accounts:
-                messages.warning(request, f'{lead.name} has active accounts, ban them first. Skipping.')
+                messages.warning(request, f'{lead.name()} has active accounts, ban them first. Skipping.')
                 continue
             lead.ban(request.user)
-            messages.info(request, f'{lead.name} is banned.')
+            messages.info(request, f'{lead.name()} is banned.')
 
     def unban_lead(self, request, queryset):
         for lead in queryset:
             if not lead.is_banned():
-                messages.warning(request, f'{lead.name} is not banned. Skipping.')
+                messages.warning(request, f'{lead.name()} is not banned. Skipping.')
                 continue
 
             lead.unban(request.user)
-            messages.info(request, f'{lead.name} is unbanned.')
+            messages.info(request, f'{lead.name()} is unbanned.')
 
     def ban_google_account(self, request, queryset):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, action_name='ban_google_account')
