@@ -142,6 +142,8 @@ class LeadAdmin(admin.ModelAdmin):
         'mark_google_as_qualified',
         'mark_amazon_as_qualified',
         'mark_as_disqualified',
+        'ban_lead',
+        'unban_lead',
         'ban_google_account',
         'unban_google_account',
         'ban_facebook_account',
@@ -541,6 +543,28 @@ class LeadAdmin(admin.ModelAdmin):
             for lead_account in lead.lead_accounts.filter(account_type=account_type):
                 if lead_account.unban(request.user):
                     messages.info(request, '{} is unbanned.'.format(lead_account))
+
+    def ban_lead(self, request, queryset):
+        for lead in queryset:
+            if lead.is_banned():
+                messages.warning(request, f'{lead.name} is already banned. Skipping.')
+                continue
+
+            active_accounts = LeadAccount.get_active_lead_accounts(lead)
+            if active_accounts:
+                messages.warning(request, f'{lead.name} has active accounts, ban them first. Skipping.')
+                continue
+            lead.ban(request.user)
+            messages.info(request, f'{lead.name} is banned.')
+
+    def unban_lead(self, request, queryset):
+        for lead in queryset:
+            if not lead.is_banned():
+                messages.warning(request, f'{lead.name} is not banned. Skipping.')
+                continue
+
+            lead.unban(request.user)
+            messages.info(request, f'{lead.name} is unbanned.')
 
     def ban_google_account(self, request, queryset):
         return self.ban_lead_account(request, queryset, account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE, action_name='ban_google_account')
