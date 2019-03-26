@@ -283,6 +283,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         result.append('<a target="_blank" href="{url}">Report new issue</a>'.format(
             url=reverse('admin_helpers:report_lead_account_issue', kwargs=dict(lead_account_id=obj.id)),
         ))
+        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Bundler payments</a>'.format(
+            url=reverse('admin:adsrental_bundlerpayment_changelist'),
+            id=obj.id,
+        ))
         return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):

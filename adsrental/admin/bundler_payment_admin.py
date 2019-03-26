@@ -5,6 +5,12 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_payment import BundlerPayment
+from adsrental.admin.list_filters import AbstractIntIDListFilter
+
+
+class LeadAccountIDListFilter(AbstractIntIDListFilter):
+    parameter_name = 'lead_account_id'
+    title = 'LeadAccount ID'
 
 
 class BundlerPaymentAdmin(admin.ModelAdmin):
@@ -24,6 +30,7 @@ class BundlerPaymentAdmin(admin.ModelAdmin):
         'datetime',
     )
     list_filter = (
+        LeadAccountIDListFilter,
         'payment_type',
         'paid',
         'bundler',
