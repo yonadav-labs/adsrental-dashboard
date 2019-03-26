@@ -171,9 +171,10 @@ class BundlerPaymentsView(View):
                     BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
             ]):
                 lead_account = bundler_payment.lead_account
-                lead_account.bundler_paid = True
-                lead_account.bundler_paid_date = now_utc
-                lead_account.save()
+                if not lead_account.bundler_paid:
+                    lead_account.bundler_paid = True
+                    lead_account.bundler_paid_date = now_utc
+                    lead_account.save()
 
             bundler_payments.update(report=report, paid=True)
             for chargebacks in bundler_chargebacks_by_bundler_id.values():
