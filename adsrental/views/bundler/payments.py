@@ -166,9 +166,9 @@ class BundlerPaymentsView(View):
             )
             report.save()
             for bundler_payment in bundler_payments.filter(payment_type__in=[
-                BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
-                BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
-                BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
+                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
+                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
             ]):
                 lead_account = bundler_payment.lead_account
                 lead_account.bundler_paid = True
