@@ -43,7 +43,10 @@ class BundlerLeadStat(models.Model):
     def calculate(cls, bundler: Bundler) -> None:
         obj = cls(bundler=bundler)
         LeadAccount = apps.get_model('adsrental', 'LeadAccount')
-        lead_accounts = LeadAccount.objects.filter(lead__bundler=obj.bundler, account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK).prefetch_related('lead', 'lead__raspberry_pi')
+        lead_accounts = LeadAccount.objects.filter(
+            lead__bundler=obj.bundler,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
+        ).prefetch_related('lead', 'lead__raspberry_pi')
         now = timezone.localtime(timezone.now())
         last_30_days_start = now - datetime.timedelta(days=30)
         last_14_days_start = now - datetime.timedelta(days=14)
