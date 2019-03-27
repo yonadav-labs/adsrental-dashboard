@@ -161,11 +161,11 @@ class DashboardHomeView(View):
             value = form.cleaned_data['pi_connected']
             if value == 'true':
                 entries = entries.filter(
-                    in_progress_date__isnull=False,
+                    lead__raspberry_pi__last_seen__isnull=False,
                 )
             if value == 'false':
-                entries = entries.filter(
-                    in_progress_date__isnull=True,
+                entries = entries.exclude(
+                    lead__raspberry_pi__last_seen__isnull=True,
                 )
 
         if form.cleaned_data['search']:
