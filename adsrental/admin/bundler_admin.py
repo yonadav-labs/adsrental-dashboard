@@ -44,6 +44,7 @@ class BundlerAdmin(admin.ModelAdmin):
     list_filter = (
         IDListFilter,
         'is_active',
+        'team',
     )
 
     def get_queryset(self, request):
