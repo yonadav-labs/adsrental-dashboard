@@ -8,6 +8,7 @@ class ConnectionDataView(View):
     '''
     Get data about EC2 by RPID. Should have been used by new python RaspberryPi firmware, but was not.
     '''
+
     def get(self, request: HttpRequest, rpid: str) -> JsonResponse:
         raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
         if not raspberry_pi:
@@ -21,7 +22,7 @@ class ConnectionDataView(View):
         if not lead or not lead.is_active():
             return JsonResponse({
                 'error': 'Not available',
-                'shutdown': True,
+                # 'shutdown': True,
                 'result': False,
             })
 

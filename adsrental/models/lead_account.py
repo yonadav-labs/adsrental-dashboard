@@ -561,7 +561,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             )
             CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED_HAS_ACCOUNTS, account_type=self.account_type, active_accounts=active_accounts_str)
         else:
-            CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED, account_type=self.account_type)
+            pass
+            # CustomerIOClient().send_lead_event(self.lead, CustomerIOClient.EVENT_BANNED, account_type=self.account_type)
 
         # if not active_accounts:
         #     self.lead.ban(edited_by)
