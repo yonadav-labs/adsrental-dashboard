@@ -44,7 +44,7 @@ class LeadAccountIssue(models.Model):
     STATUS_CHOICES = (
         (STATUS_REPORTED, 'Reported', ),
         (STATUS_SUBMITTED, 'Fix submitted', ),
-        (STATUS_REJECTED, 'Rejected', ),
+        (STATUS_REJECTED, 'Fix rejected', ),
         (STATUS_RESHIPPED, 'Reshipped', ),
         (STATUS_CANCELLED, 'Cancelled', ),
         (STATUS_VERIFIED, 'Verified', ),

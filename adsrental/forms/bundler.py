@@ -11,8 +11,8 @@ class BundlerIssuesForm(forms.Form):
     STATUS_CHOICES = (
         ('', 'All'),
         (LeadAccountIssue.STATUS_REPORTED, 'Reported'),
-        (LeadAccountIssue.STATUS_REJECTED, 'Rejected'),
-        (LeadAccountIssue.STATUS_SUBMITTED, 'Submitted'),
+        (LeadAccountIssue.STATUS_REJECTED, 'Fix rejected'),
+        (LeadAccountIssue.STATUS_SUBMITTED, 'Fix submitted'),
     )
 
     issue_type = forms.ChoiceField(label='Issue type', choices=ISSUE_TYPE_CHOICES, required=False)
