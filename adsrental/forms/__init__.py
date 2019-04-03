@@ -358,18 +358,6 @@ class UserLoginForm(forms.Form):
             self.add_error('first_name', 'User not found')
 
 
-class UserFixPasswordForm(forms.Form):
-    new_password = forms.CharField(label='New password', required=True)
-
-    def clean_new_password(self):
-        lead_account = self.lead_account
-        new_password = self.cleaned_data['new_password']
-        if new_password == lead_account.password:
-            raise forms.ValidationError("Password cannot be the same as the old one")
-
-        return new_password
-
-
 class DisqualifyLeadAccountForm(forms.Form):
     ACTION_SUBMIT = 'submit'
 

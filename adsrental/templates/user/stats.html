@@ -107,18 +107,7 @@
                         {% if lead_account.is_wrong_password %}
                             <p>
                                 Password is reported as <strong>incorrect {{ lead_account.wrong_password_date|naturaltime }}</strong>.
-                            </p> 
-                            {% if lead_account.user_can_change_password %}
-                                <p>
-                                    <form class="form-inline" action="{% url 'user_fix_password' lead_account_id=lead_account.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <div class="input-group mb-2 mr-sm-2">
-                                            <input type="text" name="new_password" class="form-control" placeholder="New password">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary mb-2">Fix password</button>
-                                    </form>
-                                </p>
-                            {% endif %}
+                            </p>
                         {% endif %}
                     </div>
                 {% else %}
@@ -129,6 +118,23 @@
                     </div>
                 {% endif %}
             {% endfor %}
+
+            {% if issues %}
+                <h3>Issues</h3>
+                {% for issue in issues %}
+                    <div class="alert alert-warning">
+                        <p>
+                            Your {{ issue.lead_account.account_type }} account {{ issue.lead_account.username }}
+                            has issue <strong>{{ issue.get_issue_type_display }}</strong>
+                        </p>
+                        {% if issue.can_be_fixed_by_user %}
+                            <p>
+                                <a target="_blank" href="{% url 'user_fix_lead_account_issue' lead_account_issue_id=issue.id %}" class="btn btn-primary mb-2">Fix</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
             <h3>Last paychecks</h3>
 

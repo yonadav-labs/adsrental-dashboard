@@ -7,7 +7,7 @@
 {% block content %}
     <div class="container">
         <h1>Fix {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
-        {% if lead_account_issue.can_be_fixed %}
+        {% if lead_account_issue.can_be_fixed_by_user %}
         <form action="" method="post">
             {% csrf_token %}
             {% if form %}
@@ -17,6 +17,9 @@
         </form>
         {% else %}
             <p>Fix has been submitted for approval.</p>
+            <p>
+                <a href="{% url 'user_stats' %}"> Go back</a>
+            </p>
         {% endif %}
     </div>
 {% endblock %}

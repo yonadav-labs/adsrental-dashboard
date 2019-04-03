@@ -2,13 +2,14 @@ import datetime
 
 from django.views import View
 from django.shortcuts import render, redirect
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.models.bundler import Bundler
@@ -187,6 +188,8 @@ class DashboardHomeView(View):
             value = form.cleaned_data['shipstation_order_status']
             if value:
                 entries = entries.filter(lead__shipstation_order_status=value)
+
+        entries = entries.annotate(reported_issues_count=Count('issue', filter=Q(issue__status=LeadAccountIssue.STATUS_REPORTED)))
 
         order = request.GET.get('order', '-lead__raspberry_pi__last_seen')
         # entries = entries.prefetch_related('lead', 'lead__raspberry_pi', 'lead__bundler')

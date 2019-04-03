@@ -52,7 +52,7 @@ class LeadAccountIssue(models.Model):
     )
 
     lead_account = models.ForeignKey('adsrental.LeadAccount',
-                                     on_delete=models.CASCADE, related_name='lead_accounts', related_query_name='lead_account_issue')
+                                     on_delete=models.CASCADE, related_name='issues', related_query_name='issue')
     issue_type = models.CharField(max_length=50, choices=ISSUE_TYPE_CHOICES)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
@@ -73,13 +73,21 @@ class LeadAccountIssue(models.Model):
             self.note = f'{self.note}\n{line}'
 
     def can_be_fixed(self):
-        if self.status in [self.STATUS_REPORTED, self.STATUS_REJECTED]:
+        if self.status in [LeadAccountIssue.STATUS_REPORTED, LeadAccountIssue.STATUS_REJECTED]:
             return True
 
         return False
 
+    def can_be_fixed_by_user(self):
+        if self.issue_type not in [LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD]:
+            return False
+        if self.status not in [LeadAccountIssue.STATUS_REPORTED]:
+            return False
+
+        return True
+
     def can_be_resolved(self):
-        if self.status == self.STATUS_SUBMITTED:
+        if self.status == LeadAccountIssue.STATUS_SUBMITTED:
             return True
 
         return False

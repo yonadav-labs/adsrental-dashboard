@@ -528,7 +528,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
 
         self.status = value
 
-        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email}')
+        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
 
         if self.status in (self.STATUS_IN_PROGRESS, self.STATUS_BANNED):
             self.generate_payments()

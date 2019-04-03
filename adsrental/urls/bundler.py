@@ -19,6 +19,7 @@ urlpatterns = [  # pylint: disable=C0103
     path('report/check/<int:bundler_id>/', BundlerCheckView.as_view(), name='bundler_report_check'),
     path('report/check/<int:bundler_id>/days/<lead_id>/', BundlerCheckDaysView.as_view(), name='bundler_report_check_days'),
     path('issues/dashboard/', IssuesDashboardView.as_view(), name='bundler_issues_dashboard'),
+    path('issues/dashboard/<int:lead_account_id>/', IssuesDashboardView.as_view(), name='bundler_issues_dashboard'),
     path('issues/fix/<int:lead_account_issue_id>/', FixLeadAccountIssueView.as_view(), name='bundler_fix_lead_account_issue'),
     path('issues/reject/<int:lead_account_issue_id>/', RejectLeadAccountIssueView.as_view(), name='bundler_reject_lead_account_issue'),
 ]

@@ -55,6 +55,7 @@
                     <th>Security Checkpoint</th>
                     <th>Pi delivered</th>
                     <th>Sent</th>
+                    <th>Links</th>
                 </tr>
             </thead>
             {% if entries %}
@@ -88,11 +89,8 @@
                             <td>
                                 {{ entry.lead.get_address }}
                                 {% if entry.lead.usps_tracking_code %}
-                                    <br />    
+                                    <br />
                                     USPS: {{entry.lead.usps_tracking_code}}
-                                {% endif %}
-                                {% if entry.lead.is_order_on_hold %}
-                                    <a href="{% url 'dashboard_change_address' lead_id=entry.lead.leadid %}">Fix</a>
                                 {% endif %}
                             </td>
                             <td>
@@ -115,9 +113,6 @@
                             <td>
                                 {% if entry.is_wrong_password %}
                                     <span class="glyphicon glyphicon-ok" style="color: red;"></span>
-                                    {% if user.is_superuser or entry.user_can_change_password %}
-                                        <a target="_blank" href="{% url 'dashboard_set_password' lead_account_id=entry.id %}">Fix</a>
-                                    {% endif %}
                                 {% else %}
                                     <span class="glyphicon glyphicon-remove" style="color: lightgreen;"></span>
                                 {% endif %}   
@@ -145,6 +140,17 @@
                                     <span class="glyphicon glyphicon-ok" style="color: lightgreen;" title="{{entry.lead.ship_date|naturalday|default:"Never"}}"></span>
                                 {% else %}
                                     <span class="glyphicon glyphicon-remove" style="color: red;"</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.reported_issues_count %}
+                                    <a  target="_blank" class="btn btn-primary btn-xs" href="{% url 'bundler_issues_dashboard' lead_account_id=entry.id %}">
+                                        {{ entry.reported_issues_count }} issue{{ entry.reported_issues_count|pluralize }}
+                                    </a>
+                                {% else %}
+                                    <a  target="_blank" class="btn btn-default btn-xs" href="{% url 'bundler_issues_dashboard' lead_account_id=entry.id %}">
+                                        {{ entry.reported_issues_count }} issue{{ entry.reported_issues_count|pluralize }}
+                                    </a>
                                 {% endif %}
                             </td>
                         </tr>

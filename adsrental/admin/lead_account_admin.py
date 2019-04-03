@@ -15,7 +15,7 @@ from adsrental.models.lead import Lead
 from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.forms import AdminLeadAccountBanForm, AdminLeadAccountPasswordForm
+from adsrental.forms import AdminLeadAccountBanForm
 from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFilter, \
     WrongPasswordListFilter, AbstractFulltextFilter, AbstractIntIDListFilter, \
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
@@ -120,9 +120,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'ban',
         'unban',
         'report_wrong_password',
-        'report_correct_password',
         'report_security_checkpoint',
-        'report_security_checkpoint_resolved',
         'sync_to_adsdb',
     )
     readonly_fields = (
@@ -381,37 +379,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
             issue.save()
             messages.info(request, f'{lead_account} password is marked as wrong.')
 
-    def report_correct_password(self, request, queryset):
-        if queryset.count() != 1:
-            messages.error(request, 'Only one lead account can be selected.')
-            return None
-
-        lead_account = queryset.first()
-
-        if 'do_action' in request.POST:
-            form = AdminLeadAccountPasswordForm(request.POST)
-            if form.is_valid():
-                if not lead_account.is_wrong_password():
-                    messages.info(request, f'Lead Account {lead_account} password is not marked as wrong, skipping.')
-                    return None
-                new_password = form.cleaned_data['new_password']
-                lead_account.set_correct_password(new_password, edited_by=request.user)
-                messages.info(request, 'Lead Account {} password is marked as correct.'.format(lead_account))
-                return None
-        else:
-            form = AdminLeadAccountPasswordForm(initial=dict(
-                old_password=lead_account.password,
-                new_password=lead_account.password,
-            ))
-
-        return render(request, 'admin/action_with_form.html', {
-            'action_name': 'report_correct_password',
-            'title': 'Set new pasword for {}'.format(lead_account),
-            'button': 'Save password',
-            'objects': queryset,
-            'form': form,
-        })
-
     def report_security_checkpoint(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_security_checkpoint_reported():
@@ -426,15 +393,6 @@ class LeadAccountAdmin(admin.ModelAdmin):
             issue.insert_note(f'Reported by {request.user}')
             issue.save()
             messages.info(request, '{} security checkpoint reported.'.format(lead_account))
-
-    def report_security_checkpoint_resolved(self, request, queryset):
-        for lead_account in queryset:
-            if not lead_account.is_security_checkpoint_reported():
-                messages.info(request, '{} security checkpoint is not reported, skipping.'.format(lead_account))
-                continue
-
-            lead_account.resolve_security_checkpoint(edited_by=request.user)
-            messages.info(request, '{} security checkpoint reported as resolved.'.format(lead_account))
 
     def sync_to_adsdb(self, request, queryset):
         for lead_account in queryset:
@@ -554,9 +512,7 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
 
     actions = (
         'report_wrong_password',
-        'report_correct_password',
         'report_security_checkpoint',
-        'report_security_checkpoint_resolved',
     )
 
     # We cannot call super().get_fields(request, obj) because that method calls

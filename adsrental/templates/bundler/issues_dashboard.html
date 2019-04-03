@@ -3,11 +3,18 @@
 {% load bootstrap %}
 {% load helpers %}
 
-{% block title %}Fix lead account issue{% endblock %}
+{% block title %}Lead account issues{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h1>Lead account issues</h1>
+        {% if lead_account %}
+            <h2>Lead account {{ lead_account }} issues</h2>
+            <p>
+                <a href="{% url 'bundler_issues_dashboard' %}" class="btn btn-primary">Show all lead accounts</a>
+            </p>
+        {% else %}
+            <h2>Lead account issues</h2>
+        {% endif %}
         
         <form role="form" action="" method="GET">
             {{ form|bootstrap }}
@@ -37,7 +44,11 @@
                         <tr>
                             <td>{{ issue.get_time_elapsed|humanize_timedelta }}</td>
                             <td>{{ issue.lead_account.account_type }}</td>
-                            <td>{{ issue.lead_account.lead.name }}</td>
+                            <td>
+                                <a target="_blank" href="{% url 'bundler_issues_dashboard' lead_account_id=issue.lead_account.id %}">
+                                    {{ issue.lead_account.lead.name }}
+                                </a>
+                            </td>
                             <td>{{ issue.lead_account.lead.bundler.name }}</td>
                             <td>{{ issue.get_issue_type_display }}</td>
                             <td>{{ issue.get_status_display }}</td>
