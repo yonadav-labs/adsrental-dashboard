@@ -38,8 +38,8 @@ def ordinal(value: int) -> str:
 
 
 @register.filter()
-def humanize_timedelta(timedeltaobj: datetime.timedelta) -> str:
-    return utils.humanize_timedelta(timedeltaobj)
+def humanize_timedelta(timedeltaobj: datetime.timedelta, time_format='long') -> str:
+    return utils.humanize_timedelta(timedeltaobj, short=time_format == 'short')
 
 
 @register.filter()

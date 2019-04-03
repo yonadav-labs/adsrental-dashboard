@@ -42,7 +42,7 @@
                 <tbody>
                     {% for issue in issues %}
                         <tr>
-                            <td>{{ issue.get_time_elapsed|humanize_timedelta }}</td>
+                            <td>{{ issue.get_time_elapsed|humanize_timedelta:'short' }}</td>
                             <td>{{ issue.lead_account.account_type }}</td>
                             <td>
                                 <a target="_blank" href="{% url 'bundler_issues_dashboard' lead_account_id=issue.lead_account.id %}">
