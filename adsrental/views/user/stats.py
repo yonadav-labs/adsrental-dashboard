@@ -23,10 +23,16 @@ class UserStatsView(View):
             ))
 
         lead_accounts = lead.lead_accounts.all()
+        issues = LeadAccountIssue.objects.filter(lead_account__in=lead_accounts, status=LeadAccountIssue.STATUS_REPORTED)
+        fixable_issues = []
+        for issue in issues:
+            if issue.can_be_fixed_by_user():
+                fixable_issues.append(issue)
+
         return render(request, 'user/stats.html', dict(
             lead=lead,
             lead_accounts=lead_accounts,
-            issues=LeadAccountIssue.objects.filter(lead_account__in=lead_accounts, status=LeadAccountIssue.STATUS_REPORTED),
+            issues=fixable_issues,
             raspberry_pi=lead.raspberry_pi,
             lead_histories_month=LeadHistoryMonth.objects.filter(lead=lead).order_by('-date'),
         ))
