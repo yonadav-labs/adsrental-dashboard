@@ -81,7 +81,7 @@ class LeadAccountIssue(models.Model):
     def can_be_fixed_by_user(self):
         if self.issue_type not in [LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD]:
             return False
-        if self.status not in [LeadAccountIssue.STATUS_REPORTED]:
+        if self.status not in [LeadAccountIssue.STATUS_REPORTED, LeadAccountIssue.STATUS_REJECTED]:
             return False
 
         return True

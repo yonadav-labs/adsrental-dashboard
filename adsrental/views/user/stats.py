@@ -23,16 +23,17 @@ class UserStatsView(View):
             ))
 
         lead_accounts = lead.lead_accounts.all()
-        issues = LeadAccountIssue.objects.filter(lead_account__in=lead_accounts, status=LeadAccountIssue.STATUS_REPORTED)
-        fixable_issues = []
-        for issue in issues:
-            if issue.can_be_fixed_by_user():
-                fixable_issues.append(issue)
+        issues = LeadAccountIssue.objects.filter(lead_account__in=lead_accounts, status__in=[
+            LeadAccountIssue.STATUS_REPORTED,
+            LeadAccountIssue.STATUS_REJECTED,
+        ], issue_type__in=[
+            LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
+        ])
 
         return render(request, 'user/stats.html', dict(
             lead=lead,
             lead_accounts=lead_accounts,
-            issues=fixable_issues,
+            issues=issues,
             raspberry_pi=lead.raspberry_pi,
             lead_histories_month=LeadHistoryMonth.objects.filter(lead=lead).order_by('-date'),
         ))
