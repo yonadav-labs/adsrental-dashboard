@@ -37,6 +37,7 @@ class IssuesDashboardView(View):
             issues = issues.filter(lead_account=lead_account)
 
         issues = issues.select_related('lead_account', 'lead_account__lead', 'lead_account__lead__bundler')
+        issues = issues.order_by('-created')
 
         form = BundlerIssuesForm(request.GET)
         if form.is_valid():
