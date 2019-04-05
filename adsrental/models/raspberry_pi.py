@@ -4,6 +4,7 @@ import re
 import os
 import datetime
 import typing
+import random
 
 import requests
 from django.utils import timezone
@@ -133,13 +134,12 @@ class RaspberryPi(models.Model):
         return lead.get_ec2_instance()
 
     def find_tunnel_ports(self) -> typing.Tuple[int, int]:
-        tunnel_ports = [i[0] for i in RaspberryPi.objects.filter(tunnel_port__isnull=False).exclude(rpid=self.rpid).values_list('tunnel_port')]
-        for check_tunnel_port in range(RaspberryPi.TUNNEL_PORT_START, RaspberryPi.TUNNEL_PORT_END, 2):
-            if check_tunnel_port in tunnel_ports:
-                continue
-            return (check_tunnel_port, check_tunnel_port + 1)
+        tunnel_ports = [i[0] for i in RaspberryPi.objects.filter(tunnel_port__isnull=False).values_list('tunnel_port')]
+        tunnel_port = random.randint(RaspberryPi.TUNNEL_PORT_START, RaspberryPi.TUNNEL_PORT_END) // 2 * 2
+        while tunnel_port in tunnel_ports:
+            tunnel_port = random.randint(RaspberryPi.TUNNEL_PORT_START, RaspberryPi.TUNNEL_PORT_END) // 2 * 2
 
-        raise ValueError('No free port found')
+        return (tunnel_port, tunnel_port + 1)
 
     def assign_proxy_hostname(self) -> None:
         hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
