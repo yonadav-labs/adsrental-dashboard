@@ -89,7 +89,6 @@ class LeadAdmin(admin.ModelAdmin):
         'touch_count_field',
         'touch_button',
         'ip_address',
-        'fix_button',
         'wrong_password_field',
         'security_checkpoint_field',
         'sync_with_adsdb_field',
@@ -710,26 +709,6 @@ class LeadAdmin(admin.ModelAdmin):
             model_name='LeadAdmin',
         )))
 
-    def fix_button(self, obj):
-        row_actions = [
-            {
-                'label': 'Fix Facebook PW',
-                'action': 'report_correct_facebook_password',
-                'enabled': obj.is_wrong_password_facebook(),
-            },
-            {
-                'label': 'Fix Google PW',
-                'action': 'report_correct_google_password',
-                'enabled': obj.is_wrong_password_google(),
-            },
-        ]
-
-        return mark_safe(render_to_string('django_admin_row_actions/dropdown.html', request=self._request, context=dict(
-            obj=obj,
-            items=row_actions,
-            model_name='LeadAdmin',
-        )))
-
     google_billed.boolean = True
     google_billed.admin_order_field = 'lead_account__billed'
 
@@ -788,7 +767,6 @@ class LeadAdmin(admin.ModelAdmin):
     sync_with_adsdb_field.boolean = True
 
     touch_button.short_description = ' '
-    fix_button.short_description = ' '
 
     usps_field.short_description = 'USPS'
     usps_field.admin_order_field = 'shipstation_order_status'
@@ -824,7 +802,6 @@ class ReportLeadAdmin(LeadAdmin):
         'touch_count_field',
         'touch_button',
         'ip_address',
-        'fix_button',
         'wrong_password_field',
         'security_checkpoint_field',
         'sync_with_adsdb_field',
