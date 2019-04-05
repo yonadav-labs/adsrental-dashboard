@@ -91,6 +91,7 @@ class LeadAdmin(admin.ModelAdmin):
         'ip_address',
         'wrong_password_field',
         'security_checkpoint_field',
+        'fix_button',
         'sync_with_adsdb_field',
         'facebook_billed',
         'google_billed',
@@ -709,6 +710,16 @@ class LeadAdmin(admin.ModelAdmin):
             model_name='LeadAdmin',
         )))
 
+    def fix_button(self, obj):
+        result = []
+        if obj.is_wrong_password() or obj.is_security_checkpoint_reported():
+            result.append('<a class="button" target="_blank" href="{url}?lead_account__lead__leadid={leadid}">Fix</a>'.format(
+                url=reverse('admin:adsrental_leadaccountissue_changelist'),
+                leadid=obj.leadid,
+            ))
+
+        return mark_safe(', '.join(result))
+
     google_billed.boolean = True
     google_billed.admin_order_field = 'lead_account__billed'
 
@@ -767,6 +778,7 @@ class LeadAdmin(admin.ModelAdmin):
     sync_with_adsdb_field.boolean = True
 
     touch_button.short_description = ' '
+    fix_button.short_description = ' '
 
     usps_field.short_description = 'USPS'
     usps_field.admin_order_field = 'shipstation_order_status'
@@ -802,6 +814,7 @@ class ReportLeadAdmin(LeadAdmin):
         'touch_count_field',
         'touch_button',
         'ip_address',
+        'fix_button',
         'wrong_password_field',
         'security_checkpoint_field',
         'sync_with_adsdb_field',
