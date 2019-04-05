@@ -37,7 +37,6 @@ class ProxyTunnelInfoView(View):
         except requests.exceptions.RequestException:
             messages.error(request, 'Proxy tunnel did not respond in 5 seconds. User internet connection might be too slow.')
 
-
         return render(request, 'rpi/proxy_tunnel_info.html', dict(
             user=request.user,
             raspberry_pi=raspberry_pi,
@@ -52,6 +51,8 @@ class ProxyTunnelInfoView(View):
         action = request.POST.get('action')
         if action == 'new_config':
             raspberry_pi.reset_cache()
+            raspberry_pi.assign_proxy_hostname()
+            raspberry_pi.assign_tunnel_ports()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
             messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
