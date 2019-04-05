@@ -46,9 +46,11 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'lead_account__account_type',
     )
     search_fields = (
-        'lead__account__username',
-        'lead__account__lead__first_name',
-        'lead__account__lead__last_name',
+        'lead_account__username',
+        'lead_account__lead__first_name',
+        'lead_account__lead__last_name',
+        'lead_account__lead__email',
+        'lead_account__lead__raspberry_pi__rpid',
     )
 
     raw_id_fields = ('lead_account', )
