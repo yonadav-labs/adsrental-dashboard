@@ -29,6 +29,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'id',
         'lead_account_field',
         'lead_field',
+        'raspberry_pi_field',
         'bundler_field',
         'issue_type',
         'status_field',
@@ -37,7 +38,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'created',
         'buttons',
     )
-    list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler')
+    list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler', 'lead_account__lead__raspberry_pi')
     list_filter = (
         LeadAccountIDListFilter,
         LeadLeadidListFilter,
@@ -96,6 +97,15 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
             note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead.note)}" alt="?">' if lead.note else '',
         ))
 
+    def raspberry_pi_field(self, obj):
+        if not obj.lead_account.lead.raspberry_pi:
+            return None
+
+        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+            url=reverse('admin:adsrental_raspberrypi_changelist'),
+            rpid=obj.lead_account.lead.raspberry_pi.rpid,
+        ))
+
     def bundler_field(self, obj):
         bundler = obj.lead_account.lead.bundler
         if not bundler:
@@ -116,3 +126,6 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         return mark_safe(', '.join(result))
 
     status_field.short_description = 'Status'
+    lead_field.short_description = 'Lead'
+    lead_account_field.short_description = 'Account'
+    raspberry_pi_field.short_description = 'RaspberryPi'
