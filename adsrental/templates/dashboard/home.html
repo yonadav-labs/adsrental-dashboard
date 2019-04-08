@@ -152,6 +152,9 @@
                                         {{ entry.reported_issues_count }} issue{{ entry.reported_issues_count|pluralize }}
                                     </a>
                                 {% endif %}
+                                <a  target="_blank" class="btn btn-default btn-xs" href="{% url 'bundler_report_lead_account_issue' lead_account_id=entry.id %}">
+                                    Report issue
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}
