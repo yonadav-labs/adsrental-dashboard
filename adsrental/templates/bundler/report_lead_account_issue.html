@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% load bootstrap %}
+
+{% block title %}Report lead account issue{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Report issue for {{ lead_account_issue.lead_account }}</h1>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+            <button class="btn btn-primary">Report</button>
+        </form>
+    </div>
+{% endblock %}

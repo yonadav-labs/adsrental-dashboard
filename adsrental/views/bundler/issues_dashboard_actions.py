@@ -1,11 +1,51 @@
 from django.views import View
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 
+from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.forms.bundler import FixIssueForm
+from adsrental.forms.bundler import FixIssueForm, ReportIssueForm
+
+
+class ReportLeadAccountIssueView(View):
+    @method_decorator(login_required)
+    def get(self, request, lead_account_id):
+        lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
+        form = ReportIssueForm()
+
+        return render(request, 'bundler/report_lead_account_issue.html', dict(
+            lead_account=lead_account,
+            form=form,
+        ))
+
+    @method_decorator(login_required)
+    def post(self, request, lead_account_id):
+        lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
+        form = ReportIssueForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'bundler/report_lead_account_issue.html', dict(
+                lead_account=lead_account,
+                form=form,
+            ))
+
+        issue = LeadAccountIssue(
+            lead_account=lead_account,
+            issue_type=form.cleaned_data['issue_type'],
+        )
+        issue.insert_note(f'Reported by {request.user}')
+        if form.cleaned_data['note']:
+            issue.insert_note(form.cleaned_data['note'])
+        issue.save()
+        messages.success(request, 'New issue reported')
+
+        next_url = request.GET.get('next')
+        if next_url:
+            return HttpResponseRedirect(next_url)
+
+        return redirect('bundler_issues_dashboard', lead_account_id=lead_account.id)
 
 
 class FixLeadAccountIssueView(View):
@@ -44,6 +84,8 @@ class FixLeadAccountIssueView(View):
             lead_account_issue.submit(request.POST.get('new_value', ''), request.user)
             lead_account_issue.save()
 
+        messages.success(request, 'Fix submitted')
+
         next_url = request.GET.get('next')
         if next_url:
             return HttpResponseRedirect(next_url)
@@ -59,6 +101,7 @@ class RejectLeadAccountIssueView(View):
             lead_account_issue.reject(request.user)
             lead_account_issue.save()
 
+        messages.success(request, 'Fix rejected')
         next_url = request.GET.get('next')
         if next_url:
             return HttpResponseRedirect(next_url)

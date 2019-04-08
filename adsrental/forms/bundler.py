@@ -38,3 +38,10 @@ class FixIssueForm(forms.Form):
             raise forms.ValidationError("Value cannot be the same as the old one")
 
         return new_value
+
+
+class ReportIssueForm(forms.Form):
+    ISSUE_TYPE_CHOICES = LeadAccountIssue.ISSUE_TYPE_CHOICES
+
+    issue_type = forms.ChoiceField(label='Issue type', choices=ISSUE_TYPE_CHOICES, required=True)
+    note = forms.CharField(label='Note', required=False, widget=forms.Textarea(attrs=dict(placeholder='Add detailed notes about the issue')))

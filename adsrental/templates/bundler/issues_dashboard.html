@@ -12,8 +12,10 @@
             <p>
                 <a href="{% url 'bundler_issues_dashboard' %}" class="btn btn-primary">Show all lead accounts</a>
             </p>
+            <a class="btn btn-primary" href="{% url 'bundler_report_lead_account_issue' lead_account_id=lead_account.id %}">Report new issue for {{ lead_account.username }}</a>
         {% else %}
             <h2>Lead account issues</h2>
+            <a class="btn btn-primary" disabled>Select lead account to report issues</a>
         {% endif %}
         
         <form role="form" action="" method="GET">
