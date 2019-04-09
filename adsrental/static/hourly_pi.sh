@@ -50,6 +50,9 @@ if [[ "${RASPBERRYPI_ID}" == "RP00018498" ]]; then
     curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_2.0.3.zip > pi_patch.zip
     unzip -o pi_patch.zip
     # cat /home/pi/new-pi/crontab.txt | crontab
+    ${HOME}/new-pi/client_log.sh "Crontab"
+    ${HOME}/new-pi/client_log.sh "`crontab -l`"
+    ${HOME}/new-pi/client_log.sh "`ls -lh`"
     ${HOME}/new-pi/client_log.sh "Update complete"
 fi
 
