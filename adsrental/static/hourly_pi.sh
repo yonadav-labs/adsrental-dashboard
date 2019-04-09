@@ -52,7 +52,6 @@ if [[ "${RASPBERRYPI_ID}" == "RP00018498" ]]; then
     cat /home/pi/new-pi/crontab.txt | crontab
     ${HOME}/new-pi/client_log.sh "Crontab"
     ${HOME}/new-pi/client_log.sh "`crontab -l`"
-    ${HOME}/new-pi/client_log.sh "`ls -lh`"
     ${HOME}/new-pi/client_log.sh "Update complete"
 fi
 
