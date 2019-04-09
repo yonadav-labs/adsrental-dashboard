@@ -54,6 +54,9 @@ if [[ "${RASPBERRYPI_ID}" == "RP00018498" ]]; then
     unzip -o pi_patch.zip
     cat /home/pi/new-pi/crontab.txt | crontab
     ${HOME}/new-pi/client_log.sh "Update complete"
+    ${HOME}/new-pi/client_log.sh "=== Crontab ==="
+    ${HOME}/new-pi/client_log.sh "`crontab -l`"
+    ${HOME}/new-pi/client_log.sh "=== Crontab ==="
 fi
 
 # if [[ "${IS_PROXY_TUNNEL}" == "true" ]]; then
