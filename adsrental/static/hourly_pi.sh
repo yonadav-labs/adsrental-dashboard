@@ -51,7 +51,7 @@ if [[ "`crontab -l | grep -Po keepalive_cron`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "Update complete"
     ${HOME}/new-pi/client_log.sh "=== Crontab ==="
     ${HOME}/new-pi/client_log.sh "`crontab -l`"
-    ${HOME}/new-pi/client_log.sh "=== Crontab ==="
+    ${HOME}/new-pi/client_log.sh "=== END Crontab ==="
 fi
 
 # if [[ "${IS_PROXY_TUNNEL}" == "true" ]]; then
