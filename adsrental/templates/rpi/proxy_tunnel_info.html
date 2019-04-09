@@ -24,18 +24,16 @@
             </ol>
         </p>
         <h3>Actions</h3>
-        {% if is_online %}
-            <p>
-                <form action="" method="POST">
-                    {% csrf_token %}
-                    {% if not raspberry_pi.is_proxy_tunnel %}
-                        <button class="btn btn-primary" name="action" value="make_proxy_tunnel">Make proxy tunnel</button>
-                    {% endif %}
-                    <button class="btn btn-default" name="action" value="new_config">Restart tunnels</button>
-                    <button class="btn btn-default" name="action" value="restart">Restart device</button>
-                </form>
-            </p>
-        {% endif %}
+        <p>
+            <form action="" method="POST">
+                {% csrf_token %}
+                {% if not raspberry_pi.is_proxy_tunnel %}
+                    <button class="btn btn-primary" name="action" value="make_proxy_tunnel">Make proxy tunnel</button>
+                {% endif %}
+                <button class="btn btn-default" name="action" value="new_config">Restart tunnels</button>
+                <button class="btn btn-default" name="action" value="restart">Restart device</button>
+            </form>
+        </p>
         <p>
             <a target="_blank" href="{% url 'show_log' rpid=raspberry_pi.rpid  filename=today_log_filename %}" class="btn btn-default">Today log</a>
         </p>
