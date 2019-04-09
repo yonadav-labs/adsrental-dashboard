@@ -3,6 +3,7 @@ import io
 import decimal
 
 from django.db.models import Q, Sum
+from django.db.models.functions import Coalesce
 from django.shortcuts import render, Http404, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -90,23 +91,23 @@ class BundlerPaymentsView(View):
         ).order_by('-payment')
         bundler_payments_total_by_bundler = bundler_payments.values('bundler_id', 'bundler__name', 'bundler__utm_source').annotate(
             payment__sum=Sum('payment'),
-            own_payment_facebook__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)),
-            own_payment_google__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)),
-            own_payment_amazon__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)),
-            own_payment__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN)),
-            children_payment_facebook__sum=Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)),
-            children_payment_google__sum=Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)),
-            children_payment_amazon__sum=Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)),
-            children_payment__sum=Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT)),
-            payment_bonus__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_BONUS)),
-            payment_sum=Sum('payment'),
+            own_payment_facebook__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)), 0),
+            own_payment_google__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)), 0),
+            own_payment_amazon__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)), 0),
+            own_payment__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN)), 0),
+            children_payment_facebook__sum=Coalesce(Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)), 0),
+            children_payment_google__sum=Coalesce(Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)), 0),
+            children_payment_amazon__sum=Coalesce(Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT, lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)), 0),
+            children_payment__sum=Coalesce(Sum('payment', filter=Q(payment_type__in=BundlerPayment.PAYMENT_TYPES_PARENT)), 0),
+            payment_bonus__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_BONUS)), 0),
+            payment_sum=Coalesce(Sum('payment'), 0),
         ).order_by('-payment__sum')
         bundler_payments_total = bundler_payments.aggregate(
-            payment_facebook__sum=Sum('payment', filter=Q(lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)),
-            payment_google__sum=Sum('payment', filter=Q(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)),
-            payment_amazon__sum=Sum('payment', filter=Q(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)),
-            payment_bonus__sum=Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_BONUS)),
-            payment__sum=Sum('payment'),
+            payment_facebook__sum=Coalesce(Sum('payment', filter=Q(lead_account__account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK)), 0),
+            payment_google__sum=Coalesce(Sum('payment', filter=Q(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE)), 0),
+            payment_amazon__sum=Coalesce(Sum('payment', filter=Q(lead_account__account_type=LeadAccount.ACCOUNT_TYPE_AMAZON)), 0),
+            payment_bonus__sum=Coalesce(Sum('payment', filter=Q(payment_type=BundlerPayment.PAYMENT_TYPE_BONUS)), 0),
+            payment__sum=Coalesce(Sum('payment'), 0),
         )
         bundler_payments_by_bundler_id = {}
         children_bundler_payments_by_bundler_id = {}
