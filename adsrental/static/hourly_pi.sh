@@ -4,9 +4,6 @@ RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 
 
 ${HOME}/new-pi/client_log.sh "Hourly script for ${RASPBERRYPI_ID}"
-${HOME}/new-pi/client_log.sh "=== Crontab ==="
-${HOME}/new-pi/client_log.sh "`crontab -l`"
-${HOME}/new-pi/client_log.sh "=== Crontab ==="
 
 if [[ "`which jq`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "Installing jq"
