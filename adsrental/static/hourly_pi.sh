@@ -42,7 +42,7 @@ if [[ "${SHUTDOWN}" == "true" ]]; then
     sudo poweroff
 fi
 
-if [[ "`crontab -l | grep -Po keepalive_cron`" == "" ]]; 
+if [[ "`crontab -l | grep -Po keepalive_cron`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "=== Crontab rescue ==="
     cd /home/pi/new-pi/
     curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_2.0.3.zip > pi_patch.zip
