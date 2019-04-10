@@ -123,6 +123,8 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
             result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         if obj.can_be_resolved():
             result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+        if obj.image:
+            result.append(f'<a target="_blank" href="{obj.image.url}"><button type="button">Image</button></a>')
         return mark_safe(', '.join(result))
 
     status_field.short_description = 'Status'

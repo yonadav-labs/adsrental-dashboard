@@ -8,6 +8,7 @@ class LeadAccountIssue(models.Model):
     ISSUE_TYPE_WRONG_PASSWORD = 'Wrong Password'
     ISSUE_TYPE_SECURITY_CHECKPOINT = 'Security Checkpoint'
     ISSUE_TYPE_CONNECTION_ISSUE = 'Connection Issue'
+    ISSUE_TYPE_OFFLINE = 'Offline'
     ISSUE_TYPE_BAN_REQUEST = 'Ban Account Request'
     ISSUE_TYPE_PHONE_NUMBER_CHANGE = 'Phone Number Change'
     ISSUE_TYPE_ADDRESS_CHANGE = 'Address Change'
@@ -21,6 +22,7 @@ class LeadAccountIssue(models.Model):
     ISSUE_TYPE_CHOICES = (
         (ISSUE_TYPE_BAN_REQUEST, 'Ban Account Request', ),
         (ISSUE_TYPE_CONNECTION_ISSUE, 'Connection Issue', ),
+        (ISSUE_TYPE_OFFLINE, 'Offline', ),
         (ISSUE_TYPE_WRONG_PASSWORD, 'Wrong Password', ),
         (ISSUE_TYPE_SECURITY_CHECKPOINT, 'Security Checkpoint', ),
         (ISSUE_TYPE_PHONE_NUMBER_CHANGE, 'Phone Number Change', ),
@@ -57,6 +59,7 @@ class LeadAccountIssue(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
     new_value = models.TextField(default='', blank=True)
+    image = models.ImageField(blank=True, null=True)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
 

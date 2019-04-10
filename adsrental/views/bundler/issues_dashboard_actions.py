@@ -24,7 +24,7 @@ class ReportLeadAccountIssueView(View):
     @method_decorator(login_required)
     def post(self, request, lead_account_id):
         lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
-        form = ReportIssueForm(request.POST)
+        form = ReportIssueForm(request.POST, request.FILES)
         if not form.is_valid():
             return render(request, 'bundler/report_lead_account_issue.html', dict(
                 lead_account=lead_account,
@@ -38,6 +38,8 @@ class ReportLeadAccountIssueView(View):
         issue.insert_note(f'Reported by {request.user}')
         if form.cleaned_data['note']:
             issue.insert_note(form.cleaned_data['note'])
+        if form.cleaned_data['image']:
+            issue.image = form.cleaned_data['image']
         issue.save()
         messages.success(request, 'New issue reported')
 

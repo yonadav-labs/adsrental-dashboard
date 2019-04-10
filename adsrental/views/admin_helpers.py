@@ -101,7 +101,7 @@ class ReportLeadAccountIssueView(View):
             raise Http404
 
         lead_account = get_object_or_404(LeadAccount, id=int(lead_account_id))
-        form = ReportIssueForm(request.POST)
+        form = ReportIssueForm(request.POST, request.FILES)
         if not form.is_valid():
             return render(request, 'admin/report_lead_account_issue.html', dict(
                 lead_account=lead_account,
@@ -113,6 +113,10 @@ class ReportLeadAccountIssueView(View):
             issue_type=form.cleaned_data['issue_type'],
         )
         issue.insert_note(f'Reported by {request.user}')
+        if form.cleaned_data['note']:
+            issue.insert_note(form.cleaned_data['note'])
+        if form.cleaned_data['image']:
+            issue.image = form.cleaned_data['image']
         issue.save()
 
         next_url = request.GET.get('next')

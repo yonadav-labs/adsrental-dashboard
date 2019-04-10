@@ -47,7 +47,7 @@ class SyncOfflineView(View):
             for lead_account in LeadAccount.get_active_lead_accounts(lead=lead):
                 issue = LeadAccountIssue(
                     lead_account=lead_account,
-                    issue_type=LeadAccountIssue.ISSUE_TYPE_CONNECTION_ISSUE,
+                    issue_type=LeadAccountIssue.ISSUE_TYPE_OFFLINE,
                 )
                 issue.save()
 

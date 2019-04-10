@@ -7,14 +7,20 @@
 {% block content %}
     <div class="container">
         <h1>Fix {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
+        {% if lead_account_issue.image %}
+            <h3>Images</h3>
+            <a href="{{ lead_account_issue.image.url }}" target="_blank">
+                <img src="{{ lead_account_issue.image.url }}" width="100%;" />
+            </a>
+        {% endif %}
         {% if lead_account_issue.can_be_fixed_by_user %}
-        <form action="" method="post">
-            {% csrf_token %}
-            {% if form %}
-                {{ form|bootstrap }}
-            {% endif %}
-            <button type="submit" class="btn btn-primary">Fix</button>
-        </form>
+            <form action="" method="post">
+                {% csrf_token %}
+                {% if form %}
+                    {{ form|bootstrap }}
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Fix</button>
+            </form>
         {% else %}
             <p>Fix has been submitted for approval.</p>
             <p>

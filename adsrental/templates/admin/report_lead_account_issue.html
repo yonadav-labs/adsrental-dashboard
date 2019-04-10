@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Report issue for {{ lead_account_issue.lead_account }}</h1>
-    <form action="" method="post">
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <button>Report</button>
