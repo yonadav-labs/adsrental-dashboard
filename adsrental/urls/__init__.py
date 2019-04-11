@@ -53,5 +53,6 @@ urlpatterns = [
     path('bookkeeper/', include('adsrental.urls.bookkeeper')),
     path('admin_helpers/', include(('adsrental.urls.admin_helpers', 'adsrental'), namespace='admin_helpers')),
     path('report/', include(('adsrental.urls.report', 'adsrental'), namespace='report')),
+    path('slack/', include(('adsrental.urls.slack', 'adsrental'), namespace='slack')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
 ]

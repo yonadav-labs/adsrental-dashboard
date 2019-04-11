@@ -32,7 +32,7 @@ services:
       - ./app_log/:/app/app_log/
       - ./media/:/app/media/
     ports:
-      # - "8080:80"
+      - "8443:80"
       - "7443:443"
     depends_on:
       - db
