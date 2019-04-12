@@ -16,6 +16,11 @@ from adsrental.models.lead_account import LeadAccount
 class StatsView(View):
     FIELDS_LIMIT = 10
     LINK_HOST = 'https://adsrental.com'
+    ADMIN_SLACK_TAGS = (
+        'vlad.emelianov',
+        'adsrental18',
+        'bkirk',
+    )
 
     def lead_accounts_to_attachment(self, lead_accounts, title, color, title_link=None):
         fields = []
@@ -44,7 +49,7 @@ class StatsView(View):
         # import json
         # return JsonResponse({'text': json.dumps(request.POST)})
         slack_tag = request.POST.get('user_name', '')
-        if request.POST.get('text'):
+        if request.POST.get('text') and slack_tag in self.ADMIN_SLACK_TAGS:
             slack_tag = request.POST.get('text').replace('@', '')
 
         now = timezone.localtime(timezone.now())
