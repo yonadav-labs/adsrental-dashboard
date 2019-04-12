@@ -141,8 +141,11 @@ class StatsView(View):
                 title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline_2_hours&account_type=google",
             ))
 
-        # raise ValueError(attachments)
+        text = f'Stats for your bundler {bundler.name}'
+        if not attachments:
+            text = f'Your bundler {bundler.name} has no lead accounts that require attention.'
+
         return JsonResponse({
-            'text': f'Stats for {bundler.name}',
+            'text': text,
             "attachments": attachments,
         })
