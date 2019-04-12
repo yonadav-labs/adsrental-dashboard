@@ -74,7 +74,7 @@ class StatsView(View):
             lead__bundler=bundler,
             account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
             status=LeadAccount.STATUS_IN_PROGRESS,
-            lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(hours=2),
+            lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 60),
         ).select_related('lead', 'lead__raspberry_pi')
 
         offline_google_lead_accounts = LeadAccount.objects.filter(
@@ -93,7 +93,7 @@ class StatsView(View):
             lead__bundler=bundler,
             account_type=LeadAccount.ACCOUNT_TYPE_GOOGLE,
             status=LeadAccount.STATUS_IN_PROGRESS,
-            lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(hours=2),
+            lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 60),
         ).select_related('lead', 'lead__raspberry_pi')
 
         attachments = []
@@ -116,7 +116,7 @@ class StatsView(View):
                 offline_2_hours_facebook_lead_accounts,
                 title='Facebook accounts that have been offline for 2 or more hours',
                 color='danger',
-                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline&account_type=facebook",
+                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline_2_hours&account_type=facebook",
             ))
 
         if offline_google_lead_accounts:
@@ -138,7 +138,7 @@ class StatsView(View):
                 offline_2_hours_google_lead_accounts,
                 title='Google accounts that have been offline for 2 or more hours',
                 color='danger',
-                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline&account_type=google",
+                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline_2_hours&account_type=google",
             ))
 
         # raise ValueError(attachments)

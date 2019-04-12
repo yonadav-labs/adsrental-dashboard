@@ -72,6 +72,10 @@ class DashboardHomeView(View):
                 ) | Q(
                     lead__raspberry_pi__last_seen__isnull=True,
                 ))
+            if value == 'offline_2_hours':
+                entries = entries.filter(
+                    lead__raspberry_pi__last_seen__gte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 60),
+                )
             if value == 'offline_0_2days':
                 entries = entries.filter(
                     lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),

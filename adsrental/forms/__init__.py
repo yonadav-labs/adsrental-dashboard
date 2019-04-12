@@ -15,6 +15,7 @@ class DashboardForm(forms.Form):
         ('', 'All'),
         ('online', 'Online only'),
         ('offline', 'Offline only'),
+        ('offline_2_hours', 'Offline for 2 hours'),
         ('offline_0_2days', 'Offline for last 0-2 days'),
         ('offline_3_5days', 'Offline for last 3-5  days'),
         ('offline_5days', 'Offline for more than 5 days'),
