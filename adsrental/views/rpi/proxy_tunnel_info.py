@@ -56,6 +56,13 @@ class ProxyTunnelInfoView(View):
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
             messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
+        if action == 'reassign_ports':
+            raspberry_pi.reset_cache()
+            raspberry_pi.assign_proxy_hostname()
+            raspberry_pi.assign_tunnel_ports()
+            raspberry_pi.new_config_required = True
+            raspberry_pi.save()
+            messages.success(request, 'New hostname and ports were assigned. Update proxy settings in MLA.')
         if action == 'restart':
             raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
