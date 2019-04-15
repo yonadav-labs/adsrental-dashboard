@@ -74,6 +74,7 @@ class FixLeadAccountIssueView(View):
 
         if lead_account_issue.is_form_needed():
             form = FixIssueForm(request.POST)
+            form.user = request.user
             form.lead_account_issue = lead_account_issue
             if not form.is_valid():
                 return render(request, 'bundler/fix_lead_account_issue.html', dict(

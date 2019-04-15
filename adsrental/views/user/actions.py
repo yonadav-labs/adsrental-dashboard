@@ -33,6 +33,7 @@ class FixLeadAccountIssueView(View):
         if lead_account_issue.is_form_needed():
             form = FixIssueForm(request.POST)
             form.lead_account_issue = lead_account_issue
+            form.user = request.user
             if not form.is_valid():
                 return render(request, 'user/fix_lead_account_issue.html', dict(
                     lead_account_issue=lead_account_issue,

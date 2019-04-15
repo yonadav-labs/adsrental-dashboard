@@ -34,8 +34,9 @@ class FixIssueForm(forms.Form):
     def clean_new_value(self):
         new_value = self.cleaned_data['new_value']
         old_value = self.lead_account_issue.get_old_value()
-        if new_value == old_value:
-            raise forms.ValidationError("Value cannot be the same as the old one")
+        if self.user and not self.user.is_superuser:
+            if new_value == old_value:
+                raise forms.ValidationError("Value cannot be the same as the old one")
 
         return new_value
 
