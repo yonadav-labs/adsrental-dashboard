@@ -51,8 +51,8 @@ class ProxyTunnelInfoView(View):
         action = request.POST.get('action')
         if action == 'new_config':
             raspberry_pi.reset_cache()
-            raspberry_pi.assign_proxy_hostname()
-            raspberry_pi.assign_tunnel_ports()
+            # raspberry_pi.assign_proxy_hostname()
+            # raspberry_pi.assign_tunnel_ports()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
             messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
