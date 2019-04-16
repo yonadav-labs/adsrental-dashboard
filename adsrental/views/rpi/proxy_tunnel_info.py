@@ -1,6 +1,6 @@
 import requests
 from django.views import View
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
@@ -15,7 +15,7 @@ class ProxyTunnelInfoView(View):
     @method_decorator(login_required)
     def get(self, request: HttpRequest, rpid: str) -> HttpResponse:
         now = timezone.localtime(timezone.now())
-        raspberry_pi = RaspberryPi.objects.get(rpid=rpid)
+        raspberry_pi = get_object_or_404(RaspberryPi, rpid=rpid)
         if not raspberry_pi.is_proxy_tunnel:
             messages.warning(request, 'This device cannot be used as a proxy tunnel. Use "Make proxy tunnel" action.')
         if not raspberry_pi.online():
