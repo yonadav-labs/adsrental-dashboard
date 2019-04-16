@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.forms.bundler import FixIssueForm, ReportIssueForm
+from adsrental.forms.bundler import FixIssueForm, FixIssueNoValueForm, ReportIssueForm
 
 
 class ReportLeadAccountIssueView(View):
@@ -56,11 +56,13 @@ class FixLeadAccountIssueView(View):
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
         form = None
 
-        if lead_account_issue.is_form_needed():
+        if lead_account_issue.is_value_needed():
             form = FixIssueForm(initial=dict(
                 old_value=lead_account_issue.get_old_value(),
                 new_value=lead_account_issue.new_value or lead_account_issue.get_old_value(),
             ))
+        else:
+            form = FixIssueNoValueForm()
 
         return render(request, 'bundler/fix_lead_account_issue.html', dict(
             lead_account_issue=lead_account_issue,
@@ -72,19 +74,26 @@ class FixLeadAccountIssueView(View):
     def post(self, request, lead_account_issue_id):
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
 
-        if lead_account_issue.is_form_needed():
-            form = FixIssueForm(request.POST)
-            form.user = request.user
-            form.lead_account_issue = lead_account_issue
-            if not form.is_valid():
-                return render(request, 'bundler/fix_lead_account_issue.html', dict(
-                    lead_account_issue=lead_account_issue,
-                    form=form,
-                    can_be_fixed=lead_account_issue.can_be_fixed(),
-                ))
+        if lead_account_issue.is_value_needed():
+            form = FixIssueForm(request.POST, request.FILES)
+        else:
+            form = FixIssueNoValueForm(request.POST, request.FILES)
+
+        form.user = request.user
+        form.lead_account_issue = lead_account_issue
+        if not form.is_valid():
+            return render(request, 'bundler/fix_lead_account_issue.html', dict(
+                lead_account_issue=lead_account_issue,
+                form=form,
+                can_be_fixed=lead_account_issue.can_be_fixed(),
+            ))
 
         if lead_account_issue.can_be_fixed():
-            lead_account_issue.submit(request.POST.get('new_value', ''), request.user)
+            lead_account_issue.submit(form.cleaned_data.get('new_value', ''), request.user)
+            if form.cleaned_data.get('note'):
+                lead_account_issue.insert_note(f"Fix note: {form.cleaned_data['note']}")
+            if form.cleaned_data.get('image'):
+                lead_account_issue.image = form.cleaned_data['image']
             lead_account_issue.save()
 
         messages.success(request, 'Fix submitted')

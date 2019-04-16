@@ -30,6 +30,8 @@ class BundlerIssuesForm(forms.Form):
 class FixIssueForm(forms.Form):
     old_value = forms.CharField(label='Old value', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     new_value = forms.CharField(label='New value', required=True)
+    image = forms.ImageField(label='Image', required=False)
+    note = forms.CharField(label='Note', required=False, widget=forms.Textarea(attrs=dict(placeholder='Add detailed notes about the issue')))
 
     def clean_new_value(self):
         new_value = self.cleaned_data['new_value']
@@ -39,6 +41,11 @@ class FixIssueForm(forms.Form):
         #         raise forms.ValidationError("Value cannot be the same as the old one")
 
         return new_value
+
+
+class FixIssueNoValueForm(forms.Form):
+    image = forms.ImageField(label='Image', required=False)
+    note = forms.CharField(label='Note', required=False, widget=forms.Textarea(attrs=dict(placeholder='Add detailed notes about the issue')))
 
 
 class ReportIssueForm(forms.Form):

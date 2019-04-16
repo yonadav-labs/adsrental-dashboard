@@ -20,7 +20,7 @@
             </a>
         {% endif %}
         {% if lead_account_issue.can_be_fixed %}
-            <form action="" method="post">
+            <form action="" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% if form %}
                     {{ form|bootstrap }}

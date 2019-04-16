@@ -161,7 +161,7 @@ class LeadAccountIssue(models.Model):
         self.new_value = value
         self.insert_note(f'Fix submitted by {edited_by} with value {value}')
 
-    def is_form_needed(self):
+    def is_value_needed(self):
         return self.issue_type in [
             self.ISSUE_TYPE_ADDRESS_CHANGE,
             self.ISSUE_TYPE_PHONE_NUMBER_CHANGE,

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter
+from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter, LeadAccountStatusListFilter
 
 
 class LeadAccountIDListFilter(AbstractIntIDListFilter):
@@ -42,6 +42,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
     list_filter = (
         LeadAccountIDListFilter,
         LeadLeadidListFilter,
+        LeadAccountStatusListFilter,
         'issue_type',
         'status',
         'lead_account__account_type',
