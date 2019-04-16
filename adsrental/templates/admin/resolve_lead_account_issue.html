@@ -8,11 +8,18 @@
     {% for note in lead_account_issue.get_note_lines %}
         <p>{{ note }}</p>
     {% endfor %}
+    {% if lead_account_issue.image %}
+        <h2>Images</h2>
+        <a href="{{ lead_account_issue.image.url }}" target="_blank">
+            <img src="{{ lead_account_issue.image.url }}" width="300px" />
+        </a>
+    {% endif %}
 
     <h2>Actions</h2>
     {% if lead_account_issue.can_be_resolved %}
         <form action="" method="post">
             {% csrf_token %}
+            {{ form.as_p }}
             <button name="action" value="resolve">Resolve</button>
             <button name="action" value="reject">Reject</button>
         </form>
@@ -20,7 +27,7 @@
         <p>Issue is already {{ lead_account_issue.get_status_display }} and cannot be resolved.</p>
         <p>
             <a href="{% url 'admin:adsrental_leadaccountissue_changelist'%}">
-                Back to issues admin
+                Back to issues administration
             </a>
         </p>
     {% endif %}

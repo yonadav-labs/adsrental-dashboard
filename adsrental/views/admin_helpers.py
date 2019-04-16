@@ -10,7 +10,7 @@ from adsrental.admin.lead_history_admin import LeadHistoryAdmin
 from adsrental.admin.lead_account_issue_admin import LeadAccountIssueAdmin
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.forms.admin import ReportIssueForm
+from adsrental.forms.admin import ReportIssueForm, ResolveIssueForm
 
 
 class AdminActionView(View):
@@ -59,6 +59,7 @@ class ResolveLeadAccountIssueView(View):
 
         return render(request, 'admin/resolve_lead_account_issue.html', dict(
             lead_account_issue=lead_account_issue,
+            form=ResolveIssueForm(),
         ))
 
     @method_decorator(login_required)
@@ -67,11 +68,25 @@ class ResolveLeadAccountIssueView(View):
             raise Http404
 
         lead_account_issue = get_object_or_404(LeadAccountIssue, id=int(lead_account_issue_id))
+
+        form = ResolveIssueForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return render(request, 'admin/resolve_lead_account_issue.html', dict(
+                lead_account_issue=lead_account_issue,
+                form=form,
+            ))
+
         if lead_account_issue.can_be_resolved():
             if request.POST['action'] == 'resolve':
                 lead_account_issue.resolve(request.user)
             if request.POST['action'] == 'reject':
                 lead_account_issue.reject(request.user)
+
+            if form.cleaned_data.get('note'):
+                lead_account_issue.insert_note(f"Admin note: {form.cleaned_data['note']}")
+            if form.cleaned_data.get('image'):
+                lead_account_issue.image = form.cleaned_data['image']
+
             lead_account_issue.save()
 
         next_url = request.GET.get('next')
@@ -108,16 +123,16 @@ class ReportLeadAccountIssueView(View):
                 form=form,
             ))
 
-        issue = LeadAccountIssue(
+        lead_account_issue = LeadAccountIssue(
             lead_account=lead_account,
             issue_type=form.cleaned_data['issue_type'],
         )
-        issue.insert_note(f'Reported by {request.user}')
-        if form.cleaned_data['note']:
-            issue.insert_note(form.cleaned_data['note'])
-        if form.cleaned_data['image']:
-            issue.image = form.cleaned_data['image']
-        issue.save()
+        lead_account_issue.insert_note(f'Reported by {request.user}')
+        if form.cleaned_data.get('note'):
+            lead_account_issue.insert_note(form.cleaned_data['note'])
+        if form.cleaned_data.get('image'):
+            lead_account_issue.image = form.cleaned_data['image']
+        lead_account_issue.save()
 
         next_url = request.GET.get('next')
         if next_url:
