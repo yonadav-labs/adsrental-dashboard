@@ -374,6 +374,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             issue = LeadAccountIssue(
                 lead_account=lead_account,
                 issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
+                reporter=request.user,
             )
             issue.insert_note(f'Reported by {request.user}')
             issue.save()
@@ -389,6 +390,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             issue = LeadAccountIssue(
                 lead_account=lead_account,
                 issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
+                reporter=request.user,
             )
             issue.insert_note(f'Reported by {request.user}')
             issue.save()

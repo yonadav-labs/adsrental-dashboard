@@ -35,6 +35,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'status_field',
         'old_value',
         'new_value',
+        'reporter',
         'created',
         'buttons',
     )

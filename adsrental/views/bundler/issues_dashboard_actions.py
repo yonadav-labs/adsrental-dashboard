@@ -34,6 +34,7 @@ class ReportLeadAccountIssueView(View):
         issue = LeadAccountIssue(
             lead_account=lead_account,
             issue_type=form.cleaned_data['issue_type'],
+            reporter=request.user,
         )
         issue.insert_note(f'Reported by {request.user}')
         if form.cleaned_data['note']:
