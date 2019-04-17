@@ -78,9 +78,9 @@ class ResolveLeadAccountIssueView(View):
 
         if lead_account_issue.can_be_resolved():
             if request.POST['action'] == 'resolve':
-                lead_account_issue.resolve(request.user)
+                lead_account_issue.resolve('Admin')
             if request.POST['action'] == 'reject':
-                lead_account_issue.reject(request.user)
+                lead_account_issue.reject('Admin')
 
             if form.cleaned_data.get('note'):
                 lead_account_issue.insert_note(f"Admin note: {form.cleaned_data['note']}")
