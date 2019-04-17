@@ -60,19 +60,19 @@ class StatsView(View):
 
         offline_facebook_lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
             status=LeadAccount.STATUS_IN_PROGRESS,
             lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl),
         ).select_related('lead', 'lead__raspberry_pi')
         sec_check_facebook_lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
             status=LeadAccount.STATUS_IN_PROGRESS,
             security_checkpoint_date__isnull=False,
         ).select_related('lead', 'lead__raspberry_pi')
         offline_2_hours_facebook_lead_accounts = LeadAccount.objects.filter(
             lead__bundler=bundler,
-            account_type=LeadAccount.ACCOUNT_TYPE_FACEBOOK,
+            account_type__in=LeadAccount.ACCOUNT_TYPES_FACEBOOK,
             status=LeadAccount.STATUS_IN_PROGRESS,
             lead__raspberry_pi__last_seen__lt=now - datetime.timedelta(minutes=RaspberryPi.online_minutes_ttl + 2 * 60),
         ).select_related('lead', 'lead__raspberry_pi')
@@ -102,21 +102,21 @@ class StatsView(View):
                 offline_facebook_lead_accounts,
                 title='offline Facebook accounts',
                 color='warning',
-                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline&account_type=facebook",
+                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline&account_type=facebook_types",
             ))
         if sec_check_facebook_lead_accounts:
             attachments.append(self.lead_accounts_to_attachment(
                 sec_check_facebook_lead_accounts,
                 title=' Facebook accounts with a security checkpoint',
                 color='danger',
-                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&security_checkpoint=yes&account_type=facebook",
+                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&security_checkpoint=yes&account_type=facebook_types",
             ))
         if offline_2_hours_facebook_lead_accounts:
             attachments.append(self.lead_accounts_to_attachment(
                 offline_2_hours_facebook_lead_accounts,
                 title='Facebook accounts that have been offline for 2 or more hours',
                 color='danger',
-                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline_2_hours&account_type=facebook",
+                title_link=f"{self.LINK_HOST}{reverse('dashboard')}?lead_status=In-Progress&raspberry_pi_status=offline_2_hours&account_type=facebook_types",
             ))
 
         if offline_google_lead_accounts:
