@@ -417,12 +417,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         'Change password, marks as correct, create LeadChange instance.'
         old_value = self.password
         self.password = new_password
-        user_email = 'user'
-        if edited_by:
-            user_email = edited_by.email
-        if edited_by.is_superuser:
-            user_email = 'admin'
-
+        user_email = edited_by.email if edited_by else 'user'
         if self.wrong_password_date:
             self.wrong_password_date = None
             if edited_by and not edited_by.is_superuser:
