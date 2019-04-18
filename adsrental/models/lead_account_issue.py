@@ -113,6 +113,15 @@ class LeadAccountIssue(models.Model):
     def get_note_lines(self):
         return self.note.split('\n')
 
+    def get_user_note_email(self, user):
+        if not user:
+            return 'user'
+
+        if user.is_superuser:
+            return 'admin'
+
+        return user.email
+
     def resolve(self, edited_by):
         if not self.can_be_resolved():
             return
@@ -145,14 +154,14 @@ class LeadAccountIssue(models.Model):
             return
 
         self.status = self.STATUS_VERIFIED
-        self.insert_note(f'Resolved by {edited_by}')
+        self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
 
     def reject(self, edited_by):
         if not self.can_be_resolved():
             return
 
         self.status = self.STATUS_REJECTED
-        self.insert_note(f'Rejected by {edited_by}')
+        self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
 
     def submit(self, value, edited_by):
         if not self.can_be_fixed():
@@ -160,7 +169,7 @@ class LeadAccountIssue(models.Model):
 
         self.status = self.STATUS_SUBMITTED
         self.new_value = value
-        self.insert_note(f'Fix submitted by {edited_by} with value {value}')
+        self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
 
     def is_value_needed(self):
         return self.issue_type in [
