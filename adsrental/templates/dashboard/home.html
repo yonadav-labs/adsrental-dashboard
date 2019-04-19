@@ -61,7 +61,7 @@
             {% if entries %}
                 <tbody>
                     {% for entry in entries %}
-                        <tr>
+                        <tr style="{% if entry.reported_issues_count %}background-color: #faa;{% endif %}">
                             <td>{{ forloop.counter }}</td>
                             <td>{{ entry.lead.name }}</td>
                             <td>{{ entry.username }}</td>
