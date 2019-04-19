@@ -39,7 +39,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'created',
         'buttons',
     )
-    list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler', 'lead_account__lead__raspberry_pi')
+    list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler', 'lead_account__lead__raspberry_pi',)
     list_filter = (
         LeadAccountIDListFilter,
         LeadLeadidListFilter,
@@ -125,8 +125,8 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
             result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         if obj.can_be_resolved():
             result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
-        if obj.image:
-            result.append(f'<a target="_blank" href="{obj.image.url}"><button type="button">Image</button></a>')
+        for image in obj.images.all():
+            result.append(f'<a target="_blank" href="{image.image.url}"><button type="button">Image</button></a>')
         return mark_safe(', '.join(result))
 
     status_field.short_description = 'Status'

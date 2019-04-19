@@ -59,7 +59,6 @@ class LeadAccountIssue(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
     new_value = models.TextField(default='', blank=True)
-    image = models.ImageField(blank=True, null=True)
     reporter = models.ForeignKey('adsrental.User', blank=True, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)

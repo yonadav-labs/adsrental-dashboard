@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.models.lead_account_issue_image import LeadAccountIssueImage
 from adsrental.forms.bundler import FixIssueForm, FixIssueNoValueForm
 
 
@@ -49,9 +50,14 @@ class FixLeadAccountIssueView(View):
             lead_account_issue.submit(form.cleaned_data.get('new_value', ''), 'user')
             if form.cleaned_data.get('note'):
                 lead_account_issue.insert_note(f"Fix note: {form.cleaned_data['note']}")
-            if form.cleaned_data.get('image'):
-                lead_account_issue.image = form.cleaned_data['image']
             lead_account_issue.save()
+
+            for image in form.cleaned_data.get('images'):
+                lai_image = LeadAccountIssueImage(
+                    lead_account_issue=lead_account_issue,
+                    image=image,
+                )
+                lai_image.save()
 
         next_url = request.GET.get('next')
         if next_url:

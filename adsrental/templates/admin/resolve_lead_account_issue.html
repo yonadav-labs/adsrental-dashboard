@@ -8,11 +8,13 @@
     {% for note in lead_account_issue.get_note_lines %}
         <p>{{ note }}</p>
     {% endfor %}
-    {% if lead_account_issue.image %}
+    {% if lead_account_issue.images.count %}
         <h2>Images</h2>
-        <a href="{{ lead_account_issue.image.url }}" target="_blank">
-            <img src="{{ lead_account_issue.image.url }}" width="300px" />
-        </a>
+        {% for image in lead_account_issue.images.all %}
+            <a href="{{ image.image.url }}" target="_blank">
+                <img src="{{ image.image.url }}" width="300px" />
+            </a>
+        {% endfor %}
     {% endif %}
 
     <h2>Actions</h2>

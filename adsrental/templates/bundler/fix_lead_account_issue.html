@@ -13,11 +13,13 @@
                 <p>{{ line }}</p>
             {% endfor %}
         {% endif %}
-        {% if lead_account_issue.image %}
+        {% if lead_account_issue.images.count %}
             <h3>Images</h3>
-            <a href="{{ lead_account_issue.image.url }}" target="_blank">
-                <img src="{{ lead_account_issue.image.url }}" width="300px" />
-            </a>
+            {% for image in lead_account_issue.images.all %}
+                <a href="{{ image.image.url }}" target="_blank">
+                    <img src="{{ image.image.url }}" width="300px" />
+                </a>
+            {% endfor %}
         {% endif %}
         {% if lead_account_issue.can_be_fixed %}
             <form action="" method="post" enctype="multipart/form-data">
@@ -30,5 +32,12 @@
         {% else %}
             <p>Fix has been submitted for approval.</p>
         {% endif %}
+        {% if lead_account_issue.can_be_resolved %}
+            {% if request.user.is_superuser %}
+                <a class="btn btn-primary" href="{%url 'admin_helpers:resolve_lead_account_issue' lead_account_issue_id=lead_account_issue.id %}">Resolve / Reject as admin</a>
+            {% endif %}
+            <a class="btn btn-primary" href="{%url 'bundler_reject_lead_account_issue' lead_account_issue_id=lead_account_issue.id %}">Reject</a>
+        {% endif %}
+        <a href="{% url 'bundler_issues_dashboard' %}" class="btn btn-default">Back to issues dashboard</a>
     </div>
 {% endblock %}

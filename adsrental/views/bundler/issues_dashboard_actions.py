@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.models.lead_account_issue_image import LeadAccountIssueImage
 from adsrental.forms.bundler import FixIssueForm, FixIssueNoValueForm, ReportIssueForm
 
 
@@ -39,9 +40,15 @@ class ReportLeadAccountIssueView(View):
         issue.insert_note(f'Reported by {request.user}')
         if form.cleaned_data['note']:
             issue.insert_note(form.cleaned_data['note'])
-        if form.cleaned_data['image']:
-            issue.image = form.cleaned_data['image']
         issue.save()
+
+        for image in form.cleaned_data.get('images'):
+            lai_image = LeadAccountIssueImage(
+                lead_account_issue=issue,
+                image=image,
+            )
+            lai_image.save()
+
         messages.success(request, 'New issue reported')
 
         next_url = request.GET.get('next')
@@ -93,8 +100,12 @@ class FixLeadAccountIssueView(View):
             lead_account_issue.submit(form.cleaned_data.get('new_value', ''), request.user)
             if form.cleaned_data.get('note'):
                 lead_account_issue.insert_note(f"Fix note: {form.cleaned_data['note']}")
-            if form.cleaned_data.get('image'):
-                lead_account_issue.image = form.cleaned_data['image']
+            for image in form.cleaned_data.get('images'):
+                lai_image = LeadAccountIssueImage(
+                    lead_account_issue=lead_account_issue,
+                    image=image,
+                )
+                lai_image.save()
             lead_account_issue.save()
 
         messages.success(request, 'Fix submitted')

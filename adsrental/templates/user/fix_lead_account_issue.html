@@ -7,11 +7,13 @@
 {% block content %}
     <div class="container">
         <h1>Fix {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
-        {% if lead_account_issue.image %}
+        {% if lead_account_issue.images.count %}
             <h3>Images</h3>
-            <a href="{{ lead_account_issue.image.url }}" target="_blank">
-                <img src="{{ lead_account_issue.image.url }}" width="300px" />
-            </a>
+            {% for image in lead_account_issue.images.all %}
+                <a href="{{ image.image.url }}" target="_blank">
+                    <img src="{{ image.image.url }}" width="300px" />
+                </a>
+            {% endfor %}
         {% endif %}
         {% if lead_account_issue.can_be_fixed_by_user %}
             <form action="" method="post" enctype="multipart/form-data">

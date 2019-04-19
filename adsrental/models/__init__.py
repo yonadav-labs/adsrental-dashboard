@@ -13,3 +13,5 @@ from adsrental.models.bundler_payments_report import BundlerPaymentsReport  # no
 from adsrental.models.bundler_lead_stat import BundlerLeadStat  # noqa: F401
 from adsrental.models.bundler_payment import BundlerPayment  # noqa: F401
 from adsrental.models.lead_account_issue import LeadAccountIssue  # noqa: F401
+from adsrental.models.bundler_team import BundlerTeam  # noqa: F401
+from adsrental.models.lead_account_issue_image import LeadAccountIssueImage  # noqa: F401
