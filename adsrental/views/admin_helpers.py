@@ -10,6 +10,7 @@ from adsrental.admin.lead_history_admin import LeadHistoryAdmin
 from adsrental.admin.lead_account_issue_admin import LeadAccountIssueAdmin
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.models.lead_account_issue_image import LeadAccountIssueImage
 from adsrental.forms.admin import ReportIssueForm, ResolveIssueForm
 
 
@@ -84,10 +85,15 @@ class ResolveLeadAccountIssueView(View):
 
             if form.cleaned_data.get('note'):
                 lead_account_issue.insert_note(f"Admin note: {form.cleaned_data['note']}")
-            if form.cleaned_data.get('image'):
-                lead_account_issue.image = form.cleaned_data['image']
 
             lead_account_issue.save()
+
+            for image in form.cleaned_data.get('images'):
+                lai_image = LeadAccountIssueImage(
+                    lead_account_issue=lead_account_issue,
+                    image=image,
+                )
+                lai_image.save()
 
         next_url = request.GET.get('next')
         if next_url:
@@ -131,9 +137,14 @@ class ReportLeadAccountIssueView(View):
         lead_account_issue.insert_note(f'Reported by {request.user}')
         if form.cleaned_data.get('note'):
             lead_account_issue.insert_note(form.cleaned_data['note'])
-        if form.cleaned_data.get('image'):
-            lead_account_issue.image = form.cleaned_data['image']
         lead_account_issue.save()
+
+        for image in form.cleaned_data.get('images'):
+            lai_image = LeadAccountIssueImage(
+                lead_account_issue=lead_account_issue,
+                image=image,
+            )
+            lai_image.save()
 
         next_url = request.GET.get('next')
         if next_url:
