@@ -22,7 +22,6 @@ import customerio
 from shipstation.api import ShipStation, ShipStationOrder, ShipStationAddress, ShipStationItem, ShipStationWeight
 
 from adsrental.models.customerio_event import CustomerIOEvent
-from adsrental.models.lead_account import LeadAccount
 
 if typing.TYPE_CHECKING:
     from adsrental.models.lead import Lead
@@ -450,6 +449,12 @@ class PingCacheHelper():
     KEYS = 'ping_keys'
     TTL_SECONDS = 600
 
+    STATUS_QUALIFIED = 'Qualified'
+    STATUS_NEEDS_APPROVAL = 'Needs approval'
+    STATUS_AVAILABLE = 'Available'
+    STATUS_IN_PROGRESS = 'In-Progress'
+    STATUSES_ACTIVE = [STATUS_AVAILABLE, STATUS_QUALIFIED, STATUS_IN_PROGRESS, STATUS_NEEDS_APPROVAL]
+
     def __init__(self) -> None:
         self.cache = cache
 
@@ -583,7 +588,7 @@ class PingCacheHelper():
             created=timezone.now(),
             rpid=rpid,
             lead_status=lead and lead.status,
-            lead_active_accounts_count=lead.lead_accounts.filter(status__in=LeadAccount.STATUSES_ACTIVE).count(),
+            lead_active_accounts_count=lead.lead_accounts.filter(status__in=PingCacheHelper.STATUSES_ACTIVE).count(),
             wrong_password=lead.is_wrong_password() if lead else False,
             restart_required=restart_required,
             new_config_required=new_config_required,
