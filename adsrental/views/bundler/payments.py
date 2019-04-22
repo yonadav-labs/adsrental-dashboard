@@ -170,6 +170,7 @@ class BundlerPaymentsView(View):
                     BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
                     BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
                     BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_THIRD_PARENT,
             ]):
                 lead_account = bundler_payment.lead_account
                 if not lead_account.bundler_paid:

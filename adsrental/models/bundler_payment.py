@@ -9,11 +9,13 @@ class BundlerPayment(models.Model):
     PAYMENT_TYPE_ACCOUNT_CHARGEBACK = 'chargeback'
     PAYMENT_TYPE_ACCOUNT_PARENT = 'account_parent'
     PAYMENT_TYPE_ACCOUNT_SECOND_PARENT = 'account_second_parent'
+    PAYMENT_TYPE_ACCOUNT_THIRD_PARENT = 'account_third_parent'
     PAYMENT_TYPE_BONUS = 'bonus'
     PAYMENT_TYPE_CHOICES = (
         (PAYMENT_TYPE_ACCOUNT_MAIN, 'Lead account activated'),
         (PAYMENT_TYPE_ACCOUNT_PARENT, 'Child\'s Lead account activated'),
         (PAYMENT_TYPE_ACCOUNT_SECOND_PARENT, 'Child\'s Lead account activated (2nd parent)'),
+        (PAYMENT_TYPE_ACCOUNT_THIRD_PARENT, 'Child\'s Lead account activated (3rd parent)'),
         (PAYMENT_TYPE_BONUS, 'Bonus'),
         (PAYMENT_TYPE_ACCOUNT_CHARGEBACK, 'Chargeback'),
     )
@@ -21,6 +23,7 @@ class BundlerPayment(models.Model):
     PAYMENT_TYPES_PARENT = (
         PAYMENT_TYPE_ACCOUNT_PARENT,
         PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+        PAYMENT_TYPE_ACCOUNT_THIRD_PARENT,
     )
 
     BONUSES = [

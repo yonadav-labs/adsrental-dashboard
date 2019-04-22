@@ -113,7 +113,14 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def facebook_payment_field(self, obj):
         result = []
-        if obj.second_parent_bundler:
+        if obj.third_parent_bundler:
+            result.append('${} / ${} / ${} / ${}'.format(
+                obj.facebook_payment - obj.facebook_parent_payment - obj.facebook_second_parent_payment - obj.facebook_third_parent_payment,
+                obj.facebook_parent_payment,
+                obj.facebook_second_parent_payment,
+                obj.facebook_third_parent_payment,
+            ))
+        elif obj.second_parent_bundler:
             result.append('${} / ${} / ${}'.format(
                 obj.facebook_payment - obj.facebook_parent_payment - obj.facebook_second_parent_payment,
                 obj.facebook_parent_payment,
@@ -131,7 +138,14 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def facebook_screenshot_payment_field(self, obj):
         result = []
-        if obj.second_parent_bundler:
+        if obj.third_parent_bundler:
+            result.append('${} / ${} / ${} / ${}'.format(
+                obj.facebook_payment - obj.facebook_screenshot_parent_payment - obj.facebook_screenshot_second_parent_payment - obj.facebook_screenshot_third_parent_payment,
+                obj.facebook_screenshot_parent_payment,
+                obj.facebook_screenshot_second_parent_payment,
+                obj.facebook_screenshot_third_parent_payment,
+            ))
+        elif obj.second_parent_bundler:
             result.append('${} / ${} / ${}'.format(
                 obj.facebook_payment - obj.facebook_screenshot_parent_payment - obj.facebook_screenshot_second_parent_payment,
                 obj.facebook_screenshot_parent_payment,
@@ -149,7 +163,14 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def google_payment_field(self, obj):
         result = []
-        if obj.second_parent_bundler:
+        if obj.third_parent_bundler:
+            result.append('${} / ${} / ${} / ${}'.format(
+                obj.google_payment - obj.google_parent_payment - obj.google_second_parent_payment - obj.google_third_parent_payment,
+                obj.google_parent_payment,
+                obj.google_second_parent_payment,
+                obj.google_third_parent_payment,
+            ))
+        elif obj.second_parent_bundler:
             result.append('${} / ${} / ${}'.format(
                 obj.google_payment - obj.google_parent_payment - obj.google_second_parent_payment,
                 obj.google_parent_payment,
@@ -167,7 +188,14 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def amazon_payment_field(self, obj):
         result = []
-        if obj.second_parent_bundler:
+        if obj.third_parent_bundler:
+            result.append('${} / ${} / ${} / ${}'.format(
+                obj.amazon_payment - obj.amazon_parent_payment - obj.amazon_second_parent_payment - obj.amazon_third_parent_payment,
+                obj.amazon_parent_payment,
+                obj.amazon_second_parent_payment,
+                obj.amazon_third_parent_payment,
+            ))
+        elif obj.second_parent_bundler:
             result.append('${} / ${} / ${}'.format(
                 obj.amazon_payment - obj.amazon_parent_payment - obj.amazon_second_parent_payment,
                 obj.amazon_parent_payment,
