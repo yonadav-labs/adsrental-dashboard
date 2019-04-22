@@ -66,6 +66,8 @@ class RaspberryPi(models.Model):
         ('178.128.1.68', 'Proxykeeper', ),
         ('138.197.219.240', 'Proxykeeper2', ),
         ('138.197.197.65', 'Proxykeeper3', ),
+        ('157.230.146.152', 'Proxykeeper4', ),
+        ('157.230.155.97', 'Proxykeeper5', ),
     )
 
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
@@ -142,14 +144,20 @@ class RaspberryPi(models.Model):
 
         return (tunnel_port, tunnel_port + 1)
 
-    def assign_proxy_hostname(self) -> None:
+    def assign_proxy_hostname(self) -> str:
         hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
-        if not hostname_count:
-            self.proxy_hostname = RaspberryPi.TUNNEL_HOST
-            return
+
+        hostnames = []
+        for i in hostname_count:
+            hostnames.append(i['proxy_hostname'])
+
+        for proxy_hostname, _ in RaspberryPi.PROXY_HOSTNAME_CHOICES:
+            if proxy_hostname not in hostnames:
+                self.proxy_hostname = proxy_hostname
+                return self.proxy_hostname
 
         self.proxy_hostname = hostname_count.first()['proxy_hostname']
-        return
+        return self.proxy_hostname
 
     def assign_tunnel_ports(self) -> None:
         self.tunnel_port, self.rtunnel_port = self.find_tunnel_ports()
@@ -224,6 +232,8 @@ class RaspberryPi(models.Model):
     @classmethod
     def get_objects_online(cls) -> models.query.QuerySet:
         now = timezone.localtime(timezone.now())
+        if settings.LOCAL:
+            now = now - datetime.timedelta(days=180)
         return cls.objects.filter(last_seen__gte=now - datetime.timedelta(minutes=cls.online_minutes_ttl))
 
     @classmethod
