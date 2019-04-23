@@ -135,11 +135,12 @@ class LogView(View):
     def _get_ping_response_data(self, request: HttpRequest, rpid: str, ping_data: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
         lead_status = ping_data['lead_status']
         wrong_password = ping_data.get('wrong_password')
+        lead_active_accounts_count = ping_data.get('lead_active_accounts_count', 1)
 
         reason = None
         result = True
 
-        if not Lead.is_status_active(lead_status):
+        if not Lead.is_status_active(lead_status) or not lead_active_accounts_count:
             reason = 'Lead not found or banned'
             response_data = {
                 'reason': reason,
