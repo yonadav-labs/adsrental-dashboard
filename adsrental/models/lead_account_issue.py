@@ -119,6 +119,10 @@ class LeadAccountIssue(models.Model):
     def get_note_lines(self):
         return self.note.split('\n')
 
+    def get_comments(self):
+        return [f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} {ii} {ii.text}\n'
+                for ii in self.comments.order_by('created')]
+
     def get_user_note_email(self, user):
         if not user:
             return 'user'
