@@ -31,7 +31,7 @@ class Comment(models.Model):
     text = models.TextField(
         blank=True, null=True, 
         help_text='Not shown when you hover user name in admin interface.')
-    image = models.ImageField()
+    image = models.ImageField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -541,6 +541,10 @@ class Lead(models.Model, FulltextSearchMixin):
     def add_comment(self, message, user=None):
         'Add a comment to the model'
         self.comments.create(user=user, text=message)
+
+    def get_comments(self):
+        return [f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
+                for ii in self.comments.order_by('created')]
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'

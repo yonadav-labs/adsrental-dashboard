@@ -687,6 +687,10 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         'Add a comment to the model'
         self.comments.create(user=user, text=message)
 
+    def get_comments(self):
+        return [f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
+                for ii in self.comments.order_by('created')]
+
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
         if not event_datetime:
