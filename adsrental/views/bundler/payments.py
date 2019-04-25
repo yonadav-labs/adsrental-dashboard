@@ -84,6 +84,7 @@ class BundlerPaymentsView(View):
             report_id=report_id,
             bundler__in=available_bundlers,
             payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
+            lead_account__charge_back=True,
         ).select_related(
             'bundler',
             'lead_account',
