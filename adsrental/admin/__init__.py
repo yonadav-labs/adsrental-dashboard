@@ -18,6 +18,7 @@ from adsrental.admin.bundler_payment_admin import BundlerPaymentAdmin
 from adsrental.admin.lead_account_issue_admin import LeadAccountIssueAdmin
 from adsrental.admin.bundler_team_admin import BundlerTeamAdmin
 from adsrental.admin.lead_account_issue_image_admin import LeadAccountIssueImageAdmin
+from adsrental.models.lead import Comment
 
 
 admin.site.register(CustomUserAdmin.model, CustomUserAdmin)
@@ -42,3 +43,4 @@ admin.site.register(VultrInstanceAdmin.model, VultrInstanceAdmin)
 admin.site.register(LeadAccountIssueAdmin.model, LeadAccountIssueAdmin)
 admin.site.register(BundlerTeamAdmin.model, BundlerTeamAdmin)
 admin.site.register(LeadAccountIssueImageAdmin.model, LeadAccountIssueImageAdmin)
+admin.site.register(Comment)
