@@ -24,6 +24,23 @@ if typing.TYPE_CHECKING:
     from adsrental.models.ec2_instance import EC2Instance
 
 
+class Comment(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
+        related_name="comments", null=True, blank=True)
+    text = models.TextField(
+        blank=True, null=True, 
+        help_text='Not shown when you hover user name in admin interface.')
+    image = models.ImageField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.user:
+            return '{} {}'.format(self.user.first_name, self.user.last_name)
+        else:
+            return 'User'
+
+
 class Lead(models.Model, FulltextSearchMixin):
     """
     Stores a single lead entry, related to :model:`adsrental.RaspberryPi` and
@@ -146,6 +163,7 @@ class Lead(models.Model, FulltextSearchMixin):
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available', help_text='All statuses except for Banned are considered as Active')
     email = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
+    comments = models.ManyToManyField(Comment, blank=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
     account_name = models.CharField(max_length=255, blank=True, null=True, help_text='Obsolete, was used in SF, should be removed')
