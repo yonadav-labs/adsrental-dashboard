@@ -41,7 +41,9 @@ class ShowLogView(View):
 
         lines = open(log_path).readlines()
         lines.reverse()
-        return HttpResponse(''.join(lines), content_type='text/plain')
+        return render(request, 'log/file.html', dict(
+            lines=lines,
+        ))
 
 
 class LogView(View):

@@ -1,0 +1,12 @@
+{% for line in lines %}
+    {% if 'PING' in line %}
+        <span style="background-color: #efe;">{{ line }}</span>
+    {% else %}
+        {% if 'restarting' in line %}
+            <span style="background-color: #fee;">{{ line }}</span>
+        {% else %}
+            <span>{{ line }}</span>
+        {% endif %}
+    {% endif %}
+    <br />
+{% endfor %}
