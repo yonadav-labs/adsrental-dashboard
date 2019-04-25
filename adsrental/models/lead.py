@@ -36,7 +36,10 @@ class Comment(models.Model):
 
     def __str__(self):
         if self.user:
-            return '{} {}'.format(self.user.first_name, self.user.last_name)
+            if self.user.is_superuser:
+                return 'Admin'
+            else:
+                return '{} {}'.format(self.user.first_name, self.user.last_name)
         else:
             return 'User'
 
@@ -316,8 +319,9 @@ class Lead(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
-        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
-        self.save()
+        self.add_comment(f'Status changed from {old_value} to {self.status}', edited_by)
+        # self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
+        # self.save()
         LeadChange(lead=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
         try:
             CustomerIOClient().send_lead(self)
@@ -533,6 +537,10 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
+
+    def add_comment(self, message, user=None):
+        'Add a comment to the model'
+        self.comments.create(user=user, text=message)
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'

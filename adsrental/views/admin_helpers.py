@@ -84,7 +84,8 @@ class ResolveLeadAccountIssueView(View):
                 lead_account_issue.reject(request.user)
 
             if form.cleaned_data.get('note'):
-                lead_account_issue.insert_note(f"Admin note: {form.cleaned_data['note']}")
+                lead_account_issue.add_comment(f"Admin note: {form.cleaned_data['note']}", request.user)
+                # lead_account_issue.insert_note(f"Admin note: {form.cleaned_data['note']}")
 
             lead_account_issue.save()
 
@@ -134,10 +135,12 @@ class ReportLeadAccountIssueView(View):
             issue_type=form.cleaned_data['issue_type'],
             reporter=request.user,
         )
-        lead_account_issue.insert_note(f'Reported by {request.user}')
-        if form.cleaned_data.get('note'):
-            lead_account_issue.insert_note(form.cleaned_data['note'])
         lead_account_issue.save()
+        lead_account_issue.add_comment(f'Reported by {request.user}', request.user)
+        # lead_account_issue.insert_note(f'Reported by {request.user}')
+        if form.cleaned_data.get('note'):
+            lead_account_issue.add_comment(form.cleaned_data['note'], request.user)
+            # lead_account_issue.insert_note(form.cleaned_data['note'])
 
         for image in form.cleaned_data.get('images'):
             lai_image = LeadAccountIssueImage(
