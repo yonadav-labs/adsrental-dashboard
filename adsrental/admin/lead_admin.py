@@ -201,9 +201,10 @@ class LeadAdmin(admin.ModelAdmin):
         return obj.leadid
 
     def name(self, obj):
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('{name}{note}'.format(
             name=html.escape(obj.name()),
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def usps_field(self, obj):
