@@ -93,11 +93,12 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         lead = obj.lead_account.lead
         if not lead:
             return None
+        comments = '\n'.join(lead.get_comments())
         return mark_safe('<a href="{url}?leadid={q}">{title}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             title=lead.name(),
             q=lead.leadid,
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead.note)}" alt="?">' if lead.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def raspberry_pi_field(self, obj):
