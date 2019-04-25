@@ -38,7 +38,10 @@ class ShowLogView(View):
         log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid, filename)
         if not os.path.exists(log_path):
             raise Http404
-        return HttpResponse(open(log_path).read(), content_type='text/plain')
+
+        lines = open(log_path).readlines()
+        lines.reverse()
+        return HttpResponse(''.join(lines), content_type='text/plain')
 
 
 class LogView(View):
