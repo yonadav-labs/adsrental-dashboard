@@ -66,6 +66,10 @@ class LeadAccountIssue(models.Model):
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
 
+    def add_comment(self, message, user=None):
+        'Add a comment to the model'
+        self.comments.create(user=user, text=message)
+
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
         if not event_datetime:
@@ -156,14 +160,16 @@ class LeadAccountIssue(models.Model):
             return
 
         self.status = self.STATUS_VERIFIED
-        self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
+        self.add_comment(f'Resolved by {self.get_user_note_email(edited_by)}', edited_by)
+        # self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
 
     def reject(self, edited_by):
         if not self.can_be_resolved():
             return
 
         self.status = self.STATUS_REJECTED
-        self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
+        self.add_comment(f'Rejected by {self.get_user_note_email(edited_by)}', edited_by)
+        # self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
 
     def submit(self, value, edited_by):
         if not self.can_be_fixed():
@@ -171,7 +177,8 @@ class LeadAccountIssue(models.Model):
 
         self.status = self.STATUS_SUBMITTED
         self.new_value = value
-        self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
+        self.add_comment(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}', edited_by)
+        # self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
 
     def is_value_needed(self):
         return self.issue_type in [

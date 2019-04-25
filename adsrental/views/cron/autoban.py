@@ -46,8 +46,9 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(autoban_user, reason=LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD)
-                lead_account.insert_note(f'Auto banned as account had wrong password issue for {days_wrong_password} days', event_datetime=now)
-                lead_account.save()
+                lead_account.add_comment(f'Auto banned as account had wrong password issue for {days_wrong_password} days', request.user)
+                # lead_account.insert_note(f'Auto banned as account had wrong password issue for {days_wrong_password} days', event_datetime=now)
+                # lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
@@ -61,11 +62,13 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(edited_by=autoban_user, reason=LeadAccount.BAN_REASON_AUTO_OFFLINE)
-                lead_account.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
-                lead_account.save()
+                lead_account.add_comment(f'Auto banned as device was offline for {days_offline} days', request.user)
+                # lead_account.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
+                # lead_account.save()
                 lead = lead_account.lead
                 lead.ban(edited_by=autoban_user)
-                lead.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
+                lead.add_comment(f'Auto banned as device was offline for {days_offline} days', request.user)
+                # lead.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
 
         for lead_account in LeadAccount.objects.filter(
                 security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
@@ -79,8 +82,9 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(autoban_user, reason=LeadAccount.BAN_REASON_AUTO_CHECKPOINT)
-                lead_account.insert_note(f'Auto banned as account had sec checkpoint issue for {days_checkpoint} days', event_datetime=now)
-                lead_account.save()
+                lead_account.add_comment(f'Auto banned as account had sec checkpoint issue for {days_checkpoint} days', request.user)
+                # lead_account.insert_note(f'Auto banned as account had sec checkpoint issue for {days_checkpoint} days', event_datetime=now)
+                # lead_account.save()
 
         for lead_account in LeadAccount.objects.filter(
                 status=Lead.STATUS_QUALIFIED,
@@ -94,8 +98,9 @@ class AutoBanView(View):
             })
             if execute:
                 lead_account.ban(autoban_user, reason=LeadAccount.BAN_REASON_AUTO_NOT_USED)
-                lead_account.insert_note(f'Auto banned as device was not used for {days_delivered} days', event_datetime=now)
-                lead_account.save()
+                lead_account.add_comment(f'Auto banned as device was not used for {days_delivered} days', request.user)
+                # lead_account.insert_note(f'Auto banned as device was not used for {days_delivered} days', event_datetime=now)
+                # lead_account.save()
 
         # for lead_account in LeadAccount.objects.filter(
         #         status=LeadAccount.STATUS_BANNED,
