@@ -25,13 +25,14 @@ if typing.TYPE_CHECKING:
 
 
 class Comment(models.Model):
+    "Coments class for Lead, LeadAccount, LeadAccountIssue"
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
         related_name="comments", null=True, blank=True)
     text = models.TextField(
         blank=True, null=True, 
         help_text='Not shown when you hover user name in admin interface.')
-    image = models.ImageField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -42,6 +43,13 @@ class Comment(models.Model):
                 return f'{self.user.first_name} {self.user.last_name}'
         else:
             return 'User'
+
+
+class CommentImage(models.Model):
+    "Images for comment"
+
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    image = models.ImageField(blank=True, null=True)
 
 
 class Lead(models.Model, FulltextSearchMixin):
