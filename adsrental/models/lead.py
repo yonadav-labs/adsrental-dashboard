@@ -39,7 +39,7 @@ class Comment(models.Model):
             if self.user.is_superuser:
                 return 'Admin'
             else:
-                return '{} {}'.format(self.user.first_name, self.user.last_name)
+                return f'{self.user.first_name} {self.user.last_name}'
         else:
             return 'User'
 
