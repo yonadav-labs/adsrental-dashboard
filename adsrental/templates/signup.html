@@ -108,7 +108,7 @@
                     });
                 </script>
 
-                <form id="registerForm" action="" method="POST" enctype="multipart/form-data">
+                <form id="registerForm" action="" class="form-horizontal" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.utm_source }}
 
@@ -120,146 +120,123 @@
                                 {% endfor %}
                             {% endif %}
 
-                            <table style="margin: auto;">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.first_name.field.required %}required{% endif %}" for="email">{{form.first_name.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.last_name.field.required %}required{% endif %}" for="email">{{form.last_name.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.email.field.required %}required{% endif %}" for="email">{{form.email.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.phone.field.required %}required{% endif %}" for="email">{{form.phone.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+                            <div class="form-group m-b-5">
+                                <label class="control-label col-sm-4 {% if form.facebook_profile_url.field.required %}required{% endif %}" for="email">{{form.facebook_profile_url.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.facebook_profile_url }}
+                                </div>
+                            </div>
+                            <small>Go to facebook.com, and click your name in the upper left corner. Copy the url in the field for 'Facebook Profile Url'</small>
+                            <div class="form-group m-t-5">
+                                <label class="control-label col-sm-4 {% if form.fb_email.field.required %}required{% endif %}" for="email">{{form.fb_email.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.fb_email }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.fb_secret.field.required %}required{% endif %}" for="email">{{form.fb_secret.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.fb_secret }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.fb_friends.field.required %}required{% endif %}" for="email">{{form.fb_friends.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.fb_friends }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.street.field.required %}required{% endif %}" for="email">{{form.street.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.street }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.apartment.field.required %}required{% endif %}" for="email">{{form.apartment.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.apartment }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.city.field.required %}required{% endif %}" for="email">{{form.city.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.state.field.required %}required{% endif %}" for="email">{{form.state.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.postal_code.field.required %}required{% endif %}" for="email">{{form.postal_code.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.photo_id.field.required %}required{% endif %}" for="email">{{form.photo_id.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.photo_id }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.extra_photo_id.field.required %}required{% endif %}" for="email">{{form.extra_photo_id.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.extra_photo_id }}
+                                </div>
+                            </div>
 
-                                <tr>
-                                    <td class="form_label {% if form.first_name.field.required %}required{% endif %}">{{form.first_name.label}}</td>
-                                    <td>
-                                        {{ form.first_name }}
-                                    </td>
-                                </tr>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4 {% if form.apply_type.field.required %}required{% endif %}" for="email">{{form.apply_type.label}}</label>
+                                <div class="col-sm-8 col-md-5">
+                                    {{ form.apply_type }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-md-5 col-sm-offset-4 text-left">
+                                    {{ form.accept }}
+                                    I agree to the <a href="{% url 'terms' %}"
+                                    target="_blank">terms and conditions</a>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-md-5 col-sm-offset-4 text-left">
+                                    {{ form.age_check }}
+                                    {{ form.age_check.label }}
+                                </div>
+                            </div>
 
-                                <tr>
-                                    <td class="form_label {% if form.last_name.field.required %}required{% endif %}">{{form.last_name.label}}</td>
-                                    <td>
-                                        {{ form.last_name }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.email.field.required %}required{% endif %}">{{form.email.label}}</td>
-                                    <td>
-                                        {{ form.email }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.phone.field.required %}required{% endif %}">{{form.phone.label}}</td>
-                                    <td>
-                                        {{ form.phone }}
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="form_label {% if form.facebook_profile_url.field.required %}required{% endif %}">{{form.facebook_profile_url.label}}</td>
-                                    <td>
-                                        {{ form.facebook_profile_url }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="2"><small>Go to facebook.com, and click your name in the upper left corner. Copy the url in the field for 'Facebook Profile Url'</small></td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="form_label {% if form.fb_email.field.required %}required{% endif %}">{{form.fb_email.label}}</td>
-                                    <td>
-                                        {{ form.fb_email }}
-                                    </td>
-                                </tr>
-                                
-                                <tr>
-                                    <td class="form_label {% if form.fb_secret.field.required %}required{% endif %}">{{form.fb_secret.label}}</td>
-                                    <td>
-                                        {{ form.fb_secret }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.fb_friends.field.required %}required{% endif %}">{{form.fb_friends.label}}</td>
-                                    <td>
-                                        {{ form.fb_friends }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.street.field.required %}required{% endif %}">{{form.street.label}}</td>
-                                    <td>
-                                        {{ form.street }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.apartment.field.required %}required{% endif %}">{{form.apartment.label}}</td>
-                                    <td>
-                                        {{ form.apartment }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.city.field.required %}required{% endif %}">{{form.city.label}}</td>
-                                    <td>
-                                        {{ form.city }}
-                                    </td>
-                                    
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.state.field.required %}required{% endif %}">{{form.state.label}}</td>
-                                    <td>
-                                        {{ form.state }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.postal_code.field.required %}required{% endif %}">{{form.postal_code.label}}</td>
-                                    <td>
-                                        {{ form.postal_code }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.photo_id.field.required %}required{% endif %}">{{form.photo_id.label}}</td>
-                                    <td>
-                                        {{ form.photo_id }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.extra_photo_id.field.required %}required{% endif %}">{{form.extra_photo_id.label}}</td>
-                                    <td>
-                                        {{ form.extra_photo_id }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="form_label {% if form.apply_type.field.required %}required{% endif %}">{{form.apply_type.label}}</td>
-                                    <td>
-                                        {{ form.apply_type }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="2" align="left">
-                                        {{ form.accept }}
-                                        I agree to the <a href="{% url 'terms' %}"
-                                            target="_blank">terms and conditions</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" align="left">
-                                        {{ form.age_check }}
-                                        {{ form.age_check.label }}
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="text-align: right;" colspan="2">
-                                        {{ form.captcha }}
-                                    </td>
-                                </tr>
-
-                            </table>
+                            <div class="form-group">
+                                <div class="col-sm-8 col-md-5 col-sm-offset-4 text-left">
+                                    {{ form.captcha }}
+                                </div>
+                            </div>
 
                             <button class="click-btn role-element leadstyle-link" style="cursor: pointer;" id="start-today-link">Click Here to Apply</button>
 
