@@ -151,7 +151,7 @@ class LogView(View):
                 'reason': reason,
                 'source': 'ping',
                 'result': result,
-                'skip_ping': True,
+                'unassign_hostname': True,
             }
             return response_data
 
