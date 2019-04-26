@@ -130,11 +130,12 @@ class LogView(View):
         ping_cache_helper = PingCacheHelper()
         ping_data = ping_cache_helper.get_data_for_request(request)
         ping_data['last_ping'] = timezone.now()
-        ping_cache_helper.set(rpid, ping_data)
 
         self.add_log(request, rpid, 'PING {}'.format(request.GET.urlencode()))
 
         response_data = self._get_ping_response_data(request, rpid, ping_data)
+        if not response_data.get('skip_ping', False):
+            ping_cache_helper.set(rpid, ping_data)
         return self.json_response(request, rpid, response_data)
 
     def _get_ping_response_data(self, request: HttpRequest, rpid: str, ping_data: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
@@ -151,6 +152,7 @@ class LogView(View):
                 'reason': reason,
                 'source': 'ping',
                 'result': result,
+                'skip_ping': True,
             }
             return response_data
 
