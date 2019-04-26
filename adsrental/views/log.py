@@ -147,11 +147,18 @@ class LogView(View):
 
         if not Lead.is_status_active(lead_status) or not lead_active_accounts_count:
             reason = 'Lead not found or banned'
+            update_required = self._get_update_required(ping_data)
+            if update_required:
+                self.add_log(request, rpid, 'RaspberryPi image updated, updating...')
+                raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+                if raspberry_pi:
+                    raspberry_pi.reset_cache()
             response_data = {
                 'reason': reason,
                 'source': 'ping',
                 'result': result,
                 'unassign_hostname': True,
+                'update': update_required,
             }
             return response_data
 
