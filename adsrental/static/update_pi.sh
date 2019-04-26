@@ -22,10 +22,10 @@ IS_BETA=`echo "$CONNECTION_DATA" | jq -r '.is_beta'`
 ${HOME}/new-pi/client_log.sh "Response: $CONNECTION_DATA Beta: $IS_BETA"
 
 # setings.RASPBERRY_PI_VERSION
-VERSION="2.0.4"
+VERSION="2.0.5"
 if [[ "${IS_BETA}" == "true" ]]; then
     # setings.BETA_RASPBERRY_PI_VERSION
-    VERSION="2.0.4"
+    VERSION="2.0.5"
 fi
 
 cd /home/pi/new-pi/
