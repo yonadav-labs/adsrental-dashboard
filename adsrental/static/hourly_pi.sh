@@ -45,7 +45,7 @@ fi
 if [[ "`crontab -l | grep -Po keepalive_cron`" == "" ]]; then
     ${HOME}/new-pi/client_log.sh "=== Crontab rescue ==="
     cd /home/pi/new-pi/
-    curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_2.0.5.zip > pi_patch.zip
+    curl https://s3-us-west-2.amazonaws.com/mvp-store/pi_patch_2.0.6.zip > pi_patch.zip
     unzip -o pi_patch.zip
     cat /home/pi/new-pi/crontab.txt | crontab
     ${HOME}/new-pi/client_log.sh "Update complete"
