@@ -41,7 +41,7 @@ class ConnectionDataView(View):
 
         return JsonResponse({
             'rpid': raspberry_pi.rpid,
-            'hostname': raspberry_pi.proxy_hostname,
+            'hostname': raspberry_pi.proxy_hostname or '',
             'user': raspberry_pi.TUNNEL_USER,
             'tunnel_port': raspberry_pi.tunnel_port,
             'rtunnel_port': raspberry_pi.rtunnel_port,
