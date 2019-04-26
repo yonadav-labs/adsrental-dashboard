@@ -2,6 +2,7 @@ from django.views import View
 from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead_account import LeadAccount
 
 
 class ConnectionDataView(View):
@@ -19,10 +20,20 @@ class ConnectionDataView(View):
             })
 
         lead = raspberry_pi.get_lead()
-        if not lead or not lead.is_active():
+        if not lead:
             return JsonResponse({
                 'error': 'Not available',
                 # 'shutdown': True,
+                'hostname': '',
+                'result': False,
+            })
+
+        active_accounts_count = lead.lead_accounts.filter(status__in=LeadAccount.STATUSES_ACTIVE).count()
+        if not active_accounts_count:
+            return JsonResponse({
+                'error': 'Not available',
+                # 'shutdown': True,
+                'hostname': '',
                 'result': False,
             })
 
