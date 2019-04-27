@@ -12,44 +12,18 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django_bulk_update.manager import BulkUpdateManager
+from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
+from adsrental.models.comment import Comment
 from adsrental.utils import CustomerIOClient, ShipStationClient
 
 
 if typing.TYPE_CHECKING:
     from adsrental.models.user import User
     from adsrental.models.ec2_instance import EC2Instance
-
-
-class Comment(models.Model):
-    "Coments class for Lead, LeadAccount, LeadAccountIssue"
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
-        related_name="comments", null=True, blank=True)
-    text = models.TextField(
-        blank=True, null=True, 
-        help_text='Not shown when you hover user name in admin interface.')
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        if self.user:
-            if self.user.is_superuser:
-                return 'Admin'
-            else:
-                return f'{self.user.first_name} {self.user.last_name}'
-        else:
-            return 'User'
-
-
-class CommentImage(models.Model):
-    "Images for comment"
-
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
-    image = models.ImageField(blank=True, null=True)
 
 
 class Lead(models.Model, FulltextSearchMixin):
@@ -174,7 +148,7 @@ class Lead(models.Model, FulltextSearchMixin):
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available', help_text='All statuses except for Banned are considered as Active')
     email = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
-    comments = models.ManyToManyField(Comment, blank=True)
+    comments = GenericRelation(Comment, blank=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
     account_name = models.CharField(max_length=255, blank=True, null=True, help_text='Obsolete, was used in SF, should be removed')
