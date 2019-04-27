@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.core.files.base import ContentFile
 from django.contrib import messages
+from django.http import HttpResponse
 from xhtml2pdf import pisa
 
 from adsrental.models.lead_account import LeadAccount
@@ -196,3 +197,13 @@ class BundlerPaymentsView(View):
             return redirect('admin:adsrental_bundlerpaymentsreport_changelist')
 
         return render(request, 'bundler_payments.html', context)
+
+
+class BundlerPaymentsChargeBackView(View):
+    @method_decorator(login_required)
+    def get(self, request, lead_account_id):
+        lead_account = LeadAccount.objects.get(pk=lead_account_id)
+        lead_account.charge_back = False
+        lead_account.save()
+        
+        return HttpResponse('success')
