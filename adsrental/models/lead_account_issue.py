@@ -2,9 +2,9 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 
-from adsrental.models.lead import Comment
-
+from adsrental.models.comment import Comment
 
 class LeadAccountIssue(models.Model):
     ISSUE_TYPE_WRONG_PASSWORD = 'Wrong Password'
@@ -60,7 +60,7 @@ class LeadAccountIssue(models.Model):
     issue_type = models.CharField(max_length=50, choices=ISSUE_TYPE_CHOICES)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
-    comments = models.ManyToManyField(Comment, blank=True)
+    comments = GenericRelation(Comment, blank=True)
     new_value = models.TextField(default='', blank=True)
     reporter = models.ForeignKey('adsrental.User', blank=True, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(default=timezone.now)

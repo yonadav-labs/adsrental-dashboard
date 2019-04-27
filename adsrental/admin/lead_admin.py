@@ -28,6 +28,7 @@ from adsrental.admin.list_filters import \
     AbstractFulltextFilter, \
     LeadAccountSecurityCheckpointListFilter, \
     titled_filter
+from adsrental.admin.comment_admin import CommentInline
 
 
 class LeadidListFilter(AbstractUIDListFilter):
@@ -121,6 +122,7 @@ class LeadAdmin(admin.ModelAdmin):
     )
     inlines = (
         LeadAccountInline,
+        CommentInline
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
     # list_prefetch_related = ('lead_accounts', )
