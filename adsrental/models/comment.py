@@ -35,4 +35,3 @@ class CommentImage(models.Model):
 
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     image = models.ImageField(blank=True, null=True)
-

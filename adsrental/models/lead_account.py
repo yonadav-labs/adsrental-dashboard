@@ -690,8 +690,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         self.comments.create(user=user, text=message)
 
     def get_comments(self):
-        return [f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
-                for ii in self.comments.order_by('created')]
+        res = []
+        for ii in self.comments.order_by('created'):
+            item = f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
+            if ii.response:
+                item += f'\n >> Admin response: {ii.response}'
+            res.append(item)
+        return res
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
