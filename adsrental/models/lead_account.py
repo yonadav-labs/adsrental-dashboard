@@ -11,10 +11,12 @@ from django.db import models
 from django.conf import settings
 from django.utils import dateformat
 from django_bulk_update.query import BulkUpdateQuerySet
+from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.mixins import FulltextSearchMixin
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.lead import Lead, Comment
+from adsrental.models.lead import Lead
+from adsrental.models.comment import Comment
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.utils import CustomerIOClient, AdsdbClient
@@ -157,7 +159,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
-    comments = models.ManyToManyField(Comment, blank=True)
+    comments = GenericRelation(Comment, blank=True)
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='lead_accounts', related_query_name='lead_account')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_AVAILABLE)
     old_status = models.CharField(max_length=50, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
