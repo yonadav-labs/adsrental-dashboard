@@ -18,6 +18,10 @@
           <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
           <link href="{% static 'css/base.css' %}" rel="stylesheet">
       {% endblock styles %}
+
+      {% block extra_css %}
+      {% endblock extra_css %}
+
     {% endblock head %}
   </head>
   <body{% block body_attribs %}{% endblock body_attribs %}>
@@ -73,6 +77,10 @@
       <script src="{% static 'scripts/jquery.min.js' %}"></script>
       <script src="{% static 'scripts/bootstrap.min.js' %}"></script>
     {% endblock scripts %}
+
+    {% block extra_js %}
+    {% endblock extra_js %}
+
     {% endblock body %}
   </body>
 {% endblock html %}
