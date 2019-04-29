@@ -61,3 +61,7 @@ fi
 #     sudo sync
 #     ${HOME}/new-pi/client_log.sh "Installed 2.0.0"
 # fi
+
+${HOME}/new-pi/client_log.sh "=== Top output ==="
+${HOME}/new-pi/client_log.sh "`top | head`"
+${HOME}/new-pi/client_log.sh "=== End top output ==="
