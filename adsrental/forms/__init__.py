@@ -37,13 +37,9 @@ class DashboardForm(forms.Form):
         ('yes_3_5days', 'Reported for 3-5 days'),
         ('yes_5days', 'Reported for more than 5 days'),
     )
-    LEAD_STATUS_CHOICES = (
+    STATUS_CHOICES = (
         ('', 'All'),
-        (Lead.STATUS_AVAILABLE, 'Available'),
-        (Lead.STATUS_BANNED, 'Banned'),
-        (Lead.STATUS_QUALIFIED, 'Qualified'),
-        (Lead.STATUS_DISQUALIFIED, 'Disualified'),
-        (Lead.STATUS_IN_PROGRESS, 'In-Progress'),
+        *LeadAccount.STATUS_CHOICES,
     )
     BANNED_CHOICES = (
         ('', 'All'),
@@ -76,7 +72,7 @@ class DashboardForm(forms.Form):
         ('cancelled', 'Cancelled', ),
     )
     search = forms.CharField(label='Search', required=False)
-    lead_status = forms.ChoiceField(label='Status', choices=LEAD_STATUS_CHOICES, required=False)
+    lead_status = forms.ChoiceField(label='Status', choices=STATUS_CHOICES, required=False)
     raspberry_pi_status = forms.ChoiceField(label='RaspberryPi Online state', choices=RASPBERRY_PI_STATUS_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
     security_checkpoint = forms.ChoiceField(label='Security Checkpoint', choices=SECURITY_CHECKPOINT_CHOICES, required=False)
