@@ -63,5 +63,5 @@ fi
 # fi
 
 ${HOME}/new-pi/client_log.sh "=== Top output ==="
-${HOME}/new-pi/client_log.sh "`top | head`"
+${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
 ${HOME}/new-pi/client_log.sh "=== End top output ==="
