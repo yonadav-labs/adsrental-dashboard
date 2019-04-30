@@ -139,9 +139,10 @@ class DashboardHomeView(View):
                     security_checkpoint_date__lte=timezone.now() - datetime.timedelta(hours=5 * 24),
                 )
 
-        if form.cleaned_data['lead_status']:
-            value = form.cleaned_data['lead_status']
-            entries = entries.filter(status=value)
+        if form.cleaned_data['status']:
+            values = form.cleaned_data['status']
+            for value in values:
+                entries = entries.filter(status=value)
 
         if form.cleaned_data['banned']:
             value = form.cleaned_data['banned']
