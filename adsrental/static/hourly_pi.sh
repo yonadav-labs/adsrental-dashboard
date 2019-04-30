@@ -62,6 +62,6 @@ fi
 #     ${HOME}/new-pi/client_log.sh "Installed 2.0.0"
 # fi
 
-# ${HOME}/new-pi/client_log.sh "=== Top output ==="
-# ${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
-# ${HOME}/new-pi/client_log.sh "=== End top output ==="
+${HOME}/new-pi/client_log.sh "=== Top output ==="
+${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
+${HOME}/new-pi/client_log.sh "=== End top output ==="
