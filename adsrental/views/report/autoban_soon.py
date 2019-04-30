@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.shortcuts import render, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db.models import Q
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead import Lead
@@ -31,6 +32,9 @@ class AutoBanSoonView(View):
             active=True,
             auto_ban_enabled=True,
         )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True) 
+                                           | Q(disable_auto_ban_until__lte=now))
+
         days_before_ban = self.DAYS_BEFORE_BAN
         ban_reasons = LeadAccount.AUTO_BAN_REASONS
 

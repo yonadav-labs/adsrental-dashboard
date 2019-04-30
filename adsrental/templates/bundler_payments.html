@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% load static %}
 {% load bootstrap %}
 {% load humanize %}
 {% load helpers %}
@@ -120,7 +121,7 @@
                                 {{ payment.lead_account.status }}
                             </td>
                             <td>
-                                ${{payment.payment}}
+                                ${{payment.payment}}                                    
                             </td>
                         </tr>
                     {% endfor %}
@@ -147,6 +148,7 @@
                             </td>
                             <td>
                                 ${{payment.payment}}
+                                <a href="javascript:removeAccountFromReport({{ payment.lead_account.id }});" class="btn-del-la">Remove</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -297,3 +299,7 @@
         <h4>Total: ${{ record.payment__sum}}</h4> 
     {% endfor %}
 {% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'scripts/bundler-report.js' %}"></script>
+{% endblock extra_js %}
