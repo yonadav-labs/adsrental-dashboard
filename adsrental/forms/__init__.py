@@ -72,7 +72,7 @@ class DashboardForm(forms.Form):
         ('cancelled', 'Cancelled', ),
     )
     search = forms.CharField(label='Search', required=False)
-    lead_status = forms.ChoiceField(label='Status', choices=STATUS_CHOICES, required=False)
+    status = forms.MultipleChoiceField(label='Status', choices=STATUS_CHOICES, required=False, widget=forms.CheckboxSelectMultiple)
     raspberry_pi_status = forms.ChoiceField(label='RaspberryPi Online state', choices=RASPBERRY_PI_STATUS_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
     security_checkpoint = forms.ChoiceField(label='Security Checkpoint', choices=SECURITY_CHECKPOINT_CHOICES, required=False)
