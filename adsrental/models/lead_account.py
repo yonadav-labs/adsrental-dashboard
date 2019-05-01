@@ -229,24 +229,16 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if self.status == LeadAccount.STATUS_IN_PROGRESS and self.lead.raspberry_pi and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_payment
-                result -= self.get_parent_bundler_payment(bundler)
-                result -= self.get_second_parent_bundler_payment(bundler)
-                result -= self.get_third_parent_bundler_payment(bundler)
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
                 result += bundler.facebook_screenshot_payment
-                result -= self.get_parent_bundler_payment(bundler)
-                result -= self.get_second_parent_bundler_payment(bundler)
-                result -= self.get_third_parent_bundler_payment(bundler)
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_payment
-                result -= self.get_parent_bundler_payment(bundler)
-                result -= self.get_second_parent_bundler_payment(bundler)
-                result -= self.get_third_parent_bundler_payment(bundler)
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_payment
-                result -= self.get_parent_bundler_payment(bundler)
-                result -= self.get_second_parent_bundler_payment(bundler)
-                result -= self.get_third_parent_bundler_payment(bundler)
+
+            result -= self.get_parent_bundler_payment(bundler)
+            result -= self.get_second_parent_bundler_payment(bundler)
+            result -= self.get_third_parent_bundler_payment(bundler)
 
         return result
 
@@ -261,13 +253,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return decimal.Decimal('0.00')
 
         if self.ban_reason not in (
-                LeadAccount.BAN_REASON_QUIT,
-                LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
-                LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
-                LeadAccount.BAN_REASON_AUTO_OFFLINE,
-                LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-                LeadAccount.BAN_REASON_BAD_AD_ACCOUNT,
-                LeadAccount.BAN_REASON_DUPLICATE,
+            LeadAccount.BAN_REASON_QUIT,
+            LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
+            LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
+            LeadAccount.BAN_REASON_AUTO_OFFLINE,
+            LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+            LeadAccount.BAN_REASON_BAD_AD_ACCOUNT,
+            LeadAccount.BAN_REASON_DUPLICATE,
         ):
             return decimal.Decimal('0.00')
 
@@ -289,11 +281,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
             if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
                 result += bundler.facebook_screenshot_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_parent_payment
 
         return result
@@ -303,11 +295,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if bundler.second_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
             if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_second_parent_payment
-            if self.account_type == self.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            elif self.account_type == self.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
                 result += bundler.facebook_screenshot_second_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_second_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_second_parent_payment
 
         return result
@@ -317,11 +309,11 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         if bundler.third_parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
             if self.account_type == self.ACCOUNT_TYPE_FACEBOOK:
                 result += bundler.facebook_third_parent_payment
-            if self.account_type == self.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
+            elif self.account_type == self.ACCOUNT_TYPE_FACEBOOK_SCREENSHOT:
                 result += bundler.facebook_screenshot_third_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 result += bundler.google_third_parent_payment
-            if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
+            elif self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON:
                 result += bundler.amazon_third_parent_payment
 
         return result
@@ -477,17 +469,16 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         payment_datetime = self.in_progress_date or timezone.now()
         result = []
         payment = self.get_bundler_payment(bundler)
+
         if payment:
             entry, _ = BundlerPayment.objects.get_or_create(
                 bundler=bundler,
                 lead_account=self,
                 payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
-                defaults=dict(payment=payment)
+                defaults=dict(payment=payment, datetime=payment_datetime)
             )
-            entry.payment = payment
-            entry.datetime = payment_datetime
-            entry.save()
             result.append(entry)
+
         parent_payment = self.get_parent_bundler_payment(bundler)
         if parent_payment:
             parent_bundler = bundler.parent_bundler  # pylint: disable=no-member
@@ -495,11 +486,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 bundler=parent_bundler,
                 lead_account=self,
                 payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
-                defaults=dict(payment=parent_payment)
+                defaults=dict(payment=parent_payment, datetime=payment_datetime)
             )
-            entry.payment = parent_payment
-            entry.datetime = payment_datetime
-            entry.save()
             result.append(entry)
 
         second_parent_payment = self.get_second_parent_bundler_payment(bundler)
@@ -509,11 +497,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 bundler=second_parent_bundler,
                 lead_account=self,
                 payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
-                defaults=dict(payment=second_parent_payment)
+                defaults=dict(payment=second_parent_payment, datetime=payment_datetime)
             )
-            entry.payment = second_parent_payment
-            entry.datetime = payment_datetime
-            entry.save()
             result.append(entry)
 
         third_parent_payment = self.get_third_parent_bundler_payment(bundler)
@@ -523,11 +508,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 bundler=third_parent_bundler,
                 lead_account=self,
                 payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_THIRD_PARENT,
-                defaults=dict(payment=second_parent_payment)
+                defaults=dict(payment=third_parent_payment, datetime=payment_datetime)
             )
-            entry.payment = second_parent_payment
-            entry.datetime = payment_datetime
-            entry.save()
             result.append(entry)
 
         chargeback = self.get_bundler_chargeback(bundler)
@@ -536,11 +518,8 @@ class LeadAccount(models.Model, FulltextSearchMixin):
                 bundler=bundler,
                 lead_account=self,
                 payment_type=BundlerPayment.PAYMENT_TYPE_ACCOUNT_CHARGEBACK,
-                defaults=dict(payment=chargeback)
+                defaults=dict(payment=chargeback, datetime=self.banned_date)
             )
-            entry.payment = chargeback
-            entry.datetime = self.banned_date
-            entry.save()
             result.append(entry)
 
         return result
