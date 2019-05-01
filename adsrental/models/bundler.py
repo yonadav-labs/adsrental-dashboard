@@ -12,6 +12,7 @@ class Bundler(models.Model):
 
     name = models.CharField(max_length=255, unique=True, db_index=True)
     utm_source = models.CharField(max_length=50, db_index=True, null=True, blank=True)
+    url_tag = models.CharField(max_length=50, db_index=True, null=True, blank=True)
     adsdb_id = models.IntegerField(null=True, blank=True, help_text='ID from adsdb database')
     email = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)

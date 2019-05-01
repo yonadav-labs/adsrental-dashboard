@@ -9,7 +9,16 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.landing import LandingView, TermsView, FAQView, AboutView, ContactView, RequirementsView, JoinView
+from adsrental.views.landing import (
+    LandingView, 
+    TermsView, 
+    FAQView, 
+    AboutView, 
+    ContactView, 
+    RequirementsView, 
+    JoinView, 
+    LandingWithUrlTagView
+)
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.robots import RobotsView
 
@@ -55,4 +64,5 @@ urlpatterns = [
     path('report/', include(('adsrental.urls.report', 'adsrental'), namespace='report')),
     path('slack/', include(('adsrental.urls.slack', 'adsrental'), namespace='slack')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
+    path('apply/<url_tag>/', LandingWithUrlTagView.as_view(), name='home_tag'),
 ]
