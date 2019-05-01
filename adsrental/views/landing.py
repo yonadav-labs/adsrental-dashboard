@@ -56,6 +56,23 @@ class LandingView(View):
         ))
 
 
+class LandingWithUrlTagView(LandingView):
+    template_name = 'landing_v2/index.html'
+
+    @https_required
+    def get(self, request, url_tag):
+        bundler = Bundler.objects.filter(url_tag=url_tag, is_active=True).first()
+        if not url_tag or not bundler:
+            if request.user.is_authenticated:
+                return redirect('main')
+            return redirect('user_login')
+
+        return render(request, self.template_name, dict(
+            user=request.user,
+            form=LandingForm(),
+        ))
+
+
 class ContactView(LandingView):
     template_name = 'landing_v2/contact.html'
 
