@@ -4,9 +4,10 @@ import json
 from django.views import View
 from django.shortcuts import render, redirect
 from django.shortcuts import Http404
+from django.conf import settings
 import django.db
 
-from adsrental.forms import SignupForm
+from adsrental.forms import SignupForm, SafeSignupForm
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.bundler import Bundler
@@ -14,6 +15,8 @@ from adsrental.utils import CustomerIOClient
 
 
 class SignupView(View):
+    form_class = SafeSignupForm if settings.LOCAL else SignupForm
+
     def get(self, request):
         if 'utm_source' in request.GET:
             utm_source = request.GET.get('utm_source')
@@ -44,11 +47,11 @@ class SignupView(View):
             utm_source=request.GET.get('utm_source'),
             isp='',
             remote_addr=request.META.get('REMOTE_ADDR'),
-            form=SignupForm(initial=form_initial_data),
+            form=self.form_class(initial=form_initial_data),
         ))
 
     def post(self, request):
-        form = SignupForm(request.POST, request.FILES)
+        form = self.form_class(request.POST, request.FILES)
         if not form.is_valid():
             # raise ValueError(form.errors)
             form_errors = []
