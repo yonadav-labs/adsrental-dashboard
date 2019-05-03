@@ -246,6 +246,10 @@ class SignupForm(forms.Form):
         return value
 
 
+class SafeSignupForm(SignupForm):
+    captcha = None
+
+
 class ReportForm(forms.Form):
     MONTH_CURRENT = '2018-02'
     MONTH_CHOICES = (
