@@ -10,6 +10,7 @@ venv
 dbdata1
 /pip_cache/http
 /pip_cache/wheels
+e2e_tests/output/*
 
 **/*.pyc
 

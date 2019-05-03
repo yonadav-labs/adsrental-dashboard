@@ -3,66 +3,21 @@ const uuid = require('uuid/v4');
 
 function getRandomDigits(length) {
     let result = '';
-    for (let i=0; i < length ; i++) {
+    for (let i = 0; i < length; i++) {
         result += Math.floor(Math.random() * 10)
     }
-   return result;
+    return result;
 }
-   
-
 
 Feature('My Adsrental Test');
 
-// Scenario('test main page', (I) => {
-//   I.amOnPage('http://localhost:8443/?utm_source=600');
-//   I.see('EARN CASH NOW');
-//   I.fillField('First name', 'asd');
-//   I.wait(1000);
-// });
-
-
-// Scenario('test no last name', (I) => {
-//     I.amOnPage('http://localhost:5000');
-//     I.see('Hi there!');
-//     I.fillField('First name', 'Vlad');
-//     I.click('Continue');
-//     I.see('Hi there');
-// });
-// Scenario('test botton', (I) => {
-//     I.amOnPage('http://localhost:5000');
-//     I.see('Hi there!');
-//     I.fillField('First name', 'Vlad');
-//     I.fillField('Last name', 'Emelianov');
-//     I.pressKey('Enter');
-//     I.see('Hi Vlad Emelianov!');
-//   });
-//   Scenario('not me', (I) => {
-//     I.amOnPage('http://localhost:5000');
-//     I.see('Hi there!');
-//     I.fillField('First name', 'Vlad');
-//     I.fillField('Last name', 'Emelianov');
-//     I.click('Continue');
-//     I.see('Hi Vlad Emelianov!');
-//     I.see('This is not me')
-//   });
-//   Scenario('not me', (I) => {
-//     I.amOnPage('http://localhost:5000');
-//     I.see('Hi there!');
-//     I.fillField('First name', 'Vlad');
-//     I.fillField('Last name', 'Emelianov');
-//     I.click('Continue');
-//     I.see('Hi Vlad Emelianov!');
-//     I.see('This is not me');
-//     I.click('This is not me');
-//     I.see('Hi there!')
-//   });
 Scenario('ads', async (I) => {
-    const randomID = uuid().split('-')[0]; 
+    const randomID = uuid().split('-')[0];
 
     I.amOnPage('http://localhost:8443/?utm_source=600');
     I.see('Sign Up for free.');
     I.fillField('First name', 'Vlad')
-    I.fillField('Last name' , 'Emelianow');
+    I.fillField('Last name', 'Emelianow');
     I.fillField('Email address', 'volshebnyi_' + randomID + '@gmail.com')
     I.click('APPLY');
     I.waitForElement('body', 5)
@@ -76,9 +31,9 @@ Scenario('ads', async (I) => {
 
     // I.wait(100)
     // I.see('volshebnyi@gmail.com')
-    I.fillField('phone', '1'+getRandomDigits(9))
+    I.fillField('phone', '1' + getRandomDigits(9))
     I.fillField('input[name="facebook_profile_url"]', 'https://www.facebook.com/' + randomID)
-    I.fillField('input[name="fb_email"]', 'olvida_ '+ randomID + '@mail.ru')
+    I.fillField('input[name="fb_email"]', 'olvida_ ' + randomID + '@mail.ru')
     I.fillField('input[name="fb_secret"]', '65656565')
     I.fillField('input[name="fb_friends"]', '150')
     I.fillField('input[name="street"]', 'fufuguf')
