@@ -25,12 +25,7 @@ Scenario('ads', async (I) => {
     I.seeElement('input[name="first_name"][value="Vlad"]')
     I.seeElement('input[name="last_name"][value="Emelianow"]')
     I.seeElement('input[name="email"][value="volshebnyi_' + randomID + '@gmail.com"]')
-    // const text = await I.grabTextFrom('input[name="first_name"]');
-    // throw Error(text)
 
-
-    // I.wait(100)
-    // I.see('volshebnyi@gmail.com')
     I.fillField('phone', '1' + getRandomDigits(9))
     I.fillField('input[name="facebook_profile_url"]', 'https://www.facebook.com/' + randomID)
     I.fillField('input[name="fb_email"]', 'olvida_ ' + randomID + '@mail.ru')
