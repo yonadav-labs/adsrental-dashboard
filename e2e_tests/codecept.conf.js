@@ -4,7 +4,11 @@ exports.config = {
   helpers: {
     Puppeteer: {
       url: 'http://localhost',
-      show: true
+      show: true,
+      windowSize: '1920x1080',
+      chrome: {
+        args: ['--no-sandbox', '--window-size=1920,1080'],
+      },
     }
   },
   include: {
@@ -12,5 +16,5 @@ exports.config = {
   },
   bootstrap: null,
   mocha: {},
-  name: 'example_test'
+  name: 'example_test',
 }
