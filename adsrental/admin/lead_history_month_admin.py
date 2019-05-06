@@ -30,7 +30,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     model = LeadHistoryMonth
     # admin_caching_enabled = True
-    list_per_page = 5000
+    # list_per_page = 5000
     list_display = (
         'id',
         'date_field',
