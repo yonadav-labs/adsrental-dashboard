@@ -794,7 +794,7 @@ class ReportLeadAdmin(LeadAdmin):
 
     model = ReportProxyLead
     # admin_caching_enabled = True
-    list_per_page = 500
+    # list_per_page = 500
     list_display = (
         'name',
         'status_field',
