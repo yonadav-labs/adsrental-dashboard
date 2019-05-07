@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Bundler {{ bundler.name }} bonuses for {{start_date|date:"d M"}} - {{end_date|date:"d M"}}</h1>
 
-    <a class="button" href="{% url 'admin_helpers:bundler_bonuses' %}?date={{start_date|date:"Y-m-d"|urlencode }}">
+    <a class="button" href="{% url 'admin_helpers:bundler_daily_bonuses' %}?date={{start_date|date:"Y-m-d"|urlencode }}">
         &lt;&lt; Back
     </a>
 
