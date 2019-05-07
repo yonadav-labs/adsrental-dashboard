@@ -205,5 +205,5 @@ class BundlerPaymentsChargeBackView(View):
         lead_account = LeadAccount.objects.get(pk=lead_account_id)
         lead_account.charge_back = False
         lead_account.save()
-        
+
         return HttpResponse('success')
