@@ -10,3 +10,7 @@ if os.environ.get('ENV') == 'dev':
 if os.environ.get('ENV') == 'prod':
     ENVIRONMENT = 'prod'
     SETTINGS_MODULE = 'config.settings.prod'
+
+if os.environ.get('ENV') == 'test':
+    ENVIRONMENT = 'test'
+    SETTINGS_MODULE = 'config.settings.test'
