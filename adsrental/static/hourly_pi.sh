@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+''                  '               '   #!/usr/bin/env bash
 
 RASPBERRYPI_ID="`head -n 1 ${HOME}/rpid.conf`"
 
@@ -15,7 +15,7 @@ if [[ "`which jq`" == "" ]]; then
     sudo apt-get update
     sudo apt-get -y install jq
     if [[ "`which jq`" == "" ]]; then
-        ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"
+        ${HOME}/new-pi/client_log.sh "DPKG is in bad state!"        
         VERSION="`head -n 1 ${HOME}/new-pi/version.txt`"
         if [[ "$VERSION" == "2.0.0" ]]; then
             cd /home/pi/new-pi/
