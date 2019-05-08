@@ -290,14 +290,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def approve_account(self, request, queryset):
         for lead_account in queryset:
             if lead_account.status != LeadAccount.STATUS_NEEDS_APPROVAL:
-                messages.info(request, 'Lead Account {} should be in Neeads Approval status.'.format(lead_account))
+                messages.info(request, f'Lead Account {lead_account} should be in Neeads Approval status.')
                 continue
             lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
             lead_account.save()
             if lead_account.lead.status == Lead.STATUS_NEEDS_APPROVAL:
                 lead_account.lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                 lead_account.lead.save()
-            messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
+            messages.info(request, f'Lead Account {lead_account} approved and moved to In-Progress.')
 
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:

@@ -199,6 +199,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.save()
+            messages.success(request, f'Cache reset successful for {raspberry_pi.rpid}.')
 
     def show_cache(self, request, queryset):
         for raspberry_pi in queryset:
