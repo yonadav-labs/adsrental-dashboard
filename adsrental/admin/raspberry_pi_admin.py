@@ -143,14 +143,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
             raspberry_pi.save()
-        messages.success(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
+            messages.success(request, f'Restart successfully requested for {raspberry_pi.rpid}. RPi and tunnel should be online in two minutes.')
 
     def update_config(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
-        messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
+            messages.success(request, f'New config successfully requested for {raspberry_pi.rpid}. Tunnel should be online in two minutes.')
 
     def convert_to_ec2(self, request, queryset):
         for raspberry_pi in queryset:
@@ -167,9 +167,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             else:
                 EC2Instance.launch_for_lead(lead)
 
-            messages.success(request, 'Device {rpid} converted to EC2'.format(
-                rpid=raspberry_pi.rpid,
-            ))
+            messages.success(request, f'Device {raspberry_pi.rpid} converted to EC2')
 
     def convert_to_proxy_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
@@ -204,7 +202,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
     def show_cache(self, request, queryset):
         for raspberry_pi in queryset:
             cache_data = raspberry_pi.get_cache()
-            messages.info(request, '{} cache: {}'.format(raspberry_pi.rpid, cache_data))
+            messages.info(request, f'{raspberry_pi.rpid} cache: {cache_data}')
 
     def links(self, obj):
         links = []
