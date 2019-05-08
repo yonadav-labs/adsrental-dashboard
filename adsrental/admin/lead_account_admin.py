@@ -288,7 +288,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):
-        for lead_account in queryset.filter(status=LeadAccount.STATUS_NEEDS_APPROVAL):
+        for lead_account in queryset:
+            if lead_account.status != LeadAccount.STATUS_NEEDS_APPROVAL:
+                messages.info(request, 'Lead Account {} should be in Neeads Approval status.'.format(lead_account))
+                continue
             lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
             lead_account.save()
             if lead_account.lead.status == Lead.STATUS_NEEDS_APPROVAL:
