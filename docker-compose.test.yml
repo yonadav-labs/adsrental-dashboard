@@ -16,7 +16,7 @@ services:
     command: /app/scripts/runserver.sh
     privileged: true
     environment:
-      ENV: local
+      ENV: test
       WERKZEUG_DEBUG_PIN: "off"
       HTTPS: "on"
       wsgi.url_scheme: "https"
