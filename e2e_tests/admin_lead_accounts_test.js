@@ -1,6 +1,6 @@
 Feature('Admin LeadAccounts Test')
 
-Scenario('main active', (I)=>{
+Scenario('main', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
     I.see('Adsrental Administration')
     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
