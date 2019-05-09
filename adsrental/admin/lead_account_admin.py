@@ -172,7 +172,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             leadid=obj.lead.leadid,
@@ -182,7 +182,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if not obj.lead.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
         ))
@@ -194,7 +194,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             dt = f'after {humanize_timedelta(obj.banned_date - obj.created, short=True)}' if obj.banned_date else ''
             status = f'{obj.status} ({obj.get_ban_reason_display()}) {dt}'
             title = obj.note if obj.note else f'Banned for {obj.get_ban_reason_display()}'
-        return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.id,
             title=title,
@@ -263,7 +263,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def bundler_field(self, obj):
         bundler = obj.lead.bundler
         if bundler:
-            return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+            return mark_safe('<a href="{url}?q={q}" title="{title}">{text}</a>'.format(
                 url=reverse('admin:adsrental_bundler_changelist'),
                 q=bundler.email,
                 title=bundler.utm_source,
@@ -274,14 +274,14 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Issues</a>'.format(
+        result.append('<a href="{url}?lead_account_id={id}">Issues</a>'.format(
             url=reverse('admin:adsrental_leadaccountissue_changelist'),
             id=obj.id,
         ))
-        result.append('<a target="_blank" href="{url}">Report new issue</a>'.format(
+        result.append('<a href="{url}">Report new issue</a>'.format(
             url=reverse('admin_helpers:report_lead_account_issue', kwargs=dict(lead_account_id=obj.id)),
         ))
-        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Bundler payments</a>'.format(
+        result.append('<a href="{url}?lead_account_id={id}">Bundler payments</a>'.format(
             url=reverse('admin:adsrental_bundlerpayment_changelist'),
             id=obj.id,
         ))
@@ -541,7 +541,7 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_readonlylead_changelist'),
             lead=lead.name(),
             leadid=lead.leadid,

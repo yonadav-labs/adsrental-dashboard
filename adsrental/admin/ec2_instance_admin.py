@@ -69,7 +69,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def lead_link(self, obj):
         if obj.lead is None:
             return obj.email
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=obj.lead.email,
             q=obj.lead.leadid,
@@ -81,7 +81,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
-        return mark_safe('<a target="_blank" href="{url}?rpid={q}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={q}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
             q=obj.lead.raspberry_pi.rpid,
@@ -132,23 +132,23 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def links(self, obj):
         links = []
         if obj.rpid:
-            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            links.append('<a href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
         if obj.lead:
-            links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+            links.append('<a href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
             ))
         if obj.lead and obj.lead.raspberry_pi:
             now = timezone.localtime(timezone.now())
             today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
-            links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
+            links.append('<a href="{log_url}">Today log</a>'.format(
                 log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
             ))
-            links.append('<a target="_blank" href="{url}">Netstat</a>'.format(
+            links.append('<a href="{url}">Netstat</a>'.format(
                 url=reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=obj.rpid)),
             ))
-            links.append('<a target="_blank" href="{url}">RTunnel</a>'.format(
+            links.append('<a href="{url}">RTunnel</a>'.format(
                 url=reverse('ec2_ssh_start_reverse_tunnel', kwargs=dict(rpid=obj.rpid)),
             ))
 

@@ -31,8 +31,8 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{url}">View</a>'.format(url=reverse('bundler_payments', kwargs=dict(report_id=obj.id))))
-        result.append('<a target="_blank" href="{url}">Download PDF</a>'.format(url=obj.pdf.url))
+        result.append('<a href="{url}">View</a>'.format(url=reverse('bundler_payments', kwargs=dict(report_id=obj.id))))
+        result.append('<a href="{url}">Download PDF</a>'.format(url=obj.pdf.url))
         return mark_safe(', '.join(result))
 
     def mark_as_paid(self, request, queryset):
