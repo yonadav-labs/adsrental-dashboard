@@ -80,7 +80,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         lead = obj.get_lead()
         if lead is None:
             return obj.leadid
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.email,
             q=lead.leadid,
@@ -95,7 +95,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             return None
         result = []
         if ec2_instance:
-            result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+            result.append('<a href="{url}?q={q}">{ec2_instance}</a>'.format(
                 url=reverse('admin:adsrental_ec2instance_changelist'),
                 ec2_instance=ec2_instance,
                 q=ec2_instance.instance_id,
@@ -208,21 +208,21 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         links = []
         now = timezone.localtime(timezone.now())
         if obj.is_proxy_tunnel:
-            links.append('<a target="_blank" href="{url}">Proxy tunnel</a>'.format(
+            links.append('<a href="{url}">Proxy tunnel</a>'.format(
                 url=reverse('rpi_proxy_tunnel_info', kwargs=dict(rpid=obj.rpid)),
             ))
         else:
-            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            links.append('<a href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
-        links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+        links.append('<a href="{url}">pi.conf</a>'.format(
             url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
         ))
         today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
-        links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
+        links.append('<a href="{log_url}">Today log</a>'.format(
             log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
         ))
-        links.append('<a target="_blank" href="{url}?q={rpid}">Sessions</a>'.format(
+        links.append('<a href="{url}?q={rpid}">Sessions</a>'.format(
             url=reverse('admin:adsrental_raspberrypisession_changelist'),
             rpid=obj.rpid,
         ))

@@ -29,7 +29,7 @@ class CustomUserAdmin(UserAdmin):
     def bundler_field(self, obj):
         if not obj.bundler:
             return None
-        return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+        return mark_safe('<a href="{url}?q={q}" title="{title}">{text}</a>'.format(
             url=reverse('admin:adsrental_bundler_changelist'),
             q=obj.bundler.email,
             title=obj.bundler.utm_source,

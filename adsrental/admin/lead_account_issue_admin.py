@@ -103,7 +103,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         if not obj.lead_account.lead.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead_account.lead.raspberry_pi.rpid,
         ))
@@ -122,11 +122,11 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
     def buttons(self, obj):
         result = []
         if obj.can_be_fixed():
-            result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+            result.append('<a href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         if obj.can_be_resolved():
-            result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+            result.append('<a href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         for image in obj.images.all():
-            result.append(f'<a target="_blank" href="{image.image.url}"><button type="button">Image</button></a>')
+            result.append(f'<a href="{image.image.url}"><button type="button">Image</button></a>')
         return mark_safe(', '.join(result))
 
     status_field.short_description = 'Status'
