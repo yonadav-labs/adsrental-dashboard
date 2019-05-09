@@ -1,4 +1,4 @@
-Feature('Admin LeadAccounts Test')
+Feature('Admin RaspberryPi Test')
 
 Scenario('adrental active', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
