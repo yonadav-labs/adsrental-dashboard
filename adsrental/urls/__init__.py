@@ -10,13 +10,13 @@ from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
 from adsrental.views.landing import (
-    LandingView, 
-    TermsView, 
-    FAQView, 
-    AboutView, 
-    ContactView, 
-    RequirementsView, 
-    JoinView, 
+    LandingView,
+    TermsView,
+    FAQView,
+    AboutView,
+    ContactView,
+    RequirementsView,
+    JoinView,
     LandingWithUrlTagView
 )
 from adsrental.views.adsdb import ADSDBLeadView
