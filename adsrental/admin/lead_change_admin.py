@@ -62,7 +62,7 @@ class LeadChangeAdmin(ReadOnlyModelAdmin):
         lead = obj.lead
         if not lead:
             return None
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{text}</a>{note}'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{text}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             text=lead.name(),
             q=lead.leadid,
