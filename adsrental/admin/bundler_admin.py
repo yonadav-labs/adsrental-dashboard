@@ -105,10 +105,10 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{payments_url}">Reports list</a>'.format(payments_url=reverse('bundler_report_payments_list', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{report_url}">Leaderboard</a>'.format(report_url=reverse('bundler_leaderboard', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{report_url}">Check report</a>'.format(report_url=reverse('bundler_report_check', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{payments_url}">Reports list</a>'.format(payments_url=reverse('bundler_report_payments_list', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{report_url}">Leaderboard</a>'.format(report_url=reverse('bundler_leaderboard', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{report_url}">Check report</a>'.format(report_url=reverse('bundler_report_check', kwargs={'bundler_id': obj.id})))
         return mark_safe(', '.join(result))
 
     def facebook_payment_field(self, obj):
