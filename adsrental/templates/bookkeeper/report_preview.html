@@ -10,8 +10,8 @@
 
 <div class="container">
     {% block actions_buttons %}
-        <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
-        <a target="_blank" href="{% url 'bookkeeper_report_preview' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
+        <a href="{% url 'bookkeeper_report_preview' %}?pdf=true"><button class="btn btn-default">Download PDF</button></a>
+        <a href="{% url 'bookkeeper_report_preview' %}?save=true&amp;mark=true"><button class="btn btn-primary">Generate a new report</button></a>
     {% endblock actions_buttons %}
 
     <h3>Summary</h3>
