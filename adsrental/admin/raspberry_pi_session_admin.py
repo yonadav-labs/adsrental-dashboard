@@ -23,9 +23,10 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         result = []
         if obj.raspberry_pi:
-            result.append('<a href="{url}?rpid={rpid}">{rpid}</a> (<a href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>)'.format(
+            result.append('<a href="{url}?rpid={rpid}">{rpid}</a> (<a href="{log_url}">Logs</a>, <a href="{rdp_url}">RDP</a>)'.format(
                 rdp_url=reverse('rdp_ec2_connect', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
+                log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 rpid=obj.raspberry_pi.rpid,
             ))
 
