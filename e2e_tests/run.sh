@@ -8,8 +8,10 @@ cd $ROOT_PATH
 
 
 echo "=== Installing test DB ==="
-mysql -u root -h 0.0.0.0 -P 23306 -e 'create database if not exists adsrental_test;'
+mysql -u root -h 0.0.0.0 -P 23306 -e 'drop database if exists adsrental_test;'
+mysql -u root -h 0.0.0.0 -P 23306 -e 'create database adsrental_test;'
 zcat e2e_tests/test.sql.gz | mysql -u root -h 0.0.0.0 -P 23306 adsrental_test
+# docker-compose -f docker-compose.test.yml run web python manage.py migrate
 
 echo "=== Running tests $1 ==="
 cd e2e_tests
