@@ -13,7 +13,7 @@
     {% block actions_buttons %}
         {% if allow_change %}
             {% if report_id is None %}
-                <a target="_blank" href="{% url 'bundler_payments' bundler_id=bundler_id %}?save=true"><button class="btn btn-primary">Generate a new report</button></a>
+                <a href="{% url 'bundler_payments' bundler_id=bundler_id %}?save=true"><button class="btn btn-primary">Generate a new report</button></a>
             {% endif %}
         {% endif %}
     {% endblock actions_buttons %}
