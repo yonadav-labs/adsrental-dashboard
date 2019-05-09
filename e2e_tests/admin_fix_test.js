@@ -74,7 +74,7 @@ Scenario('fix', (I)=>{
     I.see('did not recieve payment')
     I.see('payment')
     I.see('fixed')
-    
+
     
 
 
