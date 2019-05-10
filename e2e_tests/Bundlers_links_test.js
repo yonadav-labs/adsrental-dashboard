@@ -29,7 +29,7 @@ Scenario('bunlinks', (I)=>{
     I.see('Summary')
     I.click('Generate a new report')
     I.click('Send by email')
-    I.see('Emails with report for 09 May 2019 were successfully sent')
+    I.see('Emails with report')
     I.seeElement('span.glyphicon-ok')
     I.click('Admin')
     I.see('Dashboard')
@@ -44,4 +44,13 @@ Scenario('bunlinks', (I)=>{
     I.see('Select bundler to change')
     I.checkOption('input[name="_selected_action"]')
     I.click('Leaderboard')
+    I.see('Leads by qualified date')
+    I.click('Admin')
+    I.see('Dashboard')
+    I.click('Bundlers')
+    I.see('Select bundler to change')
+    I.checkOption('input[name="_selected_action"]')
+    I.click('Check report')
+    I.see('Check report')
+
 });
