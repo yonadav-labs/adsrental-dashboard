@@ -1,0 +1,30 @@
+Feature('User info Test')
+
+Scenario('userinfo', (I)=>{
+I.amOnPage('http://localhost:8443/user/login/?next=/admin/')
+I.see('User sign in')
+I.fillField('input[name="first_name"]', 'Vlad')
+I.fillField('input[name="last_name"]', 'Emelianov')
+I.fillField('input[name="postal_code"]', '80636')
+I.click('Sign in')
+I.see('Lead volshebnyi@gmail.com stats')
+I.see('Your Google account volshebnyi@gmail.com is In-Progress')
+I.see('Your Facebook account volshebnyi_fb@gmail.com is In-Progress')
+I.see('Your Amazon account volshebnyi_am@gmail.com is Available')
+I.click('a[href="/user/stats/timestamps/?date=2018-08-01"]')
+I.see('daily stats for')
+I.see('Aug. 31, 2018 - Online ($0.8065)')
+I.click('Back to stats')
+I.see('General info')
+I.click('a[href="/user/stats/timestamps/?date=2018-04-01"]')
+I.see(' daily stats for')
+I.click('Back to stats')
+I.see('General info')
+I.click('a[href="/user/stats/timestamps/?date=2018-03-01"]')
+I.see(' daily stats for')
+I.click('Back to stats')
+I.see('General info')
+I.click('a[href="/user/stats/timestamps/?date=2018-02-01"]')
+
+
+});
