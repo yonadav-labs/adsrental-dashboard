@@ -8,6 +8,9 @@ exports.config = {
       windowSize: '1920x1080',
       chrome: {
         args: ['--no-sandbox', '--window-size=1920,1080'],
+        prefs: {
+          'download.default_directory': 'downloads',
+        }
       },
     }
   },
