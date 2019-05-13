@@ -82,7 +82,7 @@ Scenario('bununban', (I)=>{
     I.fillField('select[name="action"]', 'Unban lead')
     I.click('Go')
     I.see('is unbanned')
-    I.see('	In-Progress')
+    I.see('In-Progress')
 
 
 
