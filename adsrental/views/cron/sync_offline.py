@@ -34,6 +34,9 @@ class SyncOfflineView(View):
         ).exclude(
             raspberry_pi__last_offline_reported__gte=now - datetime.timedelta(hours=RaspberryPi.last_offline_reported_hours_ttl),
         ).select_related('raspberry_pi'):
+            active_accounts = LeadAccount.get_active_lead_accounts(lead)
+            if not active_accounts:
+                continue
             offline_hours_ago = 1
             if lead.raspberry_pi.last_seen:
                 offline_hours_ago = int((now - lead.raspberry_pi.last_seen).total_seconds() / 60 / 60)
