@@ -89,12 +89,18 @@ class AdminBundlerDailyBonusesView(View):
         final_bundler_stats = list(final_bundler_stats.values())
         final_bundler_stats.sort(key=lambda x: x['lead_accounts_count'], reverse=True)
 
+        total_accounts = 0
+        total_bonus = decimal.Decimal(0.00)
         for bundler_stat in final_bundler_stats:
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
+            total_accounts += bundler_stat['lead_accounts_count']
+            total_bonus += bundler_stat['bonus']
 
         return render(request, 'admin/bundler_daily_bonuses.html', dict(
             bundler_stats=bundler_stats,
             final_bundler_stats=final_bundler_stats,
+            total_accounts=total_accounts,
+            total_bonus=total_bonus,
             start_date=start_date,
             end_date=end_date - datetime.timedelta(days=1),
             dates_list=dates_list,
