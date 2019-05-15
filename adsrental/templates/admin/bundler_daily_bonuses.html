@@ -52,6 +52,11 @@
                     </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <th>Total</th>
+                <th>{{total_accounts}}</th>
+                <th>${{total_bonus|floatformat:2}}</th>
+            </tfoot>
         </table>
     {% else %}
         No data
