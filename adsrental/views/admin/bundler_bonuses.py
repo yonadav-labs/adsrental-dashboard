@@ -92,7 +92,6 @@ class AdminBundlerBonusesView(View):
         total_accounts = 0
         total_bonus = decimal.Decimal(0.00)
         for bundler_stat in final_bundler_stats:
-            total_accounts += bundler_stat['lead_accounts_count']
             bundler_stat['bonus'] = self.get_bonus(bundler_stat['lead_accounts_count'])
             total_accounts += bundler_stat['lead_accounts_count']
             total_bonus += bundler_stat['bonus']
