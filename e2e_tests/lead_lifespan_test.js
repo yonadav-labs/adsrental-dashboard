@@ -9,7 +9,7 @@ Scenario('signup', async (I) => {
     I.fillField('Last name', 'Newone');
     I.fillField('Email address', 'volshebnyii@gmail.com')
     I.click('APPLY');
-    I.waitForElement('body', 5)
+    I.waitForNavigation()
     I.see('START MAKING EASY MONEY WITH')
     I.seeElement('input[name="first_name"][value="Blad"]')
     I.seeElement('input[name="last_name"][value="Newone"]')
@@ -44,6 +44,7 @@ Scenario('qualify', async (I) =>{
     I.click('Log in')
     I.see('Dashboard')
     I.click('Leads')
+    I.waitForNavigation()
     I.see('Select lead to change')
     I.checkOption('table tr.row2 td.action-checkbox input')
     I.fillField('select[name="action"]', 'Mark Facebook account as qualified')
@@ -63,6 +64,35 @@ Scenario('qualify', async (I) =>{
     I.click('Leads')
     I.see('Select lead to change')
     I.click('Blad Newone')
-    
-
  });
+
+
+Scenario('checkaccount', (I)=>{
+    I.amOnPage('http://localhost:8443/app/admin/')
+    I.see('Adsrental Administration')
+    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+    I.fillField('input[name="password"]', 'team17')
+    I.click('Log in')
+    I.see('Dashboard')
+    I.click('Leads')
+    I.see('Select lead to change')
+    I.click('Blad Newone')
+    I.see('Change lead')
+    I.fillField('input[name="lead_accounts-1-username"]', 'Neblad')
+    I.fillField('input[name="lead_accounts-1-password"]', 'Zuzu')
+    I.fillField('select[name="lead_accounts-1-account_type"]', 'Google')
+    I.fillField('input[name="lead_accounts-2-username"]', 'Nevlad')
+    I.fillField('input[name="lead_accounts-2-password"]', 'Xuxu')
+    I.fillField('select[name="lead_accounts-2-account_type"]', 'Amazon')
+    I.click('Save')
+    I.checkOption('table tr.row2 td.action-checkbox input')
+    I.fillField('select[name="action"]', 'Mark Google account as Qualified')
+    I.click('Go')
+    I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
+    // pause()
+    I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
+    I.see('Google Neblad (Available)', 'table tr.row2')
+    I.see('Amazon Nevlad (Available)', 'table tr.row2')
+
+});
+    
