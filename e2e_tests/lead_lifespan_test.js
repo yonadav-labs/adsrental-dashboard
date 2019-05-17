@@ -54,7 +54,8 @@ Scenario('qualify', async (I) =>{
     I.checkOption('input[name="_selected_action"]')
     I.click('RP00001000')
     I.see('Change raspberry pi')
-    I.click('.field-first_tested .datetimeshortcuts:nth-of-type(1) a:nth-of-type(1)')
+    // I.click('.field-first_tested .datetimeshortcuts:nth-of-type(1) a:nth-of-type(1)')
+    I.fillField('.field-first_tested input[name="first_tested_0"]', '2019-05-10')
     I.click('.field-first_tested .datetimeshortcuts:nth-of-type(2) a:nth-of-type(1)')
     I.click('Save')
     I.see('Select raspberry pi to change')
@@ -86,13 +87,84 @@ Scenario('checkaccount', (I)=>{
     I.fillField('select[name="lead_accounts-2-account_type"]', 'Amazon')
     I.click('Save')
     I.checkOption('table tr.row2 td.action-checkbox input')
+    I.see('Google Neblad (Available)', 'table tr.row2')
+    I.see('Amazon Nevlad (Available)', 'table tr.row2')
     I.fillField('select[name="action"]', 'Mark Google account as Qualified')
     I.click('Go')
     I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
     // pause()
     I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
-    I.see('Google Neblad (Available)', 'table tr.row2')
-    I.see('Amazon Nevlad (Available)', 'table tr.row2')
 
 });
     
+
+Scenario('bundlerDenerated', (I)=>{
+    I.amOnPage('http://localhost:8443/app/admin/')
+    I.see('Adsrental Administration')
+    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+    I.fillField('input[name="password"]', 'team17')
+    I.click('Log in')
+    I.see('Dashboard')
+    I.click('Bundlers')
+    I.fillField('input[name="q"]', 'Jason@clicktechmarketing.com')
+    I.click('Go')
+    I.see('Jason Taylor')
+    I.see('600')
+    I.see('1', 'table tr.row1 td.field-leads_count')
+    I.click('a[href="/bundler/127/payments/"]')
+
+});
+
+Scenario('ping', async (I) =>{
+    I.amOnPage('http://localhost:8443/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123')
+    I.see('result": true')
+    I.see('new_config')
+    I.see('Hostname changed')
+});
+
+Scenario('check accounts status', async (I) =>{
+    I.amOnPage('http://localhost:8443/app/admin/')
+    I.see('Adsrental Administration')
+    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+    I.fillField('input[name="password"]', 'team17')
+    I.click('Log in')
+    I.see('Dashboard')
+    I.click('Leads')
+    I.see('Google Neblad (In-Progress)', 'table tr.row2')
+    I.see('Amazon Nevlad (Available)', 'table tr.row2')
+    I.see('Facebook olvida@mail.ru (In-Progress)', 'table tr.row2')
+    I.see('In-Progress', 'table tr.row2 td.field-status_field')
+
+
+});
+
+Scenario('check bundler payments', async (I) =>{
+    I.amOnPage('http://localhost:8443/app/admin/')
+    I.see('Adsrental Administration')
+    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+    I.fillField('input[name="password"]', 'team17')
+    I.click('Log in')
+    I.see('Dashboard')
+    I.click('Bundlers')
+    I.fillField('input[name="q"]', '600')
+    I.click('Search')
+    I.see('Jason@clicktechmarketing.com')
+    I.seeElement('td.field-is_active img[alt="True"]')
+    I.click('Payments')
+    I.see('Bundler Jason Taylor	')
+    I.see('Total pay for Facebook accounts')
+    I.see('Total pay for Google accounts')
+    I.see('Total')
+});
+
+Scenario('check device log', async (I) =>{
+    I.amOnPage('http://localhost:8443/app/admin/')
+    I.see('Adsrental Administration')
+    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+    I.fillField('input[name="password"]', 'team17')
+    I.click('Log in')
+    I.see('Dashboard')
+    I.click('Raspberry pis')
+    I.see('Select raspberry pi to change')
+    I.seeElement('td.field-online img[alt="True"]')
+});
