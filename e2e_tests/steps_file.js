@@ -2,10 +2,12 @@
 
 module.exports = function () {
   return actor({
-
-    // Define custom steps here, use 'this' to access default methods of I.
-    // It is recommended to place a general 'login' function here.
-
+    seeChecked: function (selector) {
+      this.seeElement(selector + ' .glyphicon-ok')
+    },
+    seeUnchecked: function (selector) {
+      this.seeElement(selector + ' .glyphicon-remove')
+    },
     loginAsAdmin: function () {
       this.see('Adsrental Administration')
       this.fillField('input[name="username"]', 'volshebnyi@gmail.com')
