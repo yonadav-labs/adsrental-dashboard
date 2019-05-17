@@ -1,11 +1,12 @@
+/// <reference path="./steps.d.ts" />
+
 Feature('Admin fix Test')
 
-Scenario('fix', (I)=>{
+
+Scenario('fix', (I) => {
     I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
+    I.loginAsAdmin()
+    I.see('asdl;alpsdm;ladksp;asdk')
     I.see('Dashboard')
     I.click('Lead accounts')
     I.see('Select lead account to change')
@@ -74,9 +75,4 @@ Scenario('fix', (I)=>{
     I.see('did not recieve payment')
     I.see('payment')
     I.see('fixed')
-
-    
-
-
-
 });
