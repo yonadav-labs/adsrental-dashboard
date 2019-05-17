@@ -3,10 +3,10 @@
 module.exports = function () {
   return actor({
     seeChecked: function (selector) {
-      this.seeElement(selector + ' .glyphicon-ok')
+      this.seeElement(selector + ' span.glyphicon-ok')
     },
     seeUnchecked: function (selector) {
-      this.seeElement(selector + ' .glyphicon-remove')
+      this.seeElement(selector + ' span.glyphicon-remove')
     },
     loginAsAdmin: function () {
       this.see('Adsrental Administration')
