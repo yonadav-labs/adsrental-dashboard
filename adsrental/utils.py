@@ -553,7 +553,7 @@ class PingCacheHelper():
             self.cache.set(self.KEYS, keys)
 
     def get_hostname(self, lead: Lead, raspberry_pi: RaspberryPi, ec2_instance: EC2Instance) -> typing.Optional[str]:
-        if not lead.is_active():
+        if not lead or not lead.is_active():
             return None
         if raspberry_pi.is_proxy_tunnel:
             return raspberry_pi.proxy_hostname
@@ -588,7 +588,7 @@ class PingCacheHelper():
             created=timezone.now(),
             rpid=rpid,
             lead_status=lead and lead.status,
-            lead_active_accounts_count=lead.lead_accounts.filter(status__in=PingCacheHelper.STATUSES_ACTIVE).count(),
+            lead_active_accounts_count=lead.lead_accounts.filter(status__in=PingCacheHelper.STATUSES_ACTIVE).count() if lead else 0,
             wrong_password=lead.is_wrong_password() if lead else False,
             restart_required=restart_required,
             new_config_required=new_config_required,
