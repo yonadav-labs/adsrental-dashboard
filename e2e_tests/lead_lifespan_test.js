@@ -1,5 +1,3 @@
-
-
 Feature('Lead Lifespan Test');
 
 Scenario('signup', async (I) => {
@@ -69,35 +67,52 @@ Scenario('qualify', async (I) =>{
  });
 
 
-Scenario('checkaccount', (I)=>{
-    I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
-    I.see('Dashboard')
-    I.click('Leads')
-    I.see('Select lead to change')
-    I.click('Blad Newone')
-    I.see('Change lead')
-    I.fillField('input[name="lead_accounts-1-username"]', 'Neblad')
-    I.fillField('input[name="lead_accounts-1-password"]', 'Zuzu')
-    I.fillField('select[name="lead_accounts-1-account_type"]', 'Google')
-    I.fillField('input[name="lead_accounts-2-username"]', 'Nevlad')
-    I.fillField('input[name="lead_accounts-2-password"]', 'Xuxu')
-    I.fillField('select[name="lead_accounts-2-account_type"]', 'Amazon')
-    I.click('Save')
-    I.checkOption('table tr.row2 td.action-checkbox input')
-    I.see('Google Neblad (Available)', 'table tr.row2')
-    I.see('Amazon Nevlad (Available)', 'table tr.row2')
-    I.fillField('select[name="action"]', 'Mark Google account as Qualified')
-    I.click('Go')
-    I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
-    // pause()
-    I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
+
+ 
+ Scenario('checkaccount', (I)=>{
+     I.amOnPage('http://localhost:8443/app/admin/')
+     I.see('Adsrental Administration')
+     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+     I.fillField('input[name="password"]', 'team17')
+     I.click('Log in')
+     I.see('Dashboard')
+     I.click('Leads')
+     I.see('Select lead to change')
+     I.click('Blad Newone')
+     I.see('Change lead')
+     I.fillField('input[name="lead_accounts-1-username"]', 'Neblad')
+     I.fillField('input[name="lead_accounts-1-password"]', 'Zuzu')
+     I.fillField('select[name="lead_accounts-1-account_type"]', 'Google')
+     I.fillField('input[name="lead_accounts-2-username"]', 'Nevlad')
+     I.fillField('input[name="lead_accounts-2-password"]', 'Xuxu')
+     I.fillField('select[name="lead_accounts-2-account_type"]', 'Amazon')
+     I.click('Save')
+     I.checkOption('table tr.row2 td.action-checkbox input')
+     I.see('Google Neblad (Available)', 'table tr.row2')
+     I.see('Amazon Nevlad (Available)', 'table tr.row2')
+     I.fillField('select[name="action"]', 'Mark Google account as Qualified')
+     I.click('Go')
+     I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
+     // pause()
+     I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
+     
+    });
+    
+    
+    Scenario('qualified', (I) => {
+       I.amOnPage('http://localhost:8443/app/admin/')
+       I.see('Adsrental Administration')
+       I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
+       I.fillField('input[name="password"]', 'team17')
+       I.click('Log in')
+       I.see('Dashboard')
+       I.click('Raspberry pis')
+       I.checkOption('input[type="checkbox"]')
+       I.fillField('select[name="action"]', 'reset_cache')
+       I.click('Go')
+
 
 });
-    
 
 Scenario('bundlerDenerated', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
@@ -119,8 +134,7 @@ Scenario('bundlerDenerated', (I)=>{
 Scenario('ping', async (I) =>{
     I.amOnPage('http://localhost:8443/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123')
     I.see('result": true')
-    I.see('new_config')
-    I.see('Hostname changed')
+    I.see('"source": "ping"')
 });
 
 Scenario('check accounts status', async (I) =>{
@@ -171,4 +185,43 @@ Scenario('check device log', async (I) =>{
     I.waitForNavigation()
     I.see('Select raspberry pi to change')
     I.seeElement('td.field-online img[alt="True"]')
+});
+
+Scenario('timestamps', async (I) =>{
+    I.amOnPage('http://localhost:8443/cron/lead_history/?now=true')
+});
+
+ Scenario('timestamps', async (I) =>{
+    I.loginAsAdmin()
+    I.see('Dashboard')
+    I.click('Lead Timestamps')
+    I.see('Select Lead Timestamp to change')
+    I.click('1732315')
+    I.fillField('input[name="checks_online"]', '20')
+    I.click('Save')
+    I.click('Lead Timestamps') 
+    I.seeElement('td.field-active img[alt="True"]')
+    I.seeElement('td.field-online img[alt="True"]')
+    // I.seeElement
+    // pause()
+
+    const titleSelector = 'table tr.row2 td.field-amount_field .has_note'
+    I.seeInElementTitle('Facebook account in-progress', titleSelector)
+    I.seeInElementTitle('Google account in-progress', titleSelector)
+    I.seeInElementTitle('Amazon account is not in-progress', titleSelector)
+    I.seeInElementTitle('Total: $0.9678', titleSelector)
+
+
+});
+
+Scenario('timestamps', async (I) =>{
+   I.amOnPage('http://localhost:8443/cron/lead_history/?aggregate=true')
+
+});
+
+   Scenario('timestamps', async (I) =>{
+    I.loginAsAdmin()
+    I.see('Dashboard')
+    I.click('Lead Histories Month')
+   I.see('1', 'table tr.row1 td.field-days_online')
 });
