@@ -15,5 +15,8 @@ module.exports = function () {
       this.fillField('input[name="password"]', 'team17')
       this.click('Log in')
     },
+    seeInElementTitle: function (text, selector) {
+      this.seeElement(selector + '[title*="' + text + '"]')
+    }
   });
 }
