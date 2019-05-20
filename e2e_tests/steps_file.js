@@ -9,6 +9,7 @@ module.exports = function () {
       this.seeElement(selector + ' span.glyphicon-remove')
     },
     loginAsAdmin: function () {
+      this.amOnPage('http://localhost:8443/admin/login/')
       this.see('Adsrental Administration')
       this.fillField('input[name="username"]', 'volshebnyi@gmail.com')
       this.fillField('input[name="password"]', 'team17')
