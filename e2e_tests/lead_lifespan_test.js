@@ -224,4 +224,56 @@ Scenario('timestamps', async (I) =>{
     I.see('Dashboard')
     I.click('Lead Histories Month')
    I.see('1', 'table tr.row1 td.field-days_online')
+   I.see('0', 'table tr.row1 td.field-days_offline')
+   I.see('0', 'table tr.row1 td.field-days_wrong_password')
+   I.see('0', 'table tr.row1 td.field-days_sec_checkpoint')
+   I.see('$0.97', 'table tr.row1 td.field-amount_current_field')
+   I.see('0', 'table tr.row1 td.field-amount_moved_field')
+   I.see('$0.97', 'table tr.row1 td.field-amount_field')
+   I.see('0', 'table tr.row1 td.field-amount_moved_field')
+   I.seeElement('table#result_list tr.row1 td.field-move_to_next_month img[alt="True"]')
+   I.checkOption('table tr.row1 td.action-checkbox input')
+   I.fillField('select[name="action"]', 'DEBUG Aggregate')
+   I.click('Go')
+
+
+});
+
+Scenario('googleBans', async (I) =>{
+    I.loginAsAdmin()
+    I.see('Dashboard')
+    I.click('Leads')
+    I.see('Select lead to change')
+    I.checkOption('table tr.row2 td.action-checkbox input')
+    I.fillField('select[name="action"]', 'Ban google account')
+    I.click('Go')
+    I.see('ban Google account')
+    I.fillField('textarea[name="note"]', 'bad conection')
+    I.click('Ban')
+    I.checkOption('table tr.row2 td.action-checkbox input')
+    I.fillField('select[name="action"]', 'Ban amazon account')
+    I.click('Go')
+    I.see('ban Amazon account')
+    I.fillField('textarea[name="note"]', 'bad conection')
+    I.click('Ban')
+    I.checkOption('table tr.row2 td.action-checkbox input')
+    I.fillField('select[name="action"]', 'Ban facebook account')
+    I.click('Go')
+    I.see('ban Facebook account')
+    I.fillField('textarea[name="note"]', 'bad conection')
+    I.click('Ban')
+    I.checkOption('table tr.row2 td.action-checkbox input')
+    I.fillField('select[name="action"]', 'Ban lead')
+    I.click('Go')
+   
+});
+Scenario('googleBans', async (I) =>{
+    I.loginAsAdmin()
+    I.see('Dashboard')
+    I.click('Bundlers')
+    I.see('Select bundler to change')
+    I.fillField('input[name="q"]', '600')
+    I.click('Search')
+    I.click('Payments')
+    
 });
