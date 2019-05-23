@@ -98,6 +98,9 @@
             return;
         }
 
+        $('.secret-key-status').removeClass('text-danger');
+        $('.secret-key-status').html('Generating ...');
+
         $.get("{% url 'user_get_secret_key' %}", { email: email }, function(res) {
             if (!res.success) {
                 $('.secret-key-status').addClass('text-danger');
