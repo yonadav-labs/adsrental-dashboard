@@ -86,6 +86,32 @@
     </style>
 {% endblock styles %}
 
+{% block extra_js %}
+<script type="text/javascript">
+    function getSecretKey()
+    {
+        var email = $('#id_email').val().trim();
+        if (email.length == 0) {
+            $('#id_email').focus();
+            $('.secret-key-status').addClass('text-danger');
+            $('.secret-key-status').html('Please put your email');
+            return;
+        }
+
+        $.get("{% url 'user_get_secret_key' %}", { email: email }, function(res) {
+            if (!res.success) {
+                $('.secret-key-status').addClass('text-danger');
+                $('.secret-key-status').html(res.msg);
+            } else {
+                $('.secret-key-status').removeClass('text-danger');
+                $('.secret-key-status').addClass('text-success');
+                $('.secret-key-status').html(res.msg);
+            }
+        });
+    }
+</script>
+{% endblock extra_js %}
+
 {% block content %}
 <div class="container">
         <div class="row">
@@ -100,7 +126,11 @@
                         <button class="btn btn-lg btn-primary btn-block" type="submit">
                             Sign in
                         </button>
-                        <a href="{% url 'login' %}" class="pull-right need-help">Sign in using your email</a><span class="clearfix"></span>
+                        <a href="javascript:getSecretKey();" class="btn btn-link btn-block">
+                            Get Secret Key
+                        </a>
+                        <div class="text-center secret-key-status"></div>
+                        <a href="{% url 'login' %}" class="btn btn-link btn-block">Sign in using your email</a><span class="clearfix"></span>
                     </form>
                 </div>
             </div>
