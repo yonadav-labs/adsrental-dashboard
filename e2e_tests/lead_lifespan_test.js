@@ -1,7 +1,7 @@
 Feature('Lead Lifespan Test');
 
-Scenario('signup', async (I) => {
-    I.amOnPage('http://localhost:8443/?utm_source=600');
+Scenario('User registers FB account', async (I) => {
+    I.amOnAdsrentalPage('/?utm_source=600')
     I.see('Sign Up for free.');
     I.fillField('First name', 'Blad')
     I.fillField('Last name', 'Newone');
@@ -32,15 +32,12 @@ Scenario('signup', async (I) => {
     I.see('Thank You for Registering!')
     I.fillField('input[name="splashtop_id"]', '64644')
     I.click('Submit')
+    I.waitForNavigation()
     I.see('Our agent will contact you shortly.')
 });
 
-Scenario('qualify', async (I) =>{
-    I.amOnPage('http://localhost:8443/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
+Scenario('RaspberryPi is tested', async (I) =>{
+    I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Leads')
     I.waitForNavigation()
@@ -50,33 +47,35 @@ Scenario('qualify', async (I) =>{
     I.click('Go')
     I.see('Qualified', 'table tr.row2 td.field-status_field')
     I.click('RP00001000')
+    I.waitForNavigation()
     I.checkOption('input[name="_selected_action"]')
     I.click('RP00001000')
+    I.waitForNavigation()
     I.see('Change raspberry pi')
-    // I.click('.field-first_tested .datetimeshortcuts:nth-of-type(1) a:nth-of-type(1)')
     I.fillField('.field-first_tested input[name="first_tested_0"]', '2019-05-10')
     I.click('.field-first_tested .datetimeshortcuts:nth-of-type(2) a:nth-of-type(1)')
     I.click('Save')
+    I.waitForNavigation()
     I.see('Select raspberry pi to change')
     I.seeElement('td.field-first_tested_field img[alt=True]')
     I.click('Home')
+    I.waitForNavigation()
     I.see('Dashboard')
     I.click('Leads')
+    I.waitForNavigation()
     I.see('Select lead to change')
     I.click('Blad Newone')
+    I.waitForNavigation()
  });
 
 
 
  
- Scenario('checkaccount', (I)=>{
-     I.amOnPage('http://localhost:8443/app/admin/')
-     I.see('Adsrental Administration')
-     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-     I.fillField('input[name="password"]', 'team17')
-     I.click('Log in')
+ Scenario('Lead moves from available to qualified', (I)=>{
+    I.loginAsAdmin()
      I.see('Dashboard')
      I.click('Leads')
+     I.waitForNavigation()
      I.see('Select lead to change')
      I.click('Blad Newone')
      I.see('Change lead')
@@ -87,64 +86,56 @@ Scenario('qualify', async (I) =>{
      I.fillField('input[name="lead_accounts-2-password"]', 'Xuxu')
      I.fillField('select[name="lead_accounts-2-account_type"]', 'Amazon')
      I.click('Save')
+     I.waitForNavigation()
      I.checkOption('table tr.row2 td.action-checkbox input')
      I.see('Google Neblad (Available)', 'table tr.row2')
      I.see('Amazon Nevlad (Available)', 'table tr.row2')
      I.fillField('select[name="action"]', 'Mark Google account as Qualified')
      I.click('Go')
      I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
-     // pause()
      I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
      
     });
     
     
-    Scenario('qualified', (I) => {
-       I.amOnPage('http://localhost:8443/app/admin/')
-       I.see('Adsrental Administration')
-       I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-       I.fillField('input[name="password"]', 'team17')
-       I.click('Log in')
+    Scenario('RaspberryPi reset cache', (I) => {
+       I.loginAsAdmin()
        I.see('Dashboard')
        I.click('Raspberry pis')
+       I.waitForNavigation()
        I.checkOption('input[type="checkbox"]')
        I.fillField('select[name="action"]', 'reset_cache')
        I.click('Go')
 
 
+
 });
 
-Scenario('bundlerDenerated', (I)=>{
-    I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
+Scenario('Check bundler leads', (I)=>{
+    I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Bundlers')
+    I.waitForNavigation()
     I.fillField('input[name="q"]', 'Jason@clicktechmarketing.com')
-    I.click('Go')
+    I.click('Search')
     I.see('Jason Taylor')
     I.see('600')
     I.see('1', 'table tr.row1 td.field-leads_count')
-    I.click('a[href="/bundler/127/payments/"]')
+    I.click('a[href="/bundler/127/payments/"]') 
 
 });
 
-Scenario('ping', async (I) =>{
-    I.amOnPage('http://localhost:8443/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123')
+Scenario('Send ping from RaspberryPi', async (I) =>{
+    I.amOnAdsrentalPage('/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123')
     I.see('result": true')
     I.see('"source": "ping"')
 });
 
-Scenario('check accounts status', async (I) =>{
-    I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
+Scenario('Check accounts status', async (I) =>{
+    I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Leads')
+    I.waitForNavigation()
     I.see('Google Neblad (In-Progress)', 'table tr.row2')
     I.see('Amazon Nevlad (Available)', 'table tr.row2')
     I.see('Facebook olvida@mail.ru (In-Progress)', 'table tr.row2')
@@ -153,14 +144,11 @@ Scenario('check accounts status', async (I) =>{
 
 });
 
-Scenario('check bundler payments', async (I) =>{
-    I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
+ Scenario('Check bundler payments', async (I) =>{
+    I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Bundlers')
+    I.waitForNavigation()
     I.fillField('input[name="q"]', '600')
     I.click('Search')
     I.see('Jason@clicktechmarketing.com')
@@ -168,18 +156,17 @@ Scenario('check bundler payments', async (I) =>{
     I.click('Payments')
     I.waitForNavigation()
     I.see('Bundler Jason Taylor	')
+    I.see('$235.00', 'table tr.bundler td.amount')
     I.see('Total pay for Facebook accounts')
-    I.see('Total pay for Google accounts')
-    I.see('Total')
+    I.see('$125.00', 'table tr.total-facebook td.amount')
+     I.see('Total pay for Google accounts')
+     I.see('$110.00', 'table tr.total-google td.amount')
+   I.see('Total')
+
 });
 
-Scenario('check device log', async (I) =>{
-    I.amOnPage('http://localhost:8443/app/admin/')
-    I.see('Adsrental Administration')
-    I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
-    I.fillField('input[name="password"]', 'team17')
-    I.click('Log in')
-    I.waitForNavigation()
+Scenario('Check RaspberryPi log', async (I) =>{
+    I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Raspberry pis')
     I.waitForNavigation()
@@ -187,23 +174,24 @@ Scenario('check device log', async (I) =>{
     I.seeElement('td.field-online img[alt="True"]')
 });
 
-Scenario('timestamps', async (I) =>{
-    I.amOnPage('http://localhost:8443/cron/lead_history/?now=true')
+Scenario('Generate daily lead timestamps', async (I) =>{
+    I.amOnAdsrentalPage('/cron/lead_history/?now=true')
 });
 
- Scenario('timestamps', async (I) =>{
+ Scenario('Check lead timestamps', async (I) =>{
     I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Lead Timestamps')
+    I.waitForNavigation()
     I.see('Select Lead Timestamp to change')
     I.click('1732315')
+    I.waitForNavigation()
     I.fillField('input[name="checks_online"]', '20')
     I.click('Save')
-    I.click('Lead Timestamps') 
+    I.click('Lead Timestamps')
     I.seeElement('td.field-active img[alt="True"]')
     I.seeElement('td.field-online img[alt="True"]')
-    // I.seeElement
-    // pause()
+  
 
     const titleSelector = 'table tr.row2 td.field-amount_field .has_note'
     I.seeInElementTitle('Facebook account in-progress', titleSelector)
@@ -214,15 +202,16 @@ Scenario('timestamps', async (I) =>{
 
 });
 
-Scenario('timestamps', async (I) =>{
+Scenario('Generate lead histories month', async (I) =>{
    I.amOnPage('http://localhost:8443/cron/lead_history/?aggregate=true')
 
 });
 
-   Scenario('timestamps', async (I) =>{
-    I.loginAsAdmin()
-    I.see('Dashboard')
-    I.click('Lead Histories Month')
+Scenario('Check lead histories month', async (I) =>{
+   I.loginAsAdmin()
+   I.see('Dashboard')
+   I.click('Lead Histories Month')
+   I.waitForNavigation()
    I.see('1', 'table tr.row1 td.field-days_online')
    I.see('0', 'table tr.row1 td.field-days_offline')
    I.see('0', 'table tr.row1 td.field-days_wrong_password')
@@ -235,45 +224,41 @@ Scenario('timestamps', async (I) =>{
    I.checkOption('table tr.row1 td.action-checkbox input')
    I.fillField('select[name="action"]', 'DEBUG Aggregate')
    I.click('Go')
-
-
 });
 
-Scenario('googleBans', async (I) =>{
+Scenario('Ban all lead accounts', async (I) =>{
     I.loginAsAdmin()
     I.see('Dashboard')
     I.click('Leads')
+    I.waitForNavigation()
     I.see('Select lead to change')
     I.checkOption('table tr.row2 td.action-checkbox input')
     I.fillField('select[name="action"]', 'Ban google account')
     I.click('Go')
+    I.waitForNavigation()
     I.see('ban Google account')
     I.fillField('textarea[name="note"]', 'bad conection')
     I.click('Ban')
+    I.waitForNavigation()
     I.checkOption('table tr.row2 td.action-checkbox input')
     I.fillField('select[name="action"]', 'Ban amazon account')
     I.click('Go')
+    I.waitForNavigation()
     I.see('ban Amazon account')
     I.fillField('textarea[name="note"]', 'bad conection')
     I.click('Ban')
+    I.waitForNavigation()
     I.checkOption('table tr.row2 td.action-checkbox input')
     I.fillField('select[name="action"]', 'Ban facebook account')
     I.click('Go')
+    I.waitForNavigation()
     I.see('ban Facebook account')
     I.fillField('textarea[name="note"]', 'bad conection')
     I.click('Ban')
+    I.waitForNavigation()
     I.checkOption('table tr.row2 td.action-checkbox input')
     I.fillField('select[name="action"]', 'Ban lead')
     I.click('Go')
-   
+    I.waitForNavigation()
 });
-Scenario('googleBans', async (I) =>{
-    I.loginAsAdmin()
-    I.see('Dashboard')
-    I.click('Bundlers')
-    I.see('Select bundler to change')
-    I.fillField('input[name="q"]', '600')
-    I.click('Search')
-    I.click('Payments')
-    
-});
+

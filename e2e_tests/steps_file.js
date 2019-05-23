@@ -17,6 +17,9 @@ module.exports = function () {
     },
     seeInElementTitle: function (text, selector) {
       this.seeElement(selector + '[title*="' + text + '"]')
+    },
+    amOnAdsrentalPage: function(url){
+      this.amOnPage('http://localhost:8443' + url)
     }
   });
 }
