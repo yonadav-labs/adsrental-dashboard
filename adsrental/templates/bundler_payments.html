@@ -29,45 +29,45 @@
             </thead>
             <tbody>
                 {% for data in payments_total_by_bundler %}
-                    <tr>
+                    <tr class="bundler">
                         <td>Bundler {{ data.bundler__name }}</td>
-                        <td>${{ data.payment__sum }}</td>
+                        <td class="amount">${{ data.payment__sum }}</td>
                     </tr>
                 {% endfor %}
                 {% if payments_total.payment_facebook__sum %}
-                    <tr>
+                    <tr class="total-facebook">
                         <td>Total pay for Facebook accounts</td>
-                        <td>${{ payments_total.payment_facebook__sum }}</td>
+                        <td class="amount">${{ payments_total.payment_facebook__sum }}</td>
                     </tr>
                 {% endif %}
                 {% if payments_total.payment_google__sum %}
-                    <tr>
+                    <tr class="total-google">
                         <td>Total pay for Google accounts</td>
-                        <td>${{ payments_total.payment_google__sum }}</td>
+                        <td class="amount">${{ payments_total.payment_google__sum }}</td>
                     </tr>
                 {% endif %}
                 {% if payments_total.payment_amazon__sum %}
-                    <tr>
+                    <tr class="total-amazon">
                         <td>Total pay for Amazon accounts</td>
-                        <td>${{ payments_total.payment_amazon__sum }}</td>
+                        <td class="amount">${{ payments_total.payment_amazon__sum }}</td>
                     </tr>
                 {% endif %}
                 {% if payments_total.payment_bonus__sum %}
-                    <tr>
+                    <tr class="total-bonus">
                         <td>Total pay for bonuses</td>
-                        <td>${{ payments_total.payment_bonus__sum }}</td>
+                        <td class="amount">${{ payments_total.payment_bonus__sum }}</td>
                     </tr>
                 {% endif %}
                 {% if payments_total.chargeback__sum %}
-                    <tr>
+                    <tr class="total-chargeback">
                         <td>Total chargeback</td>
-                        <td>${{ payments_total.chargeback__sum }}</td>
+                        <td class="amount">${{ payments_total.chargeback__sum }}</td>
                     </tr>
                 {% endif %}
                 {% if payments_total.payment__sum %}
-                    <tr>
+                    <tr class="total-total">
                         <td>Total pay</td>
-                        <td>${{ payments_total.payment__sum }}</td>
+                        <td class="amount">${{ payments_total.payment__sum }}</td>
                     </tr>
                 {% else %}
                     <tr>
