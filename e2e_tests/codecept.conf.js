@@ -2,12 +2,12 @@ exports.config = {
   tests: './*_test.js',
   output: './output',
   helpers: {
-    ErrorHandler: {
-      require: "./error_handler.js",
-    },
+    // ErrorHandler: {
+    //   require: "./error_handler.js",
+    // },
     Puppeteer: {
       url: 'http://localhost',
-      // show: true,
+      show: true,
       windowSize: '1920x1080',
       getPageTimeout: 60000,
       waitForNavigation: "networkidle0",
