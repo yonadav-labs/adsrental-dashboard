@@ -4,9 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+from django.core.mail import send_mail
 
 from adsrental.forms import UserLoginForm
 from adsrental.models.lead import Lead
@@ -58,13 +56,9 @@ class UserSecretKeyView(View):
         lead.secret_key = make_password(secret_key)
         lead.save()
 
-        subject = 'ADS INC Secret Key'
-        html_content = render_to_string('email/base.html', {})
-        text_content = strip_tags(html_content)
-
-        msg = EmailMultiAlternatives(subject, text_content, settings.DEFAULT_FROM_EMAIL, email.split(','))
-        msg.attach_alternative(html_content, 'text/html')
-        # msg.send()
+        subject = 'New Secret Key'
+        text_content = f'Your secret key is {secret_key}'
+        send_mail(subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
 
         res = { 'success': True, 'msg': 'Secret key sent to your email' }
         return JsonResponse(res, safe=False)
