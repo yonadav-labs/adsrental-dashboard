@@ -253,13 +253,13 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             return decimal.Decimal('0.00')
 
         if self.ban_reason not in (
-            LeadAccount.BAN_REASON_QUIT,
-            LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
-            LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
-            LeadAccount.BAN_REASON_AUTO_OFFLINE,
-            LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
-            LeadAccount.BAN_REASON_BAD_AD_ACCOUNT,
-            LeadAccount.BAN_REASON_DUPLICATE,
+                LeadAccount.BAN_REASON_QUIT,
+                LeadAccount.BAN_REASON_FACEBOOK_UNRESPONSIVE_USER,
+                LeadAccount.BAN_REASON_GOOGLE_UNRESPONSIVE_USER,
+                LeadAccount.BAN_REASON_AUTO_OFFLINE,
+                LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD,
+                LeadAccount.BAN_REASON_BAD_AD_ACCOUNT,
+                LeadAccount.BAN_REASON_DUPLICATE,
         ):
             return decimal.Decimal('0.00')
 
