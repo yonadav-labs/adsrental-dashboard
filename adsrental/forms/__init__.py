@@ -2,6 +2,8 @@ import re
 import typing
 
 from django import forms
+from django.contrib.auth.hashers import check_password
+
 from snowpenguin.django.recaptcha2.fields import ReCaptchaField
 from snowpenguin.django.recaptcha2.widgets import ReCaptchaWidget
 
@@ -329,34 +331,24 @@ class AdminPrepareForReshipmentForm(forms.Form):
 
 
 class UserLoginForm(forms.Form):
-    first_name = forms.CharField(label='First name', required=True)
-    last_name = forms.CharField(label='Last name', required=True)
-    postal_code = forms.CharField(label='Zip code', required=True)
+    email = forms.EmailField(label='Email', required=True)
+    secret_key = forms.CharField(label='Secret Key', required=True, widget=forms.PasswordInput)
 
     def get_lead(self, data: typing.Dict) -> typing.Optional[Lead]:
-        leads = Lead.objects.filter(
-            first_name__iexact=data.get('first_name'),
-            last_name__iexact=data.get('last_name'),
-            postal_code=data.get('postal_code'),
-        ).order_by('-created')
-
-        if not leads:
-            return None
-
-        for lead in leads:
-            if lead.is_active():
-                return lead
-
-        first_lead = leads.first()
-        return first_lead
+        return Lead.objects.filter(
+            email__iexact=data.get('email')
+        ).first()
 
     def clean(self) -> None:
         cleaned_data = super().clean()
 
         lead = self.get_lead(cleaned_data)
-
         if not lead:
-            self.add_error('first_name', 'User not found')
+            self.add_error('email', 'User not found')
+        elif not lead.secret_key:
+            self.add_error('secret_key', 'Please get the secret key')
+        elif not check_password(cleaned_data['secret_key'], lead.secret_key):
+            self.add_error('secret_key', 'Secret key is wrong')
 
 
 class DisqualifyLeadAccountForm(forms.Form):
