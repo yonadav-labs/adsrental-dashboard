@@ -35,6 +35,11 @@ def sign_up_as_lead(context):
     context.driver = start_webdriver()
     context.driver.get(f"{HOST}/?utm_source=600")
 
+@given('I am logged in as an Admin with wrong password')
+def logged_in_as_admin_wrong_password(context):
+    context.driver = webdriver.Chrome()
+    login_as_admin(context.driver, "volshebnyi@gmail.com", "bvvgr")
+
 
 @given('I am logged in as user')
 def logged_in_as_user(context):
@@ -58,10 +63,18 @@ def click_link(context, link_text):
 
 
 @then('I should see text on page "{text}"')
-def see_test_on_page(context, text):
+def see_text_on_page(context, text):
     context.test.assertTrue(text in context.driver.page_source, f'Text "{text}" not found on page')
 
 
 @then('I should see "{title}" page title')
 def see_page_title(context, title):
     context.test.assertEqual(context.driver.title, title)
+
+@then('I am on url "{url}"')
+def i_am_on_url(context, url):
+    context.test.assertEqual(context.driver.current_url, HOST + url)
+
+@then('Admin Dashboard should be shown')
+def admin_dashboard_should_be_shown(context):
+    context.test.assertTrue('Adsrental Administration' in context.driver.page_source, 'It is not Admin Dashboard page')
