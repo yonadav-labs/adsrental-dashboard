@@ -25,6 +25,13 @@ def logged_in_as_admin(context):
     login_as_admin(context.driver, "volshebnyi@gmail.com", "team17")
 
 
+@given('I sign up as a lead')
+def sign_up_as_lead(context):
+    context.driver = webdriver.Chrome()
+    context.driver.maximize_window()
+    context.driver.get(f"{HOST}/?utm_source=600")
+
+
 @given('I am logged in as user')
 def logged_in_as_user(context):
     context.driver = webdriver.Chrome()
