@@ -5,6 +5,12 @@ from behave_django.decorators import fixtures
 HOST = 'http://localhost:8000'
 
 
+def start_webdriver():
+    driver = webdriver.Chrome()
+    driver.maximize_window()
+    return driver
+
+
 def login_as_admin(driver, username, password):
     driver.get(f"{HOST}/admin/login/")
     driver.find_element_by_name('username').send_keys(username)
@@ -20,22 +26,19 @@ def use_test_database(_context):
 
 @given('I am logged in as an Admin')
 def logged_in_as_admin(context):
-    context.driver = webdriver.Chrome()
-    context.driver.maximize_window()
+    context.driver = start_webdriver()
     login_as_admin(context.driver, "volshebnyi@gmail.com", "team17")
 
 
 @given('I sign up as a lead')
 def sign_up_as_lead(context):
-    context.driver = webdriver.Chrome()
-    context.driver.maximize_window()
+    context.driver = start_webdriver()
     context.driver.get(f"{HOST}/?utm_source=600")
 
 
 @given('I am logged in as user')
 def logged_in_as_user(context):
-    context.driver = webdriver.Chrome()
-    context.driver.maximize_window()
+    context.driver = start_webdriver()
     context.driver.get(f"{HOST}/user/login/")
     context.driver.find_element_by_name('first_name').send_keys('Vlad')
     context.driver.find_element_by_name('last_name').send_keys('Emelianov')
