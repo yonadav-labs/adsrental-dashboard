@@ -35,6 +35,7 @@ def sign_up_as_lead(context):
     context.driver = start_webdriver()
     context.driver.get(f"{HOST}/?utm_source=600")
 
+
 @given('I am logged in as an Admin with wrong password')
 def logged_in_as_admin_wrong_password(context):
     context.driver = webdriver.Chrome()
@@ -49,6 +50,11 @@ def logged_in_as_user(context):
     context.driver.find_element_by_name('last_name').send_keys('Emelianov')
     context.driver.find_element_by_name('postal_code').send_keys('6348489')
     context.driver.find_element_by_css_selector('input[type=submit]').click()
+
+
+@when('I type "{text}" in field {name}')
+def type_text(context, text, name):
+    context.driver.find_element_by_name(name).send_keys(text)
 
 
 @given('I am on main Admin Dashboard page')
@@ -71,9 +77,11 @@ def see_text_on_page(context, text):
 def see_page_title(context, title):
     context.test.assertEqual(context.driver.title, title)
 
+
 @then('I am on url "{url}"')
 def i_am_on_url(context, url):
     context.test.assertEqual(context.driver.current_url, HOST + url)
+
 
 @then('Admin Dashboard should be shown')
 def admin_dashboard_should_be_shown(context):
