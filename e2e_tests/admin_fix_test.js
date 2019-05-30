@@ -4,9 +4,7 @@ Feature('Admin fix Test')
 
 
 Scenario('fix', (I) => {
-    I.amOnPage('http://localhost:8443/app/admin/')
     I.loginAsAdmin()
-    I.see('asdl;alpsdm;ladksp;asdk')
     I.see('Dashboard')
     I.click('Lead accounts')
     I.see('Select lead account to change')
@@ -20,6 +18,7 @@ Scenario('fix', (I) => {
     I.see('Fix Ban Account')
     I.fillField('textarea[name="note"]', 'no ban reason')
     I.click('Fix')
+    I.waitForNavigation()
     I.see('Fix')
     I.click('Resolve / Reject as admin')
     I.see('Resolve Ban Accoun')
