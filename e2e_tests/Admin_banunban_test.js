@@ -1,6 +1,6 @@
 Feature('Admin bununban Test')
 
-Scenario('bununban', (I)=>{
+Scenario('Ban unban lead', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
     I.see('Adsrental Administration')
     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
