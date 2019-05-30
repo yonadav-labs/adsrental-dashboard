@@ -21,13 +21,15 @@ def use_test_database(_context):
 @given('I am logged in as an Admin')
 def logged_in_as_admin(context):
     context.driver = webdriver.Chrome()
+    context.driver.maximize_window()
     login_as_admin(context.driver, "volshebnyi@gmail.com", "team17")
 
 
 @given('I am logged in as user')
 def logged_in_as_user(context):
     context.driver = webdriver.Chrome()
-    context.driver.get(f"{HOST}/usr/login/")
+    context.driver.maximize_window()
+    context.driver.get(f"{HOST}/user/login/")
     context.driver.find_element_by_name('first_name').send_keys('Vlad')
     context.driver.find_element_by_name('last_name').send_keys('Emelianov')
     context.driver.find_element_by_name('postal_code').send_keys('6348489')
