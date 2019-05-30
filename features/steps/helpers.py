@@ -62,6 +62,6 @@ def see_test_on_page(context, text):
     context.test.assertTrue(text in context.driver.page_source, f'Text "{text}" not found on page')
 
 
-@then('I should see "{text}" page title')
+@then('I should see "{title}" page title')
 def see_page_title(context, title):
     context.test.assertEqual(context.driver.title, title)
