@@ -1,6 +1,6 @@
-Feature('Admin LeadAccounts Test')
+Feature('Admin check lead accounts')
 
-Scenario('adrental active', (I)=>{
+Scenario('Check lead accounts', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
     I.see('Adsrental Administration')
     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
@@ -9,7 +9,6 @@ Scenario('adrental active', (I)=>{
     I.see('Dashboard')
     I.click('Lead accounts')
     I.see('Select lead account to change')
-    // I.fillField('input[name="q"', 'Epiphany Alston')
     I.checkOption('input[name="_selected_action"]')
     I.fillField('select[name="action"]', 'Approve account')
     I.click('Go')

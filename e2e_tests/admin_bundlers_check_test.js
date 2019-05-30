@@ -1,6 +1,6 @@
-Feature('Admin bundlers Test')
+Feature('Admin check bundler actions Test')
 
-Scenario('img', (I)=>{
+Scenario('check bundler actions', (I)=>{
     I.amOnPage('http://localhost:8443/app/admin/')
     I.see('Adsrental Administration')
     I.fillField('input[name="username"]', 'volshebnyi@gmail.com')
@@ -31,23 +31,6 @@ Scenario('img', (I)=>{
     I.fillField('select[name="action"]', 'Disable chageback')
     I.click('Go')
     I.seeElement('td.field-enable_chargeback img[alt="False"]')
-
-    // I.checkOption('input[name="_selected_action"]')
-    // I.fillField('select[name="action"]', 'Pause')
-    // I.click('Go')
-    // I.seeElement('td.field-enable_chargeback img[alt="False"]')
-    // I.checkOption('input[name="_selected_action"]')
-    // I.fillField('select[name="action"]', 'Active')
-    // I.click('Go')
-    // I.seeElement('td.field-enable_chargeback img[alt="False"]')
-    // I.checkOption('input[name="_selected_action"]')
-    // I.fillField('select[name="action"]', 'Enable chageback')
-    // I.click('Go')
-    // I.seeElement('td.field-enable_chargeback img[alt="True"]')
-    // I.checkOption('input[name="_selected_action"]')
-    // I.fillField('select[name="action"]', 'Disable chageback')
-    // I.click('Go')
-    // I.seeElement('td.field-enable_chargeback img[alt="False"]')
 
 
 
