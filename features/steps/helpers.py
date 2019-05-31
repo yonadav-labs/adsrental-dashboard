@@ -1,6 +1,9 @@
+from pathlib import Path
+
 from behave import given, when, then  # pylint: disable=no-name-in-module
 from selenium import webdriver
 from behave_django.decorators import fixtures
+from django.conf import settings
 
 HOST = 'http://localhost:8000'
 
@@ -55,6 +58,11 @@ def logged_in_as_user(context):
 @when('I type "{text}" in field {name}')
 def type_text(context, text, name):
     context.driver.find_element_by_name(name).send_keys(text)
+
+
+@when('I upload file "{filepath}" in field {name}')
+def upload_file(context, filepath, name):
+    context.driver.find_element_by_name(name).send_keys(Path(settings.BASE_DIR) / 'features' / 'assets' / filepath)
 
 
 @given('I am on main Admin Dashboard page')
