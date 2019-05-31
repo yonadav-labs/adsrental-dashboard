@@ -12,6 +12,7 @@ from django.db.models.functions import Concat
 from django.template.loader import render_to_string
 
 from adsrental.models.lead import Lead
+from adsrental.admin.base import CSVExporter
 from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
@@ -47,7 +48,41 @@ class AddressListFilter(AbstractFulltextFilter):
     field_names = ['lead__city', 'lead__country', 'lead__state', 'lead__postal_code', 'lead__street']
 
 
-class LeadAccountAdmin(admin.ModelAdmin):
+class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead__name',
+        'lead__raspberry_pi___rpid',
+        'account_type',
+        'status',
+        'username',
+        'bundler_paid',
+        'last_touch',
+        'lead__raspberry_pi__first_seen',
+        'lead__raspberry_pi__last_seen',
+        'touch_count',
+        'wrong_password_date',
+        'security_checkpoint_date',
+        'created',
+    )
+    csv_titles = (
+        'ID',
+        'Lead',
+        'RPID',
+        'Type',
+        'Status',
+        'Username',
+        'Bundler paid',
+        'Last touch',
+        'First seen',
+        'Last seen',
+        'Touch count',
+        'Wrong password date',
+        'Security checkpoint date',
+        'Created',
+    )
+    csv_filename = 'lead_accounts__{day}_{month}_{year}.csv'
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -122,6 +157,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'report_wrong_password',
         'report_security_checkpoint',
         'sync_to_adsdb',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',
