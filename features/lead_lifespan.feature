@@ -22,9 +22,10 @@ Feature: Lead lifespan
         And I click radio with name "apply_type" and value "splashtop"
         And I click checkbox with name "accept"
         And I click button "Click Here to Apply"
-        And I type "Click Here to Apply"
-        And I type "9944455" in field
-        Then I wait
+        And I type "9944455" in field splashtop_id
+        And I click button "Submit"
+        Then I should see text on page "Thank you! Our agent will contact you shortly"
+        
 
 
 #    Scenario: RaspberryPi is tested
