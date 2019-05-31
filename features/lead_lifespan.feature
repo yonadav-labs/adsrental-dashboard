@@ -5,7 +5,8 @@ Feature: Lead lifespan
     I want to login and click all links in Admin Dashboard
 
     Scenario: Links check
-        Given I sign up as a lead
+        Given I am using initial database
+        And I sign up as a lead
         When I type "1234567890" in field phone
         And I type "https://www.facebook.com" in field facebook_profile_url
         And I type "olvida@mail.ru" in field fb_email
@@ -22,23 +23,23 @@ Feature: Lead lifespan
         And I click checkbox with name "accept"
         And I click button "Click Here to Apply"
         And I type "Click Here to Apply"
-        And I type "9944455" in field 
+        And I type "9944455" in field
         Then I wait
 
 
-    #    Scenario: RaspberryPi is tested
-    #       Given I am logged in as an Admin
-    #       And I am on main Admin Dashboard page
-    #       When I click link "Leads"
-    #       And I should see text on page "Select lead to change"
-    #       And I I click checkbox with name "_selected_action"
-    #       And I type 'Mark Facebook account as qualified' in field action
-    #       And I click button "Go" 
-    #       And I see disabled check mark "False"
-    #       And I click link "RP999"
-    #       And I click checkbox with name "_selected_action"
-    #       And I click link "RP999"
-    #      And I should see text on page "Change raspberry pi"
+#    Scenario: RaspberryPi is tested
+#       Given I am logged in as an Admin
+#       And I am on main Admin Dashboard page
+#       When I click link "Leads"
+#       And I should see text on page "Select lead to change"
+#       And I I click checkbox with name "_selected_action"
+#       And I type 'Mark Facebook account as qualified' in field action
+#       And I click button "Go"
+#       And I see disabled check mark "False"
+#       And I click link "RP999"
+#       And I click checkbox with name "_selected_action"
+#       And I click link "RP999"
+#      And I should see text on page "Change raspberry pi"
 
 
 
