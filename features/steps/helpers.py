@@ -3,8 +3,11 @@ import time
 
 from behave import given, when, then  # pylint: disable=no-name-in-module
 from selenium import webdriver
-from behave_django.decorators import fixtures
 from django.conf import settings
+from django.core.management import call_command
+
+from adsrental.models.lead import Lead
+from adsrental.models.lead_account import LeadAccount
 
 HOST = 'http://localhost:8000'
 
@@ -22,10 +25,11 @@ def login_as_admin(driver, username, password):
     driver.find_element_by_css_selector('input[type=submit]').click()
 
 
-@fixtures('test.json')
 @given('I am using initial database')
 def use_test_database(_context):
-    pass
+    Lead.objects.all().delete()
+    LeadAccount.objects.all().delete()
+    call_command('loaddata', 'test.json')
 
 
 @given('I am logged in as an Admin')
@@ -76,6 +80,7 @@ def on_main_admin_page(context):
     context.driver.get(f"{HOST}/admin/")
     context.driver.page_source.find('Dashboard')
 
+
 @when('I see disabled check mark "{alt}"')
 def i_see_disabled_check(context):
     pass
@@ -95,11 +100,11 @@ def click_link(context, link_text):
 def click_button(context, button_text):
     context.driver.find_element_by_xpath(f'//button[contains(text(), "{button_text}")]').click()
 
+
 @when('I click radio with name "{name}" and value "{value}"')
 def click_radio_with_name(context, name, value):
     css_selector = f'input[type="radio"][name="{name}"][value="{value}"]'
     context.driver.find_element_by_css_selector(css_selector).click()
-
 
 
 @when('I click checkbox with name "{name}"')
