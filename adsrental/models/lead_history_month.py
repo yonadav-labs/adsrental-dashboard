@@ -57,8 +57,8 @@ class LeadHistoryMonth(models.Model, FulltextSearchMixin):
         self.days_sec_checkpoint = 0
         lead_histories = LeadHistory.objects.filter(
             lead=self.lead,
-            date__gte=self.get_first_day().date(),
-            date__lte=self.get_last_day().date(),
+            date__gte=self.get_first_day(),
+            date__lte=self.get_last_day(),
         ).prefetch_related(
             'lead',
             'lead__raspberry_pi',
