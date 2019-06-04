@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 
+import selenium
 from behave import given, when, then  # pylint: disable=no-name-in-module
 from selenium import webdriver
 from django.conf import settings
@@ -8,6 +9,7 @@ from django.core.management import call_command
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.raspberry_pi import RaspberryPi
 
 
 def login_as_admin(context, username, password):
@@ -21,6 +23,7 @@ def login_as_admin(context, username, password):
 def use_test_database(_context):
     Lead.objects.all().delete()
     LeadAccount.objects.all().delete()
+    RaspberryPi.objects.all().delete()
     call_command('loaddata', 'test.json')
 
 
@@ -52,12 +55,12 @@ def logged_in_as_user(context):
     context.driver.find_element_by_css_selector('button[type=submit]').click()
 
 
-@when('I type "{text}" in field {name}')
+@when('I type "{text}" in field "{name}"')
 def type_text(context, text, name):
     context.driver.find_element_by_name(name).send_keys(text)
 
 
-@when('I upload file "{filepath}" in field {name}')
+@when('I upload file "{filepath}" in field "{name}"')
 def upload_file(context, filepath, name):
     path = Path(settings.BASE_DIR) / 'features' / 'assets' / filepath
     context.driver.find_element_by_name(name).send_keys(path.as_posix())
@@ -69,14 +72,18 @@ def on_main_admin_page(context):
     context.driver.page_source.find('Dashboard')
 
 
-@when('I see disabled check mark "{alt}"')
-def i_see_disabled_check(context):
-    pass
+@then('I should see {state} check mark in column "{column_name}"')
+def i_see_disabled_check(context, state, column_name):
+    alt = 'true' if state == 'enabled' else 'false'
+    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/a[contains(text(), "{column_name}")]/../..')
+    column_classes = column.get_attribute('class').split(' ')
+    field_class = None
+    for column_class in column_classes:
+        if column_class.startswith('column-'):
+            field_class = column_class.replace('column-', 'field-')
+    check_mark = context.driver.find_element_by_css_selector(f'td.{field_class} img')
+    context.test.assertEqual(check_mark.get_attribute('alt'), alt, 'Check mark has wrong state')
 
-
-@when('I see enabled check mark "{alt}"')
-def i_see_enabled_check(context):
-    pass
 
 
 @when('I click link "{link_text}"')
@@ -86,7 +93,14 @@ def click_link(context, link_text):
 
 @when('I click button "{button_text}"')
 def click_button(context, button_text):
-    context.driver.find_element_by_xpath(f'//button[contains(text(), "{button_text}")]').click()
+    try:
+        element = context.driver.find_element_by_xpath(f'//button[contains(text(), "{button_text}")]')
+    except selenium.common.exceptions.NoSuchElementException:
+        element = context.driver.find_element_by_css_selector(f'input[value="{button_text}"]')
+    element.click()
+
+
+
 
 
 @when('I click radio with name "{name}" and value "{value}"')
@@ -99,15 +113,38 @@ def click_radio_with_name(context, name, value):
 def click_checkbox_with_name(context, name):
     context.driver.find_element_by_name(name).click()
 
-
 @then('I should see text on page "{text}"')
-def see_text_on_page(context, text):
+def when_see_text_on_page(context, text):
     context.test.assertTrue(text in context.driver.page_source, f'Text "{text}" not found on page')
+
+@then('I should see "{title}" when i hover {selector}')
+def seee_title(context, title, selector):
+    element = context.driver.find_element_by_css_selector(selector)
+    context.text.assertEqual(element.get_attribute('title'), title)
 
 
 @then('I should see "{title}" page title')
 def see_page_title(context, title):
     context.test.assertEqual(context.driver.title, title)
+
+
+@then('I should see "{text}" in "{selector}"')
+def see_page_title(context, text, selector):
+    element = context.driver.find_element_by_css_selector(selector)
+    context.test.assertTrue(text in element.text, f"Element has text {element.text}, expected {text}")
+
+
+@then('I should see "{text}" in column "{column_name}"')
+def see_page_title(context, text, column_name):
+    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/a[contains(text(), "{column_name}")]/../..')
+    column_classes = column.get_attribute('class').split(' ')
+    field_class = None
+    for column_class in column_classes:
+        if column_class.startswith('column-'):
+            field_class = column_class.replace('column-', 'field-')
+
+    element = context.driver.find_element_by_css_selector(f'td.{field_class}')
+    context.test.assertTrue(text in element.text, f"Element has text {element.text}, expected {text}")
 
 
 @then('I am on url "{url}"')
