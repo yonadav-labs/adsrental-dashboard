@@ -64,6 +64,115 @@ Feature: Lead lifespan
         And I type "Xuxu" in field "lead_accounts-2-password"
         And I type "Amazon" in field "lead_accounts-2-account_type"
         And I click button "Save"
+        And I type "volshebnyii@gmail.com" in field "q"
+        And I click button "Search"
+        Then I should see "Google Neblad (Available)" in column "Accounts"
+        And I should see "Amazon Nevlad (Available" in column "Accounts"
+
+
+      Scenario: Mark accounts as Qualified
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "volshebnyii@gmail.com" in field "q"
+        And I click button "Search"
+        And I type "Mark Google account as qualified" in field "action"
+        And I click button "Go" 
+        And I type "Mark Amozon account as qualified" in field "action"
+        And I click button "Go" 
+        Then I should see "Facebook olvida@mail.ru (Qualified)" in column "Accounts"
+
+      Scenario: RaspberryPi reset cache
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Raspberry pis"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "reset_cache" in field "action"
+        And I click button "Go" 
+        Then I should see text on page "Cache reset successful for RP00001000."
+
+
+
+      Scenario: Check bundler leads
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Bundlers"
+        And I click checkbox with name "_selected_action"
+        Then I should see "2" in column "Leads"
+
+
+     Scenario: Send ping from RaspberryPi
+         Given I go to url "/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123"
+         Then I should see text on page "result"
+         And I should see text on page "true"
+         And I should see text on page "source"
+         And I should see text on page "ping"
+
+
+
+     Scenario: Check accounts status
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "volshebnyii@gmail.com" in field "q"
+        And I click button "Search"
+        Then I should see "Google Neblad (Available)" in column "Accounts"
+        And I should see "Amazon Nevlad (Available" in column "Accounts"
+        And I should see "Facebook olvida@mail.ru (In-Progress)" in column "Accounts"
+
+    Scenario: Check bundler active
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Bundlers"
+        And I type "600" in field "q"
+        And I click button "Search"
+        Then I should see enabled check mark in column "Is active"
+
+    Scenario: Check bundler payments
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Bundlers"
+        And I type "600" in field "q"
+        And I click button "Search"
+        And I click link "Payments"
+        Then I should see text on page "Bundler Jason Taylor"
+        And I should see text on page "Total pay for Facebook accounts"
+        And I should see text on page "Total"
+
+    Scenario: Check RaspberryPi log
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Raspberry pis"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        Then I should see enabled check mark in column "Online"
+
+    
+    Scenario: Generate daily lead timestamps
+        Given I go to url "/cron/lead_history/?now=true"
+        Then I should see text on page "true"
+
+
+    Scenario: Check lead 
+       Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Lead Timestamps"
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
