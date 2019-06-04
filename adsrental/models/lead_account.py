@@ -135,6 +135,15 @@ class LeadAccount(models.Model, FulltextSearchMixin):
         BAN_REASON_AUTO_NOT_USED,
     )
 
+    PRORATED_BAN_REASONS = (
+        BAN_REASON_GOOGLE_POLICY,
+        BAN_REASON_GOOGLE_BILLING,
+        BAN_REASON_FACEBOOK_POLICY,
+        BAN_REASON_FACEBOOK_SUSPICIOUS,
+        BAN_REASON_FACEBOOK_LOCKOUT,
+        BAN_REASON_OTHER,
+    )
+
     BAN_REASON_CHOICES = (
         (BAN_REASON_GOOGLE_POLICY, 'Google - Policy', ),
         (BAN_REASON_GOOGLE_BILLING, 'Google - Billing', ),
