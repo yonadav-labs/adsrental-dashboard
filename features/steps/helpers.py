@@ -11,20 +11,12 @@ from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.raspberry_pi import RaspberryPi
 
-HOST = 'http://localhost:8000'
 
-
-def start_webdriver():
-    driver = webdriver.Chrome()
-    driver.maximize_window()
-    return driver
-
-
-def login_as_admin(driver, username, password):
-    driver.get(f"{HOST}/admin/login/")
-    driver.find_element_by_name('username').send_keys(username)
-    driver.find_element_by_name('password').send_keys(password)
-    driver.find_element_by_css_selector('input[type=submit]').click()
+def login_as_admin(context, username, password):
+    context.driver.get(f"{context.host}/admin/login/")
+    context.driver.find_element_by_name('username').send_keys(username)
+    context.driver.find_element_by_name('password').send_keys(password)
+    context.driver.find_element_by_css_selector('input[type=submit]').click()
 
 
 @given('I am using initial database')
@@ -37,14 +29,12 @@ def use_test_database(_context):
 
 @given('I am logged in as an Admin')
 def logged_in_as_admin(context):
-    context.driver = start_webdriver()
-    login_as_admin(context.driver, "volshebnyi@gmail.com", "team17")
+    login_as_admin(context, "volshebnyi@gmail.com", "team17")
 
 
 @given('I sign up as a lead')
 def sign_up_as_lead(context):
-    context.driver = start_webdriver()
-    context.driver.get(f"{HOST}/?utm_source=600")
+    context.driver.get(f"{context.host}/?utm_source=600")
     context.driver.find_element_by_name('first_name').send_keys('Vlad')
     context.driver.find_element_by_name('last_name').send_keys('Emelianov')
     context.driver.find_element_by_name('email').send_keys('volshebnyii@gmail.com')
@@ -53,14 +43,12 @@ def sign_up_as_lead(context):
 
 @given('I am logged in as an Admin with wrong password')
 def logged_in_as_admin_wrong_password(context):
-    context.driver = webdriver.Chrome()
-    login_as_admin(context.driver, "volshebnyi@gmail.com", "bvvgr")
+    login_as_admin(context, "volshebnyi@gmail.com", "bvvgr")
 
 
 @given('I am logged in as user')
 def logged_in_as_user(context):
-    context.driver = start_webdriver()
-    context.driver.get(f"{HOST}/user/login/")
+    context.driver.get(f"{context.host}/user/login/")
     context.driver.find_element_by_name('first_name').send_keys('Vlad')
     context.driver.find_element_by_name('last_name').send_keys('Emelianov')
     context.driver.find_element_by_name('postal_code').send_keys('6348489')
@@ -80,7 +68,7 @@ def upload_file(context, filepath, name):
 
 @given('I am on main Admin Dashboard page')
 def on_main_admin_page(context):
-    context.driver.get(f"{HOST}/admin/")
+    context.driver.get(f"{context.host}/admin/")
     context.driver.page_source.find('Dashboard')
 
 
@@ -161,7 +149,7 @@ def see_page_title(context, text, column_name):
 
 @then('I am on url "{url}"')
 def i_am_on_url(context, url):
-    context.test.assertEqual(context.driver.current_url, HOST + url)
+    context.test.assertEqual(context.driver.current_url, context.host + url)
 
 
 @then('Admin Dashboard should be shown')
