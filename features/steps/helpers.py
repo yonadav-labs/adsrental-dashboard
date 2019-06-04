@@ -31,6 +31,9 @@ def use_test_database(_context):
 def logged_in_as_admin(context):
     login_as_admin(context, "volshebnyi@gmail.com", "team17")
 
+@given('I go to url "{url}"')
+def go_to_url(context, url):
+    context.driver.get(f"{context.host}{url}")
 
 @given('I sign up as a lead')
 def sign_up_as_lead(context):
@@ -57,13 +60,20 @@ def logged_in_as_user(context):
 
 @when('I type "{text}" in field "{name}"')
 def type_text(context, text, name):
-    context.driver.find_element_by_name(name).send_keys(text)
+    element = context.driver.find_element_by_name(name)
+    if element.tag_name != 'select':
+        element.clear() 
+    element.send_keys(text)
 
 
 @when('I upload file "{filepath}" in field "{name}"')
 def upload_file(context, filepath, name):
     path = Path(settings.BASE_DIR) / 'features' / 'assets' / filepath
-    context.driver.find_element_by_name(name).send_keys(path.as_posix())
+    text = path.as_posix()
+    element = context.driver.find_element_by_name(name)
+    element.clear() 
+    element.send_keys(text)
+
 
 
 @given('I am on main Admin Dashboard page')
@@ -75,7 +85,7 @@ def on_main_admin_page(context):
 @then('I should see {state} check mark in column "{column_name}"')
 def i_see_disabled_check(context, state, column_name):
     alt = 'true' if state == 'enabled' else 'false'
-    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/a[contains(text(), "{column_name}")]/../..')
+    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/*[contains(text(), "{column_name}")]/../..')
     column_classes = column.get_attribute('class').split(' ')
     field_class = None
     for column_class in column_classes:
@@ -136,7 +146,7 @@ def see_page_title(context, text, selector):
 
 @then('I should see "{text}" in column "{column_name}"')
 def see_page_title(context, text, column_name):
-    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/a[contains(text(), "{column_name}")]/../..')
+    column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/*[contains(text(), "{column_name}")]/../..')
     column_classes = column.get_attribute('class').split(' ')
     field_class = None
     for column_class in column_classes:
