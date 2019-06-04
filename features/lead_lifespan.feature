@@ -49,6 +49,24 @@ Feature: Lead lifespan
         And I type "11:22:28" in field "first_tested_1"
         And I click button "Save"
         Then I should see enabled check mark in column "Tested"
+
+     Scenario: Lead moves from available to qualified
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "volshebnyii@gmail.com" in field "q"
+        And I click button "Search"
+        And I click link "Vlad Emelianov"
+        And I type "Neblad" in field "lead_accounts-1-username"
+        And I type "Zuzu" in field "lead_accounts-1-password"
+        And I type "Google" in field "lead_accounts-1-account_type"
+        And I type "Nevlad" in field "lead_accounts-2-username"
+        And I type "Xuxu" in field "lead_accounts-2-password"
+        And I type "Amazon" in field "lead_accounts-2-account_type"
+        And I click button "Save"
+
+
+
         
 
 
