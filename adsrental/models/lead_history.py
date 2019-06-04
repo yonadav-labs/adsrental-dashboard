@@ -184,7 +184,7 @@ class LeadHistory(models.Model):
                         date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
                     ))
                     continue
-                if lead_account.ban_reason not in lead_account.PRORATED_BAN_REASONS and lead_account.banned_date.date() <= self.get_last_day():
+                if lead_account.ban_reason not in lead_account.PRORATED_BAN_REASONS:
                     note.append('{type} account was banned on {date} ($0.00)'.format(
                         type=lead_account.get_account_type_display(),
                         date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
