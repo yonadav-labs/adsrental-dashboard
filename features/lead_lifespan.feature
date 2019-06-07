@@ -76,9 +76,11 @@ Feature: Lead lifespan
         When I click link "Leads"
         And I type "volshebnyii@gmail.com" in field "q"
         And I click button "Search"
+        And I click checkbox with name "_selected_action"
         And I type "Mark Google account as qualified" in field "action"
         And I click button "Go" 
-        And I type "Mark Amozon account as qualified" in field "action"
+        And I click checkbox with name "_selected_action"
+        And I type "Mark Amazon account as qualified" in field "action"
         And I click button "Go" 
         Then I should see "Facebook olvida@mail.ru (Qualified)" in column "Accounts"
 
@@ -118,8 +120,8 @@ Feature: Lead lifespan
         When I click link "Leads"
         And I type "volshebnyii@gmail.com" in field "q"
         And I click button "Search"
-        Then I should see "Google Neblad (Available)" in column "Accounts"
-        And I should see "Amazon Nevlad (Available" in column "Accounts"
+        Then I should see "Google Neblad (In-Progress)" in column "Accounts"
+        And I should see "Amazon Nevlad (In-Progress)" in column "Accounts"
         And I should see "Facebook olvida@mail.ru (In-Progress)" in column "Accounts"
 
     Scenario: Check bundler active
@@ -156,10 +158,109 @@ Feature: Lead lifespan
 
 
     Scenario: Check lead 
-       Given I am logged in as an Admin
+        Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Lead Timestamps"
-        
+        And I type "volshebnyii@gmail.com" in field "q"
+        And I click button "Search"
+        And I click the first row in table
+        And I type "20" in field "checks_online"
+        And I click button "Save"
+        Then I should see enabled check mark in column "Active"
+        And I should see enabled check mark in column "Online"
+        And I see hint "Facebook account in-progress"
+        And I see hint "Google account in-progress"
+        And I see hint "Amazon account in-progress"
+        And I see hint "Total: $1.3333"
+
+    Scenario: Generate lead histories month
+        Given I go to url "/cron/lead_history/?aggregate=true"
+        Then I should see text on page "true"
+
+
+
+    Scenario: Check lead histories month
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Lead Histories Month"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        Then I should see enabled check mark in column "Move to next month"
+        And I should see "1" in column "Days online"
+        And I should see "0" in column "Days offline"
+        And I should see "0" in column "Days wrong password"
+        And I should see "0" in column "Days sec checkpoint"
+        And I should see "$1.33" in column "Payment"
+        And I should see "$1.33" in column "Amount Total"
+
+
+    Scenario: Debug aggregate
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Lead Histories Month"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "DEBUG Aggregate" in field "action"
+        And I click button "Go" 
+
+
+    Scenario: Ban Google account
+       Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Ban google account" in field "action"
+       And I click button "Go" 
+       And I type "bad conection" in field "note"
+       And I click button "Ban" 
+       Then I should see text on page "is banned"
+
+
+     
+
+    Scenario: Ban amazon account
+       Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Ban amazon account" in field "action"
+       And I click button "Go" 
+       And I type "bad conection" in field "note"
+       And I click button "Ban" 
+       Then I should see text on page "is banned"
+
+
+    Scenario: Ban facebook account
+       Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Ban facebook account" in field "action"
+       And I click button "Go" 
+       And I type "bad conection" in field "note"
+       And I click button "Ban" 
+       Then I should see text on page "is banned"
+     
+
+
+
+    Scenario: Ban lead
+     Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Ban lead" in field "action"
+       And I click button "Go" 
+       Then I should see text on page "is banned"
 
 
 

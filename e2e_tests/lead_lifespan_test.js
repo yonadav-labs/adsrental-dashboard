@@ -189,7 +189,6 @@ Scenario('Generate daily lead timestamps', async (I) =>{
     I.waitForNavigation()
     I.fillField('input[name="checks_online"]', '20')
     I.click('Save')
-    I.click('Lead Timestamps')
     I.seeElement('td.field-active img[alt="True"]')
     I.seeElement('td.field-online img[alt="True"]')
   
