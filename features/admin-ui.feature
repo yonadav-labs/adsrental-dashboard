@@ -38,3 +38,4 @@ Feature: Admin UI
        When I click link "Leads"
        When I click link "Cost"
        Then I should see text on page "Monthly payments"
+       

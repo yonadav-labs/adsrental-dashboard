@@ -9,6 +9,7 @@ from django.core.management import call_command
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
+from adsrental.models.lead_history import LeadHistory
 from adsrental.models.raspberry_pi import RaspberryPi
 
 
@@ -19,10 +20,13 @@ def login_as_admin(context, username, password):
     context.driver.find_element_by_css_selector('input[type=submit]').click()
 
 
+
+
 @given('I am using initial database')
 def use_test_database(_context):
     Lead.objects.all().delete()
     LeadAccount.objects.all().delete()
+    LeadHistory.objects.all().delete()
     RaspberryPi.objects.all().delete()
     call_command('loaddata', 'test.json')
 
@@ -47,6 +51,8 @@ def sign_up_as_lead(context):
 @given('I am logged in as an Admin with wrong password')
 def logged_in_as_admin_wrong_password(context):
     login_as_admin(context, "volshebnyi@gmail.com", "bvvgr")
+
+
 
 
 @given('I am logged in as user')
@@ -96,9 +102,17 @@ def i_see_disabled_check(context, state, column_name):
 
 
 
+
+
+
 @when('I click link "{link_text}"')
 def click_link(context, link_text):
     context.driver.find_element_by_link_text(link_text).click()
+
+
+@when('I click the first row in table')
+def click_first_row(context):
+    context.driver.find_element_by_css_selector('tr.row1 .field-id a').click()
 
 
 @when('I click button "{button_text}"')
@@ -145,7 +159,7 @@ def see_page_title(context, text, selector):
 
 
 @then('I should see "{text}" in column "{column_name}"')
-def see_page_title(context, text, column_name):
+def I_should_see_in_column(context, text, column_name):
     column = context.driver.find_element_by_xpath(f'//th/div[@class="text"]/*[contains(text(), "{column_name}")]/../..')
     column_classes = column.get_attribute('class').split(' ')
     field_class = None
@@ -155,6 +169,10 @@ def see_page_title(context, text, column_name):
 
     element = context.driver.find_element_by_css_selector(f'td.{field_class}')
     context.test.assertTrue(text in element.text, f"Element has text {element.text}, expected {text}")
+
+
+# @then('I should see "{text}" in column "{coulmn_name}" where row contains "{row_text}"')
+# def i_see_
 
 
 @then('I am on url "{url}"')
@@ -170,3 +188,9 @@ def admin_dashboard_should_be_shown(context):
 @then('I wait')
 def i_wait(context):
     time.sleep(1000)
+
+@then('I see hint "{text}"')
+def i_see_hint(context, text):
+    element = context.driver.find_element_by_class_name('has_note')
+    title = element.get_attribute('title')
+    context.test.assertTrue(text in title, f'No hint found with text "{text}"')
