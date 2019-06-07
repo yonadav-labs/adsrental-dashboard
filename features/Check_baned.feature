@@ -73,68 +73,187 @@ Feature: Lead lifespan
         And I should see "Amazon Jack (Available" in column "Accounts"
 
 
-    Scenario: Ban Google account
+
+  Scenario: Account became Qualified
        Given I am logged in as an Admin
        And I am on main Admin Dashboard page
        When I click link "Leads"
        And I type "RP00001000" in field "q"
        And I click button "Search"
        And I click checkbox with name "_selected_action"
-       And I type "Ban google account" in field "action"
-       And I click button "Go" 
-       And I type "bad conection" in field "note"
-       And I click button "Ban" 
-       Then I should see text on page "is banned"
+       And I type "Mark Faceboook account as Qualified" in field "action"
+       And I click button "Go"
+       And I click checkbox with name "_selected_action"
+       And I type "Mark Google account as Qualified" in field "action"
+       And I click button "Go"
+       And I click checkbox with name "_selected_action"
+       And I type "Mark Amazon account as Qualified" in field "action"
+       And I click button "Go"
+       Then I should see "Qualified" in column "Status"
+       And I should see "Google Jon (Qualified)" in column "Accounts"
+       And I should see "Amazon Jack (Qualified)" in column "Accounts"
+       And I should see "Facebook olvida@mail.ru (Qualified)" in column "Accounts"
 
 
-     
 
-    Scenario: Ban amazon account
+  Scenario: Re-Qualification should not change lead status (Faceboook account)
        Given I am logged in as an Admin
        And I am on main Admin Dashboard page
        When I click link "Leads"
        And I type "RP00001000" in field "q"
        And I click button "Search"
        And I click checkbox with name "_selected_action"
-       And I type "Ban amazon account" in field "action"
-       And I click button "Go" 
-       And I type "bad conection" in field "note"
-       And I click button "Ban" 
-       Then I should see text on page "is banned"
+       And I type "Mark Faceboook account as Qualified" in field "action"
+       And I click button "Go"
+       Then I should see text on page "Facebook lead olvida@mail.ru order already exists"
 
 
-    Scenario: Ban facebook account
+Scenario: Re-Qualification should not change lead status (Google account)
        Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Mark Google account as Qualified" in field "action"
+       And I click button "Go"
+       Then I should see text on page "Google lead Jon order already exists:"
+
+Scenario: Re-Qualification should not change lead status (Amazon account)
+       Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Mark Amazon account as Qualified" in field "action"
+       And I click button "Go"
+       Then I should see text on page "Lead Amazon lead Jack order already exists"
+       And  I should see "Qualified" in column "Status"
+
+
+
+Scenario: Status check after ban and unban (Faceboook account)part 1
+      Given I am logged in as an Admin
        And I am on main Admin Dashboard page
        When I click link "Leads"
        And I type "RP00001000" in field "q"
        And I click button "Search"
        And I click checkbox with name "_selected_action"
        And I type "Ban facebook account" in field "action"
-       And I click button "Go" 
+       And I click button "Go"
        And I type "bad conection" in field "note"
        And I click button "Ban" 
-       Then I should see text on page "is banned"
-     
+       Then I should see "Facebook olvida@mail.ru (Banned)" in column "Accounts"
+      
 
-
-
-    Scenario: Ban lead
-       Given I am logged in as an Admin
+Scenario: Status check after ban and unban (Faceboook account)part 2
+    Given I am logged in as an Admin
        And I am on main Admin Dashboard page
        When I click link "Leads"
        And I type "RP00001000" in field "q"
        And I click button "Search"
        And I click checkbox with name "_selected_action"
-       And I type "Ban lead" in field "action"
-       And I click button "Go" 
-       Then I should see text on page "is banned"
+       And I type "Unban facebook account" in field "action"
+       And I click button "Go"
+      Then I should see "Facebook olvida@mail.ru (Qualified), " in column "Accounts"
 
 
-     Scenario: New lead Banned
-        Given I am logged in as an Admin
-        And I am on main Admin Dashboard page
-        When I click link "Leads"
-        And I type "volshebnyii@gmail.com" in field "q"
-        And I click button "Search"
-        Then I should see "Banned" in column "Status"
+
+Scenario: Status check after ban and unban (Amazon account)part 1
+      Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Ban amazon account" in field "action"
+       And I click button "Go"
+       And I type "bad conection" in field "note"
+       And I click button "Ban" 
+       Then I should see "Amazon Jack (Banned)" in column "Accounts"
+      
+
+Scenario: Status check after ban and unban (Amazon account)part 2
+    Given I am logged in as an Admin
+       And I am on main Admin Dashboard page
+       When I click link "Leads"
+       And I type "RP00001000" in field "q"
+       And I click button "Search"
+       And I click checkbox with name "_selected_action"
+       And I type "Unban amazon account" in field "action"
+       And I click button "Go"
+       Then I should see "Amazon Jack (Qualified)" in column "Accounts"
+
+
+    # Scenario: Ban Google account
+    #    Given I am logged in as an Admin
+    #    And I am on main Admin Dashboard page
+    #    When I click link "Leads"
+    #    And I type "RP00001000" in field "q"
+    #    And I click button "Search"
+    #    And I click checkbox with name "_selected_action"
+    #    And I type "Ban google account" in field "action"
+    #    And I click button "Go" 
+    #    And I type "bad conection" in field "note"
+    #    And I click button "Ban" 
+    #    Then I should see text on page "is banned"
+
+
+     
+
+    # Scenario: Ban amazon account
+    #    Given I am logged in as an Admin
+    #    And I am on main Admin Dashboard page
+    #    When I click link "Leads"
+    #    And I type "RP00001000" in field "q"
+    #    And I click button "Search"
+    #    And I click checkbox with name "_selected_action"
+    #    And I type "Ban amazon account" in field "action"
+    #    And I click button "Go" 
+    #    And I type "bad conection" in field "note"
+    #    And I click button "Ban" 
+    #    Then I should see text on page "is banned"
+
+
+    # Scenario: Ban facebook account
+    #    Given I am logged in as an Admin
+    #    And I am on main Admin Dashboard page
+    #    When I click link "Leads"
+    #    And I type "RP00001000" in field "q"
+    #    And I click button "Search"
+    #    And I click checkbox with name "_selected_action"
+    #    And I type "Ban facebook account" in field "action"
+    #    And I click button "Go" 
+    #    And I type "bad conection" in field "note"
+    #    And I click button "Ban" 
+    #    Then I should see text on page "is banned"
+     
+
+
+
+    # Scenario: Ban lead
+    #    Given I am logged in as an Admin
+    #    And I am on main Admin Dashboard page
+    #    When I click link "Leads"
+    #    And I type "RP00001000" in field "q"
+    #    And I click button "Search"
+    #    And I click checkbox with name "_selected_action"
+    #    And I type "Ban lead" in field "action"
+    #    And I click button "Go" 
+    #    And I type "bad conection" in field "note"
+    #    And I click button "Ban" 
+    #    Then I should see text on page "is banned"
+
+
+    #  Scenario: New lead Banned
+    #     Given I am logged in as an Admin
+    #     And I am on main Admin Dashboard page
+    #     When I click link "Leads"
+    #     And I type "volshebnyii@gmail.com" in field "q"
+    #     And I click button "Search"
+    #     Then I should see "Banned" in column "Status"
+    #     And I wait
+
+
+    Scenario: 
