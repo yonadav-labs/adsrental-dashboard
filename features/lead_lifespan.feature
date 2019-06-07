@@ -1,4 +1,4 @@
-@wip
+
 Feature: Lead lifespan
     In order to check if all links in Admin Dashboard are working
     As an Admin
