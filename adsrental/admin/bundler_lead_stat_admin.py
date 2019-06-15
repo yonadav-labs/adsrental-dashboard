@@ -5,9 +5,20 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_lead_stat import BundlerLeadStat
+from adsrental.admin.base import CSVExporter
 
 
-class BundlerLeadStatsAdmin(admin.ModelAdmin):
+class BundlerLeadStatsAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead__name',
+    )
+
+    csv_titles = (
+        'ID',
+        'Lead',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -37,6 +48,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     list_select_related = ('bundler', )
     actions = (
         'calculate',
+        'export_as_csv',
     )
     list_filter = (
         'bundler__is_active',

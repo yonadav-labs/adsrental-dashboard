@@ -10,9 +10,18 @@ from django.db.models.functions import Concat
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 from adsrental.utils import BotoResource, PingCacheHelper
+from adsrental.admin.base import CSVExporter
 
 
-class EC2InstanceAdmin(admin.ModelAdmin):
+class EC2InstanceAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+    )
+
+    csv_titles = (
+        'ID',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -63,6 +72,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'upgrade_to_large',
         'launch_essential_ec2',
         'check_status',
+        'export_as_csv',
     )
     raw_id_fields = ('lead', )
 
