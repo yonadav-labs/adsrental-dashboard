@@ -3,10 +3,18 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.user import User
+from adsrental.admin.base import CSVExporter
 
 
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin, CSVExporter):
     model = User
+    csv_fields = (
+        'id',
+    )
+
+    csv_titles = (
+        'ID',
+    )
     fieldsets = UserAdmin.fieldsets[:-1] + (
         (
             None,
@@ -25,6 +33,9 @@ class CustomUserAdmin(UserAdmin):
     list_display = UserAdmin.list_display + (
         'bundler_field',
     )
+    actions = UserAdmin.actions + [
+        'export_as_csv',
+    ]
 
     def bundler_field(self, obj):
         if not obj.bundler:

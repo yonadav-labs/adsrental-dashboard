@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter, LeadAccountStatusListFilter, LeadAccountAccountTypeListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class LeadAccountIDListFilter(AbstractIntIDListFilter):
@@ -18,7 +19,15 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
     title = 'Lead ID'
 
 
-class LeadAccountIssueAdmin(admin.ModelAdmin):
+class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+    )
+
+    csv_titles = (
+        'ID',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -55,6 +64,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'lead_account__lead__email',
         'lead_account__lead__raspberry_pi__rpid',
     )
+    actions = ('export_as_csv',)
 
     raw_id_fields = ('lead_account', )
 

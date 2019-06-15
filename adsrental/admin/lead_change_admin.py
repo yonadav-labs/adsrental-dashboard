@@ -9,6 +9,7 @@ from adsrental.models.lead_change import LeadChange
 
 from adsrental.admin.list_filters import AbstractUIDListFilter, AbstractIntIDListFilter, EditedByListFilter
 from adsrental.admin.base import ReadOnlyModelAdmin
+from adsrental.admin.base import CSVExporter
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -21,7 +22,17 @@ class LeadAccountIDListFilter(AbstractIntIDListFilter):
     title = 'LeadAccount ID'
 
 
-class LeadChangeAdmin(ReadOnlyModelAdmin):
+class LeadChangeAdmin(ReadOnlyModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+    )
+
+    csv_titles = (
+        'ID',
+    )
+
+    actions = ('export_as_csv',)
+
     model = LeadChange
     list_display = (
         'id',

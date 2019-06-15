@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class IDListFilter(AbstractUIDListFilter):
@@ -13,8 +14,18 @@ class IDListFilter(AbstractUIDListFilter):
     title = 'ID'
 
 
-class BundlerAdmin(admin.ModelAdmin):
+class BundlerAdmin(admin.ModelAdmin, CSVExporter):
     model = Bundler
+    csv_fields = (
+        'id',
+        'lead__name',
+    )
+
+    csv_titles = (
+        'ID',
+        'Lead',
+    )
+
     list_display = (
         'id',
         'name',
@@ -39,6 +50,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'activate',
         'enable_chargeback',
         'disable_chargeback',
+        'export_as_csv',
     )
     search_fields = ('utm_source', 'email', 'name', )
     list_filter = (

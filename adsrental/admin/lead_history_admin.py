@@ -8,6 +8,7 @@ from django.db.models.functions import Concat
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_account import LeadAccount
 from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter, AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -15,7 +16,15 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
     title = 'Lead ID'
 
 
-class LeadHistoryAdmin(admin.ModelAdmin):
+class LeadHistoryAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+    )
+
+    csv_titles = (
+        'ID',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -46,6 +55,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_online',
         'mark_as_offline',
+        'export_as_csv',
     )
 
     def __init__(self, *args, **kwargs):
