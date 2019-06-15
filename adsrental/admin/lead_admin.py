@@ -10,6 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
+from adsrental.admin.base import CSVExporter
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
@@ -63,7 +64,18 @@ class LeadAccountInline(admin.StackedInline):
     raw_id_fields = ('lead', )
 
 
-class LeadAdmin(admin.ModelAdmin):
+class LeadAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+            'id',
+            'lead__name',
+            )
+
+    csv_titles = (
+        'ID',
+        'Lead',
+        'RPID',
+        )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -157,6 +169,7 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'sync_to_adsdb',
         'delete_leads',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',
