@@ -3,9 +3,26 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.vultr_instance import VultrInstance
+from adsrental.admin.base import CSVExporter
 
 
-class VultrInstanceAdmin(admin.ModelAdmin):
+class VultrInstanceAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'instance_id',
+        'label',
+        'ip_address',
+        'os',
+        'status',
+    )
+
+    csv_titles = (
+        'Id',
+        'Label',
+        'IP Address',
+        'Os',
+        'Status',
+    )
+
     model = VultrInstance
     list_display = (
         'instance_id',
@@ -20,6 +37,7 @@ class VultrInstanceAdmin(admin.ModelAdmin):
     )
     actions = (
         'refresh',
+        'export_as_csv',
     )
     search_fields = ('lead__email', 'lead__raspberry_pi__rpid', )
 
