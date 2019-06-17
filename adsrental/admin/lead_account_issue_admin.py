@@ -22,10 +22,30 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
 class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
         'id',
+        'lead_account',
+        'lead_account__lead',
+        'lead_account__lead__raspberry_pi',
+        'lead_account__lead__bundler',
+        'issue_type',
+        'status',
+        'old_value',
+        'new_value',
+        'reporter',
+        'created',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Lead Account',
+        'Lead',
+        'Raspberry Pi',
+        'Bundler',
+        'Issue Type',
+        'Status',
+        'Old Value',
+        'New Value',
+        'Reporter',
+        'Created',
     )
 
     class Media:

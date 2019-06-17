@@ -19,10 +19,28 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
 class LeadHistoryAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
         'id',
+        'lead',
+        'email',
+        'rpid',
+        'date',
+        'active',
+        'online',
+        'amount',
+        'wrong_password',
+        'security_checkpoint',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Lead',
+        'Email',
+        'Rpid',
+        'Date',
+        'Active',
+        'Online',
+        'Amount',
+        'Wrong Password',
+        'Wecurity Checkpoint',
     )
 
     class Media:

@@ -20,12 +20,26 @@ class BundlerPaymentAdmin(admin.ModelAdmin, CSVExporter):
 
     csv_fields = (
         'id',
-        'lead__name',
+        'lead_account',
+        'bundler',
+        'payment',
+        'payment_type',
+        'report',
+        'paid',
+        'ready',
+        'datetime',
     )
 
     csv_titles = (
-        'ID',
-        'Lead',
+        'Id',
+        'Lead Account',
+        'Bundler',
+        'Payment',
+        'Payment Type',
+        'Report',
+        'Paid',
+        'Ready',
+        'Datetime',
     )
 
     actions = (

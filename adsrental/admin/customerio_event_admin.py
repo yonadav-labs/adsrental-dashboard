@@ -8,10 +8,22 @@ class CustomerIOEventAdmin(admin.ModelAdmin, CSVExporter):
     model = CustomerIOEvent
     csv_fields = (
         'id',
+        'lead',
+        'lead_name',
+        'lead_email',
+        'name',
+        'sent',
+        'created'
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Lead',
+        'Lead Name',
+        'Lead Email',
+        'Name',
+        'Sent',
+        'Created'
     )
     list_display = ('id', 'lead', 'lead_name', 'lead_email', 'name', 'sent', 'created')
     search_fields = ('lead__email', 'lead__first_name',
