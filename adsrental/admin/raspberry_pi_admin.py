@@ -11,6 +11,7 @@ from django.db.models.functions import Concat
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 PROXY_TUNNEL_MESSAGE = '''Your device should be updated in a couple of minutes!<br />
@@ -30,7 +31,35 @@ class RpidListFilter(AbstractUIDListFilter):
     title = 'RPID'
 
 
-class RaspberryPiAdmin(admin.ModelAdmin):
+class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'rpid',
+        'lead',
+        'lead__status',
+        'version',
+        'ip_address',
+        'first_tested',
+        'first_seen',
+        'last_seen',
+        'online',
+        'uptime',
+        'is_proxy_tunnel',
+    )
+
+    csv_titles = (
+        'Rpid',
+        'Lead',
+        'Lead Status',
+        'Version',
+        'Ip Address',
+        'First Tested',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Uptime',
+        'Is Proxy Tunnel',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -73,6 +102,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'show_cache',
         'convert_to_proxy_tunnel',
         'convert_to_ec2',
+        'export_as_csv',
     )
     readonly_fields = ('created', 'updated', )
 
