@@ -25,10 +25,22 @@ class LeadAccountIDListFilter(AbstractIntIDListFilter):
 class LeadChangeAdmin(ReadOnlyModelAdmin, CSVExporter):
     csv_fields = (
         'id',
+        'lead',
+        'lead_account',
+        'value',
+        'old_value',
+        'edited_by',
+        'created',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Lead',
+        'Lead Account',
+        'Value',
+        'Old Value',
+        'Edited By',
+        'Created',
     )
 
     actions = ('export_as_csv',)

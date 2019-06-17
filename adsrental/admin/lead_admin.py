@@ -66,15 +66,54 @@ class LeadAccountInline(admin.StackedInline):
 
 class LeadAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
-            'id',
-            'lead__name',
-            )
+        'leadid',
+        'name',
+        'status',
+        'email_field',
+        'phone_field',
+        'bundler',
+        'accounts_field',
+        'raspberry_pi',
+        'tested_field',
+        'usps_field',
+        'first_seen',
+        'last_seen',
+        'online',
+        'ec2instance',
+        'touch_count_field',
+        'ip_address',
+        'wrong_password_field',
+        'security_checkpoint_field',
+        'fix_button',
+        'sync_with_adsdb_field',
+        'facebook_billed',
+        'google_billed',
+    )
 
     csv_titles = (
-        'ID',
-        'Lead',
-        'RPID',
-        )
+        'Id',
+        'Name',
+        'Status',
+        'Email',
+        'Phone',
+        'Bundler',
+        'Accounts',
+        'Raspberry Pi',
+        'Tested',
+        'Usps',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Ec2 Instance Link',
+        'Touch Count',
+        'Ip Address',
+        'Wrong Password',
+        'Security Checkpoint',
+        'Fix Button',
+        'Sync With Adsdb',
+        'Facebook Billed',
+        'Google Billed',
+    )
 
     class Media:
         css = {

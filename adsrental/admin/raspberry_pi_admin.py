@@ -33,11 +33,31 @@ class RpidListFilter(AbstractUIDListFilter):
 
 class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
-        'id',
+        'rpid',
+        'lead',
+        'lead__status',
+        'version',
+        'ip_address',
+        'first_tested',
+        'first_seen',
+        'last_seen',
+        'online',
+        'uptime',
+        'is_proxy_tunnel',
     )
 
     csv_titles = (
-        'ID',
+        'Rpid',
+        'Lead',
+        'Lead Status',
+        'Version',
+        'Ip Address',
+        'First Tested',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Uptime',
+        'Is Proxy Tunnel',
     )
 
     class Media:

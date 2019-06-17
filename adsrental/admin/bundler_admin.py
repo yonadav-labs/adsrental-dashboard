@@ -18,12 +18,36 @@ class BundlerAdmin(admin.ModelAdmin, CSVExporter):
     model = Bundler
     csv_fields = (
         'id',
-        'lead__name',
+        'name',
+        'utm_source',
+        'adsdb_id',
+        'email',
+        'phone',
+        'is_active',
+        'leads_count',
+        'facebook_payment_field',
+        'facebook_screenshot_payment_field',
+        'google_payment_field',
+        'amazon_payment_field',
+        'parent_bundler',
+        'second_parent_bundler',
     )
 
     csv_titles = (
         'ID',
-        'Lead',
+        'Name',
+        'Utm Source',
+        'Adsdb ID',
+        'Email',
+        'Phone',
+        'Is Active',
+        'Leads Count',
+        'Facebook Payment Field',
+        'Facebook Screenshot Payment Field',
+        'Google Payment Field',
+        'Amazon Payment Field',
+        'Parent Bundler',
+        'Second Parent Bundler',
     )
 
     list_display = (

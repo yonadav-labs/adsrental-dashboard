@@ -11,12 +11,18 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin, CSVExporter):
     model = BundlerPaymentsReport
     csv_fields = (
         'id',
-        'lead__name',
+        'date',
+        'paid',
+        'cancelled',
+        'email_sent',
     )
 
     csv_titles = (
-        'ID',
-        'Lead',
+        'Id',
+        'Date',
+        'Paid',
+        'Cancelled',
+        'Email Sent',
     )
 
     list_display = (

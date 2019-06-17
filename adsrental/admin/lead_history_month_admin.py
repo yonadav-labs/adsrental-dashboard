@@ -16,10 +16,9 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import AmountListFilter, DateMonthListFilter, LeadStatusListFilter
 from adsrental.forms import AdminPrepareForReshipmentForm
-from adsrental.admin.base import CSVExporter
 
 
-class LeadHistoryMonthAdmin(admin.ModelAdmin, CSVExporter):
+class LeadHistoryMonthAdmin(admin.ModelAdmin):
     class Media:
         css = {
             'all': ('css/custom_admin.css',)

@@ -8,11 +8,19 @@ from adsrental.admin.base import CSVExporter
 
 class VultrInstanceAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
-        'id',
+        'instance_id',
+        'label',
+        'ip_address',
+        'os',
+        'status',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Label',
+        'IP Address',
+        'Os',
+        'Status',
     )
 
     model = VultrInstance

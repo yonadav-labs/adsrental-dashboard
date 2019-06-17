@@ -10,10 +10,18 @@ from adsrental.admin.base import CSVExporter
 class RaspberryPiSessionAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
         'id',
+        'raspberry_pi',
+        'start_date',
+        'end_date',
+        'duration',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Raspberry PI',
+        'Start Date',
+        'End Date',
+        'Duration',
     )
 
     model = RaspberryPiSession

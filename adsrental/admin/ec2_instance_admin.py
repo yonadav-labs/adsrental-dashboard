@@ -16,10 +16,38 @@ from adsrental.admin.base import CSVExporter
 class EC2InstanceAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
         'id',
+        'hostname',
+        'instance_type',
+        'browser_type',
+        'lead',
+        'lead_status',
+        'raspberry_pi',
+        'version',
+        'raspberry_pi_version',
+        'status',
+        'last_rdp_session',
+        'last_seen',
+        'last_troubleshoot_field',
+        'tunnel_up_date_field',
+        'raspberry_pi_online',
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Hostname',
+        'Instance Type',
+        'Browser Type',
+        'Lead',
+        'Lead Status',
+        'Raspberry Pi',
+        'Version',
+        'Raspberry Pi Version',
+        'Status',
+        'Last Rdp Session',
+        'Last Seen',
+        'Last Troubleshoot Field',
+        'Tunnel Up Date Field',
+        'Raspberry Pi Online',
     )
 
     class Media:
