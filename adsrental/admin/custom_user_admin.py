@@ -10,10 +10,20 @@ class CustomUserAdmin(UserAdmin, CSVExporter):
     model = User
     csv_fields = (
         'id',
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'bundler'
     )
 
     csv_titles = (
-        'ID',
+        'Id',
+        'Username',
+        'Email',
+        'First Name',
+        'Last Name',
+        'Bundler'
     )
     fieldsets = UserAdmin.fieldsets[:-1] + (
         (

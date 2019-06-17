@@ -11,12 +11,30 @@ from adsrental.admin.base import CSVExporter
 class BundlerLeadStatsAdmin(admin.ModelAdmin, CSVExporter):
     csv_fields = (
         'id',
-        'lead__name',
+        'bundler_field',
+        'in_progress_total_field',
+        'in_progress_offline_field',
+        'in_progress_wrong_pw_field',
+        'in_progress_security_checkpoint_field',
+        'in_progress_total_issue_percent',
+        'autobans_last_30_days_field',
+        'delivered_not_connected_last_14_days_field',
+        'delivered_connected_last_14_days',
+        'delivered_connected_last_14_days_percent',
     )
 
     csv_titles = (
-        'ID',
-        'Lead',
+        'Id',
+        'Bundler Field',
+        'In Progress Total Field',
+        'In Progress Offline Field',
+        'In Progress Wrong Pw Field',
+        'In Progress Security Checkpoint Field',
+        'In Progress Total Issue Percent',
+        'Autobans Last 30 Days Field',
+        'Delivered Not Connected Last 14 Days Field',
+        'Delivered Connected Last 14 Days',
+        'Delivered Connected Last 14 Days Percent',
     )
 
     class Media:
