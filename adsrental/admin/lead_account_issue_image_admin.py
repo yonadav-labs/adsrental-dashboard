@@ -4,6 +4,7 @@ from adsrental.models.lead_account_issue_image import LeadAccountIssueImage
 
 
 class LeadAccountIssueImageAdmin(admin.ModelAdmin):
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)

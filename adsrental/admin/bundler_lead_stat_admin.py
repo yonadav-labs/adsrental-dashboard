@@ -5,9 +5,38 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_lead_stat import BundlerLeadStat
+from adsrental.admin.base import CSVExporter
 
 
-class BundlerLeadStatsAdmin(admin.ModelAdmin):
+class BundlerLeadStatsAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'bundler_field',
+        'in_progress_total_field',
+        'in_progress_offline_field',
+        'in_progress_wrong_pw_field',
+        'in_progress_security_checkpoint_field',
+        'in_progress_total_issue_percent',
+        'autobans_last_30_days_field',
+        'delivered_not_connected_last_14_days_field',
+        'delivered_connected_last_14_days',
+        'delivered_connected_last_14_days_percent',
+    )
+
+    csv_titles = (
+        'Id',
+        'Bundler Field',
+        'In Progress Total Field',
+        'In Progress Offline Field',
+        'In Progress Wrong Pw Field',
+        'In Progress Security Checkpoint Field',
+        'In Progress Total Issue Percent',
+        'Autobans Last 30 Days Field',
+        'Delivered Not Connected Last 14 Days Field',
+        'Delivered Connected Last 14 Days',
+        'Delivered Connected Last 14 Days Percent',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -37,6 +66,7 @@ class BundlerLeadStatsAdmin(admin.ModelAdmin):
     list_select_related = ('bundler', )
     actions = (
         'calculate',
+        'export_as_csv',
     )
     list_filter = (
         'bundler__is_active',
