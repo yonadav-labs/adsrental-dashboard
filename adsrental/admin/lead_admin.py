@@ -10,6 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
+from adsrental.admin.base import CSVExporter
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
@@ -63,7 +64,57 @@ class LeadAccountInline(admin.StackedInline):
     raw_id_fields = ('lead', )
 
 
-class LeadAdmin(admin.ModelAdmin):
+class LeadAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'leadid',
+        'name',
+        'status',
+        'email_field',
+        'phone_field',
+        'bundler',
+        'accounts_field',
+        'raspberry_pi',
+        'tested_field',
+        'usps_field',
+        'first_seen',
+        'last_seen',
+        'online',
+        'ec2instance',
+        'touch_count_field',
+        'ip_address',
+        'wrong_password_field',
+        'security_checkpoint_field',
+        'fix_button',
+        'sync_with_adsdb_field',
+        'facebook_billed',
+        'google_billed',
+    )
+
+    csv_titles = (
+        'Id',
+        'Name',
+        'Status',
+        'Email',
+        'Phone',
+        'Bundler',
+        'Accounts',
+        'Raspberry Pi',
+        'Tested',
+        'Usps',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Ec2 Instance Link',
+        'Touch Count',
+        'Ip Address',
+        'Wrong Password',
+        'Security Checkpoint',
+        'Fix Button',
+        'Sync With Adsdb',
+        'Facebook Billed',
+        'Google Billed',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -157,6 +208,7 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'sync_to_adsdb',
         'delete_leads',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',

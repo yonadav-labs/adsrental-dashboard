@@ -4,9 +4,26 @@ from django.utils import timezone, timesince
 from django.utils.safestring import mark_safe
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
+from adsrental.admin.base import CSVExporter
 
 
-class RaspberryPiSessionAdmin(admin.ModelAdmin):
+class RaspberryPiSessionAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'raspberry_pi',
+        'start_date',
+        'end_date',
+        'duration',
+    )
+
+    csv_titles = (
+        'Id',
+        'Raspberry PI',
+        'Start Date',
+        'End Date',
+        'Duration',
+    )
+
     model = RaspberryPiSession
     list_display = (
         'id',
@@ -19,6 +36,7 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
     search_fields = ('raspberry_pi__rpid', )
     raw_id_fields = ('raspberry_pi', )
     readonly_fields = ('start_date', )
+    actions = ('export_as_csv',)
 
     def raspberry_pi_link(self, obj):
         result = []
