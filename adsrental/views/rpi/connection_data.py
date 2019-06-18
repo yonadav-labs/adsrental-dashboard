@@ -2,7 +2,6 @@ from django.views import View
 from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.raspberry_pi import RaspberryPi
-from adsrental.models.lead_account import LeadAccount
 
 
 class ConnectionDataView(View):
