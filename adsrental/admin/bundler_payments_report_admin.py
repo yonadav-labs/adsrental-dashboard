@@ -4,10 +4,27 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
 from adsrental.models.bundler_payment import BundlerPayment
+from adsrental.admin.base import CSVExporter
 
 
-class BundlerPaymentsReportAdmin(admin.ModelAdmin):
+class BundlerPaymentsReportAdmin(admin.ModelAdmin, CSVExporter):
     model = BundlerPaymentsReport
+    csv_fields = (
+        'id',
+        'date',
+        'paid',
+        'cancelled',
+        'email_sent',
+    )
+
+    csv_titles = (
+        'Id',
+        'Date',
+        'Paid',
+        'Cancelled',
+        'Email Sent',
+    )
+
     list_display = (
         'id',
         'date',
@@ -21,6 +38,7 @@ class BundlerPaymentsReportAdmin(admin.ModelAdmin):
         'mark_as_paid',
         'send_by_email',
         'cancel_report',
+        'export_as_csv',
     )
 
     def get_actions(self, request):
