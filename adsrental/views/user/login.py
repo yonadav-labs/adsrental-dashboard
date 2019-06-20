@@ -23,15 +23,3 @@ class UserLoginView(View):
 
         request.session['leadid'] = lead.leadid
         return redirect('user_stats')
-
-
-class UserStatsView(View):
-    def get(self, request):
-        leadid = request.session.get('leadid')
-        lead = Lead.objects.filter(leadid=leadid).first()
-        if not lead:
-            return redirect('user_login')
-
-        return render(request, 'user/stats.html', dict(
-            lead=lead,
-        ))
