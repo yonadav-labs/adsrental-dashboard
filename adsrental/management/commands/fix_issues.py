@@ -40,3 +40,4 @@ class Command(BaseCommand):
                     issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
                     created=la.security_checkpoint_date,
                 ).save()
+        print(results)
