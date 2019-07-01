@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+{% load humanize %}
+{% load helpers %}
+
+{% block title_extra %}| Aggregated Logs for {{ date }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10">
+    {% for rp, lines in log_lines.items %}
+        <div class="panel-group" id="accordion">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ rp }}">
+                {{ rp }}</a>
+              </h4>
+            </div>
+            <div id="collapse-{{ rp }}" class="panel-collapse collapse">
+              <div class="panel-body">
+                {% for line in lines %}
+                    {% if 'restarting' in line %}
+                        <pre style="background-color: #fee;">{{ line }}</pre>
+                    {% else %}
+                        <pre style="background-color: #eef;">{{ line }}</pre>
+                    {% endif %}
+                {% endfor %}                  
+              </div>
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+    </div>
+    <div class="col-md-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">RASPBERRY PIs</div>
+            <div class="panel-body">
+                <ul>
+                    <li><a href="#" onclick="$('.collapse').collapse('hide')">Collapse All</a></li>
+                    <li><a href="#" onclick="$('.collapse').collapse('show')">Expand All</a></li>
+                    <hr>
+                    {% for rpid in rps %}
+                        <li><a href="{% url 'show_log' rpid=rpid filename=filename %}">{{rpid}}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
