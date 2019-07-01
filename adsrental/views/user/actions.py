@@ -47,7 +47,7 @@ class FixLeadAccountIssueView(View):
             ))
 
         if lead_account_issue.can_be_fixed():
-            lead_account_issue.submit(form.cleaned_data.get('new_value', ''), 'user')
+            lead_account_issue.submit(form.cleaned_data.get('new_value', ''), request.user)
             if form.cleaned_data.get('note'):
                 lead_account_issue.insert_note(f"Fix note: {form.cleaned_data['note']}")
             lead_account_issue.save()
