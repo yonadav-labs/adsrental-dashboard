@@ -145,7 +145,7 @@ class RaspberryPi(models.Model):
         return (tunnel_port, tunnel_port + 1)
 
     def assign_proxy_hostname(self) -> str:
-        hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
+        hostname_count = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True).exclude(proxy_hostname='').values('proxy_hostname').annotate(count=Count('rpid')).order_by('count')
 
         hostnames = []
         for i in hostname_count:

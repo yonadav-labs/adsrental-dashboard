@@ -2,16 +2,15 @@ import os
 import datetime
 from dateutil import parser
 
-from django.views import View
-from django.http import JsonResponse
 from django.conf import settings
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_history_month import LeadHistoryMonth
+from adsrental.views.cron.base import CronView
 
 
-class LeadHistoryView(View):
+class LeadHistoryView(CronView):
     '''
     Calculate :model:`adsrental.Lead` stats and store them in :model:`adsrental.LeadHistory` and :model:`adsrental.LeadHistoryMonth`
 
@@ -38,7 +37,7 @@ class LeadHistoryView(View):
                 leads = leads.filter(raspberry_pi__rpid=rpid)
             for lead in leads:
                 LeadHistory.upsert_for_lead(lead)
-            return JsonResponse({
+            return self.render({
                 'result': True,
             })
         if aggregate:
@@ -57,7 +56,7 @@ class LeadHistoryView(View):
                 if item.amount or item.id:
                     item.save()
                 counter += 1
-            return JsonResponse({
+            return self.render({
                 'result': True,
                 'count': leads.count(),
             })
@@ -95,12 +94,12 @@ class LeadHistoryView(View):
                 ).save()
                 results.append([lead.email, checks_online])
 
-            return JsonResponse({
+            return self.render({
                 'results': results,
                 'result': True,
             })
 
-        return JsonResponse({
+        return self.render({
             'results': results,
             'result': False,
         })

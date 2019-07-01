@@ -44,7 +44,7 @@ def https_required(function: typing.Callable) -> HttpResponse:
             protocol = 'https'
 
         actual_domain = '{}://{}'.format(protocol, request.get_host())
-        if actual_domain == settings.DOMAIN:
+        if actual_domain == settings.DOMAIN or not settings.CHECK_DOMAIN:
             return function(self, request, *args, **kwargs)
 
         url = u'{host}{path}'.format(

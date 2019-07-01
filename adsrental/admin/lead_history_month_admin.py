@@ -126,7 +126,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,
@@ -134,7 +134,7 @@ class LeadHistoryMonthAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{url}?{query}">Timestamps</a>'.format(
+        result.append('<a href="{url}?{query}">Timestamps</a>'.format(
             url=reverse('admin:adsrental_leadhistory_changelist'),
             query=urlencode(dict(
                 date=obj.date.strftime(settings.SYSTEM_DATE_FORMAT),

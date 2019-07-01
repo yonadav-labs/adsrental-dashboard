@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.admin.list_filters import AbstractIntIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class LeadAccountIDListFilter(AbstractIntIDListFilter):
@@ -13,9 +14,37 @@ class LeadAccountIDListFilter(AbstractIntIDListFilter):
     title = 'LeadAccount ID'
 
 
-class BundlerPaymentAdmin(admin.ModelAdmin):
+class BundlerPaymentAdmin(admin.ModelAdmin, CSVExporter):
     list_per_page = 100
     change_list_template = 'admin/change_list_total.html'
+
+    csv_fields = (
+        'id',
+        'lead_account',
+        'bundler',
+        'payment',
+        'payment_type',
+        'report',
+        'paid',
+        'ready',
+        'datetime',
+    )
+
+    csv_titles = (
+        'Id',
+        'Lead Account',
+        'Bundler',
+        'Payment',
+        'Payment Type',
+        'Report',
+        'Paid',
+        'Ready',
+        'Datetime',
+    )
+
+    actions = (
+        'export_as_csv',
+    )
 
     model = BundlerPayment
     list_display = (

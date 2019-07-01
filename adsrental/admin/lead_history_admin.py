@@ -8,6 +8,7 @@ from django.db.models.functions import Concat
 from adsrental.models.lead_history import LeadHistory
 from adsrental.models.lead_account import LeadAccount
 from adsrental.admin.list_filters import DateMonthListFilter, LeadStatusListFilter, AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -15,7 +16,33 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
     title = 'Lead ID'
 
 
-class LeadHistoryAdmin(admin.ModelAdmin):
+class LeadHistoryAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead',
+        'email',
+        'rpid',
+        'date',
+        'active',
+        'online',
+        'amount',
+        'wrong_password',
+        'security_checkpoint',
+    )
+
+    csv_titles = (
+        'Id',
+        'Lead',
+        'Email',
+        'Rpid',
+        'Date',
+        'Active',
+        'Online',
+        'Amount',
+        'Wrong Password',
+        'Wecurity Checkpoint',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -46,6 +73,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
     actions = (
         'mark_as_online',
         'mark_as_offline',
+        'export_as_csv',
     )
 
     def __init__(self, *args, **kwargs):
@@ -59,7 +87,7 @@ class LeadHistoryAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             q=lead.leadid,

@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "chromedriver": "^74.0.0",
+    "codeceptjs": "^2.1.0",
+    "prettier": "^1.17.0",
+    "puppeteer": "^1.15.0",
+    "uuid": "^3.3.2"
+  }
+}

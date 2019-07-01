@@ -1,7 +1,7 @@
 from django.urls import path
 
 from adsrental.views.bundler.leaderboard import BundlerLeaderboardView
-from adsrental.views.bundler.payments import BundlerPaymentsView
+from adsrental.views.bundler.payments import BundlerPaymentsView, BundlerPaymentsChargeBackView
 from adsrental.views.bundler.payments_list import BundlerPaymentsListView
 from adsrental.views.bundler.check import BundlerCheckView
 from adsrental.views.bundler.check_days import BundlerCheckDaysView
@@ -23,4 +23,5 @@ urlpatterns = [  # pylint: disable=C0103
     path('issues/fix/<int:lead_account_issue_id>/', FixLeadAccountIssueView.as_view(), name='bundler_fix_lead_account_issue'),
     path('issues/reject/<int:lead_account_issue_id>/', RejectLeadAccountIssueView.as_view(), name='bundler_reject_lead_account_issue'),
     path('issues/report/<int:lead_account_id>/', ReportLeadAccountIssueView.as_view(), name='bundler_report_lead_account_issue'),
+    path('disable-charge-back/<int:lead_account_id>', BundlerPaymentsChargeBackView.as_view(), name='bundler_disable_charge_back_lead_account'),
 ]
