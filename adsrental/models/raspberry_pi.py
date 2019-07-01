@@ -211,8 +211,9 @@ class RaspberryPi(models.Model):
                 lead_account.set_status(lead_account.STATUS_IN_PROGRESS, edited_by=ping_user)
                 if not lead_account.in_progress_date:
                     lead_account.in_progress_date = ping_datetime
-                    lead_account.insert_note('Set to in-progress after first ping')
-                    lead_account.save()
+                    lead_account.add_comment('Set to in-progress after first ping', ping_user)
+                    # lead_account.insert_note('Set to in-progress after first ping')
+                    # lead_account.save()
 
         if not self.first_seen:
             self.first_seen = ping_datetime
