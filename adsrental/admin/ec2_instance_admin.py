@@ -10,9 +10,46 @@ from django.db.models.functions import Concat
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 from adsrental.utils import BotoResource, PingCacheHelper
+from adsrental.admin.base import CSVExporter
 
 
-class EC2InstanceAdmin(admin.ModelAdmin):
+class EC2InstanceAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'hostname',
+        'instance_type',
+        'browser_type',
+        'lead',
+        'lead_status',
+        'raspberry_pi',
+        'version',
+        'raspberry_pi_version',
+        'status',
+        'last_rdp_session',
+        'last_seen',
+        'last_troubleshoot_field',
+        'tunnel_up_date_field',
+        'raspberry_pi_online',
+    )
+
+    csv_titles = (
+        'Id',
+        'Hostname',
+        'Instance Type',
+        'Browser Type',
+        'Lead',
+        'Lead Status',
+        'Raspberry Pi',
+        'Version',
+        'Raspberry Pi Version',
+        'Status',
+        'Last Rdp Session',
+        'Last Seen',
+        'Last Troubleshoot Field',
+        'Tunnel Up Date Field',
+        'Raspberry Pi Online',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -63,6 +100,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'upgrade_to_large',
         'launch_essential_ec2',
         'check_status',
+        'export_as_csv',
     )
     raw_id_fields = ('lead', )
 

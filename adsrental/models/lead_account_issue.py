@@ -2,7 +2,9 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 
+from adsrental.models.comment import Comment
 
 class LeadAccountIssue(models.Model):
     ISSUE_TYPE_WRONG_PASSWORD = 'Wrong Password'
@@ -58,10 +60,15 @@ class LeadAccountIssue(models.Model):
     issue_type = models.CharField(max_length=50, choices=ISSUE_TYPE_CHOICES)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
+    comments = GenericRelation(Comment, blank=True)
     new_value = models.TextField(default='', blank=True)
     reporter = models.ForeignKey('adsrental.User', blank=True, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
+
+    def add_comment(self, message, user=None):
+        'Add a comment to the model'
+        self.comments.create(user=user, text=message)
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
@@ -112,6 +119,15 @@ class LeadAccountIssue(models.Model):
     def get_note_lines(self):
         return self.note.split('\n')
 
+    def get_comments(self):
+        res = []
+        for ii in self.comments.order_by('created'):
+            item = f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
+            if ii.response:
+                item += f'\n >> Admin response: {ii.response}'
+            res.append(item)
+        return res
+
     def get_user_note_email(self, user):
         if not user:
             return 'user'
@@ -153,14 +169,16 @@ class LeadAccountIssue(models.Model):
             return
 
         self.status = self.STATUS_VERIFIED
-        self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
+        self.add_comment(f'Resolved by {self.get_user_note_email(edited_by)}', edited_by)
+        # self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
 
     def reject(self, edited_by):
         if not self.can_be_resolved():
             return
 
         self.status = self.STATUS_REJECTED
-        self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
+        self.add_comment(f'Rejected by {self.get_user_note_email(edited_by)}', edited_by)
+        # self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
 
     def submit(self, value, edited_by):
         if not self.can_be_fixed():
@@ -168,7 +186,8 @@ class LeadAccountIssue(models.Model):
 
         self.status = self.STATUS_SUBMITTED
         self.new_value = value
-        self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
+        self.add_comment(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}', edited_by)
+        # self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
 
     def is_value_needed(self):
         return self.issue_type in [

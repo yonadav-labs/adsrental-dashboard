@@ -68,7 +68,8 @@ for account in accounts:
         continue
     if la.status != LeadAccount.STATUS_BANNED:
         print('Account will be banned', la.username, la.account_type, la.status)
-        la.insert_note('Banned by sync script')
+        la.add_comment('Banned by sync script', user)
+        # la.insert_note('Banned by sync script')
         ban_reason = LeadAccount.BAN_REASON_QUIT
         if account['ban_message'] in dict(LeadAccount.BAN_REASON_CHOICES).keys():
             ban_reason = account['ban_message']

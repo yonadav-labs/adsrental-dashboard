@@ -9,6 +9,7 @@ from adsrental.models.lead_change import LeadChange
 
 from adsrental.admin.list_filters import AbstractUIDListFilter, AbstractIntIDListFilter, EditedByListFilter
 from adsrental.admin.base import ReadOnlyModelAdmin
+from adsrental.admin.base import CSVExporter
 
 
 class LeadLeadidListFilter(AbstractUIDListFilter):
@@ -21,7 +22,29 @@ class LeadAccountIDListFilter(AbstractIntIDListFilter):
     title = 'LeadAccount ID'
 
 
-class LeadChangeAdmin(ReadOnlyModelAdmin):
+class LeadChangeAdmin(ReadOnlyModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead',
+        'lead_account',
+        'value',
+        'old_value',
+        'edited_by',
+        'created',
+    )
+
+    csv_titles = (
+        'Id',
+        'Lead',
+        'Lead Account',
+        'Value',
+        'Old Value',
+        'Edited By',
+        'Created',
+    )
+
+    actions = ('export_as_csv',)
+
     model = LeadChange
     list_display = (
         'id',
@@ -62,23 +85,25 @@ class LeadChangeAdmin(ReadOnlyModelAdmin):
         lead = obj.lead
         if not lead:
             return None
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('<a href="{url}?leadid={q}">{text}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             text=lead.name(),
             q=lead.leadid,
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead.note)}" alt="?">' if lead.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def lead_account_field(self, obj):
         lead_account = obj.lead_account
         if not lead_account:
             return None
+        comments = '\n'.join(lead_account.get_comments())
         return mark_safe('<a href="{url}?id={id}">{type} {username}</a>{note}'.format(
             url=reverse('admin:adsrental_leadaccount_changelist'),
             type=lead_account.get_account_type_display(),
             username=lead_account.username,
             id=lead_account.id,
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead_account.note)}" alt="?">' if lead_account.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     lead_link.short_description = 'Lead'

@@ -12,10 +12,12 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django_bulk_update.manager import BulkUpdateManager
+from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin
+from adsrental.models.comment import Comment
 from adsrental.utils import CustomerIOClient, ShipStationClient
 
 
@@ -146,6 +148,7 @@ class Lead(models.Model, FulltextSearchMixin):
     status = models.CharField(max_length=40, choices=STATUS_CHOICES, default='Available', help_text='All statuses except for Banned are considered as Active')
     email = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
+    comments = GenericRelation(Comment, blank=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
     account_name = models.CharField(max_length=255, blank=True, null=True, help_text='Obsolete, was used in SF, should be removed')
@@ -299,8 +302,9 @@ class Lead(models.Model, FulltextSearchMixin):
             self.old_status = self.status
 
         self.status = value
-        self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
-        self.save()
+        self.add_comment(f'Status changed from {old_value} to {self.status}', edited_by)
+        # self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
+        # self.save()
         LeadChange(lead=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
         try:
             CustomerIOClient().send_lead(self)
@@ -516,6 +520,19 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
+
+    def add_comment(self, message, user=None):
+        'Add a comment to the model'
+        self.comments.create(user=user, text=message)
+
+    def get_comments(self):
+        res = []
+        for ii in self.comments.order_by('created'):
+            item = f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
+            if ii.response:
+                item += f'\n >> Admin response: {ii.response}'
+            res.append(item)
+        return res
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
