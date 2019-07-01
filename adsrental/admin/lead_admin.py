@@ -29,6 +29,7 @@ from adsrental.admin.list_filters import \
     AbstractFulltextFilter, \
     LeadAccountSecurityCheckpointListFilter, \
     titled_filter
+from adsrental.admin.comment_admin import CommentInline
 
 
 class LeadidListFilter(AbstractUIDListFilter):
@@ -172,6 +173,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
     )
     inlines = (
         LeadAccountInline,
+        CommentInline
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
     # list_prefetch_related = ('lead_accounts', )
@@ -253,9 +255,10 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         return obj.leadid
 
     def name(self, obj):
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('{name}{note}'.format(
             name=html.escape(obj.name()),
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def usps_field(self, obj):
@@ -693,12 +696,14 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                 if not lead_account.in_progress_date:
                     lead_account.in_progress_date = now
-                    lead_account.insert_note('Set to in-progress after approval')
-                    lead_account.save()
+                    lead_account.add_comment('Set to in-progress after approval', request.user)
+                    # lead_account.insert_note('Set to in-progress after approval')
+                    # lead_account.save()
                 if lead.status == Lead.STATUS_NEEDS_APPROVAL:
                     lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
-                    lead.insert_note('Set to in-progress after approval')
-                    lead.save()
+                    lead.add_comment('Set to in-progress after approval', request.user)
+                    # lead.insert_note('Set to in-progress after approval')
+                    # lead.save()
                 messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     def approve_google(self, request, queryset):
@@ -708,12 +713,14 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
                 lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                 if not lead_account.in_progress_date:
                     lead_account.in_progress_date = now
-                    lead_account.insert_note('Set to in-progress after approval')
-                    lead_account.save()
+                    lead_account.add_comment('Set to in-progress after approval', request.user)
+                    # lead_account.insert_note('Set to in-progress after approval')
+                    # lead_account.save()
                 if lead.status == Lead.STATUS_NEEDS_APPROVAL:
                     lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
-                    lead.insert_note('Set to in-progress after approval')
-                    lead.save()
+                    lead.add_comment('Set to in-progress after approval', request.user)
+                    # lead.insert_note('Set to in-progress after approval')
+                    # lead.save()
                 messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
 
     @staticmethod

@@ -5,7 +5,7 @@
     <h2>New value</h2>
     <p>{{ lead_account_issue.new_value }}</p>
     <h2>Notes</h2>
-    {% for note in lead_account_issue.get_note_lines %}
+    {% for note in lead_account_issue.get_comments %}
         <p>{{ note }}</p>
     {% endfor %}
     {% if lead_account_issue.images.count %}
