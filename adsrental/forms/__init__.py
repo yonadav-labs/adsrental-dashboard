@@ -37,13 +37,9 @@ class DashboardForm(forms.Form):
         ('yes_3_5days', 'Reported for 3-5 days'),
         ('yes_5days', 'Reported for more than 5 days'),
     )
-    LEAD_STATUS_CHOICES = (
+    STATUS_CHOICES = (
         ('', 'All'),
-        (Lead.STATUS_AVAILABLE, 'Available'),
-        (Lead.STATUS_BANNED, 'Banned'),
-        (Lead.STATUS_QUALIFIED, 'Qualified'),
-        (Lead.STATUS_DISQUALIFIED, 'Disualified'),
-        (Lead.STATUS_IN_PROGRESS, 'In-Progress'),
+        *LeadAccount.STATUS_CHOICES,
     )
     BANNED_CHOICES = (
         ('', 'All'),
@@ -76,7 +72,7 @@ class DashboardForm(forms.Form):
         ('cancelled', 'Cancelled', ),
     )
     search = forms.CharField(label='Search', required=False)
-    lead_status = forms.ChoiceField(label='Status', choices=LEAD_STATUS_CHOICES, required=False)
+    status = forms.MultipleChoiceField(label='Status', choices=STATUS_CHOICES, required=False, widget=forms.CheckboxSelectMultiple)
     raspberry_pi_status = forms.ChoiceField(label='RaspberryPi Online state', choices=RASPBERRY_PI_STATUS_CHOICES, required=False)
     wrong_password = forms.ChoiceField(label='Wrong Password', choices=WRONG_PASSWORD_CHOICES, required=False)
     security_checkpoint = forms.ChoiceField(label='Security Checkpoint', choices=SECURITY_CHECKPOINT_CHOICES, required=False)
@@ -172,19 +168,19 @@ class SignupForm(forms.Form):
     APPLY_TYPE_SPLASHTOP = 'splashtop'
     APPLY_TYPE_SCREENSHOT = 'screenshot'
 
-    email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    phone = forms.CharField(label='Phone', required=True, widget=forms.TextInput(attrs={'size': 40, 'placeholder': '(XXX) XXX-XXXX'}))
-    facebook_profile_url = forms.CharField(label='Facebook Profile Url', required=True, widget=forms.URLInput(attrs={'size': 40}))
-    fb_email = forms.CharField(label='Facebook Email', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    fb_secret = forms.CharField(label='Facebook Password', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    fb_friends = forms.IntegerField(label='Facebook Friends Count', required=True, widget=forms.NumberInput(attrs={'size': 40}))
-    street = forms.CharField(label='Shipping Street', required=True, widget=forms.TextInput(attrs={'size': 40}))
-    apartment = forms.CharField(label='Shipping Apartment/suite', required=False, widget=forms.TextInput(attrs={'size': 40}))
-    city = forms.CharField(label='Shipping City', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    email = forms.CharField(label='Email', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    first_name = forms.CharField(label='First Name', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    last_name = forms.CharField(label='Last Name', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    phone = forms.CharField(label='Phone', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control', 'placeholder': '(XXX) XXX-XXXX'}))
+    facebook_profile_url = forms.CharField(label='Facebook Profile Url', required=True, widget=forms.URLInput(attrs={'size': 40, 'class': 'form-control'}))
+    fb_email = forms.CharField(label='Facebook Email', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    fb_secret = forms.CharField(label='Facebook Password', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    fb_friends = forms.IntegerField(label='Facebook Friends Count', required=True, widget=forms.NumberInput(attrs={'size': 40, 'class': 'form-control'}))
+    street = forms.CharField(label='Shipping Street', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    apartment = forms.CharField(label='Shipping Apartment/suite', required=False, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
+    city = forms.CharField(label='Shipping City', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
     state = forms.ChoiceField(label='Shipping State', choices=STATE_CHOICES, required=True)
-    postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40}))
+    postal_code = forms.CharField(label='Shipping Zip', required=True, widget=forms.TextInput(attrs={'size': 40, 'class': 'form-control'}))
     accept = forms.BooleanField(required=True)
     age_check = forms.BooleanField(label='I am at least 18 years old', required=True)
     photo_id = forms.FileField(label='Photo ID (JPG, PNG or PDF)', widget=forms.FileInput(attrs={'accept': '.png,.jpg,.pdf'}), required=True)
@@ -248,6 +244,10 @@ class SignupForm(forms.Form):
             raise forms.ValidationError("This Facebook email is already registered")
 
         return value
+
+
+class SafeSignupForm(SignupForm):
+    captcha = None
 
 
 class ReportForm(forms.Form):

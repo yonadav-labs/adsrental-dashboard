@@ -30,7 +30,7 @@ class SSLRedirectMiddleware:
             return True if view_kwargs[SSL_KW] else False
 
         for path in HTTPS_PATHS:
-            if request.path.startswith(u'/{}'.format(path)):
+            if request.path.startswith(f'/{path}'):
                 return True
 
         return False

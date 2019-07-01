@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.shortcuts import render, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db.models import Q
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead import Lead
@@ -20,6 +21,7 @@ class AutoBanSoonView(View):
         if not request.user.is_superuser:
             raise Http404
 
+        now = timezone.localtime(timezone.now())
         params = {
             'days': self.DAYS_BEFORE_BAN,
         }
@@ -31,6 +33,9 @@ class AutoBanSoonView(View):
             active=True,
             auto_ban_enabled=True,
         )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
+                                             | Q(disable_auto_ban_until__lte=now))
+
         days_before_ban = self.DAYS_BEFORE_BAN
         ban_reasons = LeadAccount.AUTO_BAN_REASONS
 
@@ -43,8 +48,6 @@ class AutoBanSoonView(View):
                 days_before_ban = form.cleaned_data['days']
             if form.cleaned_data['ban_reason']:
                 ban_reasons = [form.cleaned_data['ban_reason']]
-
-        now = timezone.localtime(timezone.now())
 
         wrong_password_lead_accounts = []
         if LeadAccount.BAN_REASON_AUTO_WRONG_PASSWORD in ban_reasons:

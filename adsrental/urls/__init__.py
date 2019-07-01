@@ -1,7 +1,7 @@
 import django.contrib.auth.views as auth_views
 from django.urls import include, path
 
-from adsrental.views.log import LogView, ShowLogDirView, ShowLogView
+from adsrental.views.log import LogView, ShowLogDirView, ShowLogView, ShowAggLogView
 from adsrental.views.main import MainView
 from adsrental.views.stub import StubView
 from adsrental.views.thankyou import ThankyouView, ThankyouScreenshotView
@@ -9,7 +9,16 @@ from adsrental.views.signup import SignupView
 from adsrental.views.photo_id import PhotoIdView
 from adsrental.views.sf import SFToShipstationView, SFLaunchRaspberryPiInstance
 from adsrental.views.ec2_ssh import StartReverseTunnelView, GetNetstatView
-from adsrental.views.landing import LandingView, TermsView, FAQView, AboutView, ContactView, RequirementsView, JoinView
+from adsrental.views.landing import (
+    LandingView,
+    TermsView,
+    FAQView,
+    AboutView,
+    ContactView,
+    RequirementsView,
+    JoinView,
+    LandingWithUrlTagView
+)
 from adsrental.views.adsdb import ADSDBLeadView
 from adsrental.views.robots import RobotsView
 
@@ -32,6 +41,7 @@ urlpatterns = [
     path('rlog.php', LogView.as_view(), name='old_rlog'),
     path('keepalive.php', StubView.as_view(), name='old_keepalive'),
     path('log/', LogView.as_view(), name='log'),
+    path('log_agg/', ShowAggLogView.as_view(), name='log_agg'),
     path('log/<rpid>/', ShowLogDirView.as_view(), name='show_log_dir'),
     path('log/<rpid>/<filename>', ShowLogView.as_view(), name='show_log'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
@@ -55,4 +65,5 @@ urlpatterns = [
     path('report/', include(('adsrental.urls.report', 'adsrental'), namespace='report')),
     path('slack/', include(('adsrental.urls.slack', 'adsrental'), namespace='slack')),
     path('robots.txt', RobotsView.as_view(), name='robots'),
+    path('apply/<url_tag>/', LandingWithUrlTagView.as_view(), name='home_tag'),
 ]

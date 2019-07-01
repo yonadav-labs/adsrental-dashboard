@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from adsrental.models.bundler import Bundler
 from adsrental.models.lead import Lead
 from adsrental.admin.list_filters import AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 class IDListFilter(AbstractUIDListFilter):
@@ -13,8 +14,42 @@ class IDListFilter(AbstractUIDListFilter):
     title = 'ID'
 
 
-class BundlerAdmin(admin.ModelAdmin):
+class BundlerAdmin(admin.ModelAdmin, CSVExporter):
     model = Bundler
+    csv_fields = (
+        'id',
+        'name',
+        'utm_source',
+        'adsdb_id',
+        'email',
+        'phone',
+        'is_active',
+        'leads_count',
+        'facebook_payment_field',
+        'facebook_screenshot_payment_field',
+        'google_payment_field',
+        'amazon_payment_field',
+        'parent_bundler',
+        'second_parent_bundler',
+    )
+
+    csv_titles = (
+        'ID',
+        'Name',
+        'Utm Source',
+        'Adsdb ID',
+        'Email',
+        'Phone',
+        'Is Active',
+        'Leads Count',
+        'Facebook Payment Field',
+        'Facebook Screenshot Payment Field',
+        'Google Payment Field',
+        'Amazon Payment Field',
+        'Parent Bundler',
+        'Second Parent Bundler',
+    )
+
     list_display = (
         'id',
         'name',
@@ -39,6 +74,7 @@ class BundlerAdmin(admin.ModelAdmin):
         'activate',
         'enable_chargeback',
         'disable_chargeback',
+        'export_as_csv',
     )
     search_fields = ('utm_source', 'email', 'name', )
     list_filter = (
@@ -105,10 +141,10 @@ class BundlerAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{payments_url}">Reports list</a>'.format(payments_url=reverse('bundler_report_payments_list', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{report_url}">Leaderboard</a>'.format(report_url=reverse('bundler_leaderboard', kwargs={'bundler_id': obj.id})))
-        result.append('<a target="_blank" href="{report_url}">Check report</a>'.format(report_url=reverse('bundler_report_check', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{payments_url}">Payments</a>'.format(payments_url=reverse('bundler_payments', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{payments_url}">Reports list</a>'.format(payments_url=reverse('bundler_report_payments_list', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{report_url}">Leaderboard</a>'.format(report_url=reverse('bundler_leaderboard', kwargs={'bundler_id': obj.id})))
+        result.append('<a href="{report_url}">Check report</a>'.format(report_url=reverse('bundler_report_check', kwargs={'bundler_id': obj.id})))
         return mark_safe(', '.join(result))
 
     def facebook_payment_field(self, obj):

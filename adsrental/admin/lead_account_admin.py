@@ -12,6 +12,7 @@ from django.db.models.functions import Concat
 from django.template.loader import render_to_string
 
 from adsrental.models.lead import Lead
+from adsrental.admin.base import CSVExporter
 from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
@@ -48,7 +49,41 @@ class AddressListFilter(AbstractFulltextFilter):
     field_names = ['lead__city', 'lead__country', 'lead__state', 'lead__postal_code', 'lead__street']
 
 
-class LeadAccountAdmin(admin.ModelAdmin):
+class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead__name',
+        'lead__raspberry_pi___rpid',
+        'account_type',
+        'status',
+        'username',
+        'bundler_paid',
+        'last_touch',
+        'lead__raspberry_pi__first_seen',
+        'lead__raspberry_pi__last_seen',
+        'touch_count',
+        'wrong_password_date',
+        'security_checkpoint_date',
+        'created',
+    )
+    csv_titles = (
+        'ID',
+        'Lead',
+        'RPID',
+        'Type',
+        'Status',
+        'Username',
+        'Bundler paid',
+        'Last touch',
+        'First seen',
+        'Last seen',
+        'Touch count',
+        'Wrong password date',
+        'Security checkpoint date',
+        'Created',
+    )
+    csv_filename = 'lead_accounts__{day}_{month}_{year}.csv'
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -124,6 +159,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'report_wrong_password',
         'report_security_checkpoint',
         'sync_to_adsdb',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',
@@ -175,7 +211,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.name(),
             leadid=obj.lead.leadid,
@@ -185,7 +221,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         if not obj.lead.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
         ))
@@ -197,7 +233,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
             dt = f'after {humanize_timedelta(obj.banned_date - obj.created, short=True)}' if obj.banned_date else ''
             status = f'{obj.status} ({obj.get_ban_reason_display()}) {dt}'
             title = obj.note if obj.note else f'Banned for {obj.get_ban_reason_display()}'
-        return mark_safe('<a target="_blank" href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a href="{url}?lead_account_id={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.id,
             title=title,
@@ -266,7 +302,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def bundler_field(self, obj):
         bundler = obj.lead.bundler
         if bundler:
-            return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+            return mark_safe('<a href="{url}?q={q}" title="{title}">{text}</a>'.format(
                 url=reverse('admin:adsrental_bundler_changelist'),
                 q=bundler.email,
                 title=bundler.utm_source,
@@ -277,38 +313,41 @@ class LeadAccountAdmin(admin.ModelAdmin):
 
     def links(self, obj):
         result = []
-        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Issues</a>'.format(
+        result.append('<a href="{url}?lead_account_id={id}">Issues</a>'.format(
             url=reverse('admin:adsrental_leadaccountissue_changelist'),
             id=obj.id,
         ))
-        result.append('<a target="_blank" href="{url}">Report new issue</a>'.format(
+        result.append('<a href="{url}">Report new issue</a>'.format(
             url=reverse('admin_helpers:report_lead_account_issue', kwargs=dict(lead_account_id=obj.id)),
         ))
-        result.append('<a target="_blank" href="{url}?lead_account_id={id}">Bundler payments</a>'.format(
+        result.append('<a href="{url}?lead_account_id={id}">Bundler payments</a>'.format(
             url=reverse('admin:adsrental_bundlerpayment_changelist'),
             id=obj.id,
         ))
         return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):
-        for lead_account in queryset.filter(status=LeadAccount.STATUS_NEEDS_APPROVAL):
+        for lead_account in queryset:
+            if lead_account.status != LeadAccount.STATUS_NEEDS_APPROVAL:
+                messages.info(request, f'Lead Account {lead_account} should be in Neeads Approval status.')
+                continue
             lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
             lead_account.save()
             if lead_account.lead.status == Lead.STATUS_NEEDS_APPROVAL:
                 lead_account.lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
                 lead_account.lead.save()
-            messages.info(request, 'Lead Account {} approved and moved to In-Progress.'.format(lead_account))
+            messages.info(request, f'Lead Account {lead_account} approved and moved to In-Progress.')
 
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_banned():
-                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, f'{lead_account} is {lead_account.status}, skipping')
                 continue
 
             lead_account.qualify(request.user)
             if lead_account.lead.assign_raspberry_pi():
                 messages.success(
-                    request, '{} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
+                    request, f'{lead_account} has new Raspberry Pi assigned: {lead_account.lead.raspberry_pi.rpid}')
 
             self._create_shipstation_order(request, lead_account)
 
@@ -316,22 +355,22 @@ class LeadAccountAdmin(admin.ModelAdmin):
         try:
             create_order_result = lead_account.lead.add_shipstation_order()
         except ValueError as e:
-            messages.error(request, '{} order was not created: {}'.format(lead_account, e))
+            messages.error(request, f'{lead_account} order was not created: {e}')
             return
 
         if create_order_result:
-            messages.success(request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+            messages.success(request, f'{lead_account} order created: {lead_account.lead.shipstation_order_number}')
         else:
-            messages.info(request, '{} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+            messages.info(request, f'{lead_account} order already exists: {lead_account.lead.shipstation_order_number}.')
 
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.status != LeadAccount.STATUS_AVAILABLE:
-                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, f'{lead_account} is {lead_account.status}, skipping')
                 continue
 
             lead_account.disqualify(request.user)
-            messages.info(request, '{} is disqualified.'.format(lead_account))
+            messages.info(request, f'{lead_account} is disqualified.')
 
     def mark_as_available_from_disqualified(self, request, queryset):
         for lead_account in queryset:
@@ -350,7 +389,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 note = form.cleaned_data['note']
                 for lead_account in queryset:
                     lead_account.ban(edited_by=request.user, reason=reason, note=note)
-                    messages.info(request, '{} is banned.'.format(lead_account))
+                    messages.info(request, f'{lead_account} is banned.')
                 return None
         else:
             form = AdminLeadAccountBanForm(request=request)
@@ -366,7 +405,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead_account in queryset:
             if lead_account.unban(request.user):
-                messages.info(request, '{} is unbanned.'.format(lead_account))
+                messages.info(request, f'{lead_account} is unbanned.')
 
     def report_wrong_password(self, request, queryset):
         for lead_account in queryset:
@@ -387,7 +426,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def report_security_checkpoint(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_security_checkpoint_reported():
-                messages.info(request, '{} security checkpoint is already reported, skipping.'.format(lead_account))
+                messages.info(request, f'{lead_account} security checkpoint is already reported, skipping.')
                 continue
 
             lead_account.mark_security_checkpoint(edited_by=request.user)
@@ -406,26 +445,26 @@ class LeadAccountAdmin(admin.ModelAdmin):
             lead = lead_account.get_lead()
 
             if not lead.is_active():
-                messages.warning(request, '{} is now {}, skipping.'.format(lead.email, lead.status))
+                messages.warning(request, f'{lead.email} is now {lead.status}, skipping.')
                 continue
 
             if lead.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
                 lead.touch_count = lead.ADSDB_SYNC_MIN_TOUCH_COUNT
                 lead.last_touch_date = timezone.now()
                 lead.save()
-                messages.warning(request, '{} touch count has been increased to meet conditions.'.format(lead.email))
+                messages.warning(request, f'{lead.email} touch count has been increased to meet conditions.')
 
             result = lead_account.sync_to_adsdb()
             if result:
-                messages.info(request, '{} is synced: {}'.format(lead_account, result))
+                messages.info(request, f'{lead_account} is synced: {result}')
             else:
-                messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
+                messages.warning(request, f'{lead_account} does not meet conditions to sync.')
 
     @staticmethod
     def touch(instance, request, queryset):
         for lead_account in queryset:
             lead_account.touch()
-            messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
+            messages.info(request, f'{lead_account} has been touched for {lead_account.touch_count} time.')
 
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')
@@ -543,7 +582,7 @@ class ReadOnlyLeadAccountAdmin(LeadAccountAdmin):
 
     def lead_link(self, obj):
         lead = obj.lead
-        return mark_safe('<a target="_blank" href="{url}?leadid={leadid}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={leadid}">{lead}</a>'.format(
             url=reverse('admin:adsrental_readonlylead_changelist'),
             lead=lead.name(),
             leadid=lead.leadid,

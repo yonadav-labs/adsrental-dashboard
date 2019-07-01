@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter, LeadAccountStatusListFilter, LeadAccountAccountTypeListFilter
 from adsrental.admin.comment_admin import CommentInline
+from adsrental.admin.base import CSVExporter
 
 
 class LeadAccountIDListFilter(AbstractIntIDListFilter):
@@ -19,7 +20,35 @@ class LeadLeadidListFilter(AbstractUIDListFilter):
     title = 'Lead ID'
 
 
-class LeadAccountIssueAdmin(admin.ModelAdmin):
+class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead_account',
+        'lead_account__lead',
+        'lead_account__lead__raspberry_pi',
+        'lead_account__lead__bundler',
+        'issue_type',
+        'status',
+        'old_value',
+        'new_value',
+        'reporter',
+        'created',
+    )
+
+    csv_titles = (
+        'Id',
+        'Lead Account',
+        'Lead',
+        'Raspberry Pi',
+        'Bundler',
+        'Issue Type',
+        'Status',
+        'Old Value',
+        'New Value',
+        'Reporter',
+        'Created',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -57,6 +86,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         'lead_account__lead__email',
         'lead_account__lead__raspberry_pi__rpid',
     )
+    actions = ('export_as_csv',)
 
     raw_id_fields = ('lead_account', )
 
@@ -108,7 +138,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
         if not obj.lead_account.lead.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead_account.lead.raspberry_pi.rpid,
         ))
@@ -127,11 +157,11 @@ class LeadAccountIssueAdmin(admin.ModelAdmin):
     def buttons(self, obj):
         result = []
         if obj.can_be_fixed():
-            result.append('<a target="_blank" href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+            result.append('<a href="{url}"><button type="button">Fix</button></a>'.format(url=reverse('bundler_fix_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         if obj.can_be_resolved():
-            result.append('<a target="_blank" href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
+            result.append('<a href="{url}"><button type="button">Resolve / Reject</button></a>'.format(url=reverse('admin_helpers:resolve_lead_account_issue', kwargs={'lead_account_issue_id': obj.id})))
         for image in obj.images.all():
-            result.append(f'<a target="_blank" href="{image.image.url}"><button type="button">Image</button></a>')
+            result.append(f'<a href="{image.image.url}"><button type="button">Image</button></a>')
         return mark_safe(', '.join(result))
 
     status_field.short_description = 'Status'

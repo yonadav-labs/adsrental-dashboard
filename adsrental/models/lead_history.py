@@ -171,12 +171,25 @@ class LeadHistory(models.Model):
                     date=lead_account.in_progress_date.strftime(settings.HUMAN_DATE_FORMAT),
                 ))
                 continue
-            if lead_account.is_banned() and (not lead_account.banned_date or lead_account.banned_date.date() <= self.get_last_day()):
-                note.append('{type} account was banned on {date} ($0.00)'.format(
-                    type=lead_account.get_account_type_display(),
-                    date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT) if lead_account.banned_date else 'unknown date',
-                ))
-                continue
+            if lead_account.is_banned():
+                if not lead_account.banned_date:
+                    note.append('{type} account was banned on {date} ($0.00)'.format(
+                        type=lead_account.get_account_type_display(),
+                        date='unknown date',
+                    ))
+                    continue
+                if lead_account.ban_reason in lead_account.PRORATED_BAN_REASONS and lead_account.banned_date.date() <= self.date:
+                    note.append('{type} account was banned on {date} ($0.00)'.format(
+                        type=lead_account.get_account_type_display(),
+                        date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
+                    ))
+                    continue
+                if lead_account.ban_reason not in lead_account.PRORATED_BAN_REASONS:
+                    note.append('{type} account was banned on {date} ($0.00)'.format(
+                        type=lead_account.get_account_type_display(),
+                        date=lead_account.banned_date.strftime(settings.HUMAN_DATE_FORMAT),
+                    ))
+                    continue
 
             if lead_account.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE:
                 checks_wrong_password = self.checks_wrong_password_google

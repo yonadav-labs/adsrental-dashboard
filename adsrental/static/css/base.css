@@ -1,13 +1,13 @@
 .pdf_only {
-    display: none;
+  display: none;
 }
 
 .has_note {
-    border-bottom: 1px dashed gray;
-    cursor: pointer;
+  border-bottom: 1px dashed gray;
+  cursor: pointer;
 }
 
 select.form-control {
-    display: inline-block;
-    width: auto;
+  display: inline-block;
+  width: auto;
 }

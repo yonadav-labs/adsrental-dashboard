@@ -10,9 +10,46 @@ from django.db.models.functions import Concat
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import LeadRaspberryPiOnlineListFilter, LeadRaspberryPiVersionListFilter, LeadStatusListFilter, LastTroubleshootListFilter, TunnelUpListFilter
 from adsrental.utils import BotoResource, PingCacheHelper
+from adsrental.admin.base import CSVExporter
 
 
-class EC2InstanceAdmin(admin.ModelAdmin):
+class EC2InstanceAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'hostname',
+        'instance_type',
+        'browser_type',
+        'lead',
+        'lead_status',
+        'raspberry_pi',
+        'version',
+        'raspberry_pi_version',
+        'status',
+        'last_rdp_session',
+        'last_seen',
+        'last_troubleshoot_field',
+        'tunnel_up_date_field',
+        'raspberry_pi_online',
+    )
+
+    csv_titles = (
+        'Id',
+        'Hostname',
+        'Instance Type',
+        'Browser Type',
+        'Lead',
+        'Lead Status',
+        'Raspberry Pi',
+        'Version',
+        'Raspberry Pi Version',
+        'Status',
+        'Last Rdp Session',
+        'Last Seen',
+        'Last Troubleshoot Field',
+        'Tunnel Up Date Field',
+        'Raspberry Pi Online',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -63,13 +100,14 @@ class EC2InstanceAdmin(admin.ModelAdmin):
         'upgrade_to_large',
         'launch_essential_ec2',
         'check_status',
+        'export_as_csv',
     )
     raw_id_fields = ('lead', )
 
     def lead_link(self, obj):
         if obj.lead is None:
             return obj.email
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=obj.lead.email,
             q=obj.lead.leadid,
@@ -81,7 +119,7 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def raspberry_pi_link(self, obj):
         if obj.lead is None or obj.lead.raspberry_pi is None:
             return obj.rpid
-        return mark_safe('<a target="_blank" href="{url}?rpid={q}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={q}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.lead.raspberry_pi.rpid,
             q=obj.lead.raspberry_pi.rpid,
@@ -132,23 +170,23 @@ class EC2InstanceAdmin(admin.ModelAdmin):
     def links(self, obj):
         links = []
         if obj.rpid:
-            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            links.append('<a href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
         if obj.lead:
-            links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+            links.append('<a href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
             ))
         if obj.lead and obj.lead.raspberry_pi:
             now = timezone.localtime(timezone.now())
             today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
-            links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
+            links.append('<a href="{log_url}">Today log</a>'.format(
                 log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
             ))
-            links.append('<a target="_blank" href="{url}">Netstat</a>'.format(
+            links.append('<a href="{url}">Netstat</a>'.format(
                 url=reverse('ec2_ssh_get_netstat', kwargs=dict(rpid=obj.rpid)),
             ))
-            links.append('<a target="_blank" href="{url}">RTunnel</a>'.format(
+            links.append('<a href="{url}">RTunnel</a>'.format(
                 url=reverse('ec2_ssh_start_reverse_tunnel', kwargs=dict(rpid=obj.rpid)),
             ))
 

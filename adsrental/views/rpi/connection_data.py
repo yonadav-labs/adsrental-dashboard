@@ -19,12 +19,22 @@ class ConnectionDataView(View):
             })
 
         lead = raspberry_pi.get_lead()
-        if not lead or not lead.is_active():
+        if not lead:
             return JsonResponse({
                 'error': 'Not available',
                 # 'shutdown': True,
+                'hostname': '',
                 'result': False,
             })
+
+        # active_accounts_count = lead.lead_accounts.filter(status__in=LeadAccount.STATUSES_ACTIVE).count()
+        # if not active_accounts_count:
+        #     return JsonResponse({
+        #         'error': 'Not available',
+        #         # 'shutdown': True,
+        #         'hostname': '',
+        #         'result': False,
+        #     })
 
         if not raspberry_pi.is_proxy_tunnel:
             ec2_instance = raspberry_pi.get_ec2_instance()
@@ -41,10 +51,10 @@ class ConnectionDataView(View):
 
         return JsonResponse({
             'rpid': raspberry_pi.rpid,
-            'hostname': raspberry_pi.proxy_hostname,
+            'hostname': raspberry_pi.proxy_hostname or '',
             'user': raspberry_pi.TUNNEL_USER,
-            'tunnel_port': raspberry_pi.tunnel_port,
-            'rtunnel_port': raspberry_pi.rtunnel_port,
+            'tunnel_port': raspberry_pi.tunnel_port or '',
+            'rtunnel_port': raspberry_pi.rtunnel_port or '',
             'is_proxy_tunnel': True,
             'is_beta': raspberry_pi.is_proxy_tunnel or raspberry_pi.is_beta,
             'result': True,

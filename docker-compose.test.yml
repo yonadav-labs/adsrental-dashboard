@@ -1,0 +1,55 @@
+version: "3.6"
+
+services:
+  db:
+    image: mysql:5.7.20
+    command: "mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=300"
+    environment:
+      MYSQL_DATABASE: adsrental
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - ./dbdata1:/var/lib/mysql
+    ports:
+      - "23306:3306"
+  web:
+    build: .
+    command: /app/scripts/runserver.sh
+    privileged: true
+    environment:
+      ENV: test
+      WERKZEUG_DEBUG_PIN: "off"
+      HTTPS: "on"
+      wsgi.url_scheme: "https"
+      UWSGI_INI: /app/config/nginx/uwsgi_debug.ini
+    volumes:
+      - ./cert/:/app/cert/
+      - ./config/:/app/config/
+      - ./static/:/app/static/
+      - ./adsrental/:/app/adsrental/
+      - ./restapi/:/app/restapi/
+      - ./scripts/:/app/scripts/
+      - ./log/:/app/log/
+      - ./app_log/:/app/app_log/
+      - ./media/:/app/media/
+    ports:
+      - "8443:80"
+      - "7443:443"
+    depends_on:
+      - db
+      - redis
+    links:
+      - db:db
+      - redis:redis
+  redis:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"
+  rdpclient:
+    build: rdpclient
+    command: ./run.sh
+    volumes:
+      - ./rdpclient/webconnect.html:/app/FreeRDP-WebConnect/wsgate/webroot/index-debug.html
+      - ./rdpclient/clipboard.js:/app/FreeRDP-WebConnect/wsgate/webroot/js/clipboard.js
+    ports:
+      - "9999:8000"
