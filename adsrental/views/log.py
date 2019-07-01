@@ -46,6 +46,40 @@ class ShowLogView(View):
         ))
 
 
+class ShowAggLogView(View):
+    @method_decorator(login_required)
+    def get(self, request: HttpRequest) -> HttpResponse:
+        now = timezone.localtime(timezone.now())
+        date = request.GET.get('date', now.strftime('%Y%m%d'))
+        filename = f"{date}.log"
+
+        rps = os.listdir(settings.RASPBERRY_PI_LOG_PATH)
+        rps_ = []
+        log_lines = {}
+
+        for rp in rps:
+            log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rp, filename)
+
+            if not os.path.exists(log_path):
+                continue
+
+            rps_.append(rp)
+            lines = open(log_path).readlines()
+            lines.reverse()
+            log_lines[rp] = []
+
+            for line in lines:
+                if 'restarting' in line or 'Client >>>' in line:
+                    log_lines[rp].append(line)
+
+        return render(request, 'log/log_agg.html', dict(
+            log_lines=log_lines,
+            rps=rps_,
+            date=date,
+            filename=filename
+        ))
+
+
 class LogView(View):
     PING_DATA_TTL_SECONDS = 300
 

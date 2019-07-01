@@ -93,6 +93,7 @@ Scenario('RaspberryPi is tested', async (I) =>{
      I.fillField('select[name="action"]', 'Mark Google account as Qualified')
      I.click('Go')
      I.fillField('select[name="action"]', 'Mark Amazon account as Qualified')
+     I.click('Go')
      I.see('Facebook olvida@mail.ru (Qualified)', 'table tr.row2')
      
     });
@@ -155,7 +156,7 @@ Scenario('Check accounts status', async (I) =>{
     I.seeElement('td.field-is_active img[alt="True"]')
     I.click('Payments')
     I.waitForNavigation()
-    I.see('Bundler Jason Taylor	')
+    I.see('Bundler Jason Taylor')
     I.see('$235.00', 'table tr.bundler td.amount')
     I.see('Total pay for Facebook accounts')
     I.see('$125.00', 'table tr.total-facebook td.amount')
@@ -188,7 +189,6 @@ Scenario('Generate daily lead timestamps', async (I) =>{
     I.waitForNavigation()
     I.fillField('input[name="checks_online"]', '20')
     I.click('Save')
-    I.click('Lead Timestamps')
     I.seeElement('td.field-active img[alt="True"]')
     I.seeElement('td.field-online img[alt="True"]')
   

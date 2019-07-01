@@ -12,6 +12,7 @@ from django.db.models.functions import Concat
 from django.template.loader import render_to_string
 
 from adsrental.models.lead import Lead
+from adsrental.admin.base import CSVExporter
 from adsrental.utils import humanize_timedelta
 from adsrental.models.lead_account import LeadAccount, ReadOnlyLeadAccount, ReportProxyLeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
@@ -21,6 +22,7 @@ from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFi
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
     LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, \
     LeadDeliveryDateListFilter, DeliveredLastTwoDaysListFilter, titled_filter
+from adsrental.admin.comment_admin import CommentInline
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -47,7 +49,41 @@ class AddressListFilter(AbstractFulltextFilter):
     field_names = ['lead__city', 'lead__country', 'lead__state', 'lead__postal_code', 'lead__street']
 
 
-class LeadAccountAdmin(admin.ModelAdmin):
+class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'lead__name',
+        'lead__raspberry_pi___rpid',
+        'account_type',
+        'status',
+        'username',
+        'bundler_paid',
+        'last_touch',
+        'lead__raspberry_pi__first_seen',
+        'lead__raspberry_pi__last_seen',
+        'touch_count',
+        'wrong_password_date',
+        'security_checkpoint_date',
+        'created',
+    )
+    csv_titles = (
+        'ID',
+        'Lead',
+        'RPID',
+        'Type',
+        'Status',
+        'Username',
+        'Bundler paid',
+        'Last touch',
+        'First seen',
+        'Last seen',
+        'Touch count',
+        'Wrong password date',
+        'Security checkpoint date',
+        'Created',
+    )
+    csv_filename = 'lead_accounts__{day}_{month}_{year}.csv'
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -76,6 +112,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'links',
         'created',
     )
+    inlines = [ CommentInline, ]
     list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
         AbstractIntIDListFilter,
@@ -122,6 +159,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
         'report_wrong_password',
         'report_security_checkpoint',
         'sync_to_adsdb',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',
@@ -165,9 +203,10 @@ class LeadAccountAdmin(admin.ModelAdmin):
         return queryset
 
     def name(self, obj):
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('{name}{note}'.format(
             name=html.escape(obj.lead.name()),
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def lead_link(self, obj):
@@ -302,13 +341,13 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def mark_as_qualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_banned():
-                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, f'{lead_account} is {lead_account.status}, skipping')
                 continue
 
             lead_account.qualify(request.user)
             if lead_account.lead.assign_raspberry_pi():
                 messages.success(
-                    request, '{} has new Raspberry Pi assigned: {}'.format(lead_account, lead_account.lead.raspberry_pi.rpid))
+                    request, f'{lead_account} has new Raspberry Pi assigned: {lead_account.lead.raspberry_pi.rpid}')
 
             self._create_shipstation_order(request, lead_account)
 
@@ -316,22 +355,22 @@ class LeadAccountAdmin(admin.ModelAdmin):
         try:
             create_order_result = lead_account.lead.add_shipstation_order()
         except ValueError as e:
-            messages.error(request, '{} order was not created: {}'.format(lead_account, e))
+            messages.error(request, f'{lead_account} order was not created: {e}')
             return
 
         if create_order_result:
-            messages.success(request, '{} order created: {}'.format(lead_account, lead_account.lead.shipstation_order_number))
+            messages.success(request, f'{lead_account} order created: {lead_account.lead.shipstation_order_number}')
         else:
-            messages.info(request, '{} order already exists: {}.'.format(lead_account, lead_account.lead.shipstation_order_number))
+            messages.info(request, f'{lead_account} order already exists: {lead_account.lead.shipstation_order_number}.')
 
     def mark_as_disqualified(self, request, queryset):
         for lead_account in queryset:
             if lead_account.status != LeadAccount.STATUS_AVAILABLE:
-                messages.warning(request, '{} is {}, skipping'.format(lead_account, lead_account.status))
+                messages.warning(request, f'{lead_account} is {lead_account.status}, skipping')
                 continue
 
             lead_account.disqualify(request.user)
-            messages.info(request, '{} is disqualified.'.format(lead_account))
+            messages.info(request, f'{lead_account} is disqualified.')
 
     def mark_as_available_from_disqualified(self, request, queryset):
         for lead_account in queryset:
@@ -350,7 +389,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 note = form.cleaned_data['note']
                 for lead_account in queryset:
                     lead_account.ban(edited_by=request.user, reason=reason, note=note)
-                    messages.info(request, '{} is banned.'.format(lead_account))
+                    messages.info(request, f'{lead_account} is banned.')
                 return None
         else:
             form = AdminLeadAccountBanForm(request=request)
@@ -366,7 +405,7 @@ class LeadAccountAdmin(admin.ModelAdmin):
     def unban(self, request, queryset):
         for lead_account in queryset:
             if lead_account.unban(request.user):
-                messages.info(request, '{} is unbanned.'.format(lead_account))
+                messages.info(request, f'{lead_account} is unbanned.')
 
     def report_wrong_password(self, request, queryset):
         for lead_account in queryset:
@@ -379,14 +418,15 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
                 reporter=request.user,
             )
-            issue.insert_note(f'Reported by {request.user}')
-            issue.save()
+            issue.add_comment(f'Reported by {request.user}', request.user)
+            # issue.insert_note(f'Reported by {request.user}')
+            # issue.save()
             messages.info(request, f'{lead_account} password is marked as wrong.')
 
     def report_security_checkpoint(self, request, queryset):
         for lead_account in queryset:
             if lead_account.is_security_checkpoint_reported():
-                messages.info(request, '{} security checkpoint is already reported, skipping.'.format(lead_account))
+                messages.info(request, f'{lead_account} security checkpoint is already reported, skipping.')
                 continue
 
             lead_account.mark_security_checkpoint(edited_by=request.user)
@@ -395,8 +435,9 @@ class LeadAccountAdmin(admin.ModelAdmin):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
                 reporter=request.user,
             )
-            issue.insert_note(f'Reported by {request.user}')
-            issue.save()
+            issue.add_comment(f'Reported by {request.user}', request.user)
+            # issue.insert_note(f'Reported by {request.user}')
+            # issue.save()
             messages.info(request, '{} security checkpoint reported.'.format(lead_account))
 
     def sync_to_adsdb(self, request, queryset):
@@ -404,26 +445,26 @@ class LeadAccountAdmin(admin.ModelAdmin):
             lead = lead_account.get_lead()
 
             if not lead.is_active():
-                messages.warning(request, '{} is now {}, skipping.'.format(lead.email, lead.status))
+                messages.warning(request, f'{lead.email} is now {lead.status}, skipping.')
                 continue
 
             if lead.touch_count < lead.ADSDB_SYNC_MIN_TOUCH_COUNT:
                 lead.touch_count = lead.ADSDB_SYNC_MIN_TOUCH_COUNT
                 lead.last_touch_date = timezone.now()
                 lead.save()
-                messages.warning(request, '{} touch count has been increased to meet conditions.'.format(lead.email))
+                messages.warning(request, f'{lead.email} touch count has been increased to meet conditions.')
 
             result = lead_account.sync_to_adsdb()
             if result:
-                messages.info(request, '{} is synced: {}'.format(lead_account, result))
+                messages.info(request, f'{lead_account} is synced: {result}')
             else:
-                messages.warning(request, '{} does not meet conditions to sync.'.format(lead_account))
+                messages.warning(request, f'{lead_account} does not meet conditions to sync.')
 
     @staticmethod
     def touch(instance, request, queryset):
         for lead_account in queryset:
             lead_account.touch()
-            messages.info(request, '{} has been touched for {} time.'.format(lead_account, lead_account.touch_count))
+            messages.info(request, f'{lead_account} has been touched for {lead_account.touch_count} time.')
 
     lead_link.short_description = 'Lead'
     lead_link.admin_order_field = Concat('lead__first_name', Value(' '), 'lead__last_name')

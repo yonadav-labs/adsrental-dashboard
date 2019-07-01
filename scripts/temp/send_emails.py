@@ -26,7 +26,8 @@ Email: rageth_chris@yahoo.com
         print('FAIL sending to', lead.email)
         continue
 
-    lead_account.insert_note('Account registration reminder email sent')
-    lead_account.save()
+    lead_account.add_comment('Account registration reminder email sent', None)
+    # lead_account.insert_note('Account registration reminder email sent')
+    # lead_account.save()
 
 print(lead_accounts.count(), 'messages sent')
