@@ -4,9 +4,26 @@ from django.utils import timezone, timesince
 from django.utils.safestring import mark_safe
 
 from adsrental.models.raspberry_pi_session import RaspberryPiSession
+from adsrental.admin.base import CSVExporter
 
 
-class RaspberryPiSessionAdmin(admin.ModelAdmin):
+class RaspberryPiSessionAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'id',
+        'raspberry_pi',
+        'start_date',
+        'end_date',
+        'duration',
+    )
+
+    csv_titles = (
+        'Id',
+        'Raspberry PI',
+        'Start Date',
+        'End Date',
+        'Duration',
+    )
+
     model = RaspberryPiSession
     list_display = (
         'id',
@@ -19,13 +36,15 @@ class RaspberryPiSessionAdmin(admin.ModelAdmin):
     search_fields = ('raspberry_pi__rpid', )
     raw_id_fields = ('raspberry_pi', )
     readonly_fields = ('start_date', )
+    actions = ('export_as_csv',)
 
     def raspberry_pi_link(self, obj):
         result = []
         if obj.raspberry_pi:
-            result.append('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a> (<a target="_blank" href="/log/{rpid}">Logs</a>, <a href="{rdp_url}">RDP</a>)'.format(
+            result.append('<a href="{url}?rpid={rpid}">{rpid}</a> (<a href="{log_url}">Logs</a>, <a href="{rdp_url}">RDP</a>)'.format(
                 rdp_url=reverse('rdp_ec2_connect', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 url=reverse('admin:adsrental_raspberrypi_changelist'),
+                log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid}),
                 rpid=obj.raspberry_pi.rpid,
             ))
 

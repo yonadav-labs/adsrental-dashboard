@@ -11,6 +11,7 @@ from django.db.models.functions import Concat
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
 from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter
+from adsrental.admin.base import CSVExporter
 
 
 PROXY_TUNNEL_MESSAGE = '''Your device should be updated in a couple of minutes!<br />
@@ -30,7 +31,35 @@ class RpidListFilter(AbstractUIDListFilter):
     title = 'RPID'
 
 
-class RaspberryPiAdmin(admin.ModelAdmin):
+class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'rpid',
+        'lead',
+        'lead__status',
+        'version',
+        'ip_address',
+        'first_tested',
+        'first_seen',
+        'last_seen',
+        'online',
+        'uptime',
+        'is_proxy_tunnel',
+    )
+
+    csv_titles = (
+        'Rpid',
+        'Lead',
+        'Lead Status',
+        'Version',
+        'Ip Address',
+        'First Tested',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Uptime',
+        'Is Proxy Tunnel',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -73,6 +102,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         'show_cache',
         'convert_to_proxy_tunnel',
         'convert_to_ec2',
+        'export_as_csv',
     )
     readonly_fields = ('created', 'updated', )
 
@@ -80,7 +110,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         lead = obj.get_lead()
         if lead is None:
             return obj.leadid
-        return mark_safe('<a target="_blank" href="{url}?leadid={q}">{lead}</a>'.format(
+        return mark_safe('<a href="{url}?leadid={q}">{lead}</a>'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             lead=lead.email,
             q=lead.leadid,
@@ -95,7 +125,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             return None
         result = []
         if ec2_instance:
-            result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+            result.append('<a href="{url}?q={q}">{ec2_instance}</a>'.format(
                 url=reverse('admin:adsrental_ec2instance_changelist'),
                 ec2_instance=ec2_instance,
                 q=ec2_instance.instance_id,
@@ -143,14 +173,14 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             raspberry_pi.reset_cache()
             raspberry_pi.restart_required = True
             raspberry_pi.save()
-        messages.success(request, 'Restart successfully requested. RPi and tunnel should be online in two minutes.')
+            messages.success(request, f'Restart successfully requested for {raspberry_pi.rpid}. RPi and tunnel should be online in two minutes.')
 
     def update_config(self, request, queryset):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.new_config_required = True
             raspberry_pi.save()
-        messages.success(request, 'New config successfully requested. Tunnel should be online in two minutes.')
+            messages.success(request, f'New config successfully requested for {raspberry_pi.rpid}. Tunnel should be online in two minutes.')
 
     def convert_to_ec2(self, request, queryset):
         for raspberry_pi in queryset:
@@ -167,9 +197,7 @@ class RaspberryPiAdmin(admin.ModelAdmin):
             else:
                 EC2Instance.launch_for_lead(lead)
 
-            messages.success(request, 'Device {rpid} converted to EC2'.format(
-                rpid=raspberry_pi.rpid,
-            ))
+            messages.success(request, f'Device {raspberry_pi.rpid} converted to EC2')
 
     def convert_to_proxy_tunnel(self, request, queryset):
         for raspberry_pi in queryset:
@@ -199,31 +227,32 @@ class RaspberryPiAdmin(admin.ModelAdmin):
         for raspberry_pi in queryset:
             raspberry_pi.reset_cache()
             raspberry_pi.save()
+            messages.success(request, f'Cache reset successful for {raspberry_pi.rpid}.')
 
     def show_cache(self, request, queryset):
         for raspberry_pi in queryset:
             cache_data = raspberry_pi.get_cache()
-            messages.info(request, '{} cache: {}'.format(raspberry_pi.rpid, cache_data))
+            messages.info(request, f'{raspberry_pi.rpid} cache: {cache_data}')
 
     def links(self, obj):
         links = []
         now = timezone.localtime(timezone.now())
         if obj.is_proxy_tunnel:
-            links.append('<a target="_blank" href="{url}">Proxy tunnel</a>'.format(
+            links.append('<a href="{url}">Proxy tunnel</a>'.format(
                 url=reverse('rpi_proxy_tunnel_info', kwargs=dict(rpid=obj.rpid)),
             ))
         else:
-            links.append('<a target="_blank" href="{url}">RDP</a>'.format(
+            links.append('<a href="{url}">RDP</a>'.format(
                 url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.rpid)),
             ))
-        links.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+        links.append('<a href="{url}">pi.conf</a>'.format(
             url=reverse('pi_config', kwargs=dict(rpid=obj.rpid)),
         ))
         today_log_filename = '{}.log'.format(now.strftime(settings.LOG_DATE_FORMAT))
-        links.append('<a target="_blank" href="{log_url}">Today log</a>'.format(
+        links.append('<a href="{log_url}">Today log</a>'.format(
             log_url=reverse('show_log', kwargs={'rpid': obj.rpid, 'filename': today_log_filename}),
         ))
-        links.append('<a target="_blank" href="{url}?q={rpid}">Sessions</a>'.format(
+        links.append('<a href="{url}?q={rpid}">Sessions</a>'.format(
             url=reverse('admin:adsrental_raspberrypisession_changelist'),
             rpid=obj.rpid,
         ))

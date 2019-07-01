@@ -4,6 +4,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
@@ -34,12 +35,16 @@ class AutoBanView(View):
         days_offline = LeadAccount.AUTO_BAN_DAYS_OFFLINE
         days_checkpoint = LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT
         days_delivered = LeadAccount.AUTO_BAN_DAYS_NOT_USED
-        for lead_account in LeadAccount.objects.filter(
-                wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
-                status=LeadAccount.STATUS_IN_PROGRESS,
-                active=True,
-                auto_ban_enabled=True,
-        ):
+
+        lead_accounts = LeadAccount.objects.filter(
+            wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
+            status=LeadAccount.STATUS_IN_PROGRESS,
+            active=True,
+            auto_ban_enabled=True,
+        )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True) 
+                                           | Q(disable_auto_ban_until__lte=now))
+        for lead_account in lead_accounts:
             banned_wrong_password.append({
                 'account': str(lead_account),
                 'wrong_password_date': lead_account.wrong_password_date.date()
@@ -50,12 +55,15 @@ class AutoBanView(View):
                 # lead_account.insert_note(f'Auto banned as account had wrong password issue for {days_wrong_password} days', event_datetime=now)
                 # lead_account.save()
 
-        for lead_account in LeadAccount.objects.filter(
-                lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
-                status=LeadAccount.STATUS_IN_PROGRESS,
-                active=True,
-                auto_ban_enabled=True,
-        ):
+        lead_accounts = LeadAccount.objects.filter(
+            lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
+            status=LeadAccount.STATUS_IN_PROGRESS,
+            active=True,
+            auto_ban_enabled=True,
+        )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True) 
+                                           | Q(disable_auto_ban_until__lte=now))
+        for lead_account in lead_accounts:
             banned_offline.append({
                 'account': str(lead_account),
                 'last_seen': lead_account.lead.raspberry_pi.last_seen.date()
@@ -70,12 +78,16 @@ class AutoBanView(View):
                 lead.add_comment(f'Auto banned as device was offline for {days_offline} days', request.user)
                 # lead.insert_note(f'Auto banned as device was offline for {days_offline} days', event_datetime=now)
 
-        for lead_account in LeadAccount.objects.filter(
-                security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
-                status=LeadAccount.STATUS_IN_PROGRESS,
-                active=True,
-                auto_ban_enabled=True,
-        ):
+        lead_accounts = LeadAccount.objects.filter(
+            security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
+            status=LeadAccount.STATUS_IN_PROGRESS,
+            active=True,
+            auto_ban_enabled=True,
+        )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True) 
+                                           | Q(disable_auto_ban_until__lte=now))
+
+        for lead_account in lead_accounts:
             banned_security_checkpoint.append({
                 'account': str(lead_account),
                 'security_checkpoint_date': lead_account.security_checkpoint_date.date()
@@ -86,12 +98,15 @@ class AutoBanView(View):
                 # lead_account.insert_note(f'Auto banned as account had sec checkpoint issue for {days_checkpoint} days', event_datetime=now)
                 # lead_account.save()
 
-        for lead_account in LeadAccount.objects.filter(
+        lead_accounts = LeadAccount.objects.filter(
                 status=Lead.STATUS_QUALIFIED,
                 lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
                 active=True,
                 auto_ban_enabled=True,
-        ).select_related('lead'):
+        )
+        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True) 
+                                           | Q(disable_auto_ban_until__lte=now))
+        for lead_account in lead_accounts.select_related('lead'):
             banned_not_used.append({
                 'account': str(lead_account),
                 'delivery_date': lead_account.lead.delivery_date,

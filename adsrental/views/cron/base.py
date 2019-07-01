@@ -10,8 +10,12 @@ class CronView(View):
     _request = None
 
     def _cron_check(self, request):
+        if settings.LOCAL:
+            return True
+
         if request.user.is_authenticated and request.user.is_superuser:
             return True
+
         if request.META.get('HTTP_SECRET', '') == settings.CRON_SECRET:
             return True
 

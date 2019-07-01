@@ -11,7 +11,7 @@
     {% if lead_account_issue.images.count %}
         <h2>Images</h2>
         {% for image in lead_account_issue.images.all %}
-            <a href="{{ image.image.url }}" target="_blank">
+            <a href="{{ image.image.url }}">
                 <img src="{{ image.image.url }}" width="300px" />
             </a>
         {% endfor %}

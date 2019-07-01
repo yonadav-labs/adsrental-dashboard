@@ -10,6 +10,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.utils.safestring import mark_safe
 from django.template.loader import render_to_string
 
+from adsrental.admin.base import CSVExporter
 from adsrental.forms import AdminLeadAccountBanForm, AdminPrepareForReshipmentForm, AdminLeadDeleteForm
 from adsrental.models.lead import Lead, ReadOnlyLead, ReportProxyLead
 from adsrental.models.lead_account import LeadAccount
@@ -64,7 +65,57 @@ class LeadAccountInline(admin.StackedInline):
     raw_id_fields = ('lead', )
 
 
-class LeadAdmin(admin.ModelAdmin):
+class LeadAdmin(admin.ModelAdmin, CSVExporter):
+    csv_fields = (
+        'leadid',
+        'name',
+        'status',
+        'email_field',
+        'phone_field',
+        'bundler',
+        'accounts_field',
+        'raspberry_pi',
+        'tested_field',
+        'usps_field',
+        'first_seen',
+        'last_seen',
+        'online',
+        'ec2instance',
+        'touch_count_field',
+        'ip_address',
+        'wrong_password_field',
+        'security_checkpoint_field',
+        'fix_button',
+        'sync_with_adsdb_field',
+        'facebook_billed',
+        'google_billed',
+    )
+
+    csv_titles = (
+        'Id',
+        'Name',
+        'Status',
+        'Email',
+        'Phone',
+        'Bundler',
+        'Accounts',
+        'Raspberry Pi',
+        'Tested',
+        'Usps',
+        'First Seen',
+        'Last Seen',
+        'Online',
+        'Ec2 Instance Link',
+        'Touch Count',
+        'Ip Address',
+        'Wrong Password',
+        'Security Checkpoint',
+        'Fix Button',
+        'Sync With Adsdb',
+        'Facebook Billed',
+        'Google Billed',
+    )
+
     class Media:
         css = {
             'all': ('css/custom_admin.css',)
@@ -159,6 +210,7 @@ class LeadAdmin(admin.ModelAdmin):
         'restart_raspberry_pi',
         'sync_to_adsdb',
         'delete_leads',
+        'export_as_csv',
     )
     readonly_fields = (
         'created',
@@ -226,7 +278,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def status_field(self, obj):
         title = 'Show changes'
-        return mark_safe('<a target="_blank" href="{url}?lead__leadid={q}" title="{title}">{status}</a>'.format(
+        return mark_safe('<a href="{url}?lead__leadid={q}" title="{title}">{status}</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
             title=title,
@@ -238,7 +290,7 @@ class LeadAdmin(admin.ModelAdmin):
 
     def bundler_field(self, obj):
         if obj.bundler:
-            return mark_safe('<a target="_blank" href="{url}?q={q}" title="{title}">{text}</a>'.format(
+            return mark_safe('<a href="{url}?q={q}" title="{title}">{text}</a>'.format(
                 url=reverse('admin:adsrental_bundler_changelist'),
                 q=obj.bundler.email,
                 title=obj.bundler.utm_source,
@@ -338,7 +390,7 @@ class LeadAdmin(admin.ModelAdmin):
         if not obj.raspberry_pi:
             return None
 
-        return mark_safe('<a target="_blank" href="{url}?rpid={rpid}">{rpid}</a>'.format(
+        return mark_safe('<a href="{url}?rpid={rpid}">{rpid}</a>'.format(
             url=reverse('admin:adsrental_raspberrypi_changelist'),
             rpid=obj.raspberry_pi.rpid,
         ))
@@ -347,18 +399,18 @@ class LeadAdmin(admin.ModelAdmin):
         result = []
         if obj.raspberry_pi:
             if obj.raspberry_pi.is_proxy_tunnel:
-                result.append('<a target="_blank" href="{url}">Proxy tunnel</a>'.format(
+                result.append('<a href="{url}">Proxy tunnel</a>'.format(
                     url=reverse('rpi_proxy_tunnel_info', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
                 ))
             else:
-                result.append('<a target="_blank" href="{url}">RDP</a>'.format(
+                result.append('<a href="{url}">RDP</a>'.format(
                     url=reverse('rdp_ec2_connect', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
                 ))
-            result.append('<a target="_blank" href="{log_url}">Logs</a>'.format(log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid})))
-            result.append('<a target="_blank" href="{url}">pi.conf</a>'.format(
+            result.append('<a href="{log_url}">Logs</a>'.format(log_url=reverse('show_log_dir', kwargs={'rpid': obj.raspberry_pi.rpid})))
+            result.append('<a href="{url}">pi.conf</a>'.format(
                 url=reverse('pi_config', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
             ))
-            result.append('<a target="_blank" href="{url}">Stats</a>'.format(
+            result.append('<a href="{url}">Stats</a>'.format(
                 url=reverse('admin_user_stats', kwargs=dict(rpid=obj.raspberry_pi.rpid)),
             ))
 
@@ -366,7 +418,7 @@ class LeadAdmin(admin.ModelAdmin):
             url=reverse('dashboard_change_address', kwargs=dict(lead_id=obj.leadid))
         ))
 
-        result.append('<a target="_blank" href="{url}?lead__leadid={q}">History</a>'.format(
+        result.append('<a href="{url}?lead__leadid={q}">History</a>'.format(
             url=reverse('admin:adsrental_leadchange_changelist'),
             q=obj.leadid,
         ))
@@ -380,7 +432,7 @@ class LeadAdmin(admin.ModelAdmin):
             url=reverse('admin:adsrental_leadhistorymonth_changelist'),
             search=obj.email,
         ))
-        result.append(f'''<a target="_blank" href="{reverse('report:lead_cost', kwargs={'leadid': obj.leadid})}">Cost</a>''')
+        result.append(f'''<a href="{reverse('report:lead_cost', kwargs={'leadid': obj.leadid})}">Cost</a>''')
 
         return mark_safe(', '.join(result))
 
@@ -388,7 +440,7 @@ class LeadAdmin(admin.ModelAdmin):
         result = []
         ec2_instance = obj.get_ec2_instance()
         if ec2_instance:
-            result.append('<a target="_blank" href="{url}?q={q}">{ec2_instance}</a>'.format(
+            result.append('<a href="{url}?q={q}">{ec2_instance}</a>'.format(
                 url=reverse('admin:adsrental_ec2instance_changelist'),
                 ec2_instance=ec2_instance.hostname or ec2_instance.status.capitalize(),
                 q=ec2_instance.instance_id,
@@ -720,7 +772,7 @@ class LeadAdmin(admin.ModelAdmin):
     def fix_button(self, obj):
         result = []
         if obj.is_wrong_password() or obj.is_security_checkpoint_reported():
-            result.append('<a class="button" target="_blank" href="{url}?lead_account__lead__leadid={leadid}">Fix</a>'.format(
+            result.append('<a class="button" href="{url}?lead_account__lead__leadid={leadid}">Fix</a>'.format(
                 url=reverse('admin:adsrental_leadaccountissue_changelist'),
                 leadid=obj.leadid,
             ))
@@ -801,7 +853,7 @@ class ReportLeadAdmin(LeadAdmin):
 
     model = ReportProxyLead
     # admin_caching_enabled = True
-    list_per_page = 500
+    # list_per_page = 500
     list_display = (
         'name',
         'status_field',

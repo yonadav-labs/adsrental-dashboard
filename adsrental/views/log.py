@@ -38,7 +38,46 @@ class ShowLogView(View):
         log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rpid, filename)
         if not os.path.exists(log_path):
             raise Http404
-        return HttpResponse(open(log_path).read(), content_type='text/plain')
+
+        lines = open(log_path).readlines()
+        lines.reverse()
+        return render(request, 'log/file.html', dict(
+            lines=lines,
+        ))
+
+
+class ShowAggLogView(View):
+    @method_decorator(login_required)
+    def get(self, request: HttpRequest) -> HttpResponse:
+        now = timezone.localtime(timezone.now())
+        date = request.GET.get('date', now.strftime('%Y%m%d'))
+        filename = f"{date}.log"
+
+        rps = os.listdir(settings.RASPBERRY_PI_LOG_PATH)
+        rps_ = []
+        log_lines = {}
+
+        for rp in rps:
+            log_path = os.path.join(settings.RASPBERRY_PI_LOG_PATH, rp, filename)
+
+            if not os.path.exists(log_path):
+                continue
+
+            rps_.append(rp)
+            lines = open(log_path).readlines()
+            lines.reverse()
+            log_lines[rp] = []
+
+            for line in lines:
+                if 'restarting' in line or 'Client >>>' in line:
+                    log_lines[rp].append(line)
+
+        return render(request, 'log/log_agg.html', dict(
+            log_lines=log_lines,
+            rps=rps_,
+            date=date,
+            filename=filename
+        ))
 
 
 class LogView(View):
@@ -142,10 +181,18 @@ class LogView(View):
 
         if not Lead.is_status_active(lead_status) or not lead_active_accounts_count:
             reason = 'Lead not found or banned'
+            update_required = self._get_update_required(ping_data)
+            if update_required:
+                self.add_log(request, rpid, 'RaspberryPi image updated, updating...')
+                raspberry_pi = RaspberryPi.objects.filter(rpid=rpid).first()
+                if raspberry_pi:
+                    raspberry_pi.reset_cache()
             response_data = {
                 'reason': reason,
                 'source': 'ping',
                 'result': result,
+                'unassign_hostname': True,
+                'update': update_required,
             }
             return response_data
 
