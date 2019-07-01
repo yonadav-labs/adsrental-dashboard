@@ -170,6 +170,7 @@ class Lead(models.Model, FulltextSearchMixin):
     country = models.CharField(max_length=50, blank=True, null=True, default='United States')
     state = models.CharField(max_length=50, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
+    secret_key = models.CharField(max_length=100, blank=True, null=True)
     company = models.CharField(max_length=20, default=COMPANY_EMPTY, choices=COMPANY_CHOICES)
     customerio_enabled = models.BooleanField(default=True, help_text='If False, customer.io event will not be sent for this lead. However, they are created.')
     is_reimbursed = models.BooleanField(default=False, help_text='Lead is active for more than 5 months and gets pay checks.')
