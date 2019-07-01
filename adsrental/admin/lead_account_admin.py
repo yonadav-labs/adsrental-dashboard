@@ -22,6 +22,7 @@ from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFi
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
     LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, \
     LeadDeliveryDateListFilter, DeliveredLastTwoDaysListFilter, titled_filter
+from adsrental.admin.comment_admin import CommentInline
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
@@ -111,6 +112,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         'links',
         'created',
     )
+    inlines = [ CommentInline, ]
     list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
         AbstractIntIDListFilter,
@@ -201,9 +203,10 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         return queryset
 
     def name(self, obj):
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('{name}{note}'.format(
             name=html.escape(obj.lead.name()),
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def lead_link(self, obj):
@@ -415,8 +418,9 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
                 reporter=request.user,
             )
-            issue.insert_note(f'Reported by {request.user}')
-            issue.save()
+            issue.add_comment(f'Reported by {request.user}', request.user)
+            # issue.insert_note(f'Reported by {request.user}')
+            # issue.save()
             messages.info(request, f'{lead_account} password is marked as wrong.')
 
     def report_security_checkpoint(self, request, queryset):
@@ -431,9 +435,10 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
                 reporter=request.user,
             )
-            issue.insert_note(f'Reported by {request.user}')
-            issue.save()
-            messages.info(request, f'{lead_account} security checkpoint reported.')
+            issue.add_comment(f'Reported by {request.user}', request.user)
+            # issue.insert_note(f'Reported by {request.user}')
+            # issue.save()
+            messages.info(request, '{} security checkpoint reported.'.format(lead_account))
 
     def sync_to_adsdb(self, request, queryset):
         for lead_account in queryset:

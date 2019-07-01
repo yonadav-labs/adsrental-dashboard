@@ -9,7 +9,7 @@
         <h1>Fix {{ lead_account_issue.get_issue_type_display }} issue for {{ lead_account_issue.lead_account }}</h1>
         {% if lead_account_issue.note %}
             <h3>Log</h3>
-            {% for line in lead_account_issue.get_note_lines %}
+            {% for line in lead_account_issue.get_comments %}
                 <p>{{ line }}</p>
             {% endfor %}
         {% endif %}

@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter, LeadAccountStatusListFilter, LeadAccountAccountTypeListFilter
+from adsrental.admin.comment_admin import CommentInline
 from adsrental.admin.base import CSVExporter
 
 
@@ -68,6 +69,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
         'created',
         'buttons',
     )
+    inlines = [ CommentInline, ]
     list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler', 'lead_account__lead__raspberry_pi',)
     list_filter = (
         LeadAccountIDListFilter,
@@ -98,9 +100,10 @@ class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
         return list_display
 
     def status_field(self, obj):
+        comments = '\n'.join(obj.get_comments())
         return mark_safe('{name}{note}'.format(
             name=html.escape(obj.get_status_display()),
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(obj.note)}" alt="?">' if obj.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def old_value(self, obj):
@@ -110,23 +113,25 @@ class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
         lead_account = obj.lead_account
         if not lead_account:
             return None
+        comments = '\n'.join(lead_account.get_comments())
         return mark_safe('<a href="{url}?id={id}">{type} {username}</a>{note}'.format(
             url=reverse('admin:adsrental_leadaccount_changelist'),
             type=lead_account.get_account_type_display(),
             username=lead_account.username,
             id=lead_account.id,
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead_account.note)}" alt="?">' if lead_account.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def lead_field(self, obj):
         lead = obj.lead_account.lead
         if not lead:
             return None
+        comments = '\n'.join(lead.get_comments())
         return mark_safe('<a href="{url}?leadid={q}">{title}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             title=lead.name(),
             q=lead.leadid,
-            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(lead.note)}" alt="?">' if lead.note else '',
+            note=f' <img src="/static/admin/img/icon-unknown.svg" title="{html.escape(comments)}" alt="?">' if comments else '',
         ))
 
     def raspberry_pi_field(self, obj):
