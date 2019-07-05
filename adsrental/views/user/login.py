@@ -57,7 +57,10 @@ class UserSecretKeyView(View):
         lead.save()
 
         subject = 'New Secret Key'
-        text_content = f'Your secret key is {secret_key}'
+        text_content = 'You can login to https://adsrental.com/user/login/ using the following credentials:\n\n' \
+                     + f'Email: {email}\n' \
+                     + f'Secret key: {secret_key}'
+
         send_mail(subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
 
         res = { 'success': True, 'msg': 'Secret key sent to your email' }
