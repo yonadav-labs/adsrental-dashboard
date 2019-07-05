@@ -332,7 +332,7 @@ class AdminPrepareForReshipmentForm(forms.Form):
 
 class UserLoginForm(forms.Form):
     email = forms.EmailField(label='Email', required=True)
-    secret_key = forms.CharField(label='Secret Key', required=True, widget=forms.PasswordInput)
+    secret_key = forms.CharField(label='Personal Access Token', required=True, widget=forms.PasswordInput)
 
     def get_lead(self, data: typing.Dict) -> typing.Optional[Lead]:
         return Lead.objects.filter(
@@ -346,9 +346,9 @@ class UserLoginForm(forms.Form):
         if not lead:
             self.add_error('email', 'User not found')
         elif not lead.secret_key:
-            self.add_error('secret_key', 'Please get the secret key')
+            self.add_error('secret_key', 'Please get the personal access token')
         elif not check_password(cleaned_data['secret_key'], lead.secret_key):
-            self.add_error('secret_key', 'Secret key is wrong')
+            self.add_error('secret_key', 'Personal access token is wrong')
 
 
 class DisqualifyLeadAccountForm(forms.Form):
