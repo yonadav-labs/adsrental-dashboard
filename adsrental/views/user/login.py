@@ -49,7 +49,7 @@ class UserSecretKeyView(View):
         lead = Lead.objects.filter(email=email).first()
 
         if not lead:
-            res = { 'success': False, 'msg': 'Such user does not exist' }
+            res = {'success': False, 'msg': 'Such user does not exist'}
             return JsonResponse(res, safe=False)
 
         secret_key = User.objects.make_random_password()
@@ -58,10 +58,10 @@ class UserSecretKeyView(View):
 
         subject = 'New Secret Key'
         text_content = 'You can login to https://adsrental.com/user/login/ using the following credentials:\n\n' \
-                     + f'Email: {email}\n' \
-                     + f'Secret key: {secret_key}'
+            + f'Email: {email}\n' \
+            + f'Secret key: {secret_key}'
 
         send_mail(subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
 
-        res = { 'success': True, 'msg': 'Secret key sent to your email' }
+        res = {'success': True, 'msg': 'Secret key sent to your email'}
         return JsonResponse(res, safe=False)
