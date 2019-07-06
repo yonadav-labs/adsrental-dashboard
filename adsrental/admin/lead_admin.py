@@ -594,6 +594,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
                 messages.warning(request, f'Lead {lead.name()} has active accounts, ban them first. Skipping.')
                 continue
             lead.ban(request.user)
+            lead.save()
             messages.info(request, f'Lead {lead.name()} is banned.')
 
     def unban_lead(self, request, queryset):
@@ -603,6 +604,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
                 continue
 
             lead.unban(request.user)
+            lead.save()
             messages.info(request, f'Lead {lead.name()} is unbanned.')
 
     def ban_google_account(self, request, queryset):
