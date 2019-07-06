@@ -20,8 +20,6 @@ def login_as_admin(context, username, password):
     context.driver.find_element_by_css_selector('input[type=submit]').click()
 
 
-
-
 @given('I am using initial database')
 def use_test_database(_context):
     Lead.objects.all().delete()
@@ -35,9 +33,11 @@ def use_test_database(_context):
 def logged_in_as_admin(context):
     login_as_admin(context, "volshebnyi@gmail.com", "team17")
 
+
 @given('I go to url "{url}"')
 def go_to_url(context, url):
     context.driver.get(f"{context.host}{url}")
+
 
 @given('I sign up as a lead')
 def sign_up_as_lead(context):
@@ -53,8 +53,6 @@ def logged_in_as_admin_wrong_password(context):
     login_as_admin(context, "volshebnyi@gmail.com", "bvvgr")
 
 
-
-
 @given('I am logged in as user')
 def logged_in_as_user(context):
     context.driver.get(f"{context.host}/user/login/")
@@ -68,7 +66,7 @@ def logged_in_as_user(context):
 def type_text(context, text, name):
     element = context.driver.find_element_by_name(name)
     if element.tag_name != 'select':
-        element.clear() 
+        element.clear()
     element.send_keys(text)
 
 
@@ -77,15 +75,19 @@ def upload_file(context, filepath, name):
     path = Path(settings.BASE_DIR) / 'features' / 'assets' / filepath
     text = path.as_posix()
     element = context.driver.find_element_by_name(name)
-    element.clear() 
+    element.clear()
     element.send_keys(text)
-
 
 
 @given('I am on main Admin Dashboard page')
 def on_main_admin_page(context):
     context.driver.get(f"{context.host}/admin/")
     context.driver.page_source.find('Dashboard')
+
+
+@given('I am on user login page')
+def on_user_login_page(context):
+    context.driver.get(f"{context.host}/user/login/")
 
 
 @then('I should see {state} check mark in column "{column_name}"')
@@ -98,11 +100,7 @@ def i_see_disabled_check(context, state, column_name):
         if column_class.startswith('column-'):
             field_class = column_class.replace('column-', 'field-')
     check_mark = context.driver.find_element_by_css_selector(f'td.{field_class} img')
-    context.test.assertEqual(check_mark.get_attribute('alt'), alt, 'Check mark has wrong state')
-
-
-
-
+    context.test.assertEqual(check_mark.get_attribute('alt').lower(), alt, 'Check mark has wrong state')
 
 
 @when('I click link "{link_text}"')
@@ -124,9 +122,6 @@ def click_button(context, button_text):
     element.click()
 
 
-
-
-
 @when('I click radio with name "{name}" and value "{value}"')
 def click_radio_with_name(context, name, value):
     css_selector = f'input[type="radio"][name="{name}"][value="{value}"]'
@@ -137,9 +132,18 @@ def click_radio_with_name(context, name, value):
 def click_checkbox_with_name(context, name):
     context.driver.find_element_by_name(name).click()
 
+
 @then('I should see text on page "{text}"')
 def when_see_text_on_page(context, text):
+    max_seconds = 3
+    for i in range(max_seconds):
+        page_text = context.driver.page_source
+        if text in page_text:
+            return
+        time.sleep(1)
+
     context.test.assertTrue(text in context.driver.page_source, f'Text "{text}" not found on page')
+
 
 @then('I should see "{title}" when i hover {selector}')
 def seee_title(context, title, selector):
@@ -185,9 +189,15 @@ def admin_dashboard_should_be_shown(context):
     context.test.assertTrue('Adsrental Administration' in context.driver.page_source, 'It is not Admin Dashboard page')
 
 
-@then('I wait')
+@when('I wait')
 def i_wait(context):
     time.sleep(1000)
+
+
+@when('I wait {seconds} seconds')
+def i_wait(context, seconds):
+    time.sleep(int(seconds))
+
 
 @then('I see hint "{text}"')
 def i_see_hint(context, text):
