@@ -85,7 +85,7 @@ class LeadChangeAdmin(ReadOnlyModelAdmin, CSVExporter):
         lead = obj.lead
         if not lead:
             return None
-        comments = '\n'.join(obj.get_comments())
+        comments = '\n'.join(lead.get_comments())
         return mark_safe('<a href="{url}?leadid={q}">{text}</a>{note}'.format(
             url=reverse('admin:adsrental_lead_changelist'),
             text=lead.name(),
