@@ -1,4 +1,4 @@
-
+@debug
 Feature: Lead lifespan
     In order to check if all links in Admin Dashboard are working
     As an Admin
@@ -37,6 +37,19 @@ Feature: Lead lifespan
         And I click button "Go"
         Then I should see "Qualified" in column "Status"
 
+    Scenario: Generate personal access token
+        Given I am on user login page
+        When I type "volshebnyii@gmail.com" in field "email"
+        And I click link "Get Personal Access Token"
+        Then I should see text on page "Secret key sent to your email"
+
+    Scenario: Login with personal access token
+        Given I am on user login page
+        When I type "volshebnyii@gmail.com" in field "email"
+        And I type "testkey" in field "secret_key"
+        And I click button "Sign in"
+        Then I should see text on page "Lead volshebnyii@gmail.com stats"
+
     Scenario: Mark RaspberryPi as tested
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
@@ -50,7 +63,7 @@ Feature: Lead lifespan
         And I click button "Save"
         Then I should see enabled check mark in column "Tested"
 
-     Scenario: Lead moves from available to qualified
+    Scenario: Lead moves from available to qualified
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Leads"
@@ -70,7 +83,7 @@ Feature: Lead lifespan
         And I should see "Amazon Nevlad (Available" in column "Accounts"
 
 
-      Scenario: Mark accounts as Qualified
+    Scenario: Mark accounts as Qualified
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Leads"
@@ -78,13 +91,13 @@ Feature: Lead lifespan
         And I click button "Search"
         And I click checkbox with name "_selected_action"
         And I type "Mark Google account as qualified" in field "action"
-        And I click button "Go" 
+        And I click button "Go"
         And I click checkbox with name "_selected_action"
         And I type "Mark Amazon account as qualified" in field "action"
-        And I click button "Go" 
+        And I click button "Go"
         Then I should see "Facebook olvida@mail.ru (Qualified)" in column "Accounts"
 
-      Scenario: RaspberryPi reset cache
+    Scenario: RaspberryPi reset cache
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Raspberry pis"
@@ -92,12 +105,12 @@ Feature: Lead lifespan
         And I click button "Search"
         And I click checkbox with name "_selected_action"
         And I type "reset_cache" in field "action"
-        And I click button "Go" 
+        And I click button "Go"
         Then I should see text on page "Cache reset successful for RP00001000."
 
 
 
-      Scenario: Check bundler leads
+    Scenario: Check bundler leads
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Bundlers"
@@ -105,16 +118,16 @@ Feature: Lead lifespan
         Then I should see "2" in column "Leads"
 
 
-     Scenario: Send ping from RaspberryPi
-         Given I go to url "/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123"
-         Then I should see text on page "result"
-         And I should see text on page "true"
-         And I should see text on page "source"
-         And I should see text on page "ping"
+    Scenario: Send ping from RaspberryPi
+        Given I go to url "/log/?rpid=RP00001000&p=&version=2.0.8&attempt=1&hostname=123.123.123.123"
+        Then I should see text on page "result"
+        And I should see text on page "true"
+        And I should see text on page "source"
+        And I should see text on page "ping"
 
 
 
-     Scenario: Check accounts status
+    Scenario: Check accounts status
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Leads"
@@ -151,13 +164,13 @@ Feature: Lead lifespan
         And I click button "Search"
         Then I should see enabled check mark in column "Online"
 
-    
+
     Scenario: Generate daily lead timestamps
         Given I go to url "/cron/lead_history/?now=true"
         Then I should see text on page "true"
 
 
-    Scenario: Check lead 
+    Scenario: Check lead
         Given I am logged in as an Admin
         And I am on main Admin Dashboard page
         When I click link "Lead Timestamps"
@@ -202,65 +215,65 @@ Feature: Lead lifespan
         And I click button "Search"
         And I click checkbox with name "_selected_action"
         And I type "DEBUG Aggregate" in field "action"
-        And I click button "Go" 
+        And I click button "Go"
 
 
     Scenario: Ban Google account
-       Given I am logged in as an Admin
-       And I am on main Admin Dashboard page
-       When I click link "Leads"
-       And I type "RP00001000" in field "q"
-       And I click button "Search"
-       And I click checkbox with name "_selected_action"
-       And I type "Ban google account" in field "action"
-       And I click button "Go" 
-       And I type "bad conection" in field "note"
-       And I click button "Ban" 
-       Then I should see text on page "is banned"
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "Ban google account" in field "action"
+        And I click button "Go"
+        And I type "bad conection" in field "note"
+        And I click button "Ban"
+        Then I should see text on page "is banned"
 
 
-     
+
 
     Scenario: Ban amazon account
-       Given I am logged in as an Admin
-       And I am on main Admin Dashboard page
-       When I click link "Leads"
-       And I type "RP00001000" in field "q"
-       And I click button "Search"
-       And I click checkbox with name "_selected_action"
-       And I type "Ban amazon account" in field "action"
-       And I click button "Go" 
-       And I type "bad conection" in field "note"
-       And I click button "Ban" 
-       Then I should see text on page "is banned"
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "Ban amazon account" in field "action"
+        And I click button "Go"
+        And I type "bad conection" in field "note"
+        And I click button "Ban"
+        Then I should see text on page "is banned"
 
 
     Scenario: Ban facebook account
-       Given I am logged in as an Admin
-       And I am on main Admin Dashboard page
-       When I click link "Leads"
-       And I type "RP00001000" in field "q"
-       And I click button "Search"
-       And I click checkbox with name "_selected_action"
-       And I type "Ban facebook account" in field "action"
-       And I click button "Go" 
-       And I type "bad conection" in field "note"
-       And I click button "Ban" 
-       Then I should see text on page "is banned"
-     
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "Ban facebook account" in field "action"
+        And I click button "Go"
+        And I type "bad conection" in field "note"
+        And I click button "Ban"
+        Then I should see text on page "is banned"
+
 
 
 
     Scenario: Ban lead
-     Given I am logged in as an Admin
-       And I am on main Admin Dashboard page
-       When I click link "Leads"
-       And I type "RP00001000" in field "q"
-       And I click button "Search"
-       And I click checkbox with name "_selected_action"
-       And I type "Ban lead" in field "action"
-       And I click button "Go" 
-       Then I should see text on page "is banned"
+        Given I am logged in as an Admin
+        And I am on main Admin Dashboard page
+        When I click link "Leads"
+        And I type "RP00001000" in field "q"
+        And I click button "Search"
+        And I click checkbox with name "_selected_action"
+        And I type "Ban lead" in field "action"
+        And I click button "Go"
+        Then I should see text on page "is banned"
 
 
 
@@ -277,7 +290,7 @@ Feature: Lead lifespan
 
 
 
-        
+
 
 
 

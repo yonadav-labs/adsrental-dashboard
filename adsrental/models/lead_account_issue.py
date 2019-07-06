@@ -6,6 +6,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.comment import Comment
 
+
 class LeadAccountIssue(models.Model):
     ISSUE_TYPE_WRONG_PASSWORD = 'Wrong Password'
     ISSUE_TYPE_SECURITY_CHECKPOINT = 'Security Checkpoint'
@@ -148,11 +149,15 @@ class LeadAccountIssue(models.Model):
             self.status = self.STATUS_PAID
             return
         if self.issue_type == self.ISSUE_TYPE_WRONG_PASSWORD:
-            self.lead_account.set_correct_password(new_password=self.new_value, edited_by=edited_by)  # pylint: disable=no-member
+            lead_account = self.lead_account
+            lead_account.set_correct_password(new_password=self.new_value, edited_by=edited_by)  # pylint: disable=no-member
+            lead_account.save()  # pylint: disable=no-member
             self.status = self.STATUS_VERIFIED
             return
         if self.issue_type == self.ISSUE_TYPE_SECURITY_CHECKPOINT:
-            self.lead_account.resolve_security_checkpoint(edited_by=edited_by)  # pylint: disable=no-member
+            lead_account = self.lead_account
+            lead_account.resolve_security_checkpoint(edited_by=edited_by)  # pylint: disable=no-member
+            lead_account.save()  # pylint: disable=no-member
             self.status = self.STATUS_VERIFIED
             return
         if self.issue_type == self.ISSUE_TYPE_PHONE_NUMBER_CHANGE:

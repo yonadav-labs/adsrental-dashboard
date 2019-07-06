@@ -53,6 +53,9 @@ class UserSecretKeyView(View):
             return JsonResponse(res, safe=False)
 
         secret_key = User.objects.make_random_password()
+        if settings.TEST:
+            secret_key = 'testkey'
+
         lead.secret_key = make_password(secret_key)
         lead.save()
 

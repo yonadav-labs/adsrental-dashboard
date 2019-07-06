@@ -49,6 +49,7 @@
             "ship_date": null,
             "touch_count": 0,
             "street": "Rupprechtstraße 21",
+            "secret_key": "qwe",
             "apartment": null,
             "city": "Munich",
             "country": "Germany",
