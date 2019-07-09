@@ -2,10 +2,10 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
-from anymail.exceptions import AnymailInvalidAddress
 
 from django.conf import settings
 from django.core.mail import send_mail
+from anymail.exceptions import AnymailInvalidAddress
 
 from adsrental.forms import UserLoginForm
 from adsrental.models.lead import Lead
