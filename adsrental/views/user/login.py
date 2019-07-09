@@ -2,6 +2,7 @@ from django.views import View
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
+from anymail.exceptions import AnymailInvalidAddress
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -64,7 +65,11 @@ class UserSecretKeyView(View):
             + f'Email: {email}\n' \
             + f'Secret key: {secret_key}'
 
-        send_mail(subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
+        try:
+            send_mail(subject, text_content, settings.DEFAULT_FROM_EMAIL, [email])
+        except AnymailInvalidAddress:
+            res = {'success': False, 'msg': 'Invalid email address'}
+            return JsonResponse(res, safe=False)
 
         res = {'success': True, 'msg': 'Secret key sent to your email'}
         return JsonResponse(res, safe=False)
