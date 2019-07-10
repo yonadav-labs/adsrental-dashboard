@@ -112,7 +112,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         'links',
         'created',
     )
-    inlines = [ CommentInline, ]
+    # inlines = [CommentInline, ]
     list_select_related = ('lead', 'lead__ec2instance')
     list_filter = (
         AbstractIntIDListFilter,
@@ -174,6 +174,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         'active',
     )
     raw_id_fields = ('lead', )
+    exclude = ('comments',)
 
     def __init__(self, *args, **kwargs):
         self._request = None
