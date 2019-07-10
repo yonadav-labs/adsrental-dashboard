@@ -977,19 +977,27 @@ class ReportedByListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            (settings.ADSDB_USERNAME, 'Buyers'),
-            (settings.AUTOBAN_USER_EMAIL, 'VAs'),
-            (settings.ADMIN_USER_EMAIL, 'Admin'),
-            ('other', 'Other'),
+            ('bundler', 'Bundlers'),
+            ('buyer', 'Buyers'),
+            ('va', 'VAs'),
+            ('admin', 'Admin'),
         )
 
     def queryset(self, request, queryset):
-        if self.value() == 'other':
-            return queryset.exclude(
-                edited_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL, settings.PING_USER_EMAIL],
-            )
-        if self.value():
+        if self.value() == 'va':
             return queryset.filter(
-                edited_by__email=self.value(),
+                reporter__first_name='VA',
             )
-        return None
+        elif self.value() == 'admin':
+            return queryset.filter(
+                reporter__is_superuser=True
+            )
+        elif self.value() == 'buyer':
+            ids = [ii.id for ii in queryset 
+                    if ii.reporter and ii.reporter.groups.filter(name='Buyer').exists()]
+            return queryset.filter(id__in=ids)
+        elif self.value() == 'bundler':
+            ids = [ii.id for ii in queryset 
+                    if ii.reporter and ii.reporter.groups.filter(name='Bundler').exists()]
+            return queryset.filter(id__in=ids)
+        return queryset
