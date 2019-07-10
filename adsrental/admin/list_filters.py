@@ -969,3 +969,27 @@ class EditedByListFilter(SimpleListFilter):
                 edited_by__email=self.value(),
             )
         return None
+
+
+class ReportedByListFilter(SimpleListFilter):
+    parameter_name = 'reported_by'
+    title = 'Reporter Type'
+
+    def lookups(self, request, model_admin):
+        return (
+            (settings.ADSDB_USERNAME, 'Buyers'),
+            (settings.AUTOBAN_USER_EMAIL, 'VAs'),
+            (settings.ADMIN_USER_EMAIL, 'Admin'),
+            ('other', 'Other'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'other':
+            return queryset.exclude(
+                edited_by__email__in=[settings.ADSDB_USERNAME, settings.AUTOBAN_USER_EMAIL, settings.ADMIN_USER_EMAIL, settings.PING_USER_EMAIL],
+            )
+        if self.value():
+            return queryset.filter(
+                edited_by__email=self.value(),
+            )
+        return None
