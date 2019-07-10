@@ -5,7 +5,13 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_account_issue import LeadAccountIssue
-from adsrental.admin.list_filters import AbstractIntIDListFilter, AbstractUIDListFilter, LeadAccountStatusListFilter, LeadAccountAccountTypeListFilter
+from adsrental.admin.list_filters import (
+    AbstractIntIDListFilter, 
+    AbstractUIDListFilter, 
+    LeadAccountStatusListFilter, 
+    LeadAccountAccountTypeListFilter, 
+    ReportedByListFilter
+)
 from adsrental.admin.comment_admin import CommentInline
 from adsrental.admin.base import CSVExporter
 
@@ -78,6 +84,7 @@ class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
         'issue_type',
         'status',
         LeadAccountAccountTypeListFilter,
+        ReportedByListFilter
     )
     search_fields = (
         'lead_account__username',
