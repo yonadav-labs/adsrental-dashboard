@@ -173,7 +173,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
     )
     inlines = (
         LeadAccountInline,
-        CommentInline
+        # CommentInline
     )
     # list_prefetch_related = ('raspberry_pi', 'ec2instance', 'bundler',)
     # list_prefetch_related = ('lead_accounts', )
@@ -221,7 +221,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'shipstation_order_number',
         'raspberry_pi',
     )
-    exclude = ('tracking_info', 'utm_source', )
+    exclude = ('tracking_info', 'utm_source', 'lead_account__comments', 'comments')
     raw_id_fields = ('raspberry_pi', )
 
     def __init__(self, *args, **kwargs):
