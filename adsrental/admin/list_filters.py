@@ -969,3 +969,35 @@ class EditedByListFilter(SimpleListFilter):
                 edited_by__email=self.value(),
             )
         return None
+
+
+class ReportedByListFilter(SimpleListFilter):
+    parameter_name = 'reported_by'
+    title = 'Reporter Type'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('bundler', 'Bundlers'),
+            ('buyer', 'Buyers'),
+            ('va', 'VAs'),
+            ('admin', 'Admin'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'va':
+            return queryset.filter(
+                reporter__first_name='VA',
+            )
+        elif self.value() == 'admin':
+            return queryset.filter(
+                reporter__is_superuser=True
+            )
+        elif self.value() == 'buyer':
+            ids = [ii.id for ii in queryset 
+                    if ii.reporter and ii.reporter.groups.filter(name='Buyer').exists()]
+            return queryset.filter(id__in=ids)
+        elif self.value() == 'bundler':
+            ids = [ii.id for ii in queryset 
+                    if ii.reporter and ii.reporter.groups.filter(name='Bundler').exists()]
+            return queryset.filter(id__in=ids)
+        return queryset
