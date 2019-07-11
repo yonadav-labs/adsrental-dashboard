@@ -414,6 +414,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 messages.info(request, f'Lead Account {lead_account} was already marked as wrong, skipping.')
                 continue
             lead_account.mark_wrong_password(edited_by=request.user)
+            lead_account.save()
             issue = LeadAccountIssue(
                 lead_account=lead_account,
                 issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
@@ -432,6 +433,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 continue
 
             lead_account.mark_security_checkpoint(edited_by=request.user)
+            lead_account.save()
             issue = LeadAccountIssue(
                 lead_account=lead_account,
                 issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
