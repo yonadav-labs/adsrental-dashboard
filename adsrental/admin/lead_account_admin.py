@@ -419,6 +419,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
                 reporter=request.user,
             )
+            issue.save()
             issue.add_comment(f'Reported by {request.user}', request.user)
             # issue.insert_note(f'Reported by {request.user}')
             # issue.save()
@@ -436,6 +437,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
                 issue_type=LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
                 reporter=request.user,
             )
+            issue.save()
             issue.add_comment(f'Reported by {request.user}', request.user)
             # issue.insert_note(f'Reported by {request.user}')
             # issue.save()
