@@ -3,6 +3,7 @@ from django import forms
 
 from adsrental.forms.extra_fields import MultiImageField
 from adsrental.models.lead_account_issue import LeadAccountIssue
+from adsrental.models.user import User
 
 
 class BundlerIssuesForm(forms.Form):
@@ -17,11 +18,14 @@ class BundlerIssuesForm(forms.Form):
     )
 
     issue_type = forms.ChoiceField(label='Issue type', choices=ISSUE_TYPE_CHOICES, required=False)
+    reporter = forms.ModelChoiceField(label='Reported by', queryset=User.objects.all(), required=False)
     status = forms.ChoiceField(label='Status', choices=STATUS_CHOICES, required=False)
 
     def filter(self, queryset):
         if self.cleaned_data['issue_type']:
             queryset = queryset.filter(issue_type=self.cleaned_data['issue_type'])
+        if self.cleaned_data['reporter']:
+            queryset = queryset.filter(reporter=self.cleaned_data['reporter'])
         if self.cleaned_data['status']:
             queryset = queryset.filter(status=self.cleaned_data['status'])
 
