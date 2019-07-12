@@ -279,14 +279,7 @@ class LeadAccount(models.Model, FulltextSearchMixin):
             self.charge_back = True
             self.save()
 
-        if self.account_type in LeadAccount.ACCOUNT_TYPES_FACEBOOK and bundler.facebook_chargeback:
-            return - bundler.facebook_chargeback
-        if self.account_type == LeadAccount.ACCOUNT_TYPE_GOOGLE and bundler.google_chargeback:
-            return - bundler.google_chargeback
-        if self.account_type == LeadAccount.ACCOUNT_TYPE_AMAZON and bundler.amazon_chargeback:
-            return - bundler.amazon_chargeback
-
-        return decimal.Decimal('0.00')
+        return - bundler.get_chargeback(self)
 
     def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
