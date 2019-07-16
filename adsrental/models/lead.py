@@ -16,7 +16,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange
-from adsrental.models.mixins import FulltextSearchMixin
+from adsrental.models.mixins import FulltextSearchMixin, CommentsMixin
 from adsrental.models.comment import Comment
 from adsrental.utils import CustomerIOClient, ShipStationClient
 
@@ -26,7 +26,7 @@ if typing.TYPE_CHECKING:
     from adsrental.models.ec2_instance import EC2Instance
 
 
-class Lead(models.Model, FulltextSearchMixin):
+class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
     """
     Stores a single lead entry, related to :model:`adsrental.RaspberryPi` and
     :model:`adsrental.EC2Instance`.
@@ -149,6 +149,7 @@ class Lead(models.Model, FulltextSearchMixin):
     email = models.CharField(max_length=255, blank=True, null=True, unique=True, help_text='Should be unique')
     note = models.TextField(blank=True, null=True, help_text='Not shown when you hover user name in admin interface.')
     comments = GenericRelation(Comment, blank=True)
+    comments_cache = models.TextField(blank=True, null=True)
     old_status = models.CharField(max_length=40, choices=STATUS_CHOICES, null=True, blank=True, default=None, help_text='Used to restore previous status on Unban action')
     phone = models.CharField(max_length=255, blank=True, null=True, help_text='Formatted phone number')
     account_name = models.CharField(max_length=255, blank=True, null=True, help_text='Obsolete, was used in SF, should be removed')
@@ -520,19 +521,6 @@ class Lead(models.Model, FulltextSearchMixin):
 
     def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
-
-    def add_comment(self, message, user=None):
-        'Add a comment to the model'
-        self.comments.create(user=user, text=message)
-
-    def get_comments(self):
-        res = []
-        for ii in self.comments.order_by('created'):
-            item = f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
-            if ii.response:
-                item += f'\n >> Admin response: {ii.response}'
-            res.append(item)
-        return res
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'

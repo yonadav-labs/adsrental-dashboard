@@ -11,6 +11,8 @@ class Bundler(models.Model):
     '''
     PAYMENT = decimal.Decimal(150.00)
     CHARGEBACK_PAYMENT = decimal.Decimal(50.00)
+    CHARGEBACK_ROLLING_WINDOW_DAYS = 30
+    CHARGEBACK_STREAK = 3
 
     name = models.CharField(max_length=255, unique=True, db_index=True)
     utm_source = models.CharField(max_length=50, db_index=True, null=True, blank=True)
@@ -53,7 +55,7 @@ class Bundler(models.Model):
     amazon_chargeback_30_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 30+ days active accounts.')
     amazon_chargeback_60_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 60+ days active accounts.')
     amazon_chargeback_90_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 90+ days active accounts.')
-    chargeback_streak = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='How many chargebacks bundler can have in rolling 30 days period.')
+    chargeback_streak = models.DecimalField(default=CHARGEBACK_STREAK, help_text='How many chargebacks bundler can have in rolling 30 days period.')
     parent_bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that gets part of the payment')
     second_parent_bundler = models.ForeignKey('adsrental.Bundler', related_name='second_child_bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Second Bundler that gets part of the payment')
     third_parent_bundler = models.ForeignKey('adsrental.Bundler', related_name='third_child_bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Third Bundler that gets part of the payment')
@@ -73,7 +75,7 @@ class Bundler(models.Model):
     def is_chargeback_enabled(self, lead_account):
         now = timezone.localtime(timezone.now())
         chargeback_count = BundlerPayment.objects.filter(
-            create__gt=now - datetime.timedelta(days=30), bundler=self
+            create__gt=now - datetime.timedelta(days=self.CHARGEBACK_ROLLING_WINDOW_DAYS), bundler=self
         ).exclude(lead_account=lead_account).count()
         return chargeback_count <= self.chargeback_streak
 
@@ -86,29 +88,29 @@ class Bundler(models.Model):
 
         active_days = lead_account.get_active_days()
         if lead_account.account_type in lead_account.ACCOUNT_TYPES_FACEBOOK:
-            if active_days >= 90 and self.facebook_chargeback_90_day:
+            if active_days >= 90 and self.facebook_chargeback_90_days is not None:
                 return self.facebook_chargeback_90_days
-            if active_days >= 60 and self.facebook_chargeback_60_day:
+            if active_days >= 60 and self.facebook_chargeback_60_days is not None:
                 return self.facebook_chargeback_60_days
-            if active_days >= 30 and self.facebook_chargeback_30_day:
+            if active_days >= 30 and self.facebook_chargeback_30_days is not None:
                 return self.facebook_chargeback_30_days
             if self.facebook_chargeback:
                 return self.facebook_chargeback
         if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
-            if active_days >= 90 and self.google_chargeback_90_day:
+            if active_days >= 90 and self.google_chargeback_90_days is not None:
                 return self.google_chargeback_90_days
-            if active_days >= 60 and self.google_chargeback_60_day:
+            if active_days >= 60 and self.google_chargeback_60_days is not None:
                 return self.google_chargeback_60_days
-            if active_days >= 30 and self.google_chargeback_30_day:
+            if active_days >= 30 and self.google_chargeback_30_days is not None:
                 return self.google_chargeback_30_days
             if self.google_chargeback:
                 return self.google_chargeback
         if lead_account.account_type == lead_account.ACCOUNT_TYPE_AMAZON:
-            if active_days >= 90 and self.amazon_chargeback_90_day:
+            if active_days >= 90 and self.amazon_chargeback_90_days is not None:
                 return self.amazon_chargeback_90_days
-            if active_days >= 60 and self.amazon_chargeback_60_day:
+            if active_days >= 60 and self.amazon_chargeback_60_days is not None:
                 return self.amazon_chargeback_60_days
-            if active_days >= 30 and self.amazon_chargeback_30_day:
+            if active_days >= 30 and self.amazon_chargeback_30_days is not None:
                 return self.amazon_chargeback_30_days
             if self.amazon_chargeback:
                 return self.amazon_chargeback

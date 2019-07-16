@@ -5,9 +5,10 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 
 from adsrental.models.comment import Comment
+from adsrental.models.mixins import CommentsMixin
 
 
-class LeadAccountIssue(models.Model):
+class LeadAccountIssue(models.Model, CommentsMixin):
     ISSUE_TYPE_WRONG_PASSWORD = 'Wrong Password'
     ISSUE_TYPE_SECURITY_CHECKPOINT = 'Security Checkpoint'
     ISSUE_TYPE_CONNECTION_ISSUE = 'Connection Issue'
@@ -62,14 +63,11 @@ class LeadAccountIssue(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_REPORTED)
     note = models.TextField(default='', blank=True)
     comments = GenericRelation(Comment, blank=True)
+    comments_cache = models.TextField(blank=True, null=True)
     new_value = models.TextField(default='', blank=True)
     reporter = models.ForeignKey('adsrental.User', blank=True, null=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(auto_now=True)
-
-    def add_comment(self, message, user=None):
-        'Add a comment to the model'
-        self.comments.create(user=user, text=message)
 
     def insert_note(self, message, event_datetime=None):
         'Add a text message to note field'
@@ -119,15 +117,6 @@ class LeadAccountIssue(models.Model):
 
     def get_note_lines(self):
         return self.note.split('\n')
-
-    def get_comments(self):
-        res = []
-        for ii in self.comments.order_by('created'):
-            item = f'{ii.created.strftime(settings.SYSTEM_DATETIME_FORMAT)} [{ii}] {ii.text}'
-            if ii.response:
-                item += f'\n >> Admin response: {ii.response}'
-            res.append(item)
-        return res
 
     def get_user_note_email(self, user):
         if not user:

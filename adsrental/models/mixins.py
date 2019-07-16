@@ -2,8 +2,10 @@
 import re
 import datetime
 import typing
+import json
 
 from django.utils import timezone
+from django.conf import settings
 from django.db.models import Q
 
 
@@ -55,3 +57,39 @@ class FulltextSearchMixin():
                 query = query & or_query
 
         return query
+
+
+class CommentsMixin():
+    def get_comments(self):
+        try:
+            comments = json.loads(self.comments_cache)
+        except (ValueError, TypeError):
+            comments = self.get_comments_cache()
+            self.comments_cache = json.dumps(comments)
+            self.save()
+
+        res = []
+        for comment in comments:
+            item = f'{comment["created"]} [{comment["username"]}] {comment["text"]}'
+            if comment["response"]:
+                item += f'\n >> Admin response: {comment["response"]}'
+            res.append(item)
+        return res
+
+    def get_comments_cache(self):
+        result = []
+        for comment in self.comments.all().prefetch_related('user').order_by('created'):
+            result.append(dict(
+                created=comment.created.strftime(settings.SYSTEM_DATETIME_FORMAT),
+                text=comment.text,
+                username=comment.get_username(),
+                is_admin=comment.user.is_superuser,
+                response=comment.response,
+            ))
+        return result
+
+    def add_comment(self, message, user=None):
+        'Add a comment to the model'
+        self.comments.create(user=user, text=message)
+        self.comments_cache = json.dumps(self.get_comments_cache())
+        self.save()

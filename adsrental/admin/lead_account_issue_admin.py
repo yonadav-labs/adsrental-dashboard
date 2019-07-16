@@ -6,10 +6,10 @@ from django.utils.safestring import mark_safe
 
 from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.admin.list_filters import (
-    AbstractIntIDListFilter, 
-    AbstractUIDListFilter, 
-    LeadAccountStatusListFilter, 
-    LeadAccountAccountTypeListFilter, 
+    AbstractIntIDListFilter,
+    AbstractUIDListFilter,
+    LeadAccountStatusListFilter,
+    LeadAccountAccountTypeListFilter,
     ReportedByListFilter
 )
 from adsrental.admin.comment_admin import CommentInline
@@ -75,8 +75,14 @@ class LeadAccountIssueAdmin(admin.ModelAdmin, CSVExporter):
         'created',
         'buttons',
     )
-    inlines = [ CommentInline, ]
-    list_select_related = ('lead_account', 'lead_account__lead', 'lead_account__lead__bundler', 'lead_account__lead__raspberry_pi',)
+    inlines = [CommentInline, ]
+    list_select_related = (
+        'lead_account',
+        'lead_account__lead',
+        'lead_account__lead__bundler',
+        'lead_account__lead__raspberry_pi',
+        'reporter',
+    )
     list_filter = (
         LeadAccountIDListFilter,
         LeadLeadidListFilter,
