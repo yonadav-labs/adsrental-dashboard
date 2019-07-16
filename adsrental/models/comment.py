@@ -8,10 +8,10 @@ class Comment(models.Model):
     "Coments class for Lead, LeadAccount, LeadAccountIssue"
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name="comments", null=True, blank=True)
     text = models.TextField(
-        blank=True, null=True, 
+        blank=True, null=True,
         help_text='Not shown when you hover user name in admin interface.')
     response = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -21,6 +21,15 @@ class Comment(models.Model):
     content_object = GenericForeignKey()
 
     def __str__(self):
+        if self.user:
+            if self.user.is_superuser:
+                return 'Admin'
+            else:
+                return f'{self.user.first_name} {self.user.last_name}'
+        else:
+            return 'User'
+
+    def get_username(self):
         if self.user:
             if self.user.is_superuser:
                 return 'Admin'
