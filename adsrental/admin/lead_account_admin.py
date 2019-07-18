@@ -260,7 +260,7 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
 
     def last_touch(self, obj):
-        if obj.account_type != LeadAccount.ACCOUNT_TYPE_FACEBOOK:
+        if obj.account_type not in LeadAccount.ACCOUNT_TYPES_FACEBOOK:
             return None
 
         return naturaltime(obj.last_touch_date) if obj.last_touch_date else 'Never'
