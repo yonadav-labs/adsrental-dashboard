@@ -78,7 +78,7 @@ class CommentsMixin():
 
     def get_comments_cache(self):
         result = []
-        for comment in self.comments.all().prefetch_related('user').order_by('-created')[:50]:
+        for comment in self.comments.all().select_related('user').order_by('-created')[:50]:
             result.append(dict(
                 created=comment.created.strftime(settings.SYSTEM_DATETIME_FORMAT),
                 text=comment.text,
