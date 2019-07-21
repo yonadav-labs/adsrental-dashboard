@@ -83,7 +83,7 @@ class CommentsMixin():
                 created=comment.created.strftime(settings.SYSTEM_DATETIME_FORMAT),
                 text=comment.text,
                 username=comment.get_username(),
-                is_admin=comment.user.is_superuser,
+                is_admin=comment.user.is_superuser if comment.user else False,
                 response=comment.response,
             ))
         return result
