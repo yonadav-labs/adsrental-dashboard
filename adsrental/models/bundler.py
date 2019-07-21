@@ -88,30 +88,30 @@ class Bundler(models.Model):
 
         active_days = lead_account.get_active_days()
         if lead_account.account_type in lead_account.ACCOUNT_TYPES_FACEBOOK:
-            if active_days >= 90 and self.facebook_chargeback_90_days is not None:
-                return self.facebook_chargeback_90_days
-            if active_days >= 60 and self.facebook_chargeback_60_days is not None:
-                return self.facebook_chargeback_60_days
-            if active_days >= 30 and self.facebook_chargeback_30_days is not None:
-                return self.facebook_chargeback_30_days
+            # if active_days >= 90 and self.facebook_chargeback_90_days is not None:
+            #     return self.facebook_chargeback_90_days
+            # if active_days >= 60 and self.facebook_chargeback_60_days is not None:
+            #     return self.facebook_chargeback_60_days
+            # if active_days >= 30 and self.facebook_chargeback_30_days is not None:
+            #     return self.facebook_chargeback_30_days
             if self.facebook_chargeback:
                 return self.facebook_chargeback
         if lead_account.account_type == lead_account.ACCOUNT_TYPE_GOOGLE:
-            if active_days >= 90 and self.google_chargeback_90_days is not None:
-                return self.google_chargeback_90_days
-            if active_days >= 60 and self.google_chargeback_60_days is not None:
-                return self.google_chargeback_60_days
-            if active_days >= 30 and self.google_chargeback_30_days is not None:
-                return self.google_chargeback_30_days
+            # if active_days >= 90 and self.google_chargeback_90_days is not None:
+            #     return self.google_chargeback_90_days
+            # if active_days >= 60 and self.google_chargeback_60_days is not None:
+            #     return self.google_chargeback_60_days
+            # if\ active_days >= 30 and self.google_chargeback_30_days is not None:
+            #     return self.google_chargeback_30_days
             if self.google_chargeback:
                 return self.google_chargeback
         if lead_account.account_type == lead_account.ACCOUNT_TYPE_AMAZON:
-            if active_days >= 90 and self.amazon_chargeback_90_days is not None:
-                return self.amazon_chargeback_90_days
-            if active_days >= 60 and self.amazon_chargeback_60_days is not None:
-                return self.amazon_chargeback_60_days
-            if active_days >= 30 and self.amazon_chargeback_30_days is not None:
-                return self.amazon_chargeback_30_days
+            # if active_days >= 90 and self.amazon_chargeback_90_days is not None:
+            #     return self.amazon_chargeback_90_days
+            # if active_days >= 60 and self.amazon_chargeback_60_days is not None:
+            #     return self.amazon_chargeback_60_days
+            # if active_days >= 30 and self.amazon_chargeback_30_days is not None:
+            #     return self.amazon_chargeback_30_days
             if self.amazon_chargeback:
                 return self.amazon_chargeback
 
