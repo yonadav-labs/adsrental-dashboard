@@ -55,7 +55,7 @@ class Bundler(models.Model):
     amazon_chargeback_30_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 30+ days active accounts.')
     amazon_chargeback_60_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 60+ days active accounts.')
     amazon_chargeback_90_days = models.DecimalField(default=CHARGEBACK_PAYMENT, max_digits=8, decimal_places=2, help_text='Chargeback value for Amazon 90+ days active accounts.')
-    chargeback_streak = models.DecimalField(default=CHARGEBACK_STREAK, help_text='How many chargebacks bundler can have in rolling 30 days period.')
+    chargeback_streak = models.IntegerField(default=CHARGEBACK_STREAK, help_text='How many chargebacks bundler can have in rolling 30 days period.')
     parent_bundler = models.ForeignKey('adsrental.Bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Bundler that gets part of the payment')
     second_parent_bundler = models.ForeignKey('adsrental.Bundler', related_name='second_child_bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Second Bundler that gets part of the payment')
     third_parent_bundler = models.ForeignKey('adsrental.Bundler', related_name='third_child_bundler', null=True, blank=True, on_delete=models.SET_NULL, help_text='Third Bundler that gets part of the payment')
