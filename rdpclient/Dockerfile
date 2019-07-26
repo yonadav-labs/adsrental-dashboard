@@ -16,7 +16,6 @@ RUN apt-get install -y zlib1g-dev libssl-dev libboost-all-dev libboost-atomic-de
 # RUN apt-get install -y software-properties-common 
 # RUN apt-get install -y pkg-config
 ADD setup.sh ./setup.sh
-RUN echo asd
 RUN ./setup.sh -f
 
 WORKDIR /app/FreeRDP-WebConnect/wsgate/build
