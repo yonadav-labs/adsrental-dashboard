@@ -1,6 +1,7 @@
 import decimal
 
 from django.db import models
+from django.utils import timezone
 
 from adsrental.models.bundler_payment import BundlerPayment
 
