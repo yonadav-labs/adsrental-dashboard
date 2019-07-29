@@ -45,8 +45,8 @@ services:
     expose:
       - "6379"
 
-  # rdpclient:
-  #   build: rdpclient
-  #   command: ./run.sh
-  #   ports:
-  #     - "9999:8000"
+  rdpclient:
+    build: rdpclient
+    command: ./run.sh
+    ports:
+      - "9999:8000"
