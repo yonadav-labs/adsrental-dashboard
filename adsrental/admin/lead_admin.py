@@ -84,8 +84,8 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'touch_count_field',
         'ip_address',
         'wrong_password_field',
-        'security_checkpoint_field',
-        'fix_button',
+        'days_online',
+        'days_offline',
         'sync_with_adsdb_field',
         'facebook_billed',
         'google_billed',
@@ -109,8 +109,8 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'Touch Count',
         'Ip Address',
         'Wrong Password',
-        'Security Checkpoint',
-        'Fix Button',
+        'Days Online',
+        'Days Offline',
         'Sync With Adsdb',
         'Facebook Billed',
         'Google Billed',
@@ -335,6 +335,18 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
 
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
+
+    def days_online(self, obj):
+        if not obj.raspberry_pi.last_seen:
+            return 'Never'
+        now = timezone.now()
+        return (now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24
+
+    def days_offline(self, obj):
+        if not obj.raspberry_pi.last_seen:
+            return 'Never'
+        now = timezone.now()
+        return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
