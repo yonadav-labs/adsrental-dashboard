@@ -151,7 +151,7 @@ class LogView(View):
 
         if reported_hostname is not None and hostname is not None:
             if reported_hostname != hostname:
-                return True, 'Hostname changed'
+                return True, f'Hostname changed from {hostname} to {reported_hostname}'
 
         initial_ip_address = ping_data.get('initial_ip_address')
         ip_address = ping_data.get('ip_address')
