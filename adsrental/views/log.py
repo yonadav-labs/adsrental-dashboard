@@ -156,7 +156,7 @@ class LogView(View):
         initial_ip_address = ping_data.get('initial_ip_address')
         ip_address = ping_data.get('ip_address')
         if initial_ip_address and initial_ip_address != ip_address:
-            return True, 'Device IP address changed'
+            return True, f'Device IP address changed from {initial_ip_address} to {ip_address}'
 
         return False, ''
 
