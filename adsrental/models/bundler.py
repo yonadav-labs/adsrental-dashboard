@@ -1,4 +1,5 @@
 import decimal
+import datetime
 
 from django.db import models
 from django.utils import timezone
@@ -76,7 +77,7 @@ class Bundler(models.Model):
     def is_chargeback_enabled(self, lead_account):
         now = timezone.localtime(timezone.now())
         chargeback_count = BundlerPayment.objects.filter(
-            create__gt=now - datetime.timedelta(days=self.CHARGEBACK_ROLLING_WINDOW_DAYS), bundler=self
+            created__gt=now - datetime.timedelta(days=self.CHARGEBACK_ROLLING_WINDOW_DAYS), bundler=self
         ).exclude(lead_account=lead_account).count()
         return chargeback_count <= self.chargeback_streak
 
