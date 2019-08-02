@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.shortcuts import render
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Value
 from django.db.models.functions import Concat
@@ -56,14 +57,20 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         'lead__raspberry_pi___rpid',
         'account_type',
         'status',
+        'ban_reason',
         'username',
         'bundler_paid',
         'last_touch',
+        'banned_date',
+        'qualified_date',
+        'disqualified_date',
         'lead__raspberry_pi__first_seen',
         'lead__raspberry_pi__last_seen',
         'touch_count',
         'wrong_password_date',
         'security_checkpoint_date',
+        'issues_reported',
+        'issues_reported_dates',
         'created',
     )
     csv_titles = (
@@ -72,14 +79,20 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         'RPID',
         'Type',
         'Status',
+        'Ban Reason',
         'Username',
         'Bundler paid',
         'Last touch',
+        'banned_date',
+        'Qualified Date',
+        'Disqualified Date',
         'First seen',
         'Last seen',
         'Touch count',
         'Wrong password date',
         'Security checkpoint date',
+        'Issues reported',
+        'Issues reported dates',
         'Created',
     )
     csv_filename = 'lead_accounts__{day}_{month}_{year}.csv'
@@ -217,6 +230,22 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
             lead=lead.name(),
             leadid=obj.lead.leadid,
         ))
+
+    def issues_reported(self, obj):
+        result = []
+        for issue in obj.issues.all():
+            result.append('{issue_type} ({reporter}) ({elapsed})'.format(
+                issue_type=issue.issue_type,
+                reporter=str(issue.reporter),
+                elapsed=naturaltime(issue.created)
+            ))
+        return '\n'.join(result)
+
+    def issues_reported_dates(self, obj):
+        result = []
+        for issue in obj.issues.all():
+            result.append(issue.created.strftime(settings.SYSTEM_DATETIME_FORMAT))
+        return '\n'.join(result)
 
     def raspberry_pi_field(self, obj):
         if not obj.lead.raspberry_pi:
