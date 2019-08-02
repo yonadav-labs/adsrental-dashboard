@@ -31,6 +31,7 @@ class BundlerAdmin(admin.ModelAdmin, CSVExporter):
         'amazon_payment_field',
         'parent_bundler',
         'second_parent_bundler',
+        'created'
     )
 
     csv_titles = (
@@ -48,6 +49,7 @@ class BundlerAdmin(admin.ModelAdmin, CSVExporter):
         'Amazon Payment Field',
         'Parent Bundler',
         'Second Parent Bundler',
+        'Created'
     )
 
     list_display = (
