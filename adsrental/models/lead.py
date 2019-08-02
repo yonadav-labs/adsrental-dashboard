@@ -519,6 +519,12 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
 
         return None
 
+    def get_disqualified_date(self) -> typing.Optional[datetime.datetime]:
+        for lead_account in self.lead_accounts.all():
+            return lead_account.disqualified_date
+
+        return None
+
     def is_order_on_hold(self) -> bool:
         return self.shipstation_order_status == Lead.SHIPSTATION_ORDER_STATUS_ON_HOLD
 

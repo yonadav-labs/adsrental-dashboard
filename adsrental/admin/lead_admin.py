@@ -72,10 +72,14 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'status',
         'email_field',
         'phone_field',
+        'street',
+        'city',
+        'state',
+        'postal_code',
         'bundler',
-        'accounts_field',
+        'accounts',
         'raspberry_pi',
-        'tested_field',
+        'tested',
         'usps_field',
         'first_seen',
         'last_seen',
@@ -89,6 +93,11 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'sync_with_adsdb_field',
         'facebook_billed',
         'google_billed',
+        'get_qualified_date',
+        'get_disqualified_date',
+        'issues_reported',
+        'issues_reported_dates',
+        'created'
     )
 
     csv_titles = (
@@ -97,6 +106,10 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'Status',
         'Email',
         'Phone',
+        'Address',
+        'City',
+        'State',
+        'ZIP',
         'Bundler',
         'Accounts',
         'Raspberry Pi',
@@ -114,6 +127,11 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'Sync With Adsdb',
         'Facebook Billed',
         'Google Billed',
+        'Qualified date',
+        'Disqualified date',
+        'Issues reported',
+        'Issues reported dates',
+        'Created'
     )
 
     class Media:
@@ -337,22 +355,28 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
 
     def days_online(self, obj):
-        if not obj.raspberry_pi.last_seen:
-            return 'Never'
-        now = timezone.now()
-        return (now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24
+        if obj.raspberry_pi and obj.raspberry_pi.last_seen:
+            now = timezone.now()
+            return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
+        return None
 
     def days_offline(self, obj):
-        if not obj.raspberry_pi.last_seen:
-            return 'Never'
-        now = timezone.now()
-        return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
+        if obj.raspberry_pi and obj.raspberry_pi.last_seen:
+            now = timezone.now()
+            return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
+        return None
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
             return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(
                 naturaltime(obj.raspberry_pi.first_tested),
             ))
+
+        return None
+
+    def tested(self, obj):
+        if obj.raspberry_pi and obj.raspberry_pi.first_tested:
+            return naturaltime(obj.raspberry_pi.first_tested)
 
         return None
 
@@ -472,6 +496,36 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             ))
 
         return mark_safe(', '.join(result))
+
+    def accounts(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            result.append('{type} {username} ({status})'.format(
+                type=lead_account.get_account_type_display(),
+                username=lead_account.username,
+                status=lead_account.status,
+            ))
+        return '\n'.join(result)
+
+    def issues_reported(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            for issue in lead_account.issues.all():
+                result.append('{type} {username} - ({issue_type}) ({reporter}) ({elapsed})'.format(
+                    type=lead_account.get_account_type_display(),
+                    username=lead_account.username,
+                    issue_type=issue.issue_type,
+                    reporter=str(issue.reporter),
+                    elapsed=naturaltime(issue.created)
+                ))
+        return '\n'.join(result)
+
+    def issues_reported_dates(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            for issue in lead_account.issues.all():
+                result.append(str(issue.created))
+        return '\n'.join(result)
 
     def sync_with_adsdb_field(self, obj):
         for lead_account in obj.lead_accounts.all():
