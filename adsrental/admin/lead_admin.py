@@ -80,9 +80,9 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'accounts',
         'raspberry_pi',
         'tested',
-        'usps_field',
-        'first_seen',
-        'last_seen',
+        'usps_export',
+        'first_seen_export',
+        'last_seen_export',
         'online',
         'ec2instance',
         'touch_count_field',
@@ -294,6 +294,21 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             obj.get_shipstation_order_status_display(),
         ))
 
+    def usps_export(self, obj):
+        if obj.pi_delivered:
+            return '{} - {}'.format(
+                html.escape(obj.usps_tracking_code or 'n/a'),
+                'Delivered',
+            )
+
+        if not obj.shipstation_order_status:
+            return None
+
+        return '{} - {}'.format(
+            html.escape(obj.usps_tracking_code or 'n/a'),
+            obj.get_shipstation_order_status_display(),
+        )
+
     def status_field(self, obj):
         title = 'Show changes'
         return mark_safe('<a href="{url}?lead__leadid={q}" title="{title}">{status}</a>'.format(
@@ -355,16 +370,14 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
 
     def days_online(self, obj):
-        if obj.raspberry_pi and obj.raspberry_pi.last_seen:
+        if obj.raspberry_pi and obj.raspberry_pi.online_since_date:
             now = timezone.now()
-            return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
-        return None
+            return int((now - obj.raspberry_pi.online_since_date).total_seconds() / 3600 / 24)
 
     def days_offline(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.last_seen:
             now = timezone.now()
             return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
-        return None
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
@@ -387,6 +400,13 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         first_seen = obj.raspberry_pi.get_first_seen()
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, first_seen.strftime(settings.HUMAN_DATE_FORMAT)))
 
+    def first_seen_export(self, obj):
+        if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
+            return None
+
+        first_seen = obj.raspberry_pi.get_first_seen()
+        return first_seen.strftime(settings.HUMAN_DATE_FORMAT)
+
     def last_seen(self, obj):
         raspberry_pi = obj.raspberry_pi
         if not raspberry_pi:
@@ -397,6 +417,17 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             return None
 
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
+
+    def last_seen_export(self, obj):
+        raspberry_pi = obj.raspberry_pi
+        if not raspberry_pi:
+            return None
+
+        last_seen = raspberry_pi.get_last_seen()
+        if not last_seen:
+            return None
+
+        return naturaltime(last_seen)
 
     def wrong_password_field(self, obj):
         for lead_account in obj.lead_accounts.all():
@@ -524,7 +555,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         result = []
         for lead_account in obj.lead_accounts.all():
             for issue in lead_account.issues.all():
-                result.append(str(issue.created))
+                result.append(issue.created.strftime(settings.SYSTEM_DATETIME_FORMAT))
         return '\n'.join(result)
 
     def sync_with_adsdb_field(self, obj):
