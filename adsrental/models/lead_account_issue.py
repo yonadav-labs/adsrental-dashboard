@@ -3,9 +3,11 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models.signals import post_save
 
 from adsrental.models.comment import Comment
 from adsrental.models.mixins import CommentsMixin
+from adsrental.models.signals import slack_new_issue
 
 
 class LeadAccountIssue(models.Model, CommentsMixin):
@@ -189,3 +191,6 @@ class LeadAccountIssue(models.Model, CommentsMixin):
             self.ISSUE_TYPE_PHONE_NUMBER_CHANGE,
             self.ISSUE_TYPE_WRONG_PASSWORD,
         ]
+
+
+post_save.connect(slack_new_issue, sender=LeadAccountIssue)
