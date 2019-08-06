@@ -12,6 +12,7 @@ from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
 from adsrental.models.lead_account_issue_image import LeadAccountIssueImage
 from adsrental.forms.admin import ReportIssueForm, ResolveIssueForm
+from adsrental.models.signals import slack_issue_resolved
 
 
 class AdminActionView(View):
@@ -79,6 +80,7 @@ class ResolveLeadAccountIssueView(View):
 
         if lead_account_issue.can_be_resolved():
             if request.POST['action'] == 'resolve':
+                slack_issue_resolved(lead_account_issue)
                 lead_account_issue.resolve(request.user)
             if request.POST['action'] == 'reject':
                 lead_account_issue.reject(request.user)
