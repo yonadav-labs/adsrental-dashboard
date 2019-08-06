@@ -166,6 +166,7 @@ class AutoBanWarningView(View):
 
         lead_accounts = LeadAccount.objects.filter(
             wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
+            wrong_password_date__gt=now - datetime.timedelta(days=days_wrong_password) - datetime.timedelta(hours=1),
             status=LeadAccount.STATUS_IN_PROGRESS,
             active=True,
             auto_ban_enabled=True,
@@ -177,6 +178,7 @@ class AutoBanWarningView(View):
 
         lead_accounts = LeadAccount.objects.filter(
             lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
+            lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(days=days_offline) - datetime.timedelta(hours=1),
             status=LeadAccount.STATUS_IN_PROGRESS,
             active=True,
             auto_ban_enabled=True,
@@ -188,6 +190,7 @@ class AutoBanWarningView(View):
 
         lead_accounts = LeadAccount.objects.filter(
             security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
+            security_checkpoint_date__gt=now - datetime.timedelta(days=days_checkpoint) - datetime.timedelta(hours=1),
             status=LeadAccount.STATUS_IN_PROGRESS,
             active=True,
             auto_ban_enabled=True,
@@ -201,6 +204,7 @@ class AutoBanWarningView(View):
         lead_accounts = LeadAccount.objects.filter(
             status=Lead.STATUS_QUALIFIED,
             lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
+            lead__delivery_date__gt=now - datetime.timedelta(days=days_delivered) - datetime.timedelta(hours=1),
             active=True,
             auto_ban_enabled=True,
         )
