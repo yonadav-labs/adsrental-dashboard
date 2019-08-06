@@ -3,6 +3,7 @@
 0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' -k https://45.55.36.54/cron/sync_ec2/?pending=true\&execute=true >> /root/logs/cron_sync_ec2.log
 0 * * * * bash /root/dashboard/scripts/revive_rpis.sh
 0 0 * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' -k https://45.55.36.54/cron/auto_ban/?execute=true >> /root/logs/cron_auto_ban.log
+0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' -k https://45.55.36.54/cron/auto_ban_warning/
 0 0 * * * bash /root/dashboard/scripts/backup_dev_db.sh
 0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' -k https://45.55.36.54/cron/sync_from_shipstation/?days_ago=1 >> /root/logs/cron_sync_from_shipstation.log
 0 * * * * /usr/bin/curl -w "\n\n\n" -H 'Secret: 26b12d46-619e-404a-bd10-8309938431a7' -k https://45.55.36.54/cron/sync_delivered/ >> /root/logs/cron_sync_delivered.log
