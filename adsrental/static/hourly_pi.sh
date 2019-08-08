@@ -22,6 +22,12 @@ ${HOME}/new-pi/client_log.sh "CPU max: `top -bn1 | head | tail -3 | head -1`"
 ${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
 ${HOME}/new-pi/client_log.sh "=== End top output ==="
 
+if [[ "`ps aux | grep systemd-journald`" != "" ]]; then
+    ${HOME}/new-pi/client_log.sh "Stop systemd: `sudo systemctl --force --force stop systemd-journald.service 2>&1`"
+    ${HOME}/new-pi/client_log.sh "Disable systemd: `sudo systemctl mask systemd-journald.service 2>&1`"
+fi
+
+
 if [[ "`top -bn1 | head | tail -3 | head -1 | grep '100.0'`" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage..."
 fi
