@@ -41,9 +41,12 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         'first_tested',
         'first_seen',
         'last_seen',
+        'days_online',
+        'days_offline',
         'online',
         'uptime',
         'is_proxy_tunnel',
+        'created'
     )
 
     csv_titles = (
@@ -55,9 +58,12 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         'First Tested',
         'First Seen',
         'Last Seen',
+        'Days Online',
+        'Days Offline',
         'Online',
         'Uptime',
         'Is Proxy Tunnel',
+        'Created'
     )
 
     class Media:
@@ -118,6 +124,16 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
 
     def lead_status(self, obj):
         return obj.lead and obj.lead.status
+
+    def days_online(self, obj):
+        if obj.online_since_date:
+            now = timezone.now()
+            return int((now - obj.online_since_date).total_seconds() / 3600 / 24)
+
+    def days_offline(self, obj):
+        if obj.last_seen:
+            now = timezone.now()
+            return int((now - obj.last_seen).total_seconds() / 3600 / 24)
 
     def ec2_instance_link(self, obj):
         ec2_instance = obj.get_ec2_instance()
