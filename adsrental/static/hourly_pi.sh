@@ -22,7 +22,7 @@ ${HOME}/new-pi/client_log.sh "CPU max: `top -bn1 | head | tail -3 | head -1`"
 ${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
 ${HOME}/new-pi/client_log.sh "=== End top output ==="
 
-if [[ "`top -bn1 | head | tail -3 | head -1 | awk '{print $9}'`" == "100.0" ]]; then
+if [[ "`top -bn1 | head | tail -3 | head -1 | grep '100.0' | grep 'systemd'`" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage..."
     ${HOME}/new-pi/client_log.sh "Stop systemd: `sudo systemctl --force --force stop systemd-journald.service 2>&1`"
     ${HOME}/new-pi/client_log.sh "Disable systemd: `sudo systemctl mask systemd-journald.service 2>&1`"
