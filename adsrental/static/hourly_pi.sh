@@ -28,15 +28,13 @@ if [[ "`ps aux | grep systemd-journald`" != "" ]]; then
 fi
 
 
-if [[ "`top -bn1 | head | tail -3 | head -1 | grep '100.0'`" != "" ]]; then
-    ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage..."
+CPU_USAGE="`top -bn1 | head | tail -3 | head -1 | grep '100.0'`"
+if [[ "$CPU_USAGE" != "" ]]; then
+    ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage: ${$CPU_USAGE}"
 fi
 
 if [[ "`top -bn1 | head | tail -3 | grep 'systemd' | grep '100.0'`" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage..."
-    ${HOME}/new-pi/client_log.sh "Stop systemd: `sudo systemctl --force --force stop systemd-journald.service 2>&1`"
-    ${HOME}/new-pi/client_log.sh "Disable systemd: `sudo systemctl mask systemd-journald.service 2>&1`"
-    ${HOME}/new-pi/client_log.sh "`top -bn1 | head`"
     ${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
     ${HOME}/new-pi/client_log.sh "ERROR: Device was not restarted, manual reboot required"
 fi
