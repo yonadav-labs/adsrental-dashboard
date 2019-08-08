@@ -28,9 +28,8 @@ if [[ "`ps aux | grep systemd-journald`" != "" ]]; then
 fi
 
 
-CPU_USAGE="`top -bn1 | head | tail -3 | head -1 | grep '100.0'`"
-if [[ "$CPU_USAGE" != "" ]]; then
-    ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage: ${$CPU_USAGE}"
+if [[ "`top -bn1 | head | tail -3 | head -1 | awk '{if ($9 > 90) print $0}'`" != "" ]]; then
+    ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage!"
 fi
 
 if [[ "`top -bn1 | grep 'systemd' | awk '{if ($9 > 90.0) print $0}'`" != "" ]]; then
