@@ -24,5 +24,5 @@ ${HOME}/new-pi/client_log.sh "=== End top output ==="
 
 if [[ "`top -bn1 | head | tail -3 | head -1 | awk '{print $9}'`" == "100.0" ]]; then
     ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage..."
-    ${HOME}/new-pi/client_log.sh "`sudo shutdown -r now`"
+    ${HOME}/new-pi/client_log.sh "OUT: `sudo shutdown -r now`"
 fi
