@@ -283,7 +283,14 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
         return - bundler.get_chargeback(self)
 
     def get_active_days(self):
-        return 0
+        if not self.qualified_date:
+            return 0
+
+        if self.banned_date:
+            return (self.banned_date - self.qualified_date).days
+
+        now = timezone.localtime(timezone.now())
+        return (now - self.qualified_date).days
 
     def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
