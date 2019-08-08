@@ -282,6 +282,9 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
 
         return - bundler.get_chargeback(self)
 
+    def get_active_days(self):
+        return 0
+
     def get_parent_bundler_payment(self, bundler: Bundler) -> decimal.Decimal:
         result = decimal.Decimal('0.00')
         if bundler.parent_bundler and self.status == LeadAccount.STATUS_IN_PROGRESS and not self.bundler_paid:
