@@ -33,8 +33,14 @@ if [[ "$CPU_USAGE" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "WARNING: High CPU usage: ${$CPU_USAGE}"
 fi
 
-if [[ "`top -bn1 | head | tail -3 | grep 'systemd' | grep '100.0'`" != "" ]]; then
-    ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage..."
+if [[ "`top -bn1 | grep 'systemd' | awk '{if ($9 > 90.0) print $0}'`" != "" ]]; then
+    ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage by systemd..."
+    ${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
+    ${HOME}/new-pi/client_log.sh "ERROR: Device was not restarted, manual reboot required"
+fi
+
+if [[ "`top -bn1 | grep 'dhcp' | awk '{if ($9 > 90.0) print $0}'`" != "" ]]; then
+    ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage DHCP helper..."
     ${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
     ${HOME}/new-pi/client_log.sh "ERROR: Device was not restarted, manual reboot required"
 fi
