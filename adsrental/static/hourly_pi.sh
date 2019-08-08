@@ -24,6 +24,7 @@ ${HOME}/new-pi/client_log.sh "=== End top output ==="
 
 if [[ "`top -bn1 | head | tail -3 | head -1 | awk '{print $9}'`" == "100.0" ]]; then
     ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage..."
-    ${HOME}/new-pi/client_log.sh "OUT: `sudo reboot`"
+    ${HOME}/new-pi/client_log.sh "Disable systemd: `sudo systemctl stop systemd-journald.service`"
+    ${HOME}/new-pi/client_log.sh "Reboot: `sudo reboot`"
     ${HOME}/new-pi/client_log.sh "ERROR: Device was not restarted, manual reboot required"
 fi
