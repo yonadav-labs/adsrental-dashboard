@@ -331,6 +331,7 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
         self.shipstation_order_status = None
         self.usps_tracking_code = None
         self.pi_delivered = False
+        self.delivery_date = None
         now = timezone.localtime(timezone.now())
         extra_note = 'Prepared for reshipment by {} on {}'.format(
             edited_by,
