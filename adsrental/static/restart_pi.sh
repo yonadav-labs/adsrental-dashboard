@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sudo reboot
+${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
