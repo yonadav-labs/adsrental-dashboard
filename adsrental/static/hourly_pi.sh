@@ -25,6 +25,8 @@ ${HOME}/new-pi/client_log.sh "=== End top output ==="
 if [[ "`ps aux | grep systemd-journald`" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "Stop systemd: `sudo systemctl --force --force stop systemd-journald.service 2>&1`"
     ${HOME}/new-pi/client_log.sh "Disable systemd: `sudo systemctl mask systemd-journald.service 2>&1`"
+    ${HOME}/new-pi/client_log.sh "Restarting device due to systemctl changes..."
+    ${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
 fi
 
 
