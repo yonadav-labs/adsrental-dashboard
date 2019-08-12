@@ -42,6 +42,6 @@ fi
 
 if [[ "`top -bn1 | grep 'dhcp' | awk '{if ($9 > 90.0) print $0}'`" != "" ]]; then
     ${HOME}/new-pi/client_log.sh "Restarting device due to high CPU usage DHCP helper..."
-    ${HOME}/new-pi/client_log.sh "Reboot: `sudo systemctl --force --force reboot 2>&1`"
+    ${HOME}/new-pi/client_log.sh "Reboot: `sudo reboot 2>&1`"
     ${HOME}/new-pi/client_log.sh "ERROR: Device was not restarted, manual reboot required"
 fi
