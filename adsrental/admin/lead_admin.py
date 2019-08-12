@@ -731,7 +731,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
-                messages.warning(request, 'Lead {} does not haave RaspberryPi assigned, skipping'.format(lead.email))
+                messages.warning(request, 'Lead {} does not have RaspberryPi assigned, skipping'.format(lead.email))
                 continue
 
             lead.raspberry_pi.restart_required = True
