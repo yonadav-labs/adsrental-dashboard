@@ -357,11 +357,13 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
         return mark_safe(', '.join(result))
 
     def approve_account(self, request, queryset):
+        now = timezone.localtime(timezone.now())
         for lead_account in queryset:
             if lead_account.status != LeadAccount.STATUS_NEEDS_APPROVAL:
                 messages.info(request, f'Lead Account {lead_account} should be in Neeads Approval status.')
                 continue
             lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+            lead_account.in_progress_date = now
             lead_account.save()
             if lead_account.lead.status == Lead.STATUS_NEEDS_APPROVAL:
                 lead_account.lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
