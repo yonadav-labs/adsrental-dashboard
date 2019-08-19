@@ -73,3 +73,14 @@ def slack_new_report(bundler, report_id):
         slack = SlackBot()
         message = f"New report({url}) is generated."
         slack.send_message(to, message)
+
+
+def slack_daily_account_issues(lead, issue_type, issues):
+    to = lead.bundler.slack_tag
+    rpid = lead.raspberry_pi_id
+    message = f"Accounts with the issue ({issue_type}) for today.\n"
+    message += f"RPID: {rpid}\n"
+    message += f"https://adsrental.com/dashboard/?search={rpid}"
+    message += '\n'.join([issue.lead_account.account_type for issue in issues])
+    slack = SlackBot()
+    slack.send_message(to, message)

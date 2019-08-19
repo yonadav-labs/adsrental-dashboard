@@ -13,6 +13,7 @@ from adsrental.views.cron.sync_adsdb import SyncAdsDBView
 from adsrental.views.cron.fix_primary import FixPrimaryView
 from adsrental.views.cron.event_not_qualified import EventNotQualifiedView
 from adsrental.views.cron.generate_bundler_bonuses import GenerateBundlerBonusesView
+from adsrental.views.cron.slack_daily_account_status import DailyAccountStatusView
 
 
 urlpatterns = [  # pylint: disable=C0103
@@ -24,6 +25,7 @@ urlpatterns = [  # pylint: disable=C0103
     path('update_ping/', UpdatePingView.as_view(), name='cron_update_ping'),
     path('auto_ban/', AutoBanView.as_view(), name='cron_auto_ban'),
     path('auto_ban_warning/', AutoBanWarningView.as_view(), name='cron_auto_ban_warning'),
+    path('slack_daily_account_status/', DailyAccountStatusView.as_view(), name='slack_daily_account_status'),
     path('check_ec2/', CheckEC2View.as_view(), name='cron_check_ec2'),
     path('bundler_lead_stat/', BundlerLeadStatsCalculateView.as_view(), name='cron_bundler_lead_stat'),
     path('sync_adsdb/', SyncAdsDBView.as_view(), name='cron_sync_adsdb'),
