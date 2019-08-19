@@ -19,6 +19,10 @@ from adsrental.models.lead_change import LeadChange
 from adsrental.models.mixins import FulltextSearchMixin, CommentsMixin
 from adsrental.models.comment import Comment
 from adsrental.utils import CustomerIOClient, ShipStationClient
+from adsrental.models.signals import (
+    slack_new_tracking_number,
+    slack_pii_delivered
+)
 
 
 if typing.TYPE_CHECKING:
@@ -426,6 +430,7 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
             CustomerIOClient().send_lead_event(self, CustomerIOClient.EVENT_SHIPPED, tracking_code=self.usps_tracking_code)
             # self.pi_delivered = True
             self.save()
+            slack_new_tracking_number(self)
 
     def update_pi_delivered(self, pi_delivered: bool, tracking_info_xml: str) -> None:
         'Set pi_delivered and tracking_info'
@@ -442,6 +447,7 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
                     self.delivery_date = parser.parse(dates[0]).date()
                 except ValueError:
                     pass
+            slack_pii_delivered(self)
         else:
             self.delivery_date = None
 

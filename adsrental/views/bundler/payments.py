@@ -1,6 +1,6 @@
-import datetime
 import io
 import decimal
+import datetime
 
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
@@ -20,6 +20,7 @@ from adsrental.models.bundler import Bundler
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.bundler_payment import BundlerPayment
 from adsrental.models.bundler_payments_report import BundlerPaymentsReport
+from adsrental.models.signals import slack_new_report
 
 
 class BundlerPaymentsView(View):
@@ -169,10 +170,10 @@ class BundlerPaymentsView(View):
             )
             report.save()
             for bundler_payment in bundler_payments.filter(payment_type__in=[
-                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
-                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
-                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
-                    BundlerPayment.PAYMENT_TYPE_ACCOUNT_THIRD_PARENT,
+                BundlerPayment.PAYMENT_TYPE_ACCOUNT_MAIN,
+                BundlerPayment.PAYMENT_TYPE_ACCOUNT_PARENT,
+                BundlerPayment.PAYMENT_TYPE_ACCOUNT_SECOND_PARENT,
+                BundlerPayment.PAYMENT_TYPE_ACCOUNT_THIRD_PARENT,
             ]):
                 lead_account = bundler_payment.lead_account
                 if not lead_account.bundler_paid:
@@ -190,6 +191,9 @@ class BundlerPaymentsView(View):
                     lead_account = chargeback.lead_account
                     lead_account.charge_back_billed = True
                     lead_account.save()
+
+            if bundler_id:
+                slack_new_report(available_bundlers[0], report.id)
 
             messages.success(request, 'New report was successfully generated')
             if request.user.is_bookkeeper():
