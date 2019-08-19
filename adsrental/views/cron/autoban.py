@@ -9,7 +9,10 @@ from django.db.models import Q
 from adsrental.models.lead import Lead
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.user import User
-from adsrental.models.signals import slack_auto_ban_warning
+from adsrental.models.signals import (
+    slack_auto_ban_warning,
+    slack_offline_warning
+)
 
 
 class AutoBanView(View):
@@ -159,14 +162,64 @@ class AutoBanWarningView(View):
     '''
     def get(self, request):
         now = timezone.localtime(timezone.now())
-        days_wrong_password = LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD - 2
-        days_offline = LeadAccount.AUTO_BAN_DAYS_OFFLINE - 2
-        days_checkpoint = LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT - 2
-        days_delivered = LeadAccount.AUTO_BAN_DAYS_NOT_USED - 2
+        for days_diff in [2, 1]:
+            days_wrong_password = LeadAccount.AUTO_BAN_DAYS_WRONG_PASSWORD - days_diff
+            days_offline = LeadAccount.AUTO_BAN_DAYS_OFFLINE - days_diff
+            days_checkpoint = LeadAccount.AUTO_BAN_DAYS_SEC_CHECKPOINT - days_diff
+            days_delivered = LeadAccount.AUTO_BAN_DAYS_NOT_USED - days_diff
 
+            lead_accounts = LeadAccount.objects.filter(
+                wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
+                wrong_password_date__gt=now - datetime.timedelta(days=days_wrong_password) - datetime.timedelta(hours=1),
+                status=LeadAccount.STATUS_IN_PROGRESS,
+                active=True,
+                auto_ban_enabled=True,
+            )
+            lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
+                                                 | Q(disable_auto_ban_until__lte=now))
+            for lead_account in lead_accounts:
+                slack_auto_ban_warning(lead_account, f'WRONG PASSWORD FOR {days_wrong_password} days', days_diff)
+
+            lead_accounts = LeadAccount.objects.filter(
+                lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
+                lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(days=days_offline) - datetime.timedelta(hours=1),
+                status=LeadAccount.STATUS_IN_PROGRESS,
+                active=True,
+                auto_ban_enabled=True,
+            )
+            lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
+                                                 | Q(disable_auto_ban_until__lte=now))
+            for lead_account in lead_accounts:
+                slack_auto_ban_warning(lead_account, f'OFFLINE FOR {days_offline} days', days_diff)
+
+            lead_accounts = LeadAccount.objects.filter(
+                security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
+                security_checkpoint_date__gt=now - datetime.timedelta(days=days_checkpoint) - datetime.timedelta(hours=1),
+                status=LeadAccount.STATUS_IN_PROGRESS,
+                active=True,
+                auto_ban_enabled=True,
+            )
+            lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
+                                                 | Q(disable_auto_ban_until__lte=now))
+
+            for lead_account in lead_accounts:
+                slack_auto_ban_warning(lead_account, f'SECURITY CHECKPOINT FOR {days_checkpoint} days', days_diff)
+
+            lead_accounts = LeadAccount.objects.filter(
+                status=Lead.STATUS_QUALIFIED,
+                lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
+                lead__delivery_date__gt=now - datetime.timedelta(days=days_delivered) - datetime.timedelta(hours=1),
+                active=True,
+                auto_ban_enabled=True,
+            )
+            lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
+                                                 | Q(disable_auto_ban_until__lte=now))
+            for lead_account in lead_accounts.select_related('lead'):
+                slack_auto_ban_warning(lead_account, f'NOT USED FOR {days_delivered} days', days_diff)
+
+        # 2 hours offline warning
         lead_accounts = LeadAccount.objects.filter(
-            wrong_password_date__lte=now - datetime.timedelta(days=days_wrong_password),
-            wrong_password_date__gt=now - datetime.timedelta(days=days_wrong_password) - datetime.timedelta(hours=1),
+            lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(hours=2),
             status=LeadAccount.STATUS_IN_PROGRESS,
             active=True,
             auto_ban_enabled=True,
@@ -174,43 +227,7 @@ class AutoBanWarningView(View):
         lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
                                              | Q(disable_auto_ban_until__lte=now))
         for lead_account in lead_accounts:
-            slack_auto_ban_warning(lead_account, f'WRONG PASSWORD FOR {days_wrong_password} days')
+            slack_offline_warning(lead_account)
 
-        lead_accounts = LeadAccount.objects.filter(
-            lead__raspberry_pi__last_seen__lte=now - datetime.timedelta(days=days_offline),
-            lead__raspberry_pi__last_seen__gt=now - datetime.timedelta(days=days_offline) - datetime.timedelta(hours=1),
-            status=LeadAccount.STATUS_IN_PROGRESS,
-            active=True,
-            auto_ban_enabled=True,
-        )
-        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
-                                             | Q(disable_auto_ban_until__lte=now))
-        for lead_account in lead_accounts:
-            slack_auto_ban_warning(lead_account, f'OFFLINE FOR {days_offline} days')
-
-        lead_accounts = LeadAccount.objects.filter(
-            security_checkpoint_date__lte=now - datetime.timedelta(days=days_checkpoint),
-            security_checkpoint_date__gt=now - datetime.timedelta(days=days_checkpoint) - datetime.timedelta(hours=1),
-            status=LeadAccount.STATUS_IN_PROGRESS,
-            active=True,
-            auto_ban_enabled=True,
-        )
-        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
-                                             | Q(disable_auto_ban_until__lte=now))
-
-        for lead_account in lead_accounts:
-            slack_auto_ban_warning(lead_account, f'SECURITY CHECKPOINT FOR {days_checkpoint} days')
-
-        lead_accounts = LeadAccount.objects.filter(
-            status=Lead.STATUS_QUALIFIED,
-            lead__delivery_date__lte=now - datetime.timedelta(days=days_delivered),
-            lead__delivery_date__gt=now - datetime.timedelta(days=days_delivered) - datetime.timedelta(hours=1),
-            active=True,
-            auto_ban_enabled=True,
-        )
-        lead_accounts = lead_accounts.filter(Q(disable_auto_ban_until__isnull=True)
-                                             | Q(disable_auto_ban_until__lte=now))
-        for lead_account in lead_accounts.select_related('lead'):
-            slack_auto_ban_warning(lead_account, f'NOT USED FOR {days_delivered} days')
 
         return JsonResponse({})
