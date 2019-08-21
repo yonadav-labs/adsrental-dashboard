@@ -365,9 +365,10 @@ class LeadAccountAdmin(admin.ModelAdmin, CSVExporter):
             lead_account.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
             lead_account.in_progress_date = now
             lead_account.save()
-            if lead_account.lead.status == Lead.STATUS_NEEDS_APPROVAL:
-                lead_account.lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
-                lead_account.lead.save()
+            lead = lead_account.lead
+            if lead.status == Lead.STATUS_NEEDS_APPROVAL:
+                lead.set_status(LeadAccount.STATUS_IN_PROGRESS, request.user)
+                lead.save()
             messages.info(request, f'Lead Account {lead_account} approved and moved to In-Progress.')
 
     def mark_as_qualified(self, request, queryset):
