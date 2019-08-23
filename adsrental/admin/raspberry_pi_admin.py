@@ -88,7 +88,7 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         'uptime',
         'is_proxy_tunnel',
         'proxy_hostname',
-        'proxy_delay',
+        'proxy_delay_field',
         # 'proxy_hostname',
         # 'rtunnel_port',
         # 'tunnel_online',
@@ -137,6 +137,16 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         if obj.last_seen:
             now = timezone.now()
             return int((now - obj.last_seen).total_seconds() / 3600 / 24)
+
+    def proxy_delay_field(self, obj):
+        if obj.proxy_delay is None:
+            return 'Not measured'
+        if obj.proxy_delay < 2.0:
+            return f'Good ({round(obj.proxy_delay, 2)}s)'
+        if obj.proxy_delay < 5.0:
+            return f'Slow ({round(obj.proxy_delay, 2)}s)'
+        if obj.proxy_delay < 900.0:
+            return 'Unreachable'
 
     def ec2_instance_link(self, obj):
         ec2_instance = obj.get_ec2_instance()
@@ -299,3 +309,6 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
     last_seen_field.admin_order_field = 'last_seen'
 
     uptime.admin_order_field = 'online_since_date'
+
+    proxy_delay_field.short_description = 'Proxy delay'
+    proxy_delay_field.admin_order_field = 'proxy_delay'
