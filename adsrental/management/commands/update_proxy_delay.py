@@ -31,6 +31,7 @@ class Command(BaseCommand):
         parser.add_argument('--min-delay', type=int, default=0)
         parser.add_argument('--threads', type=int, default=10)
         parser.add_argument('--limit', type=int, default=100)
+        parser.add_argument('--fix', action='store_true')
 
     def runner(self, raspberry_pi: RaspberryPi) -> Tuple[RaspberryPi, float, datetime.datetime]:
         now = timezone.localtime(timezone.now())
@@ -44,6 +45,7 @@ class Command(BaseCommand):
         min_delay = int(options['min_delay'])
         threads = int(options['threads'])
         limit = int(options['limit'])
+        fix_dead = bool(options['fix'])
         raspberry_pis = RaspberryPi.get_objects_online()
         raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
         raspberry_pis = raspberry_pis.order_by('proxy_delay_datetime')
@@ -56,5 +58,9 @@ class Command(BaseCommand):
         for raspberry_pi, proxy_delay, check_date in results:
             raspberry_pi.proxy_delay = proxy_delay
             raspberry_pi.proxy_delay_datetime = check_date
+            if fix_dead and proxy_delay > 800.0:
+                raspberry_pi.reassign_proxy()
+                self.logger.info(f'{raspberry_pi} switched to {raspberry_pi.get_proxy_hostname_display()}')
+
             raspberry_pi.save()
         self.logger.info(f'Done')

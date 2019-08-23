@@ -350,6 +350,14 @@ class RaspberryPi(models.Model):
             timeout=5,
         )
 
+    def reassign_proxy(self) -> None:
+        self.reset_cache()
+        self.assign_proxy_hostname()
+        self.assign_tunnel_ports()
+        self.new_config_required = True
+        self.proxy_delay = None
+        self.proxy_delay_datetime = None
+
     def get_unique_ips(self) -> typing.List[str]:
         last_log = self.get_last_log(tail=1000)
         ips = list(set(re.findall(r'\d+\.\d+\.\d+\.\d+', last_log)))
