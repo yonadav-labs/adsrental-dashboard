@@ -7,6 +7,7 @@ from typing import Tuple
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Q
 
 from adsrental.models.raspberry_pi import RaspberryPi
 
@@ -27,7 +28,7 @@ class Command(BaseCommand):
         self.logger = logger
 
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
-        parser.add_argument('--set', action='store_true')
+        parser.add_argument('--min-delay', type=int, default=0)
         parser.add_argument('--threads', type=int, default=10)
         parser.add_argument('--limit', type=int, default=100)
 
@@ -40,13 +41,11 @@ class Command(BaseCommand):
         return (raspberry_pi, proxy_delay, now)
 
     def handle(self, *args: str, **options: str) -> None:
-        update_set = bool(options['set'])
+        min_delay = int(options['min_delay'])
         threads = int(options['threads'])
         limit = int(options['limit'])
         raspberry_pis = RaspberryPi.get_objects_online()
-
-        if not update_set:
-            raspberry_pis = raspberry_pis.filter(proxy_delay__isnull=True)
+        raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
         raspberry_pis = raspberry_pis.order_by('proxy_delay_datetime')
         raspberry_pis_limited = raspberry_pis[:limit]
         self.logger.info(f'Total {raspberry_pis.count()}, limited to {raspberry_pis_limited.count()}')
