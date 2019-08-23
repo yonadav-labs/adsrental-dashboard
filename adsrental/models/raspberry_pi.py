@@ -132,22 +132,15 @@ class RaspberryPi(models.Model):
         except RaspberryPi.lead.RelatedObjectDoesNotExist:  # pylint: disable=E1101
             return None
 
-    def update_proxy_delay(self) -> float:
+    def get_proxy_delay(self) -> float:
         try:
             response = self.check_proxy_tunnel()
         except requests.ConnectionError:
-            self.proxy_delay = 999
-            self.save()
-            return self.proxy_delay
+            return 999.0
         except requests.exceptions.RequestException:
-            self.proxy_delay = 899
-            self.save()
-            return self.proxy_delay
+            return 899.0
 
-        response_seconds = response.elapsed.total_seconds()
-        self.proxy_delay = response_seconds
-        self.save()
-        return self.proxy_delay
+        return response.elapsed.total_seconds()
 
     def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         lead = self.get_lead()

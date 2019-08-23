@@ -25,7 +25,9 @@ class ProxyTunnelInfoView(View):
         if unique_ips_count > 9:
             messages.warning(request, f'This device is changing IP addresses to often, connection can be unstable. {unique_ips_count} IP changes detected.')
 
-        proxy_delay = raspberry_pi.update_proxy_delay()
+        proxy_delay = raspberry_pi.get_proxy_delay()
+        raspberry_pi.proxy_delay = proxy_delay
+        raspberry_pi.save()
 
         if proxy_delay < 3:
             messages.success(request, f'Proxy tunnel responded in {round(proxy_delay, 2)} seconds, so it is stable.')
