@@ -34,8 +34,9 @@ class Command(BaseCommand):
     def runner(self, raspberry_pi: RaspberryPi) -> Tuple[RaspberryPi, float, datetime.datetime]:
         now = timezone.localtime(timezone.now())
         old_proxy_delay = raspberry_pi.proxy_delay
+        old_proxy_delay_str = f'{round(old_proxy_delay, 2)}s' if old_proxy_delay else 'n/a'
         proxy_delay = raspberry_pi.get_proxy_delay()
-        self.logger.info(f'{raspberry_pi} - {old_proxy_delay or "- "}s -> {proxy_delay}s on {raspberry_pi.get_proxy_hostname_display()}')
+        self.logger.info(f'{raspberry_pi} - {old_proxy_delay_str} -> {round(proxy_delay, 2)}s on {raspberry_pi.get_proxy_hostname_display()}')
         return (raspberry_pi, proxy_delay, now)
 
     def handle(self, *args: str, **options: str) -> None:
