@@ -1010,7 +1010,7 @@ class ProxyDelayFilter(SimpleListFilter):
             ('good', 'Good'),
             ('slow', 'Buyers'),
             ('unusable', 'Unusable'),
-            ('unreachable', 'Admin'),
+            ('unreachable', 'Unreachable'),
             ('set', 'Measured'),
             ('unset', 'Not measured'),
         )
@@ -1036,7 +1036,7 @@ class ProxyDelayFilter(SimpleListFilter):
         if self.value() == 'unreachable':
             return queryset.filter(
                 proxy_delay__isnull=False,
-                proxy_delay__gl=900.0,
+                proxy_delay__gt=900.0,
             )
         if self.value() == 'set':
             return queryset.filter(
