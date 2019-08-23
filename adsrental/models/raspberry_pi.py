@@ -90,6 +90,7 @@ class RaspberryPi(models.Model):
     proxy_hostname = models.CharField(choices=PROXY_HOSTNAME_CHOICES, max_length=50, default=TUNNEL_HOST, help_text='Hostname tunnel to proxykeeper')
     proxy_password = models.CharField(max_length=50, default=TUNNEL_PASSWORD, help_text='Hostname password for proxykeeper user')
     proxy_delay = models.FloatField(null=True, blank=True, default=None, help_text='Proxy response from tunnel')
+    proxy_delay_datetime = models.DateTimeField(blank=True, null=True, help_text='Date of tunnel last check')
     restart_required = models.BooleanField(default=False)
     new_config_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)

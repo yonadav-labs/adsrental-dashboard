@@ -27,6 +27,7 @@ class ProxyTunnelInfoView(View):
 
         proxy_delay = raspberry_pi.get_proxy_delay()
         raspberry_pi.proxy_delay = proxy_delay
+        raspberry_pi.proxy_delay_datetime = now
         raspberry_pi.save()
 
         if proxy_delay < 3:
