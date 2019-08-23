@@ -68,6 +68,8 @@ class RaspberryPi(models.Model):
         ('138.197.197.65', 'Proxykeeper3', ),
         ('157.230.146.152', 'Proxykeeper4', ),
         ('157.230.155.97', 'Proxykeeper5', ),
+        ('134.209.52.3', 'Proxykeeper6', ),
+        ('68.183.163.172', 'Proxykeeper7', ),
     )
 
     # lead = models.OneToOneField('adsrental.Lead', blank=True, null=True, help_text='Corresponding lead', on_delete=models.SET_NULL, related_name='raspberry_pis', related_query_name='raspberry_pi')
