@@ -99,7 +99,7 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         RpidListFilter,
         ProxyDelayFilter,
         'proxy_hostname'
-        'proxy_delay'
+        'proxy_delay',
         'is_proxy_tunnel',
         'proxy_hostname',
     )
