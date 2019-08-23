@@ -146,6 +146,8 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         if obj.proxy_delay < 5.0:
             return f'Slow ({round(obj.proxy_delay, 2)}s)'
         if obj.proxy_delay < 900.0:
+            return 'Unusable'
+        if obj.proxy_delay < 1000.0:
             return 'Unreachable'
 
     def ec2_instance_link(self, obj):
