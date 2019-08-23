@@ -132,20 +132,20 @@ class RaspberryPi(models.Model):
 
     def update_proxy_delay(self) -> float:
         try:
-            response = raspberry_pi.check_proxy_tunnel()
+            response = self.check_proxy_tunnel()
         except requests.ConnectionError:
-            raspberry_pi.proxy_delay = 999
-            raspberry_pi.save()
-            return raspberry_pi.proxy_delay
+            self.proxy_delay = 999
+            self.save()
+            return self.proxy_delay
         except requests.exceptions.RequestException:
-            raspberry_pi.proxy_delay = 899
-            raspberry_pi.save()
-            return raspberry_pi.proxy_delay
+            self.proxy_delay = 899
+            self.save()
+            return self.proxy_delay
 
         response_seconds = response.elapsed.total_seconds()
-        raspberry_pi.proxy_delay = response_seconds
-        raspberry_pi.save()
-        return raspberry_pi.proxy_delay
+        self.proxy_delay = response_seconds
+        self.save()
+        return self.proxy_delay
 
     def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         lead = self.get_lead()
