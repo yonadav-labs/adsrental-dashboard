@@ -1008,7 +1008,7 @@ class ProxyDelayFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('good', 'Good'),
-            ('slow', 'Buyers'),
+            ('slow', 'Slow'),
             ('unusable', 'Unusable'),
             ('unreachable', 'Unreachable'),
             ('set', 'Measured'),
