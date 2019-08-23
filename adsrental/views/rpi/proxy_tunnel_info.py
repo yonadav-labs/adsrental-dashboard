@@ -28,9 +28,9 @@ class ProxyTunnelInfoView(View):
         proxy_delay = raspberry_pi.update_proxy_delay()
 
         if proxy_delay < 3:
-            messages.success(request, f'Proxy tunnel responded in {round(response_seconds, 2)} seconds, so it is stable.')
+            messages.success(request, f'Proxy tunnel responded in {round(proxy_delay, 2)} seconds, so it is stable.')
         elif proxy_delay < 100:
-            messages.error(request, f'Proxy tunnel responded in {round(response_seconds, 2)} seconds. MLA can reject this tunnel.')
+            messages.error(request, f'Proxy tunnel responded in {round(proxy_delay, 2)} seconds. MLA can reject this tunnel.')
         elif proxy_delay < 900:
             messages.error(request, 'Proxy tunnel did not respond in 5 seconds. User internet connection might be too slow.')
         else:
