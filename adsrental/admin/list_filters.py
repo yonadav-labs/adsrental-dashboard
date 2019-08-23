@@ -993,11 +993,52 @@ class ReportedByListFilter(SimpleListFilter):
                 reporter__is_superuser=True
             )
         elif self.value() == 'buyer':
-            ids = [ii.id for ii in queryset 
-                    if ii.reporter and ii.reporter.groups.filter(name='Buyer').exists()]
+            ids = [ii.id for ii in queryset if ii.reporter and ii.reporter.groups.filter(name='Buyer').exists()]
             return queryset.filter(id__in=ids)
         elif self.value() == 'bundler':
-            ids = [ii.id for ii in queryset 
-                    if ii.reporter and ii.reporter.groups.filter(name='Bundler').exists()]
+            ids = [ii.id for ii in queryset if ii.reporter and ii.reporter.groups.filter(name='Bundler').exists()]
             return queryset.filter(id__in=ids)
+        return queryset
+
+
+class ProxyDelayFilter(SimpleListFilter):
+    parameter_name = 'proxy_delay'
+    title = 'Proxy delay'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('good', 'Good'),
+            ('slow', 'Buyers'),
+            ('unusable', 'Unusable'),
+            ('unreachable', 'Admin'),
+            ('unset', 'Not measured'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'good':
+            return queryset.filter(
+                proxy_delay__isnull=False,
+                proxy_delay__lte=2.0,
+            )
+        if self.value() == 'slow':
+            return queryset.filter(
+                proxy_delay__isnull=False,
+                proxy_delay__gt=2.0,
+                proxy_delay__lte=5.0,
+            )
+        if self.value() == 'unusable':
+            return queryset.filter(
+                proxy_delay__isnull=False,
+                proxy_delay__gte=5.0,
+                proxy_delay__lt=900.0,
+            )
+        if self.value() == 'unreachable':
+            return queryset.filter(
+                proxy_delay__isnull=False,
+                proxy_delay__gl=900.0,
+            )
+        if self.value() == 'unset':
+            return queryset.filter(
+                proxy_delay__isnull=True,
+            )
         return queryset

@@ -10,7 +10,7 @@ from django.db.models.functions import Concat
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter
+from adsrental.admin.list_filters import OnlineListFilter, VersionListFilter, AbstractUIDListFilter, ProxyDelayFilter
 from adsrental.admin.base import CSVExporter
 
 
@@ -97,6 +97,9 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
         OnlineListFilter,
         VersionListFilter,
         RpidListFilter,
+        ProxyDelayFilter,
+        'proxy_hostname'
+        'proxy_delay'
         'is_proxy_tunnel',
         'proxy_hostname',
     )

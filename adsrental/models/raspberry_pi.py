@@ -87,6 +87,7 @@ class RaspberryPi(models.Model):
     rtunnel_port = models.PositiveIntegerField(null=True, blank=True, unique=True, help_text='Port to create a reverse tunnel from proxykeeper')
     proxy_hostname = models.CharField(choices=PROXY_HOSTNAME_CHOICES, max_length=50, default=TUNNEL_HOST, help_text='Hostname tunnel to proxykeeper')
     proxy_password = models.CharField(max_length=50, default=TUNNEL_PASSWORD, help_text='Hostname password for proxykeeper user')
+    proxy_delay = models.FloatField(null=True, blank=True, default=None, help_text='Proxy response from tunnel')
     restart_required = models.BooleanField(default=False)
     new_config_required = models.BooleanField(default=False)
     version = models.CharField(max_length=20, blank=True, null=True)
@@ -128,6 +129,23 @@ class RaspberryPi(models.Model):
             return self.lead  # pylint: disable=E1101
         except RaspberryPi.lead.RelatedObjectDoesNotExist:  # pylint: disable=E1101
             return None
+
+    def update_proxy_delay(self) -> float:
+        try:
+            response = raspberry_pi.check_proxy_tunnel()
+        except requests.ConnectionError:
+            raspberry_pi.proxy_delay = 999
+            raspberry_pi.save()
+            return raspberry_pi.proxy_delay
+        except requests.exceptions.RequestException:
+            raspberry_pi.proxy_delay = 899
+            raspberry_pi.save()
+            return raspberry_pi.proxy_delay
+
+        response_seconds = response.elapsed.total_seconds()
+        raspberry_pi.proxy_delay = response_seconds
+        raspberry_pi.save()
+        return raspberry_pi.proxy_delay
 
     def get_ec2_instance(self) -> typing.Optional[EC2Instance]:
         lead = self.get_lead()
