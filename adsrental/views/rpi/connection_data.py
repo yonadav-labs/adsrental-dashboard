@@ -2,6 +2,7 @@ from django.views import View
 from django.http import JsonResponse, HttpRequest
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead_account import LeadAccount
 
 
 class ConnectionDataView(View):
@@ -27,14 +28,14 @@ class ConnectionDataView(View):
                 'result': False,
             })
 
-        # active_accounts_count = lead.lead_accounts.filter(status__in=LeadAccount.STATUSES_ACTIVE).count()
-        # if not active_accounts_count:
-        #     return JsonResponse({
-        #         'error': 'Not available',
-        #         # 'shutdown': True,
-        #         'hostname': '',
-        #         'result': False,
-        #     })
+        active_accounts_count = lead.lead_accounts.filter(status__in=LeadAccount.STATUSES_ACTIVE).count()
+        if not active_accounts_count:
+            return JsonResponse({
+                'error': 'Not available',
+                # 'shutdown': True,
+                'hostname': '',
+                'result': False,
+            })
 
         if not raspberry_pi.is_proxy_tunnel:
             ec2_instance = raspberry_pi.get_ec2_instance()
