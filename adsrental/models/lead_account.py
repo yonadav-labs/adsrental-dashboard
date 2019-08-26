@@ -444,45 +444,34 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
         'Change password, marks as correct, create LeadChange instance.'
         old_value = self.password
         self.password = new_password
-        user_email = edited_by.email if edited_by else 'user'
         if self.wrong_password_date:
             self.wrong_password_date = None
             if edited_by and not edited_by.is_superuser:
                 self.wrong_password_change_counter = self.wrong_password_change_counter + 1
 
             self.add_comment(f'Wrong password fixed', edited_by)
-            # self.insert_note(f'Wrong password fixed by {user_email}')
-            # self.save()
             LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_WRONG_PASSWORD_FIX, value=new_password, old_value=old_value, edited_by=edited_by).save()
             return
 
         self.add_comment(f'Password changed', edited_by)
-        # self.insert_note(f'Password changed by {user_email}')
-        # self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_PASSWORD, value=new_password, old_value=old_value, edited_by=edited_by).save()
 
     def mark_wrong_password(self, edited_by: User) -> None:
         old_value = 'True' if self.wrong_password_date else 'False'
         self.wrong_password_date = timezone.now()
         self.add_comment(f'Wrong password reported', edited_by)
-        # self.insert_note(f'Wrong password reported by {edited_by.email}')
-        # self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_WRONG_PASSWORD, value='True', old_value=old_value, edited_by=edited_by).save()
 
     def mark_security_checkpoint(self, edited_by: User) -> None:
         old_value = 'True' if self.security_checkpoint_date else 'False'
         self.security_checkpoint_date = timezone.now()
         self.add_comment(f'Security checkpoint reported', edited_by)
-        # self.insert_note(f'Security checkpoint reported by {edited_by.email}')
-        # self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_SECURITY_CHECKPOINT, value='True', old_value=old_value, edited_by=edited_by).save()
 
     def resolve_security_checkpoint(self, edited_by: User) -> None:
         old_value = 'True' if self.security_checkpoint_date else 'False'
         self.security_checkpoint_date = None
         self.add_comment(f'Security checkpoint reported as resolved', edited_by)
-        # self.insert_note(f'Security checkpoint reported as resolved by {edited_by.email}')
-        # self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_SECURITY_CHECKPOINT, value='False', old_value=old_value, edited_by=edited_by).save()
 
     def generate_payments(self):
@@ -563,12 +552,10 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
         self.status = value
 
         self.add_comment(f'Status changed from {old_value} to {self.status}', edited_by)
-        # self.insert_note(f'Status changed from {old_value} to {self.status} by {edited_by.email if edited_by else edited_by}')
 
         if self.status in (self.STATUS_IN_PROGRESS, self.STATUS_BANNED):
             self.generate_payments()
             self.add_comment(f'Bundler payments generated', edited_by)
-            # self.insert_note(f'Bundler payments generated')
 
         self.save()
         LeadChange(lead=self.lead, lead_account=self, field=LeadChange.FIELD_STATUS, value=value, old_value=old_value, edited_by=edited_by).save()
@@ -623,8 +610,6 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
         if result:
             self.disqualified_date = timezone.now()
             self.add_comment('Disqualified', edited_by)
-            # self.insert_note('Disqualified')
-            # self.save()
             if not LeadAccount.get_active_lead_accounts(self.lead):
                 self.lead.disqualify(edited_by)
         return result
@@ -638,7 +623,6 @@ class LeadAccount(models.Model, FulltextSearchMixin, CommentsMixin):
             if not self.qualified_date:
                 self.qualified_date = timezone.now()
                 self.add_comment('Qualified', edited_by)
-                # self.insert_note('Qualified')
             self.save()
 
         return result

@@ -166,7 +166,6 @@ class LeadAccountIssue(models.Model, CommentsMixin):
 
         self.status = self.STATUS_VERIFIED
         self.add_comment(f'Resolved by {self.get_user_note_email(edited_by)}', edited_by)
-        # self.insert_note(f'Resolved by {self.get_user_note_email(edited_by)}')
 
     def reject(self, edited_by):
         if not self.can_be_resolved():
@@ -174,7 +173,6 @@ class LeadAccountIssue(models.Model, CommentsMixin):
 
         self.status = self.STATUS_REJECTED
         self.add_comment(f'Rejected by {self.get_user_note_email(edited_by)}', edited_by)
-        # self.insert_note(f'Rejected by {self.get_user_note_email(edited_by)}')
 
     def submit(self, value, edited_by):
         if not self.can_be_fixed():
@@ -183,7 +181,6 @@ class LeadAccountIssue(models.Model, CommentsMixin):
         self.status = self.STATUS_SUBMITTED
         self.new_value = value
         self.add_comment(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}', edited_by)
-        # self.insert_note(f'Fix submitted by {self.get_user_note_email(edited_by)} with value {value}')
 
     def is_value_needed(self):
         return self.issue_type in [

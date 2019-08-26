@@ -145,7 +145,13 @@ disable=print-statement,
         missing-docstring,
         invalid-name,
         no-self-use,
-        logging-fstring-interpolation
+        logging-fstring-interpolation,
+        too-many-locals,
+        too-many-return-statements,
+        too-few-public-methods,
+        too-many-public-methods,
+        too-many-instance-attributes,
+        duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
