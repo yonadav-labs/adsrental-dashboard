@@ -11,7 +11,8 @@ from adsrental.models.lead_history_month import LeadHistoryMonth
 las = LeadAccount.objects.filter(in_progress_date__gte=datetime.date(2018, 8, 1)).select_related('lead', 'lead__raspberry_pi', 'lead__bundler')
 
 
-def format_date(x): return x.strftime('%Y-%m-%d') if x else 'n/a'
+def format_date(x):
+    return x.strftime('%Y-%m-%d') if x else 'n/a'
 
 
 with open('/app/app_log/report.csv', 'w', newline='') as csvfile:
