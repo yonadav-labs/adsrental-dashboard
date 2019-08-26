@@ -56,7 +56,7 @@ class Command(BaseCommand):
         limit = int(options['limit'])
         fix_dead = bool(options['fix'])
         proxykeeper_ips = options['proxykeeper']
-        raspberry_pis = RaspberryPi.get_objects_online()
+        raspberry_pis = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True)
         raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
 
         if proxykeeper_ips:
