@@ -6,7 +6,6 @@ from typing import Tuple, Text
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.conf import settings
 from django.db.models import Q
 
 from adsrental.models.raspberry_pi import RaspberryPi
@@ -42,6 +41,7 @@ class Command(BaseCommand):
         parser.add_argument('--limit', type=int, default=100)
         parser.add_argument('-p', '--proxykeeper', type=proxykeeper_ip, nargs='*', default=[])
         parser.add_argument('--fix', action='store_true')
+        parser.add_argument('--restart', action='store_true')
 
     def runner(self, raspberry_pi: RaspberryPi) -> Tuple[RaspberryPi, float, datetime.datetime]:
         now = timezone.localtime(timezone.now())
@@ -56,6 +56,7 @@ class Command(BaseCommand):
         threads = int(options['threads'])
         limit = int(options['limit'])
         fix_dead = bool(options['fix'])
+        restart_dead = bool(options['restart'])
         proxykeeper_ips = options['proxykeeper']
         raspberry_pis = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True, lead__has_active_accounts=True, lead__status__in=Lead.STATUSES_ACTIVE)
         raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
@@ -78,5 +79,10 @@ class Command(BaseCommand):
                 raspberry_pi.reassign_proxy()
                 self.logger.info(f'{raspberry_pi} switched to {raspberry_pi.get_proxy_hostname_display()}')
 
+            if restart_dead and proxy_delay > 800.0 and not raspberry_pi.restart_required:
+                raspberry_pi.reset_cache()
+                raspberry_pi.restart_required = True
+                raspberry_pi.save()
+                self.logger.info(f'{raspberry_pi} will restart shortly')
             raspberry_pi.save()
         self.logger.info(f'Done')

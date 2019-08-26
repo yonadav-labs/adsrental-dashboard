@@ -1,13 +1,4 @@
-
-
-from multiprocessing.pool import ThreadPool
-import datetime
-import logging
-import argparse
-
 from django.core.management.base import BaseCommand
-from django.utils import timezone
-from django.conf import settings
 
 from adsrental.models.lead_account import LeadAccount
 from adsrental.models.lead_account_issue import LeadAccountIssue
