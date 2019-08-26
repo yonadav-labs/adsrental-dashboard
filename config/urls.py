@@ -1,7 +1,7 @@
 from django.urls import include, path
 from django.contrib import admin
-from django.conf.urls import handler404, handler500  # pylint: disable=W0611
 import debug_toolbar
+from adsrental.views.errors import handler404, handler500, error_view  # pylint: disable=W0611
 
 admin.site.site_header = 'Adsrental Administration'
 
@@ -14,4 +14,5 @@ urlpatterns = [
     path('app/', include(('adsrental.urls', 'adsrental'), namespace='old_schema')),
     path('__debug__/', include(debug_toolbar.urls)),
     path('api/v1/', include('restapi.urls')),
+    path('error/', error_view),
 ]
