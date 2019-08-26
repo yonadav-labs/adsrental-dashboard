@@ -2,7 +2,7 @@ from multiprocessing.pool import ThreadPool
 import datetime
 import logging
 import argparse
-from typing import Tuple
+from typing import Tuple, Text
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -10,6 +10,14 @@ from django.conf import settings
 from django.db.models import Q
 
 from adsrental.models.raspberry_pi import RaspberryPi
+
+
+def proxykeeper_ip(proxykeeper: Text) -> Text:
+    for ip, name in RaspberryPi.PROXY_HOSTNAME_CHOICES:
+        if proxykeeper.lower() == name.lower():
+            return ip
+
+    raise argparse.ArgumentTypeError(f'Unknown proxykeeper name: {proxykeeper}')
 
 
 class Command(BaseCommand):
@@ -31,6 +39,7 @@ class Command(BaseCommand):
         parser.add_argument('--min-delay', type=int, default=0)
         parser.add_argument('--threads', type=int, default=10)
         parser.add_argument('--limit', type=int, default=100)
+        parser.add_argument('-p', '--proxykeeper', type=proxykeeper_ip, nargs='*', default=[])
         parser.add_argument('--fix', action='store_true')
 
     def runner(self, raspberry_pi: RaspberryPi) -> Tuple[RaspberryPi, float, datetime.datetime]:
@@ -46,10 +55,16 @@ class Command(BaseCommand):
         threads = int(options['threads'])
         limit = int(options['limit'])
         fix_dead = bool(options['fix'])
+        proxykeeper_ips = options['proxykeeper']
         raspberry_pis = RaspberryPi.get_objects_online()
         raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
+
+        if proxykeeper_ips:
+            raspberry_pis = raspberry_pis.filter(proxy_hostname__in=proxykeeper_ips)
+
         raspberry_pis = raspberry_pis.order_by('proxy_delay_datetime')
-        raspberry_pis_limited = raspberry_pis[:limit]
+
+        raspberry_pis_limited = raspberry_pis[: limit]
         self.logger.info(f'Total {raspberry_pis.count()}, limited to {raspberry_pis_limited.count()}')
 
         pool = ThreadPool(processes=threads)
