@@ -1,9 +1,7 @@
-from django.shortcuts import redirect
-
 from adsrental.slack_bot import SlackBot
 
 
-def slack_new_issue(sender, instance, created, **kwargs):
+def slack_new_issue(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     if created:
         if instance.issue_type in [instance.ISSUE_TYPE_WRONG_PASSWORD, instance.ISSUE_TYPE_SECURITY_CHECKPOINT]:
             to = instance.lead_account.lead.bundler.slack_tag
@@ -39,7 +37,7 @@ def slack_auto_ban_warning(lead_account, reason, days_diff):
         slack.send_message(to, message)
 
 
-def slack_offline_warning(lead_account, reason=None):
+def slack_offline_warning(lead_account):
     to = lead_account.lead.bundler.slack_tag
     if to:
         slack = SlackBot()
