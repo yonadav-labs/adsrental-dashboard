@@ -31,6 +31,9 @@ php/uploads/photo_ids/*
 media/*
 !media/placeholder.txt
 
+nginx_log/*
+!nginx_log/placeholder.txt
+
 dump_*
 
 .mypy_cache

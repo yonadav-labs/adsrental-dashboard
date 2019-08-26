@@ -21,6 +21,13 @@ ADD ./restapi/ /app/restapi/
 ADD ./config/nginx/web.conf /etc/nginx/conf.d/nginx.conf
 ADD ./config/nginx/nginx.conf /app/nginx.conf
 
+RUN ln -sf /app/scripts/prestart.sh /app/prestart.sh
+ENV UWSGI_CHEAPER 4
+ENV UWSGI_PROCESSES 64
+ENV NGINX_MAX_UPLOAD 1m
+ENV NGINX_WORKER_PROCESSES auto
+ENV NGINX_WORKER_CONNECTIONS 8096
+ENV NGINX_WORKER_OPEN_FILES 2048
+
 EXPOSE 80
 EXPOSE 443
-# CMD ["/app/scripts/server.sh"]

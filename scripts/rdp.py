@@ -3,7 +3,7 @@ import os
 import argparse
 from pathlib import Path
 import base64
-import pymysql
+import MySQLdb
 
 import boto3
 from Crypto.Cipher import DES3
@@ -53,7 +53,7 @@ args = parser.parse_args()
 instance_id = None
 
 if args.id:
-    conn = pymysql.connect(host='localhost', port=23306, user='root', db='adsrental')
+    conn = MySQLdb.connect(host='localhost', port=23306, user='root', db='adsrental')
     cursor = conn.cursor()
     cursor.execute("SELECT rpid, password, instance_id FROM adsrental_ec2instance where id='{}'".format(args.id))
     for row in cursor:
@@ -62,7 +62,7 @@ if args.id:
         instance_id = row[2]
 
 if not args.password:
-    conn = pymysql.connect(host='localhost', port=23306, user='root', db='adsrental')
+    conn = MySQLdb.connect(host='localhost', port=23306, user='root', db='adsrental')
     cursor = conn.cursor()
     cursor.execute("SELECT password FROM adsrental_ec2instance where rpid='{}'".format(args.rpid))
     for row in cursor:

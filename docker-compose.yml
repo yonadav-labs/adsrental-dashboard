@@ -13,7 +13,6 @@ services:
       - "23306:3306"
   web:
     build: .
-    command: /app/scripts/runserver.sh
     privileged: true
     environment:
       ENV: local
@@ -30,6 +29,7 @@ services:
       - ./scripts/:/app/scripts/
       - ./log/:/app/log/
       - ./app_log/:/app/app_log/
+      - ./nginx_log/:/var/log/nginx/
       - ./media/:/app/media/
     ports:
       - "8443:80"

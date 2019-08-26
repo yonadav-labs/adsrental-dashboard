@@ -15,7 +15,6 @@ services:
   web:
     restart: on-failure
     build: .
-    command: /app/scripts/server.sh
     privileged: true
     environment:
       ENV: prod
@@ -30,6 +29,7 @@ services:
       - /mnt/volume-nyc3-01/log/:/app/log/
       - /mnt/volume-nyc3-01/app_log/:/app/app_log/
       - /mnt/volume-nyc3-01/media/:/app/media/
+      - /mnt/volume-nyc3-01/nginx_log/:/var/log/nginx/
     depends_on:
       - db
       - redis

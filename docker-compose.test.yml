@@ -13,7 +13,6 @@ services:
       - "23306:3306"
   web:
     build: .
-    command: /app/scripts/runserver.sh
     privileged: true
     environment:
       ENV: test
