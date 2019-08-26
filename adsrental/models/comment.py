@@ -21,22 +21,22 @@ class Comment(models.Model):
     content_object = GenericForeignKey()
 
     def __str__(self):
-        if self.user:
-            if self.user.is_superuser:
-                return 'Admin'
-            else:
-                return f'{self.user.first_name} {self.user.last_name}'
-        else:
+        if not self.user:
             return 'User'
 
+        if self.user.is_superuser:
+            return 'Admin'
+
+        return f'{self.user.first_name} {self.user.last_name}'
+
     def get_username(self):
-        if self.user:
-            if self.user.is_superuser:
-                return 'Admin'
-            else:
-                return f'{self.user.first_name} {self.user.last_name}'
-        else:
+        if not self.user:
             return 'User'
+
+        if self.user.is_superuser:
+            return 'Admin'
+
+        return f'{self.user.first_name} {self.user.last_name}'
 
 
 class CommentImage(models.Model):

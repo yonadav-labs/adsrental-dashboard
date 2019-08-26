@@ -11,8 +11,8 @@ import requests
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
-from django_bulk_update.manager import BulkUpdateManager
 from django.contrib.contenttypes.fields import GenericRelation
+from django_bulk_update.manager import BulkUpdateManager
 
 from adsrental.models.raspberry_pi import RaspberryPi
 from adsrental.models.lead_change import LeadChange

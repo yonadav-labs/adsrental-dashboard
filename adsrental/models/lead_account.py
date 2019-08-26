@@ -10,8 +10,8 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 from django.utils import dateformat
-from django_bulk_update.query import BulkUpdateQuerySet
 from django.contrib.contenttypes.fields import GenericRelation
+from django_bulk_update.query import BulkUpdateQuerySet
 
 from adsrental.models.mixins import FulltextSearchMixin, CommentsMixin
 from adsrental.models.raspberry_pi import RaspberryPi
