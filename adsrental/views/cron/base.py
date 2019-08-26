@@ -32,11 +32,11 @@ class CronView(View):
         return super(CronView, self).dispatch(request, *args, **kwargs)
 
     def is_execute(self):
-        return True if self._request.GET.get('execute', '') == 'true' else False
+        return self._request.GET.get('execute', '') == 'true'
 
     def get_datetime(self):
         date_str = self._request.GET.get('date')
         if date_str:
             return parser.parse(date_str).replace(tzinfo=timezone.get_current_timezone())
-        else:
-            return timezone.localtime(timezone.now())
+
+        return timezone.localtime(timezone.now())

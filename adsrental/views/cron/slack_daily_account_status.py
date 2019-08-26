@@ -7,7 +7,7 @@ from adsrental.models.lead_account_issue import LeadAccountIssue
 class DailyAccountStatusView(View):
 
     def get(self, request):
-        for issue_type in [LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD, 
+        for issue_type in [LeadAccountIssue.ISSUE_TYPE_WRONG_PASSWORD,
                            LeadAccountIssue.ISSUE_TYPE_SECURITY_CHECKPOINT,
                            LeadAccountIssue.ISSUE_TYPE_CONNECTION_ISSUE,
                            LeadAccountIssue.ISSUE_TYPE_OFFLINE]:
@@ -15,7 +15,7 @@ class DailyAccountStatusView(View):
                                              .filter(status__in=[LeadAccountIssue.STATUS_REPORTED,
                                                                  LeadAccountIssue.STATUS_SUBMITTED,
                                                                  LeadAccountIssue.STATUS_REJECTED]) \
-                                             .order_by(lead_account_id) \
+                                             .order_by('lead_account__id') \
                                              .exclude(lead_account__lead__bundler__slack_tag__isnull=True) \
                                              .exclude(lead_account__lead__bundler__slack_tag__exact='')
 

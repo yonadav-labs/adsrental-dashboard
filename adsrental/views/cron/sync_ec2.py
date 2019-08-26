@@ -2,7 +2,6 @@ from django.views import View
 from django.http import JsonResponse
 
 from adsrental.models.ec2_instance import EC2Instance
-from adsrental.models.lead import Lead
 from adsrental.utils import BotoResource
 
 

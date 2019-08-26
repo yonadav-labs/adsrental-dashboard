@@ -29,8 +29,8 @@ class BundlerLeaderboardView(View):
 
         top_bundlers_ids_list = BundlerLeadStat.objects.all().exclude(bundler_id=bundler.id).order_by('-in_progress_total').values_list('bundler_id')
         bundler_ids = [bundler.id, ]
-        for bundler_id in top_bundlers_ids_list:
-            bundler_ids.append(bundler_id)
+        for b_id in top_bundlers_ids_list:
+            bundler_ids.append(b_id)
 
         current_bundler_lead_stat = BundlerLeadStat.objects.filter(bundler=bundler).first()
         current_rank = None

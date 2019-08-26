@@ -60,7 +60,7 @@ class LandingWithUrlTagView(LandingView):
     template_name = 'landing_v2/index.html'
 
     @https_required
-    def get(self, request, url_tag):
+    def get(self, request, url_tag):  # pylint: disable=arguments-differ
         bundler = Bundler.objects.filter(url_tag=url_tag, is_active=True).first()
         if not url_tag or not bundler:
             if request.user.is_authenticated:
