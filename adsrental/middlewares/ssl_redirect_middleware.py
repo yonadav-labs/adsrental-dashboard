@@ -19,6 +19,8 @@ class SSLRedirectMiddleware:
         if response_is_secure != self._request_is_secure(request):
             return self._redirect(request, response_is_secure)
 
+        return None
+
     def _response_is_secure(self, request: HttpRequest, view_func: View, view_args: typing.List[str], view_kwargs: typing.Dict[str, str]) -> bool:
         if not SSL_ON:
             return False

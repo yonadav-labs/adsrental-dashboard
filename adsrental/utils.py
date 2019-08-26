@@ -114,6 +114,8 @@ class CustomerIOClient():
                 if retries >= 3:
                     raise
 
+        return None
+
     def is_enabled(self) -> bool:
         'Check if client is initialized.'
         return self.client is not None
