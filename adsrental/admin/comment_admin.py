@@ -3,6 +3,7 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 
 from adsrental.models.comment import Comment, CommentImage
 
+
 class CommentImageInline(admin.TabularInline):
     model = CommentImage
     # extra = 3
@@ -10,7 +11,7 @@ class CommentImageInline(admin.TabularInline):
 
 class CommentAdmin(admin.ModelAdmin):
     model = Comment
-    inlines = [ CommentImageInline, ]
+    inlines = [CommentImageInline, ]
 
 
 class CommentInline(GenericTabularInline):

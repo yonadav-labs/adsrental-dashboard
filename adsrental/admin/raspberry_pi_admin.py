@@ -133,10 +133,14 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
             now = timezone.now()
             return int((now - obj.online_since_date).total_seconds() / 3600 / 24)
 
+        return 0
+
     def days_offline(self, obj):
         if obj.last_seen:
             now = timezone.now()
             return int((now - obj.last_seen).total_seconds() / 3600 / 24)
+
+        return 0
 
     def proxy_delay_field(self, obj):
         if obj.proxy_delay is None:
@@ -147,8 +151,8 @@ class RaspberryPiAdmin(admin.ModelAdmin, CSVExporter):
             return f'Slow ({round(obj.proxy_delay, 2)}s)'
         if obj.proxy_delay < 900.0:
             return 'Unusable'
-        if obj.proxy_delay < 1000.0:
-            return 'Unreachable'
+
+        return 'Unreachable'
 
     def ec2_instance_link(self, obj):
         ec2_instance = obj.get_ec2_instance()

@@ -1,5 +1,4 @@
 import unicodecsv as csv
-from dateutil import parser
 
 from django.contrib import admin
 from django.utils import timezone
@@ -7,7 +6,7 @@ from django.db.models.sql.where import WhereNode
 from django.http import HttpResponse
 
 
-class EverythingNode(object):
+class EverythingNode:
     pass
 
 

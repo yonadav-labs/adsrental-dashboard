@@ -204,6 +204,8 @@ class LastTouchDateListFilter(SimpleListFilter):
                 f'{self.field_name}__isnull': True,
             })
 
+        return queryset
+
 
 class AbstractDateListFilter(SimpleListFilter):
     title = 'Date'
@@ -848,7 +850,7 @@ class AbstractUIDListFilter(SimpleListFilter):
 
     def choices(self, changelist):
         # Grab only the "all" option.
-        all_choice = next(super().choices(changelist))
+        all_choice = next(super().choices(changelist))  # pylint: disable=stop-iteration-return
         all_choice['query_parts'] = (
             (k, v)
             for k, v in changelist.get_filters_params().items()
@@ -873,8 +875,8 @@ class AbstractIntIDListFilter(AbstractUIDListFilter):
                 return queryset.filter(**{
                     self.parameter_name: value,
                 })
-            else:
-                return queryset.none()
+
+            return queryset.none()
         return None
 
 
@@ -988,14 +990,14 @@ class ReportedByListFilter(SimpleListFilter):
             return queryset.filter(
                 reporter__first_name='VA',
             )
-        elif self.value() == 'admin':
+        if self.value() == 'admin':
             return queryset.filter(
                 reporter__is_superuser=True
             )
-        elif self.value() == 'buyer':
+        if self.value() == 'buyer':
             ids = [ii.id for ii in queryset if ii.reporter and ii.reporter.groups.filter(name='Buyer').exists()]
             return queryset.filter(id__in=ids)
-        elif self.value() == 'bundler':
+        if self.value() == 'bundler':
             ids = [ii.id for ii in queryset if ii.reporter and ii.reporter.groups.filter(name='Bundler').exists()]
             return queryset.filter(id__in=ids)
         return queryset

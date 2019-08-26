@@ -29,7 +29,6 @@ from adsrental.admin.list_filters import \
     AbstractFulltextFilter, \
     LeadAccountSecurityCheckpointListFilter, \
     titled_filter
-from adsrental.admin.comment_admin import CommentInline
 
 
 class LeadidListFilter(AbstractUIDListFilter):
@@ -374,10 +373,14 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             now = timezone.now()
             return int((now - obj.raspberry_pi.online_since_date).total_seconds() / 3600 / 24)
 
+        return 0
+
     def days_offline(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.last_seen:
             now = timezone.now()
             return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
+
+        return 0
 
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:

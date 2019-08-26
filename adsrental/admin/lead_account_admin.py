@@ -23,7 +23,6 @@ from adsrental.admin.list_filters import TouchCountListFilter, AccountTypeListFi
     AbstractDateListFilter, StatusListFilter, BannedDateListFilter, LeadRaspberryPiOnlineListFilter, \
     LeadBundlerListFilter, SecurityCheckpointListFilter, AutoBanListFilter, LastTouchDateListFilter, \
     LeadDeliveryDateListFilter, DeliveredLastTwoDaysListFilter, titled_filter
-from adsrental.admin.comment_admin import CommentInline
 
 
 class QualifiedDateListFilter(AbstractDateListFilter):
