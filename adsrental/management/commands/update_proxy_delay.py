@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from adsrental.models.raspberry_pi import RaspberryPi
+from adsrental.models.lead import Lead
 
 
 def proxykeeper_ip(proxykeeper: Text) -> Text:
@@ -56,7 +57,7 @@ class Command(BaseCommand):
         limit = int(options['limit'])
         fix_dead = bool(options['fix'])
         proxykeeper_ips = options['proxykeeper']
-        raspberry_pis = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True, lead__has_active_accounts=True)
+        raspberry_pis = RaspberryPi.get_objects_online().filter(is_proxy_tunnel=True, lead__has_active_accounts=True, lead__status__in=Lead.STATUSES_ACTIVE)
         raspberry_pis = raspberry_pis.filter(Q(proxy_delay__gte=min_delay) | Q(proxy_delay__isnull=True))
 
         if proxykeeper_ips:
