@@ -184,6 +184,7 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
     isp = models.CharField(max_length=255, blank=True, null=True, help_text='Internet Service Provider')
     splashtop_id = models.CharField(max_length=255, blank=True, null=True, help_text='Splashtop ID reported by user.')
     tracking_info = models.TextField(blank=True, null=True, help_text='Raw response from secure.shippingapis.com')
+    has_active_accounts = models.BooleanField(default=True, help_text='Lead has active lead accounts.')
     pi_sent = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
