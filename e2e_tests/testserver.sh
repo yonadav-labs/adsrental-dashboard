@@ -6,7 +6,7 @@ cd $ROOT_PATH
 # echo "=== Starting server ==="
 docker-compose -f docker-compose.test.yml up -d --build web
 
-./scripts/wait-for-it.sh localhost:23306
+wait-for-it --service localhost:23306
 
 echo "=== Installing test DB ==="
 mysql -u root -h 0.0.0.0 -P 23306 -e 'drop database if exists adsrental_test;'
