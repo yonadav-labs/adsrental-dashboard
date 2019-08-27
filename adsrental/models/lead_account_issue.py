@@ -124,6 +124,9 @@ class LeadAccountIssue(models.Model, CommentsMixin):
         if not user:
             return 'user'
 
+        if not hasattr(user, 'email'):
+            return 'user'
+
         if user.is_superuser:
             return 'admin'
 
