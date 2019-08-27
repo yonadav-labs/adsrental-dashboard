@@ -47,10 +47,9 @@ class FixLeadAccountIssueView(View):
             ))
 
         if lead_account_issue.can_be_fixed():
-            user = request.user if request.user.is_authenticated else None
-            lead_account_issue.submit(form.cleaned_data.get('new_value', ''), user)
+            lead_account_issue.submit(form.cleaned_data.get('new_value', ''), request.user)
             if form.cleaned_data.get('note'):
-                lead_account_issue.add_comment(f"Fix note: {form.cleaned_data['note']}", user)
+                lead_account_issue.add_comment(f"Fix note: {form.cleaned_data['note']}", request.user)
                 # lead_account_issue.insert_note(f"Fix note: {form.cleaned_data['note']}")
             lead_account_issue.save()
 
