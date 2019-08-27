@@ -90,6 +90,9 @@ class CommentsMixin():
 
     def add_comment(self, message, user=None):
         'Add a comment to the model'
-        self.comments.create(user=user, text=message)
+        comment_user = None
+        if user and user.is_authenticated:
+            comment_user = user
+        self.comments.create(user=comment_user, text=message)
         self.comments_cache = json.dumps(self.get_comments_cache())
         self.save()
