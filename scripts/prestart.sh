@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 ROOT_PATH="/app/"
 cd $ROOT_PATH
 

@@ -13,6 +13,8 @@ services:
       - "23306:3306"
   web:
     build: .
+    sysctls:
+      net.core.somaxconn: 65536
     privileged: true
     environment:
       ENV: local
