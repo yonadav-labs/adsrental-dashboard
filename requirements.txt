@@ -16,7 +16,7 @@ django-recaptcha2==1.4.1
 django-redis==4.10.0
 django-smtp-ssl==1.0
 django-storages==1.7.1
-django==2.2.4
+django==2.2.13
 djangorestframework==3.10.2
 ipython==7.7.0
 markdown==3.1.1
