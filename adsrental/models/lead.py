@@ -331,6 +331,7 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
         self.shipstation_order_status = None
         self.usps_tracking_code = None
         self.pi_delivered = False
+        self.delivery_date = None
         now = timezone.localtime(timezone.now())
         extra_note = 'Prepared for reshipment by {} on {}'.format(
             edited_by,
@@ -516,6 +517,12 @@ class Lead(models.Model, FulltextSearchMixin, CommentsMixin):
     def get_qualified_date(self) -> typing.Optional[datetime.datetime]:
         for lead_account in self.lead_accounts.all():
             return lead_account.qualified_date
+
+        return None
+
+    def get_disqualified_date(self) -> typing.Optional[datetime.datetime]:
+        for lead_account in self.lead_accounts.all():
+            return lead_account.disqualified_date
 
         return None
 

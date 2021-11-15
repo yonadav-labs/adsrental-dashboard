@@ -72,23 +72,32 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'status',
         'email_field',
         'phone_field',
+        'street',
+        'city',
+        'state',
+        'postal_code',
         'bundler',
-        'accounts_field',
+        'accounts',
         'raspberry_pi',
-        'tested_field',
-        'usps_field',
-        'first_seen',
-        'last_seen',
+        'tested',
+        'usps_export',
+        'first_seen_export',
+        'last_seen_export',
         'online',
         'ec2instance',
         'touch_count_field',
         'ip_address',
         'wrong_password_field',
-        'security_checkpoint_field',
-        'fix_button',
+        'days_online',
+        'days_offline',
         'sync_with_adsdb_field',
         'facebook_billed',
         'google_billed',
+        'get_qualified_date',
+        'get_disqualified_date',
+        'issues_reported',
+        'issues_reported_dates',
+        'created'
     )
 
     csv_titles = (
@@ -97,6 +106,10 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'Status',
         'Email',
         'Phone',
+        'Address',
+        'City',
+        'State',
+        'ZIP',
         'Bundler',
         'Accounts',
         'Raspberry Pi',
@@ -109,11 +122,16 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
         'Touch Count',
         'Ip Address',
         'Wrong Password',
-        'Security Checkpoint',
-        'Fix Button',
+        'Days Online',
+        'Days Offline',
         'Sync With Adsdb',
         'Facebook Billed',
         'Google Billed',
+        'Qualified date',
+        'Disqualified date',
+        'Issues reported',
+        'Issues reported dates',
+        'Created'
     )
 
     class Media:
@@ -276,6 +294,21 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             obj.get_shipstation_order_status_display(),
         ))
 
+    def usps_export(self, obj):
+        if obj.pi_delivered:
+            return '{} - {}'.format(
+                html.escape(obj.usps_tracking_code or 'n/a'),
+                'Delivered',
+            )
+
+        if not obj.shipstation_order_status:
+            return None
+
+        return '{} - {}'.format(
+            html.escape(obj.usps_tracking_code or 'n/a'),
+            obj.get_shipstation_order_status_display(),
+        )
+
     def status_field(self, obj):
         title = 'Show changes'
         return mark_safe('<a href="{url}?lead__leadid={q}" title="{title}">{status}</a>'.format(
@@ -336,11 +369,27 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
     def online(self, obj):
         return obj.raspberry_pi.online() if obj.raspberry_pi else False
 
+    def days_online(self, obj):
+        if obj.raspberry_pi and obj.raspberry_pi.online_since_date:
+            now = timezone.now()
+            return int((now - obj.raspberry_pi.online_since_date).total_seconds() / 3600 / 24)
+
+    def days_offline(self, obj):
+        if obj.raspberry_pi and obj.raspberry_pi.last_seen:
+            now = timezone.now()
+            return int((now - obj.raspberry_pi.last_seen).total_seconds() / 3600 / 24)
+
     def tested_field(self, obj):
         if obj.raspberry_pi and obj.raspberry_pi.first_tested:
             return mark_safe('<img src="/static/admin/img/icon-yes.svg" title="{}" alt="True">'.format(
                 naturaltime(obj.raspberry_pi.first_tested),
             ))
+
+        return None
+
+    def tested(self, obj):
+        if obj.raspberry_pi and obj.raspberry_pi.first_tested:
+            return naturaltime(obj.raspberry_pi.first_tested)
 
         return None
 
@@ -350,6 +399,13 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
 
         first_seen = obj.raspberry_pi.get_first_seen()
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(first_seen, first_seen.strftime(settings.HUMAN_DATE_FORMAT)))
+
+    def first_seen_export(self, obj):
+        if obj.raspberry_pi is None or obj.raspberry_pi.first_seen is None:
+            return None
+
+        first_seen = obj.raspberry_pi.get_first_seen()
+        return first_seen.strftime(settings.HUMAN_DATE_FORMAT)
 
     def last_seen(self, obj):
         raspberry_pi = obj.raspberry_pi
@@ -361,6 +417,17 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             return None
 
         return mark_safe(u'<span class="has_note" title="{}">{}</span>'.format(last_seen, naturaltime(last_seen)))
+
+    def last_seen_export(self, obj):
+        raspberry_pi = obj.raspberry_pi
+        if not raspberry_pi:
+            return None
+
+        last_seen = raspberry_pi.get_last_seen()
+        if not last_seen:
+            return None
+
+        return naturaltime(last_seen)
 
     def wrong_password_field(self, obj):
         for lead_account in obj.lead_accounts.all():
@@ -460,6 +527,36 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
             ))
 
         return mark_safe(', '.join(result))
+
+    def accounts(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            result.append('{type} {username} ({status})'.format(
+                type=lead_account.get_account_type_display(),
+                username=lead_account.username,
+                status=lead_account.status,
+            ))
+        return '\n'.join(result)
+
+    def issues_reported(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            for issue in lead_account.issues.all():
+                result.append('{type} {username} - ({issue_type}) ({reporter}) ({elapsed})'.format(
+                    type=lead_account.get_account_type_display(),
+                    username=lead_account.username,
+                    issue_type=issue.issue_type,
+                    reporter=str(issue.reporter),
+                    elapsed=naturaltime(issue.created)
+                ))
+        return '\n'.join(result)
+
+    def issues_reported_dates(self, obj):
+        result = []
+        for lead_account in obj.lead_accounts.all():
+            for issue in lead_account.issues.all():
+                result.append(issue.created.strftime(settings.SYSTEM_DATETIME_FORMAT))
+        return '\n'.join(result)
 
     def sync_with_adsdb_field(self, obj):
         for lead_account in obj.lead_accounts.all():
@@ -634,7 +731,7 @@ class LeadAdmin(admin.ModelAdmin, CSVExporter):
     def restart_raspberry_pi(self, request, queryset):
         for lead in queryset:
             if not lead.raspberry_pi:
-                messages.warning(request, 'Lead {} does not haave RaspberryPi assigned, skipping'.format(lead.email))
+                messages.warning(request, 'Lead {} does not have RaspberryPi assigned, skipping'.format(lead.email))
                 continue
 
             lead.raspberry_pi.restart_required = True
