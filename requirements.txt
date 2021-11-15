@@ -17,7 +17,7 @@ django-redis==4.10.0
 django-smtp-ssl==1.0
 django-storages==1.7.1
 django==2.1.7
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 ipython==7.3.0
 markdown==3.0.1
 paramiko==2.4.2
